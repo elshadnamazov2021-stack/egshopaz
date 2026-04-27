@@ -89,6 +89,26 @@ function SellerPanel() {
   };
   useEffect(() => { if (user && isSeller) load(); }, [user, isSeller]);
 
+  // Unread messages counter (with realtime)
+  useEffect(() => {
+    if (!user || !isSeller) return;
+    const refreshUnread = () => {
+      supabase
+        .from("shop_messages")
+        .select("*", { count: "exact", head: true })
+        .eq("seller_id", user.id)
+        .eq("sender_role", "buyer")
+        .is("read_at", null)
+        .then(({ count }) => setUnreadMsgs(count ?? 0));
+    };
+    refreshUnread();
+    const ch = supabase
+      .channel(`seller-unread-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "shop_messages", filter: `seller_id=eq.${user.id}` }, refreshUnread)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user, isSeller]);
+
   if (!user || !isSeller) return null;
 
   const totalRevenue = orderItems.reduce((s, i) => s + Number(i.price) * i.quantity, 0);
