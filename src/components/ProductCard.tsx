@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useState } from "react";
+import { useFavorite } from "@/hooks/useFavorite";
 
 export interface ProductCardData {
   id: string;
@@ -20,6 +21,7 @@ export interface ProductCardData {
 export function ProductCard({ p }: { p: ProductCardData }) {
   const { user } = useAuth();
   const [adding, setAdding] = useState(false);
+  const { isFav, toggle: toggleFav } = useFavorite(p.id);
   const discount = calcDiscount(Number(p.price), p.old_price ? Number(p.old_price) : undefined);
 
   const addToCart = async (e: React.MouseEvent) => {
@@ -57,11 +59,11 @@ export function ProductCard({ p }: { p: ProductCardData }) {
           </span>
         )}
         <button
-          onClick={(e) => { e.preventDefault(); toast.success("Sevimlilərə əlavə olundu"); }}
-          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center hover:text-primary transition"
+          onClick={toggleFav}
+          className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center transition ${isFav ? "text-discount" : "hover:text-primary"}`}
           aria-label="Sevimli"
         >
-          <Heart className="h-4 w-4" />
+          <Heart className={`h-4 w-4 ${isFav ? "fill-discount" : ""}`} />
         </button>
       </div>
       <div className="p-3 flex flex-col gap-1.5 flex-1">

@@ -73,6 +73,27 @@ export type Database = {
         }
         Relationships: []
       }
+      favorites: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           id: string
@@ -229,6 +250,12 @@ export type Database = {
           full_name: string | null
           id: string
           phone: string | null
+          shop_address: string | null
+          shop_banner_url: string | null
+          shop_city: string | null
+          shop_description: string | null
+          shop_email: string | null
+          shop_logo_url: string | null
           shop_name: string | null
           updated_at: string
         }
@@ -238,6 +265,12 @@ export type Database = {
           full_name?: string | null
           id: string
           phone?: string | null
+          shop_address?: string | null
+          shop_banner_url?: string | null
+          shop_city?: string | null
+          shop_description?: string | null
+          shop_email?: string | null
+          shop_logo_url?: string | null
           shop_name?: string | null
           updated_at?: string
         }
@@ -247,6 +280,12 @@ export type Database = {
           full_name?: string | null
           id?: string
           phone?: string | null
+          shop_address?: string | null
+          shop_banner_url?: string | null
+          shop_city?: string | null
+          shop_description?: string | null
+          shop_email?: string | null
+          shop_logo_url?: string | null
           shop_name?: string | null
           updated_at?: string
         }

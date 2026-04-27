@@ -3,9 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN } from "@/lib/format";
-import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon } from "lucide-react";
+import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon, LayoutDashboard, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 
 export const Route = createFileRoute("/seller")({
   head: () => ({ meta: [{ title: "Satıcı paneli — One Board Market" }] }),
@@ -23,7 +24,11 @@ interface OrderItem {
   id: string; title: string; price: number; quantity: number;
   image_url: string | null; order_id: string; status: string; product_id: string;
 }
-interface Profile { full_name: string | null; shop_name: string | null; phone: string | null; avatar_url: string | null }
+interface Profile {
+  full_name: string | null; shop_name: string | null; phone: string | null; avatar_url: string | null;
+  shop_description: string | null; shop_logo_url: string | null; shop_banner_url: string | null;
+  shop_address: string | null; shop_city: string | null; shop_email: string | null;
+}
 
 const productSchema = z.object({
   title: z.string().trim().min(2, "Başlıq minimum 2 simvol").max(200),
@@ -69,12 +74,16 @@ function SellerPanel() {
       supabase.from("products").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("categories").select("id,name").order("sort_order"),
       supabase.from("order_items").select("*").eq("seller_id", user.id).order("id", { ascending: false }).limit(100),
-      supabase.from("profiles").select("full_name,shop_name,phone,avatar_url").eq("id", user.id).maybeSingle(),
+      supabase.from("profiles").select("full_name,shop_name,phone,avatar_url,shop_description,shop_logo_url,shop_banner_url,shop_address,shop_city,shop_email").eq("id", user.id).maybeSingle(),
     ]);
     setProducts((ps ?? []) as unknown as Product[]);
     setCategories((cs ?? []) as Category[]);
     setOrderItems((ois ?? []) as unknown as OrderItem[]);
-    setProfile((pr as Profile) ?? { full_name: "", shop_name: "", phone: "", avatar_url: "" });
+    setProfile((pr as Profile) ?? {
+      full_name: "", shop_name: "", phone: "", avatar_url: "",
+      shop_description: "", shop_logo_url: "", shop_banner_url: "",
+      shop_address: "", shop_city: "", shop_email: "",
+    });
   };
   useEffect(() => { if (user && isSeller) load(); }, [user, isSeller]);
 
@@ -185,31 +194,50 @@ function SellerPanel() {
       full_name: profile.full_name?.slice(0, 100) ?? null,
       phone: profile.phone?.slice(0, 20) ?? null,
       avatar_url: profile.avatar_url ?? null,
+      shop_description: profile.shop_description?.slice(0, 1000) ?? null,
+      shop_logo_url: profile.shop_logo_url ?? null,
+      shop_banner_url: profile.shop_banner_url ?? null,
+      shop_address: profile.shop_address?.slice(0, 300) ?? null,
+      shop_city: profile.shop_city?.slice(0, 100) ?? null,
+      shop_email: profile.shop_email?.slice(0, 200) ?? null,
     }, { onConflict: "id" });
     if (error) toast.error(error.message); else toast.success("Mağaza məlumatları yadda saxlanıldı");
     setSavingShop(false);
   };
 
+  const uploadShopImage = async (file: File, field: "shop_logo_url" | "shop_banner_url") => {
+    if (!user || !profile) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Şəkil 5MB-dan böyükdür"); return; }
+    const ext = file.name.split(".").pop();
+    const path = `${user.id}/shop-${field}-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("product-images").upload(path, file);
+    if (error) { toast.error(error.message); return; }
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    setProfile({ ...profile, [field]: data.publicUrl });
+    toast.success("Yükləndi");
+  };
+
+  const navItems: PanelNavItem[] = [
+    { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, active: tab === "dashboard", onClick: () => setTab("dashboard") },
+    { key: "products", label: "Məhsullar", icon: Package, badge: products.length, active: tab === "products", onClick: () => setTab("products") },
+    { key: "orders", label: "Sifarişlər", icon: ShoppingBag, badge: pendingOrders, active: tab === "orders", onClick: () => setTab("orders") },
+    { key: "shop", label: "Mağaza ayarları", icon: Settings, active: tab === "shop", onClick: () => setTab("shop") },
+  ];
+
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex flex-wrap items-center gap-4 justify-between mb-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold">Satıcı paneli</h1>
-          {profile?.shop_name && <p className="text-sm text-muted-foreground mt-1">{profile.shop_name}</p>}
-        </div>
-        <div className="flex gap-1 bg-secondary rounded-xl p-1 overflow-x-auto">
-          {([
-            ["dashboard", "Dashboard"],
-            ["products", "Məhsullar"],
-            ["orders", "Sifarişlər"],
-            ["shop", "Mağaza"],
-          ] as const).map(([t, l]) => (
-            <button key={t} onClick={() => setTab(t)}
-                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap ${tab === t ? "bg-card shadow-sm" : "text-muted-foreground"}`}>
-              {l}
-            </button>
-          ))}
-        </div>
+    <PanelLayout title="Satıcı paneli" subtitle={profile?.shop_name ?? "Mağazam"} items={navItems}>
+      <div className="flex flex-wrap items-center gap-2 mb-4 lg:hidden">
+        {([
+          ["dashboard", "Dashboard"],
+          ["products", "Məhsullar"],
+          ["orders", "Sifarişlər"],
+          ["shop", "Mağaza"],
+        ] as const).map(([t, l]) => (
+          <button key={t} onClick={() => setTab(t)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${tab === t ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}>
+            {l}
+          </button>
+        ))}
       </div>
 
       {tab === "dashboard" && (
@@ -357,27 +385,75 @@ function SellerPanel() {
       )}
 
       {tab === "shop" && profile && (
-        <div className="bg-card border border-border rounded-2xl p-6 max-w-2xl space-y-4">
-          <h3 className="font-bold text-lg flex items-center gap-2"><Store className="h-5 w-5 text-primary" /> Mağaza məlumatları</h3>
-          <div>
-            <label className="text-sm font-semibold">Mağaza adı</label>
-            <input value={profile.shop_name ?? ""} onChange={(e) => setProfile({ ...profile, shop_name: e.target.value })}
-                   maxLength={100} className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+        <div className="space-y-6 max-w-3xl">
+          {/* Banner & Logo */}
+          <div className="bg-card border border-border rounded-2xl overflow-hidden">
+            <div className="relative h-40 bg-gradient-soft">
+              {profile.shop_banner_url && <img src={profile.shop_banner_url} alt="" className="w-full h-full object-cover" />}
+              <label className="absolute bottom-2 right-2 bg-background/90 backdrop-blur px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer hover:bg-background inline-flex items-center gap-1">
+                <Upload className="h-3 w-3" /> Banner yüklə
+                <input type="file" accept="image/*" className="hidden"
+                       onChange={(e) => e.target.files?.[0] && uploadShopImage(e.target.files[0], "shop_banner_url")} />
+              </label>
+              <div className="absolute -bottom-10 left-6 w-20 h-20 rounded-2xl border-4 border-card bg-secondary overflow-hidden">
+                {profile.shop_logo_url && <img src={profile.shop_logo_url} alt="" className="w-full h-full object-cover" />}
+              </div>
+            </div>
+            <div className="pt-12 pb-4 px-6">
+              <label className="text-xs text-primary font-semibold cursor-pointer inline-flex items-center gap-1 hover:underline">
+                <Upload className="h-3 w-3" /> Loqo dəyişdir
+                <input type="file" accept="image/*" className="hidden"
+                       onChange={(e) => e.target.files?.[0] && uploadShopImage(e.target.files[0], "shop_logo_url")} />
+              </label>
+            </div>
           </div>
-          <div>
-            <label className="text-sm font-semibold">Tam ad</label>
-            <input value={profile.full_name ?? ""} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                   maxLength={100} className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+
+          {/* Form */}
+          <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+            <h3 className="font-bold text-lg flex items-center gap-2"><Store className="h-5 w-5 text-primary" /> Mağaza məlumatları</h3>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <div className="sm:col-span-2">
+                <label className="text-sm font-semibold">Mağaza adı *</label>
+                <input value={profile.shop_name ?? ""} onChange={(e) => setProfile({ ...profile, shop_name: e.target.value })}
+                       maxLength={100} className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-sm font-semibold">Mağaza haqqında</label>
+                <textarea value={profile.shop_description ?? ""} onChange={(e) => setProfile({ ...profile, shop_description: e.target.value })}
+                          maxLength={1000} placeholder="Müştərilərinizə özünüzdən bəhs edin..."
+                          className="mt-1 w-full px-3 py-2 rounded-lg border border-input bg-background min-h-24" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold">Tam ad</label>
+                <input value={profile.full_name ?? ""} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                       maxLength={100} className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold">Telefon</label>
+                <input value={profile.phone ?? ""} onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                       maxLength={20} placeholder="+994 ..." className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold">E-poçt (mağaza)</label>
+                <input type="email" value={profile.shop_email ?? ""} onChange={(e) => setProfile({ ...profile, shop_email: e.target.value })}
+                       maxLength={200} placeholder="info@magaza.az" className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold">Şəhər</label>
+                <input value={profile.shop_city ?? ""} onChange={(e) => setProfile({ ...profile, shop_city: e.target.value })}
+                       maxLength={100} placeholder="Bakı" className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-sm font-semibold">Ünvan</label>
+                <input value={profile.shop_address ?? ""} onChange={(e) => setProfile({ ...profile, shop_address: e.target.value })}
+                       maxLength={300} placeholder="H. Əliyev pr. 12" className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+              </div>
+            </div>
+            <button onClick={saveShop} disabled={savingShop}
+                    className="bg-primary text-primary-foreground rounded-lg px-6 h-11 font-bold hover:bg-primary/90 disabled:opacity-60">
+              {savingShop ? "..." : "Mağazanı yadda saxla"}
+            </button>
           </div>
-          <div>
-            <label className="text-sm font-semibold">Telefon</label>
-            <input value={profile.phone ?? ""} onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                   maxLength={20} placeholder="+994 ..." className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
-          </div>
-          <button onClick={saveShop} disabled={savingShop}
-                  className="bg-primary text-primary-foreground rounded-lg px-6 h-11 font-bold hover:bg-primary/90 disabled:opacity-60">
-            {savingShop ? "..." : "Yadda saxla"}
-          </button>
         </div>
       )}
 
@@ -505,6 +581,6 @@ function SellerPanel() {
           </div>
         </div>
       )}
-    </div>
+    </PanelLayout>
   );
 }

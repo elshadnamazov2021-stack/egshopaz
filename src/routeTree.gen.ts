@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SellerRouteImport } from './routes/seller'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as BecomeSellerRouteImport } from './routes/become-seller'
@@ -27,6 +28,11 @@ const SellerRoute = SellerRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavoritesRoute = FavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatalogRoute = CatalogRouteImport.update({
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/become-seller': typeof BecomeSellerRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
+  '/favorites': typeof FavoritesRoute
   '/profile': typeof ProfileRoute
   '/seller': typeof SellerRoute
   '/product/$id': typeof ProductIdRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/become-seller': typeof BecomeSellerRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
+  '/favorites': typeof FavoritesRoute
   '/profile': typeof ProfileRoute
   '/seller': typeof SellerRoute
   '/product/$id': typeof ProductIdRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/become-seller': typeof BecomeSellerRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
+  '/favorites': typeof FavoritesRoute
   '/profile': typeof ProfileRoute
   '/seller': typeof SellerRoute
   '/product/$id': typeof ProductIdRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/become-seller'
     | '/cart'
     | '/catalog'
+    | '/favorites'
     | '/profile'
     | '/seller'
     | '/product/$id'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/become-seller'
     | '/cart'
     | '/catalog'
+    | '/favorites'
     | '/profile'
     | '/seller'
     | '/product/$id'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/become-seller'
     | '/cart'
     | '/catalog'
+    | '/favorites'
     | '/profile'
     | '/seller'
     | '/product/$id'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   BecomeSellerRoute: typeof BecomeSellerRoute
   CartRoute: typeof CartRoute
   CatalogRoute: typeof CatalogRoute
+  FavoritesRoute: typeof FavoritesRoute
   ProfileRoute: typeof ProfileRoute
   SellerRoute: typeof SellerRoute
   ProductIdRoute: typeof ProductIdRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favorites': {
+      id: '/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof FavoritesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catalog': {
@@ -222,6 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   BecomeSellerRoute: BecomeSellerRoute,
   CartRoute: CartRoute,
   CatalogRoute: CatalogRoute,
+  FavoritesRoute: FavoritesRoute,
   ProfileRoute: ProfileRoute,
   SellerRoute: SellerRoute,
   ProductIdRoute: ProductIdRoute,
@@ -229,3 +250,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
