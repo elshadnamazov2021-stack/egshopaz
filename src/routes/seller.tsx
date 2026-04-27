@@ -533,6 +533,6 @@ function SellerPanel() {
           </div>
         </div>
       )}
-    </div>
+    </PanelLayout>
   );
 }
