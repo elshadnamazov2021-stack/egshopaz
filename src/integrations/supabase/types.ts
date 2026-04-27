@@ -513,6 +513,42 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_messages: {
+        Row: {
+          body: string
+          buyer_id: string
+          created_at: string
+          id: string
+          order_id: string | null
+          product_id: string | null
+          read_at: string | null
+          seller_id: string
+          sender_role: string
+        }
+        Insert: {
+          body: string
+          buyer_id: string
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          product_id?: string | null
+          read_at?: string | null
+          seller_id: string
+          sender_role: string
+        }
+        Update: {
+          body?: string
+          buyer_id?: string
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          product_id?: string | null
+          read_at?: string | null
+          seller_id?: string
+          sender_role?: string
+        }
+        Relationships: []
+      }
       support_tickets: {
         Row: {
           admin_reply: string | null
