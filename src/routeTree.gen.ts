@@ -11,12 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SellerRouteImport } from './routes/seller'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as BecomeSellerRouteImport } from './routes/become-seller'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AddressesRouteImport } from './routes/addresses'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 
@@ -28,6 +30,11 @@ const SellerRoute = SellerRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersRoute = OrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FavoritesRoute = FavoritesRouteImport.update({
@@ -60,6 +67,11 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AddressesRoute = AddressesRouteImport.update({
+  id: '/addresses',
+  path: '/addresses',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -73,24 +85,28 @@ const ProductIdRoute = ProductIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/addresses': typeof AddressesRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-seller': typeof BecomeSellerRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
   '/favorites': typeof FavoritesRoute
+  '/orders': typeof OrdersRoute
   '/profile': typeof ProfileRoute
   '/seller': typeof SellerRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/addresses': typeof AddressesRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-seller': typeof BecomeSellerRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
   '/favorites': typeof FavoritesRoute
+  '/orders': typeof OrdersRoute
   '/profile': typeof ProfileRoute
   '/seller': typeof SellerRoute
   '/product/$id': typeof ProductIdRoute
@@ -98,12 +114,14 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/addresses': typeof AddressesRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-seller': typeof BecomeSellerRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
   '/favorites': typeof FavoritesRoute
+  '/orders': typeof OrdersRoute
   '/profile': typeof ProfileRoute
   '/seller': typeof SellerRoute
   '/product/$id': typeof ProductIdRoute
@@ -112,36 +130,42 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/addresses'
     | '/admin'
     | '/auth'
     | '/become-seller'
     | '/cart'
     | '/catalog'
     | '/favorites'
+    | '/orders'
     | '/profile'
     | '/seller'
     | '/product/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/addresses'
     | '/admin'
     | '/auth'
     | '/become-seller'
     | '/cart'
     | '/catalog'
     | '/favorites'
+    | '/orders'
     | '/profile'
     | '/seller'
     | '/product/$id'
   id:
     | '__root__'
     | '/'
+    | '/addresses'
     | '/admin'
     | '/auth'
     | '/become-seller'
     | '/cart'
     | '/catalog'
     | '/favorites'
+    | '/orders'
     | '/profile'
     | '/seller'
     | '/product/$id'
@@ -149,12 +173,14 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AddressesRoute: typeof AddressesRoute
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   BecomeSellerRoute: typeof BecomeSellerRoute
   CartRoute: typeof CartRoute
   CatalogRoute: typeof CatalogRoute
   FavoritesRoute: typeof FavoritesRoute
+  OrdersRoute: typeof OrdersRoute
   ProfileRoute: typeof ProfileRoute
   SellerRoute: typeof SellerRoute
   ProductIdRoute: typeof ProductIdRoute
@@ -174,6 +200,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders': {
+      id: '/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/favorites': {
@@ -218,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/addresses': {
+      id: '/addresses'
+      path: '/addresses'
+      fullPath: '/addresses'
+      preLoaderRoute: typeof AddressesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -237,12 +277,14 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AddressesRoute: AddressesRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   BecomeSellerRoute: BecomeSellerRoute,
   CartRoute: CartRoute,
   CatalogRoute: CatalogRoute,
   FavoritesRoute: FavoritesRoute,
+  OrdersRoute: OrdersRoute,
   ProfileRoute: ProfileRoute,
   SellerRoute: SellerRoute,
   ProductIdRoute: ProductIdRoute,
