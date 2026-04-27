@@ -1,0 +1,164 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { formatAZN } from "@/lib/format";
+import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
+import { toast } from "sonner";
+
+export const Route = createFileRoute("/cart")({
+  component: CartPage,
+});
+
+interface CartRow {
+  id: string;
+  quantity: number;
+  product_id: string;
+  products: {
+    id: string; title: string; price: number; image_url: string | null; stock: number; seller_id: string;
+  } | null;
+}
+
+function CartPage() {
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const [items, setItems] = useState<CartRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [placing, setPlacing] = useState(false);
+  const [address, setAddress] = useState("");
+
+  const load = async () => {
+    if (!user) return;
+    setLoading(true);
+    const { data } = await supabase.from("cart_items")
+      .select("id,quantity,product_id,products(id,title,price,image_url,stock,seller_id)")
+      .eq("user_id", user.id);
+    setItems((data ?? []) as unknown as CartRow[]);
+    setLoading(false);
+  };
+
+  useEffect(() => { if (user) load(); else if (!authLoading) setLoading(false); }, [user, authLoading]);
+
+  if (!authLoading && !user) {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+        <h2 className="text-2xl font-bold mb-2">Səbətə baxmaq üçün daxil olun</h2>
+        <Link to="/auth" className="inline-block mt-4 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold">
+          Daxil ol
+        </Link>
+      </div>
+    );
+  }
+
+  const updateQty = async (id: string, qty: number) => {
+    if (qty < 1) return;
+    await supabase.from("cart_items").update({ quantity: qty }).eq("id", id);
+    load();
+  };
+
+  const remove = async (id: string) => {
+    await supabase.from("cart_items").delete().eq("id", id);
+    load();
+  };
+
+  const total = items.reduce((s, it) => s + (it.products ? Number(it.products.price) * it.quantity : 0), 0);
+
+  const checkout = async () => {
+    if (!user || items.length === 0) return;
+    if (!address.trim()) { toast.error("Çatdırılma ünvanını daxil edin"); return; }
+    setPlacing(true);
+    const { data: order, error } = await supabase.from("orders").insert({
+      buyer_id: user.id, total, shipping_address: address, status: "pending",
+    }).select().single();
+    if (error || !order) { toast.error("Sifariş yaradıla bilmədi"); setPlacing(false); return; }
+
+    const orderItems = items.filter((i) => i.products).map((i) => ({
+      order_id: order.id,
+      product_id: i.products!.id,
+      seller_id: i.products!.seller_id,
+      title: i.products!.title,
+      price: i.products!.price,
+      quantity: i.quantity,
+      image_url: i.products!.image_url,
+    }));
+    await supabase.from("order_items").insert(orderItems);
+    await supabase.from("cart_items").delete().eq("user_id", user.id);
+    toast.success("Sifariş qəbul olundu!");
+    setPlacing(false);
+    navigate({ to: "/profile" });
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-6">
+      <h1 className="text-2xl md:text-3xl font-extrabold mb-6">Səbət</h1>
+      {loading ? (
+        <div className="text-muted-foreground">Yüklənir...</div>
+      ) : items.length === 0 ? (
+        <div className="text-center py-16 bg-secondary/40 rounded-2xl">
+          <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+          <p className="text-muted-foreground mb-4">Səbətiniz boşdur</p>
+          <Link to="/catalog" search={{ q: undefined, cat: undefined } as never} className="inline-block bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold">
+            Alış-verişə başla
+          </Link>
+        </div>
+      ) : (
+        <div className="grid lg:grid-cols-[1fr_360px] gap-6">
+          <div className="space-y-3">
+            {items.map((it) => it.products && (
+              <div key={it.id} className="bg-card border border-border rounded-2xl p-4 flex gap-4">
+                <Link to="/product/$id" params={{ id: it.products.id }} className="w-24 h-24 bg-secondary rounded-xl overflow-hidden shrink-0">
+                  {it.products.image_url && <img src={it.products.image_url} alt={it.products.title} className="w-full h-full object-cover" />}
+                </Link>
+                <div className="flex-1 min-w-0">
+                  <Link to="/product/$id" params={{ id: it.products.id }} className="font-semibold line-clamp-2 hover:text-primary">{it.products.title}</Link>
+                  <div className="text-lg font-extrabold mt-1">{formatAZN(Number(it.products.price) * it.quantity)}</div>
+                  <div className="flex items-center gap-3 mt-2">
+                    <div className="flex items-center border border-border rounded-lg">
+                      <button onClick={() => updateQty(it.id, it.quantity - 1)} className="w-8 h-8 flex items-center justify-center hover:bg-secondary"><Minus className="h-3 w-3" /></button>
+                      <span className="w-8 text-center text-sm font-semibold">{it.quantity}</span>
+                      <button onClick={() => updateQty(it.id, it.quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-secondary"><Plus className="h-3 w-3" /></button>
+                    </div>
+                    <button onClick={() => remove(it.id)} className="text-muted-foreground hover:text-destructive">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <aside className="bg-card border border-border rounded-2xl p-5 h-fit sticky top-24 space-y-4">
+            <h3 className="font-bold text-lg">Sifariş yekunu</h3>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Məhsullar ({items.length})</span>
+              <span className="font-semibold">{formatAZN(total)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Çatdırılma</span>
+              <span className="font-semibold text-success">Pulsuz</span>
+            </div>
+            <div className="border-t border-border pt-3 flex justify-between text-lg font-extrabold">
+              <span>Cəmi</span>
+              <span>{formatAZN(total)}</span>
+            </div>
+            <textarea
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              maxLength={500}
+              placeholder="Çatdırılma ünvanı..."
+              className="w-full border border-input rounded-lg p-3 text-sm min-h-20 focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            <button
+              onClick={checkout}
+              disabled={placing}
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl py-3 font-bold disabled:opacity-60"
+            >
+              {placing ? "Göndərilir..." : "Sifariş ver"}
+            </button>
+          </aside>
+        </div>
+      )}
+    </div>
+  );
+}
