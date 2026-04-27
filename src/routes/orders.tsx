@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { formatAZN } from "@/lib/format";
-import { Package, MapPin, X } from "lucide-react";
+import { Package, MapPin, X, MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/orders")({
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/orders")({
   component: OrdersPage,
 });
 
-interface OrderItem { id: string; title: string; price: number; quantity: number; image_url: string | null; status: string }
+interface OrderItem { id: string; title: string; price: number; quantity: number; image_url: string | null; status: string; seller_id: string; product_id: string }
 interface Order { id: string; total: number; status: string; created_at: string; shipping_address: string | null; payment_method: string; order_items: OrderItem[] }
 
 const statusLabel: Record<string, string> = {
@@ -34,13 +34,37 @@ function OrdersPage() {
   const { items } = useBuyerNav();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filter, setFilter] = useState<string>("all");
+  const [msgItem, setMsgItem] = useState<OrderItem | null>(null);
+  const [msgOrderId, setMsgOrderId] = useState<string | null>(null);
+  const [msgBody, setMsgBody] = useState("");
+  const [msgSending, setMsgSending] = useState(false);
+
+  const sendMessage = async () => {
+    if (!user || !msgItem) return;
+    const body = msgBody.trim();
+    if (body.length < 2) { toast.error("Mesaj çox qısadır"); return; }
+    if (user.id === msgItem.seller_id) { toast.error("Öz mağazanıza mesaj göndərə bilməzsiniz"); return; }
+    setMsgSending(true);
+    const { error } = await supabase.from("shop_messages").insert({
+      buyer_id: user.id,
+      seller_id: msgItem.seller_id,
+      product_id: msgItem.product_id,
+      order_id: msgOrderId,
+      sender_role: "buyer",
+      body,
+    });
+    setMsgSending(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Mesaj satıcıya göndərildi");
+    setMsgBody(""); setMsgItem(null); setMsgOrderId(null);
+  };
 
   useEffect(() => { if (!authLoading && !user) navigate({ to: "/auth" }); }, [user, authLoading, navigate]);
 
   const load = () => {
     if (!user) return;
     supabase.from("orders")
-      .select("*, order_items(id,title,price,quantity,image_url,status)")
+      .select("*, order_items(id,title,price,quantity,image_url,status,seller_id,product_id)")
       .eq("buyer_id", user.id)
       .order("created_at", { ascending: false })
       .then(({ data }) => setOrders((data ?? []) as Order[]));
@@ -86,11 +110,22 @@ function OrdersPage() {
                 </div>
                 <div className="space-y-2">
                   {o.order_items?.map((it) => (
-                    <div key={it.id} className="flex items-center gap-3 text-sm">
+                    <div key={it.id} className="flex items-start gap-3 text-sm">
                       <div className="w-12 h-12 rounded-lg bg-secondary overflow-hidden shrink-0">
                         {it.image_url && <img src={it.image_url} alt="" className="w-full h-full object-cover" />}
                       </div>
-                      <div className="flex-1 min-w-0"><div className="truncate">{it.title}</div><div className="text-xs text-muted-foreground">{it.quantity} × {formatAZN(it.price)}</div></div>
+                      <div className="flex-1 min-w-0">
+                        <div className="truncate">{it.title}</div>
+                        <div className="text-xs text-muted-foreground">{it.quantity} × {formatAZN(it.price)}</div>
+                      </div>
+                      {user.id !== it.seller_id && (
+                        <button
+                          onClick={() => { setMsgItem(it); setMsgOrderId(o.id); setMsgBody(""); }}
+                          className="text-xs px-2.5 py-1.5 rounded-lg border border-border hover:border-primary hover:text-primary transition inline-flex items-center gap-1 shrink-0"
+                        >
+                          <MessageCircle className="h-3.5 w-3.5" /> Satıcıya yaz
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -104,6 +139,36 @@ function OrdersPage() {
           </div>
         )}
       </div>
+
+      {msgItem && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setMsgItem(null)}>
+          <div className="bg-card rounded-2xl p-5 w-full max-w-md space-y-3" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold flex items-center gap-2"><MessageCircle className="h-5 w-5 text-primary" /> Satıcıya mesaj</h3>
+              <button onClick={() => setMsgItem(null)} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
+            </div>
+            <div className="text-sm text-muted-foreground line-clamp-2">{msgItem.title}</div>
+            <textarea
+              value={msgBody}
+              onChange={(e) => setMsgBody(e.target.value)}
+              placeholder="Mesajınızı yazın..."
+              rows={4}
+              maxLength={2000}
+              className="w-full p-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+            />
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setMsgItem(null)} className="text-sm px-3 py-1.5 rounded-lg hover:bg-secondary">Ləğv</button>
+              <button
+                onClick={sendMessage}
+                disabled={msgSending || msgBody.trim().length < 2}
+                className="text-sm px-4 py-1.5 rounded-lg bg-primary text-primary-foreground font-bold hover:bg-primary/90 disabled:opacity-50 inline-flex items-center gap-1.5"
+              >
+                <Send className="h-3.5 w-3.5" /> {msgSending ? "..." : "Göndər"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </PanelLayout>
   );
 }
