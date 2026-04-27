@@ -40,7 +40,7 @@ function OrdersPage() {
   const load = () => {
     if (!user) return;
     supabase.from("orders")
-      .select("*, order_items(id,title,price,quantity,image_url,status)")
+      .select("*, order_items(id,title,price,quantity,image_url,status,seller_id,product_id)")
       .eq("buyer_id", user.id)
       .order("created_at", { ascending: false })
       .then(({ data }) => setOrders((data ?? []) as Order[]));
