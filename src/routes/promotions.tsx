@@ -33,7 +33,7 @@ function PromotionsPage() {
   };
 
   return (
-    <PanelLayout title="Şəxsi kabinet" subtitle={user?.email ?? "Aksiyalar"} items={items}>
+    <PanelLayout title="Müştərinin şəxsi kabineti" subtitle={user?.email ?? "Aksiyalar"} items={items}>
       <div>
         <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2"><Gift className="h-6 w-6 text-primary" /> Aksiyalar və promokodlar</h1>
 

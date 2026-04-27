@@ -30,7 +30,7 @@ function BonusPage() {
   if (!user) return null;
 
   return (
-    <PanelLayout title="Şəxsi kabinet" subtitle={user.email ?? undefined} items={items}>
+    <PanelLayout title="Müştərinin şəxsi kabineti" subtitle={user.email ?? undefined} items={items}>
       <div>
         <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2"><Coins className="h-6 w-6 text-primary" /> Bonus xallar</h1>
 

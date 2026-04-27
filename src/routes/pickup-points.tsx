@@ -29,7 +29,7 @@ function PickupPointsPage() {
   );
 
   return (
-    <PanelLayout title="Şəxsi kabinet" subtitle={user?.email ?? "Çatdırış nöqtələri"} items={items}>
+    <PanelLayout title="Müştərinin şəxsi kabineti" subtitle={user?.email ?? "Çatdırış nöqtələri"} items={items}>
       <div>
         <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2"><MapPin className="h-6 w-6 text-primary" /> Çatdırış nöqtələri (PVZ)</h1>
         <div className="relative mb-4">

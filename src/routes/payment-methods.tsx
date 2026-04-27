@@ -55,7 +55,7 @@ function PaymentMethodsPage() {
   if (!user) return null;
 
   return (
-    <PanelLayout title="Şəxsi kabinet" subtitle={user.email ?? undefined} items={items}>
+    <PanelLayout title="Müştərinin şəxsi kabineti" subtitle={user.email ?? undefined} items={items}>
       <div>
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-extrabold flex items-center gap-2"><CreditCard className="h-6 w-6 text-primary" /> Ödəniş üsulları</h1>
