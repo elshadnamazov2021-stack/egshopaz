@@ -86,6 +86,16 @@ export function SiteHeader() {
                 <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
                   <User className="h-4 w-4 mr-2" /> Şəxsi kabinet
                 </DropdownMenuItem>
+                {!isSeller && (
+                  <DropdownMenuItem onClick={() => navigate({ to: "/become-seller" })}>
+                    <Store className="h-4 w-4 mr-2" /> Mağaza aç
+                  </DropdownMenuItem>
+                )}
+                {isSeller && (
+                  <DropdownMenuItem onClick={() => navigate({ to: "/seller" })}>
+                    <Store className="h-4 w-4 mr-2" /> Satıcı paneli
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={async () => { await signOut(); navigate({ to: "/" }); }}>
                   <LogOut className="h-4 w-4 mr-2" /> Çıxış
