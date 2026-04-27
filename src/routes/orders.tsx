@@ -139,6 +139,36 @@ function OrdersPage() {
           </div>
         )}
       </div>
+
+      {msgItem && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setMsgItem(null)}>
+          <div className="bg-card rounded-2xl p-5 w-full max-w-md space-y-3" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold flex items-center gap-2"><MessageCircle className="h-5 w-5 text-primary" /> Satıcıya mesaj</h3>
+              <button onClick={() => setMsgItem(null)} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
+            </div>
+            <div className="text-sm text-muted-foreground line-clamp-2">{msgItem.title}</div>
+            <textarea
+              value={msgBody}
+              onChange={(e) => setMsgBody(e.target.value)}
+              placeholder="Mesajınızı yazın..."
+              rows={4}
+              maxLength={2000}
+              className="w-full p-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+            />
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setMsgItem(null)} className="text-sm px-3 py-1.5 rounded-lg hover:bg-secondary">Ləğv</button>
+              <button
+                onClick={sendMessage}
+                disabled={msgSending || msgBody.trim().length < 2}
+                className="text-sm px-4 py-1.5 rounded-lg bg-primary text-primary-foreground font-bold hover:bg-primary/90 disabled:opacity-50 inline-flex items-center gap-1.5"
+              >
+                <Send className="h-3.5 w-3.5" /> {msgSending ? "..." : "Göndər"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </PanelLayout>
   );
 }
