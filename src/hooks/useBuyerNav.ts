@@ -9,15 +9,12 @@ import type { PanelNavItem } from "@/components/PanelLayout";
 
 export function useBuyerNav(): { items: PanelNavItem[]; bonusBalance: number } {
   const { user, isSeller } = useAuth();
-  const [favCount, setFavCount] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
   const [bonusBalance, setBonusBalance] = useState(0);
   const [openTickets, setOpenTickets] = useState(0);
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("favorites").select("*", { count: "exact", head: true }).eq("user_id", user.id)
-      .then(({ count }) => setFavCount(count ?? 0));
     supabase.from("orders").select("*", { count: "exact", head: true }).eq("buyer_id", user.id).in("status", ["pending", "paid", "shipped"])
       .then(({ count }) => setOrderCount(count ?? 0));
     supabase.from("profiles").select("bonus_balance").eq("id", user.id).maybeSingle()
@@ -29,7 +26,6 @@ export function useBuyerNav(): { items: PanelNavItem[]; bonusBalance: number } {
   const items: PanelNavItem[] = [
     { to: "/profile", label: "Profil", icon: UserIcon },
     { to: "/orders", label: "Sifarişlərim", icon: Package, badge: orderCount },
-    { to: "/favorites", label: "Sevimlilər", icon: Heart, badge: favCount },
     { to: "/addresses", label: "Ünvanlarım", icon: MapPin },
     { to: "/pickup-points", label: "Çatdırış nöqtələri", icon: MapPin },
     { to: "/payment-methods", label: "Ödəniş üsulları", icon: CreditCard },
