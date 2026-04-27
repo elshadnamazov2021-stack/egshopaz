@@ -36,24 +36,22 @@ function Favorites() {
   if (!user) return null;
 
   return (
-    <PanelLayout title="Şəxsi kabinet" subtitle={user.email ?? undefined} items={navItems}>
-      <div>
-        <div className="flex items-center gap-3 mb-6">
-          <Heart className="h-7 w-7 text-discount" />
-          <h1 className="text-2xl md:text-3xl font-extrabold">Sevimlilərim</h1>
-          <span className="text-muted-foreground text-sm">({products.length})</span>
-        </div>
-        {products.length === 0 ? (
-          <div className="bg-secondary/40 rounded-2xl p-12 text-center text-muted-foreground">
-            <Heart className="h-12 w-12 mx-auto mb-3 opacity-40" />
-            Hələ sevimli məhsul yoxdur
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-            {products.map((p) => <ProductCard key={p.id} p={p} />)}
-          </div>
-        )}
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="flex items-center gap-3 mb-6">
+        <Heart className="h-7 w-7 text-discount" />
+        <h1 className="text-2xl md:text-3xl font-extrabold">Sevimlilərim</h1>
+        <span className="text-muted-foreground text-sm">({products.length})</span>
       </div>
-    </PanelLayout>
+      {products.length === 0 ? (
+        <div className="bg-secondary/40 rounded-2xl p-12 text-center text-muted-foreground">
+          <Heart className="h-12 w-12 mx-auto mb-3 opacity-40" />
+          Hələ sevimli məhsul yoxdur
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+          {products.map((p) => <ProductCard key={p.id} p={p} />)}
+        </div>
+      )}
+    </div>
   );
 }
