@@ -27,14 +27,44 @@ function AdminPanel() {
   const [roles, setRoles] = useState<RoleRow[]>([]);
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [products, setProducts] = useState<ProductRow[]>([]);
+  const [unlocked, setUnlocked] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return sessionStorage.getItem("admin_panel_unlocked") === "1";
+  });
+  const [pwInput, setPwInput] = useState("");
+  const [pwError, setPwError] = useState("");
+  const [pwSubmitting, setPwSubmitting] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
     if (!loading && user && !isAdmin) {
-      toast.error("Sizdə admin icazəsi yoxdur");
+      // silent redirect — never reveal admin panel to non-admins
       navigate({ to: "/" });
     }
   }, [user, isAdmin, loading, navigate]);
+
+  const submitPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwError("");
+    setPwSubmitting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("verify-admin-password", {
+        body: { password: pwInput },
+      });
+      if (error || !data?.ok) {
+        setPwError(data?.error || "Parol yanlışdır");
+        setPwSubmitting(false);
+        return;
+      }
+      sessionStorage.setItem("admin_panel_unlocked", "1");
+      setUnlocked(true);
+      setPwInput("");
+    } catch (err) {
+      setPwError((err as Error).message);
+    } finally {
+      setPwSubmitting(false);
+    }
+  };
 
   const reload = async () => {
     const [{ count: u }, { count: p }, { data: os }, { data: pr }, { data: rs }, { data: prod }] = await Promise.all([
