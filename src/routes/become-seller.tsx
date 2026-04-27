@@ -26,20 +26,9 @@ function BecomeSeller() {
     if (!user) return;
     if (shopName.trim().length < 2) { toast.error("Mağaza adı daxil edin"); return; }
     setBusy(true);
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .upsert({ id: user.id, shop_name: shopName.trim().slice(0, 100) }, { onConflict: "id" });
-    if (profileError) {
-      toast.error("Mağaza açıla bilmədi. Bir az sonra yenidən cəhd edin.");
-      setBusy(false);
-      return;
-    }
-
-    const { error } = await supabase
-      .from("user_roles")
-      .upsert({ user_id: user.id, role: "seller" }, { onConflict: "user_id,role", ignoreDuplicates: true });
+    const { error } = await supabase.rpc("become_seller", { _shop_name: shopName.trim().slice(0, 100) });
     if (error) {
-      toast.error("Satıcı icazəsi əlavə olunmadı. Yenidən cəhd edin.");
+      toast.error(error.message || "Mağaza açıla bilmədi. Yenidən cəhd edin.");
     } else {
       toast.success("Təbrik edirik! Artıq satıcısınız");
       await refreshRoles();

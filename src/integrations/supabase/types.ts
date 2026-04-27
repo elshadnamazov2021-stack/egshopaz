@@ -278,6 +278,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      become_seller: { Args: { _shop_name: string }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
