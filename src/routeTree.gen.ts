@@ -9,25 +9,69 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as SellerRouteImport } from './routes/seller'
+import { Route as PromotionsRouteImport } from './routes/promotions'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PickupPointsRouteImport } from './routes/pickup-points'
+import { Route as PaymentMethodsRouteImport } from './routes/payment-methods'
+import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as MyReviewsRouteImport } from './routes/my-reviews'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as BonusRouteImport } from './routes/bonus'
 import { Route as BecomeSellerRouteImport } from './routes/become-seller'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AddressesRouteImport } from './routes/addresses'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SellerRoute = SellerRouteImport.update({
   id: '/seller',
   path: '/seller',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PromotionsRoute = PromotionsRouteImport.update({
+  id: '/promotions',
+  path: '/promotions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PickupPointsRoute = PickupPointsRouteImport.update({
+  id: '/pickup-points',
+  path: '/pickup-points',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentMethodsRoute = PaymentMethodsRouteImport.update({
+  id: '/payment-methods',
+  path: '/payment-methods',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersRoute = OrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyReviewsRoute = MyReviewsRouteImport.update({
+  id: '/my-reviews',
+  path: '/my-reviews',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FavoritesRoute = FavoritesRouteImport.update({
@@ -45,6 +89,11 @@ const CartRoute = CartRouteImport.update({
   path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BonusRoute = BonusRouteImport.update({
+  id: '/bonus',
+  path: '/bonus',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BecomeSellerRoute = BecomeSellerRouteImport.update({
   id: '/become-seller',
   path: '/become-seller',
@@ -60,6 +109,11 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AddressesRoute = AddressesRouteImport.update({
+  id: '/addresses',
+  path: '/addresses',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -73,95 +127,165 @@ const ProductIdRoute = ProductIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/addresses': typeof AddressesRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-seller': typeof BecomeSellerRoute
+  '/bonus': typeof BonusRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
   '/favorites': typeof FavoritesRoute
+  '/my-reviews': typeof MyReviewsRoute
+  '/notifications': typeof NotificationsRoute
+  '/orders': typeof OrdersRoute
+  '/payment-methods': typeof PaymentMethodsRoute
+  '/pickup-points': typeof PickupPointsRoute
   '/profile': typeof ProfileRoute
+  '/promotions': typeof PromotionsRoute
   '/seller': typeof SellerRoute
+  '/support': typeof SupportRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/addresses': typeof AddressesRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-seller': typeof BecomeSellerRoute
+  '/bonus': typeof BonusRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
   '/favorites': typeof FavoritesRoute
+  '/my-reviews': typeof MyReviewsRoute
+  '/notifications': typeof NotificationsRoute
+  '/orders': typeof OrdersRoute
+  '/payment-methods': typeof PaymentMethodsRoute
+  '/pickup-points': typeof PickupPointsRoute
   '/profile': typeof ProfileRoute
+  '/promotions': typeof PromotionsRoute
   '/seller': typeof SellerRoute
+  '/support': typeof SupportRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/addresses': typeof AddressesRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-seller': typeof BecomeSellerRoute
+  '/bonus': typeof BonusRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
   '/favorites': typeof FavoritesRoute
+  '/my-reviews': typeof MyReviewsRoute
+  '/notifications': typeof NotificationsRoute
+  '/orders': typeof OrdersRoute
+  '/payment-methods': typeof PaymentMethodsRoute
+  '/pickup-points': typeof PickupPointsRoute
   '/profile': typeof ProfileRoute
+  '/promotions': typeof PromotionsRoute
   '/seller': typeof SellerRoute
+  '/support': typeof SupportRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/addresses'
     | '/admin'
     | '/auth'
     | '/become-seller'
+    | '/bonus'
     | '/cart'
     | '/catalog'
     | '/favorites'
+    | '/my-reviews'
+    | '/notifications'
+    | '/orders'
+    | '/payment-methods'
+    | '/pickup-points'
     | '/profile'
+    | '/promotions'
     | '/seller'
+    | '/support'
     | '/product/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/addresses'
     | '/admin'
     | '/auth'
     | '/become-seller'
+    | '/bonus'
     | '/cart'
     | '/catalog'
     | '/favorites'
+    | '/my-reviews'
+    | '/notifications'
+    | '/orders'
+    | '/payment-methods'
+    | '/pickup-points'
     | '/profile'
+    | '/promotions'
     | '/seller'
+    | '/support'
     | '/product/$id'
   id:
     | '__root__'
     | '/'
+    | '/addresses'
     | '/admin'
     | '/auth'
     | '/become-seller'
+    | '/bonus'
     | '/cart'
     | '/catalog'
     | '/favorites'
+    | '/my-reviews'
+    | '/notifications'
+    | '/orders'
+    | '/payment-methods'
+    | '/pickup-points'
     | '/profile'
+    | '/promotions'
     | '/seller'
+    | '/support'
     | '/product/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AddressesRoute: typeof AddressesRoute
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   BecomeSellerRoute: typeof BecomeSellerRoute
+  BonusRoute: typeof BonusRoute
   CartRoute: typeof CartRoute
   CatalogRoute: typeof CatalogRoute
   FavoritesRoute: typeof FavoritesRoute
+  MyReviewsRoute: typeof MyReviewsRoute
+  NotificationsRoute: typeof NotificationsRoute
+  OrdersRoute: typeof OrdersRoute
+  PaymentMethodsRoute: typeof PaymentMethodsRoute
+  PickupPointsRoute: typeof PickupPointsRoute
   ProfileRoute: typeof ProfileRoute
+  PromotionsRoute: typeof PromotionsRoute
   SellerRoute: typeof SellerRoute
+  SupportRoute: typeof SupportRoute
   ProductIdRoute: typeof ProductIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/seller': {
       id: '/seller'
       path: '/seller'
@@ -169,11 +293,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SellerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/promotions': {
+      id: '/promotions'
+      path: '/promotions'
+      fullPath: '/promotions'
+      preLoaderRoute: typeof PromotionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pickup-points': {
+      id: '/pickup-points'
+      path: '/pickup-points'
+      fullPath: '/pickup-points'
+      preLoaderRoute: typeof PickupPointsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment-methods': {
+      id: '/payment-methods'
+      path: '/payment-methods'
+      fullPath: '/payment-methods'
+      preLoaderRoute: typeof PaymentMethodsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders': {
+      id: '/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-reviews': {
+      id: '/my-reviews'
+      path: '/my-reviews'
+      fullPath: '/my-reviews'
+      preLoaderRoute: typeof MyReviewsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/favorites': {
@@ -197,6 +363,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/bonus': {
+      id: '/bonus'
+      path: '/bonus'
+      fullPath: '/bonus'
+      preLoaderRoute: typeof BonusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/become-seller': {
       id: '/become-seller'
       path: '/become-seller'
@@ -218,6 +391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/addresses': {
+      id: '/addresses'
+      path: '/addresses'
+      fullPath: '/addresses'
+      preLoaderRoute: typeof AddressesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -237,14 +417,23 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AddressesRoute: AddressesRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   BecomeSellerRoute: BecomeSellerRoute,
+  BonusRoute: BonusRoute,
   CartRoute: CartRoute,
   CatalogRoute: CatalogRoute,
   FavoritesRoute: FavoritesRoute,
+  MyReviewsRoute: MyReviewsRoute,
+  NotificationsRoute: NotificationsRoute,
+  OrdersRoute: OrdersRoute,
+  PaymentMethodsRoute: PaymentMethodsRoute,
+  PickupPointsRoute: PickupPointsRoute,
   ProfileRoute: ProfileRoute,
+  PromotionsRoute: PromotionsRoute,
   SellerRoute: SellerRoute,
+  SupportRoute: SupportRoute,
   ProductIdRoute: ProductIdRoute,
 }
 export const routeTree = rootRouteImport

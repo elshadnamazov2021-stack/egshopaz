@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN } from "@/lib/format";
-import { Package, User as UserIcon, Heart, Store, Shield, LogOut, MapPin } from "lucide-react";
+import { Package, User as UserIcon, LogOut, MapPin } from "lucide-react";
 import { toast } from "sonner";
-import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
+import { PanelLayout } from "@/components/PanelLayout";
+import { useBuyerNav } from "@/hooks/useBuyerNav";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "Şəxsi kabinet — One Board Market" }] }),
@@ -17,15 +18,15 @@ interface Order {
 }
 
 function Profile() {
-  const { user, loading: authLoading, isSeller, isAdmin, signOut } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
-  const [favCount, setFavCount] = useState(0);
   const [saving, setSaving] = useState(false);
+  const { items } = useBuyerNav();
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/auth" });
@@ -33,7 +34,7 @@ function Profile() {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("orders").select("*").eq("buyer_id", user.id).order("created_at", { ascending: false })
+    supabase.from("orders").select("*").eq("buyer_id", user.id).order("created_at", { ascending: false }).limit(5)
       .then(({ data }) => setOrders((data ?? []) as Order[]));
     supabase.from("profiles").select("full_name,phone,shop_address,shop_city").eq("id", user.id).maybeSingle()
       .then(({ data }) => {
@@ -42,8 +43,6 @@ function Profile() {
         setAddress(data?.shop_address ?? "");
         setCity(data?.shop_city ?? "");
       });
-    supabase.from("favorites").select("*", { count: "exact", head: true }).eq("user_id", user.id)
-      .then(({ count }) => setFavCount(count ?? 0));
   }, [user]);
 
   const saveProfile = async () => {
@@ -67,13 +66,6 @@ function Profile() {
   };
 
   if (!user) return null;
-
-  const items: PanelNavItem[] = [
-    { to: "/profile", label: "Profil", icon: UserIcon },
-    { to: "/favorites", label: "Sevimlilər", icon: Heart, badge: favCount },
-    ...(isSeller ? [{ to: "/seller", label: "Satıcı paneli", icon: Store }] : [{ to: "/become-seller", label: "Satıcı ol", icon: Store }]),
-    ...(isAdmin ? [{ to: "/admin", label: "Admin paneli", icon: Shield }] : []),
-  ];
 
   return (
     <PanelLayout title="Şəxsi kabinet" subtitle={user.email ?? undefined} items={items}>

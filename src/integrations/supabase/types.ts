@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      addresses: {
+        Row: {
+          apartment: string | null
+          city: string
+          created_at: string
+          id: string
+          is_default: boolean
+          notes: string | null
+          phone: string
+          recipient_name: string
+          street: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          apartment?: string | null
+          city: string
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          notes?: string | null
+          phone: string
+          recipient_name: string
+          street: string
+          title?: string
+          user_id: string
+        }
+        Update: {
+          apartment?: string | null
+          city?: string
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          notes?: string | null
+          phone?: string
+          recipient_name?: string
+          street?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      bonus_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          order_id: string | null
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          reason: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           created_at: string
@@ -149,7 +218,13 @@ export type Database = {
         Row: {
           buyer_id: string
           created_at: string
+          discount: number
           id: string
+          payment_method: string
+          pickup_point_id: string | null
+          promo_code: string | null
+          recipient_name: string | null
+          recipient_phone: string | null
           shipping_address: string | null
           status: Database["public"]["Enums"]["order_status"]
           total: number
@@ -157,7 +232,13 @@ export type Database = {
         Insert: {
           buyer_id: string
           created_at?: string
+          discount?: number
           id?: string
+          payment_method?: string
+          pickup_point_id?: string | null
+          promo_code?: string | null
+          recipient_name?: string | null
+          recipient_phone?: string | null
           shipping_address?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           total: number
@@ -165,10 +246,79 @@ export type Database = {
         Update: {
           buyer_id?: string
           created_at?: string
+          discount?: number
           id?: string
+          payment_method?: string
+          pickup_point_id?: string | null
+          promo_code?: string | null
+          recipient_name?: string | null
+          recipient_phone?: string | null
           shipping_address?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           total?: number
+        }
+        Relationships: []
+      }
+      pickup_points: {
+        Row: {
+          address: string
+          city: string
+          created_at: string
+          id: string
+          is_active: boolean
+          lat: number | null
+          lng: number | null
+          name: string
+          phone: string | null
+          working_hours: string
+        }
+        Insert: {
+          address: string
+          city: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          lat?: number | null
+          lng?: number | null
+          name: string
+          phone?: string | null
+          working_hours?: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          phone?: string | null
+          working_hours?: string
+        }
+        Relationships: []
+      }
+      price_alerts: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          target_price: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          target_price: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          target_price?: number
+          user_id?: string
         }
         Relationships: []
       }
@@ -246,6 +396,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bonus_balance: number
           created_at: string
           full_name: string | null
           id: string
@@ -261,6 +412,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          bonus_balance?: number
           created_at?: string
           full_name?: string | null
           id: string
@@ -276,6 +428,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          bonus_balance?: number
           created_at?: string
           full_name?: string | null
           id?: string
@@ -288,6 +441,114 @@ export type Database = {
           shop_logo_url?: string | null
           shop_name?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      promo_codes: {
+        Row: {
+          code: string
+          created_at: string
+          discount_amount: number | null
+          discount_percent: number | null
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          min_order: number
+          usage_limit: number | null
+          used_count: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          discount_amount?: number | null
+          discount_percent?: number | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          min_order?: number
+          usage_limit?: number | null
+          used_count?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          discount_amount?: number | null
+          discount_percent?: number | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          min_order?: number
+          usage_limit?: number | null
+          used_count?: number
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          images: string[]
+          product_id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          images?: string[]
+          product_id: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          images?: string[]
+          product_id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          admin_reply: string | null
+          category: string
+          created_at: string
+          id: string
+          message: string
+          order_id: string | null
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_reply?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          message: string
+          order_id?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_reply?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          message?: string
+          order_id?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
