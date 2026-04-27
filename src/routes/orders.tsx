@@ -34,6 +34,30 @@ function OrdersPage() {
   const { items } = useBuyerNav();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filter, setFilter] = useState<string>("all");
+  const [msgItem, setMsgItem] = useState<OrderItem | null>(null);
+  const [msgOrderId, setMsgOrderId] = useState<string | null>(null);
+  const [msgBody, setMsgBody] = useState("");
+  const [msgSending, setMsgSending] = useState(false);
+
+  const sendMessage = async () => {
+    if (!user || !msgItem) return;
+    const body = msgBody.trim();
+    if (body.length < 2) { toast.error("Mesaj çox qısadır"); return; }
+    if (user.id === msgItem.seller_id) { toast.error("Öz mağazanıza mesaj göndərə bilməzsiniz"); return; }
+    setMsgSending(true);
+    const { error } = await supabase.from("shop_messages").insert({
+      buyer_id: user.id,
+      seller_id: msgItem.seller_id,
+      product_id: msgItem.product_id,
+      order_id: msgOrderId,
+      sender_role: "buyer",
+      body,
+    });
+    setMsgSending(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Mesaj satıcıya göndərildi");
+    setMsgBody(""); setMsgItem(null); setMsgOrderId(null);
+  };
 
   useEffect(() => { if (!authLoading && !user) navigate({ to: "/auth" }); }, [user, authLoading, navigate]);
 
