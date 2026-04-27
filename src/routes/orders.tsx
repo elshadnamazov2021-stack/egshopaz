@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { formatAZN } from "@/lib/format";
-import { Package, MapPin, X } from "lucide-react";
+import { Package, MapPin, X, MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/orders")({
