@@ -15,6 +15,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PickupPointsRouteImport } from './routes/pickup-points'
 import { Route as PaymentMethodsRouteImport } from './routes/payment-methods'
 import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MyReviewsRouteImport } from './routes/my-reviews'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as CatalogRouteImport } from './routes/catalog'
@@ -55,6 +56,11 @@ const PaymentMethodsRoute = PaymentMethodsRouteImport.update({
 const OrdersRoute = OrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MyReviewsRoute = MyReviewsRouteImport.update({
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/catalog': typeof CatalogRoute
   '/favorites': typeof FavoritesRoute
   '/my-reviews': typeof MyReviewsRoute
+  '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
   '/payment-methods': typeof PaymentMethodsRoute
   '/pickup-points': typeof PickupPointsRoute
@@ -143,6 +150,7 @@ export interface FileRoutesByTo {
   '/catalog': typeof CatalogRoute
   '/favorites': typeof FavoritesRoute
   '/my-reviews': typeof MyReviewsRoute
+  '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
   '/payment-methods': typeof PaymentMethodsRoute
   '/pickup-points': typeof PickupPointsRoute
@@ -163,6 +171,7 @@ export interface FileRoutesById {
   '/catalog': typeof CatalogRoute
   '/favorites': typeof FavoritesRoute
   '/my-reviews': typeof MyReviewsRoute
+  '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
   '/payment-methods': typeof PaymentMethodsRoute
   '/pickup-points': typeof PickupPointsRoute
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/favorites'
     | '/my-reviews'
+    | '/notifications'
     | '/orders'
     | '/payment-methods'
     | '/pickup-points'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/favorites'
     | '/my-reviews'
+    | '/notifications'
     | '/orders'
     | '/payment-methods'
     | '/pickup-points'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/favorites'
     | '/my-reviews'
+    | '/notifications'
     | '/orders'
     | '/payment-methods'
     | '/pickup-points'
@@ -242,6 +254,7 @@ export interface RootRouteChildren {
   CatalogRoute: typeof CatalogRoute
   FavoritesRoute: typeof FavoritesRoute
   MyReviewsRoute: typeof MyReviewsRoute
+  NotificationsRoute: typeof NotificationsRoute
   OrdersRoute: typeof OrdersRoute
   PaymentMethodsRoute: typeof PaymentMethodsRoute
   PickupPointsRoute: typeof PickupPointsRoute
@@ -293,6 +306,13 @@ declare module '@tanstack/react-router' {
       path: '/orders'
       fullPath: '/orders'
       preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my-reviews': {
@@ -386,6 +406,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogRoute: CatalogRoute,
   FavoritesRoute: FavoritesRoute,
   MyReviewsRoute: MyReviewsRoute,
+  NotificationsRoute: NotificationsRoute,
   OrdersRoute: OrdersRoute,
   PaymentMethodsRoute: PaymentMethodsRoute,
   PickupPointsRoute: PickupPointsRoute,
