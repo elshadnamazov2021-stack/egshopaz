@@ -3,10 +3,11 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN } from "@/lib/format";
-import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon, LayoutDashboard, Settings } from "lucide-react";
+import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon, LayoutDashboard, Settings, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
+import { SellerMessages } from "@/components/SellerMessages";
 
 export const Route = createFileRoute("/seller")({
   head: () => ({ meta: [{ title: "Satıcı paneli — One Board Market" }] }),
@@ -53,7 +54,8 @@ const ORDER_STATUSES = [
 function SellerPanel() {
   const { user, isSeller, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"dashboard" | "products" | "orders" | "shop">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "products" | "orders" | "messages" | "shop">("dashboard");
+  const [unreadMsgs, setUnreadMsgs] = useState(0);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
@@ -86,6 +88,26 @@ function SellerPanel() {
     });
   };
   useEffect(() => { if (user && isSeller) load(); }, [user, isSeller]);
+
+  // Unread messages counter (with realtime)
+  useEffect(() => {
+    if (!user || !isSeller) return;
+    const refreshUnread = () => {
+      supabase
+        .from("shop_messages")
+        .select("*", { count: "exact", head: true })
+        .eq("seller_id", user.id)
+        .eq("sender_role", "buyer")
+        .is("read_at", null)
+        .then(({ count }) => setUnreadMsgs(count ?? 0));
+    };
+    refreshUnread();
+    const ch = supabase
+      .channel(`seller-unread-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "shop_messages", filter: `seller_id=eq.${user.id}` }, refreshUnread)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user, isSeller]);
 
   if (!user || !isSeller) return null;
 
@@ -221,6 +243,7 @@ function SellerPanel() {
     { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, active: tab === "dashboard", onClick: () => setTab("dashboard") },
     { key: "products", label: "Məhsullar", icon: Package, badge: products.length, active: tab === "products", onClick: () => setTab("products") },
     { key: "orders", label: "Sifarişlər", icon: ShoppingBag, badge: pendingOrders, active: tab === "orders", onClick: () => setTab("orders") },
+    { key: "messages", label: "Mesajlar", icon: MessageCircle, badge: unreadMsgs, active: tab === "messages", onClick: () => setTab("messages") },
     { key: "shop", label: "Mağaza ayarları", icon: Settings, active: tab === "shop", onClick: () => setTab("shop") },
   ];
 
@@ -369,6 +392,8 @@ function SellerPanel() {
           })}
         </div>
       )}
+
+      {tab === "messages" && <SellerMessages sellerId={user.id} />}
 
       {tab === "shop" && profile && (
         <div className="space-y-6 max-w-3xl">
