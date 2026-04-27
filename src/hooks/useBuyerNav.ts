@@ -38,6 +38,7 @@ export function useBuyerNav(): { items: PanelNavItem[]; bonusBalance: number } {
     { to: "/bonus", label: "Bonus xallar", icon: Coins, badge: bonusBalance },
     { to: "/notifications", label: "Bildirişlər", icon: Bell },
     { to: "/support", label: "Dəstək", icon: MessageCircle, badge: openTickets },
+    ...(!isSeller ? [{ to: "/become-seller", label: "Mağaza aç", icon: Store }] : []),
   ];
 
   return { items, bonusBalance };
