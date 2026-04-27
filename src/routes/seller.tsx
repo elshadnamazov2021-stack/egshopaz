@@ -3,10 +3,11 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN } from "@/lib/format";
-import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon, LayoutDashboard, Settings } from "lucide-react";
+import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon, LayoutDashboard, Settings, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
+import { SellerMessages } from "@/components/SellerMessages";
 
 export const Route = createFileRoute("/seller")({
   head: () => ({ meta: [{ title: "Satıcı paneli — One Board Market" }] }),
