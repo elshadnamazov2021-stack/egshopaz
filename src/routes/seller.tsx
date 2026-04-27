@@ -148,10 +148,12 @@ function SellerPanel() {
 
     if (editing.id) {
       const { error } = await supabase.from("products").update(data).eq("id", editing.id);
-      if (error) toast.error(error.message); else toast.success("Yeniləndi");
+      if (error) { toast.error("Məhsul yadda saxlanmadı. Satıcı icazənizi və məlumatları yoxlayın."); return; }
+      toast.success("Yeniləndi");
     } else {
       const { error } = await supabase.from("products").insert(data);
-      if (error) toast.error(error.message); else toast.success("Məhsul əlavə olundu");
+      if (error) { toast.error("Məhsul əlavə olunmadı. Satıcı icazənizi və məlumatları yoxlayın."); return; }
+      toast.success("Məhsul əlavə olundu");
     }
     setEditing(null);
     load();
@@ -177,12 +179,13 @@ function SellerPanel() {
   const saveShop = async () => {
     if (!user || !profile) return;
     setSavingShop(true);
-    const { error } = await supabase.from("profiles").update({
+    const { error } = await supabase.from("profiles").upsert({
+      id: user.id,
       shop_name: profile.shop_name?.slice(0, 100) ?? null,
       full_name: profile.full_name?.slice(0, 100) ?? null,
       phone: profile.phone?.slice(0, 20) ?? null,
       avatar_url: profile.avatar_url ?? null,
-    }).eq("id", user.id);
+    }, { onConflict: "id" });
     if (error) toast.error(error.message); else toast.success("Mağaza məlumatları yadda saxlanıldı");
     setSavingShop(false);
   };
