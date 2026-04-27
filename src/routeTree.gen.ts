@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SellerRouteImport } from './routes/seller'
+import { Route as PromotionsRouteImport } from './routes/promotions'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PickupPointsRouteImport } from './routes/pickup-points'
 import { Route as PaymentMethodsRouteImport } from './routes/payment-methods'
@@ -28,6 +29,11 @@ import { Route as ProductIdRouteImport } from './routes/product.$id'
 const SellerRoute = SellerRouteImport.update({
   id: '/seller',
   path: '/seller',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromotionsRoute = PromotionsRouteImport.update({
+  id: '/promotions',
+  path: '/promotions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/payment-methods': typeof PaymentMethodsRoute
   '/pickup-points': typeof PickupPointsRoute
   '/profile': typeof ProfileRoute
+  '/promotions': typeof PromotionsRoute
   '/seller': typeof SellerRoute
   '/product/$id': typeof ProductIdRoute
 }
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/payment-methods': typeof PaymentMethodsRoute
   '/pickup-points': typeof PickupPointsRoute
   '/profile': typeof ProfileRoute
+  '/promotions': typeof PromotionsRoute
   '/seller': typeof SellerRoute
   '/product/$id': typeof ProductIdRoute
 }
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/payment-methods': typeof PaymentMethodsRoute
   '/pickup-points': typeof PickupPointsRoute
   '/profile': typeof ProfileRoute
+  '/promotions': typeof PromotionsRoute
   '/seller': typeof SellerRoute
   '/product/$id': typeof ProductIdRoute
 }
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/payment-methods'
     | '/pickup-points'
     | '/profile'
+    | '/promotions'
     | '/seller'
     | '/product/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/payment-methods'
     | '/pickup-points'
     | '/profile'
+    | '/promotions'
     | '/seller'
     | '/product/$id'
   id:
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/payment-methods'
     | '/pickup-points'
     | '/profile'
+    | '/promotions'
     | '/seller'
     | '/product/$id'
   fileRoutesById: FileRoutesById
@@ -221,6 +233,7 @@ export interface RootRouteChildren {
   PaymentMethodsRoute: typeof PaymentMethodsRoute
   PickupPointsRoute: typeof PickupPointsRoute
   ProfileRoute: typeof ProfileRoute
+  PromotionsRoute: typeof PromotionsRoute
   SellerRoute: typeof SellerRoute
   ProductIdRoute: typeof ProductIdRoute
 }
@@ -232,6 +245,13 @@ declare module '@tanstack/react-router' {
       path: '/seller'
       fullPath: '/seller'
       preLoaderRoute: typeof SellerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promotions': {
+      id: '/promotions'
+      path: '/promotions'
+      fullPath: '/promotions'
+      preLoaderRoute: typeof PromotionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -349,6 +369,7 @@ const rootRouteChildren: RootRouteChildren = {
   PaymentMethodsRoute: PaymentMethodsRoute,
   PickupPointsRoute: PickupPointsRoute,
   ProfileRoute: ProfileRoute,
+  PromotionsRoute: PromotionsRoute,
   SellerRoute: SellerRoute,
   ProductIdRoute: ProductIdRoute,
 }
