@@ -243,6 +243,7 @@ function SellerPanel() {
     { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, active: tab === "dashboard", onClick: () => setTab("dashboard") },
     { key: "products", label: "Məhsullar", icon: Package, badge: products.length, active: tab === "products", onClick: () => setTab("products") },
     { key: "orders", label: "Sifarişlər", icon: ShoppingBag, badge: pendingOrders, active: tab === "orders", onClick: () => setTab("orders") },
+    { key: "messages", label: "Mesajlar", icon: MessageCircle, badge: unreadMsgs, active: tab === "messages", onClick: () => setTab("messages") },
     { key: "shop", label: "Mağaza ayarları", icon: Settings, active: tab === "shop", onClick: () => setTab("shop") },
   ];
 
