@@ -60,7 +60,7 @@ export function SiteHeader() {
         </form>
 
         <nav className="ml-auto flex items-center gap-1 sm:gap-2">
-          <Link to="/profile" className="hidden sm:flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
+          <Link to="/favorites" className="hidden sm:flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
             <Heart className="h-5 w-5 mb-0.5" />
             <span>Sevimli</span>
           </Link>
