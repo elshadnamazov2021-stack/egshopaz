@@ -74,12 +74,16 @@ function SellerPanel() {
       supabase.from("products").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("categories").select("id,name").order("sort_order"),
       supabase.from("order_items").select("*").eq("seller_id", user.id).order("id", { ascending: false }).limit(100),
-      supabase.from("profiles").select("full_name,shop_name,phone,avatar_url").eq("id", user.id).maybeSingle(),
+      supabase.from("profiles").select("full_name,shop_name,phone,avatar_url,shop_description,shop_logo_url,shop_banner_url,shop_address,shop_city,shop_email").eq("id", user.id).maybeSingle(),
     ]);
     setProducts((ps ?? []) as unknown as Product[]);
     setCategories((cs ?? []) as Category[]);
     setOrderItems((ois ?? []) as unknown as OrderItem[]);
-    setProfile((pr as Profile) ?? { full_name: "", shop_name: "", phone: "", avatar_url: "" });
+    setProfile((pr as Profile) ?? {
+      full_name: "", shop_name: "", phone: "", avatar_url: "",
+      shop_description: "", shop_logo_url: "", shop_banner_url: "",
+      shop_address: "", shop_city: "", shop_email: "",
+    });
   };
   useEffect(() => { if (user && isSeller) load(); }, [user, isSeller]);
 
