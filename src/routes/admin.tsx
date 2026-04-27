@@ -58,7 +58,8 @@ function AdminPanel() {
   const userRoles = (uid: string) => roles.filter((r) => r.user_id === uid).map((r) => r.role);
 
   const updateOrderStatus = async (id: string, status: string) => {
-    const { error } = await supabase.from("orders").update({ status }).eq("id", id);
+    const typed = status as "pending" | "paid" | "shipped" | "delivered" | "cancelled";
+    const { error } = await supabase.from("orders").update({ status: typed }).eq("id", id);
     if (error) toast.error(error.message); else {
       toast.success("Status yeniləndi");
       setOrders(orders.map((o) => o.id === id ? { ...o, status } : o));
