@@ -82,6 +82,7 @@ export type Database = {
           product_id: string
           quantity: number
           seller_id: string
+          status: string
           title: string
         }
         Insert: {
@@ -92,6 +93,7 @@ export type Database = {
           product_id: string
           quantity: number
           seller_id: string
+          status?: string
           title: string
         }
         Update: {
@@ -102,6 +104,7 @@ export type Database = {
           product_id?: string
           quantity?: number
           seller_id?: string
+          status?: string
           title?: string
         }
         Relationships: [
@@ -156,15 +159,18 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
+          images: string[]
           is_active: boolean
           old_price: number | null
           price: number
           rating: number
           reviews_count: number
           seller_id: string
+          sku: string | null
           stock: number
           title: string
           updated_at: string
+          weight: number | null
         }
         Insert: {
           brand?: string | null
@@ -173,15 +179,18 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          images?: string[]
           is_active?: boolean
           old_price?: number | null
           price: number
           rating?: number
           reviews_count?: number
           seller_id: string
+          sku?: string | null
           stock?: number
           title: string
           updated_at?: string
+          weight?: number | null
         }
         Update: {
           brand?: string | null
@@ -190,15 +199,18 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          images?: string[]
           is_active?: boolean
           old_price?: number | null
           price?: number
           rating?: number
           reviews_count?: number
           seller_id?: string
+          sku?: string | null
           stock?: number
           title?: string
           updated_at?: string
+          weight?: number | null
         }
         Relationships: [
           {
