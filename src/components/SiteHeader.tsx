@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function SiteHeader() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isSeller } = useAuth();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [cartCount, setCartCount] = useState(0);
