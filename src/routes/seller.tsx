@@ -194,30 +194,67 @@ function SellerPanel() {
       full_name: profile.full_name?.slice(0, 100) ?? null,
       phone: profile.phone?.slice(0, 20) ?? null,
       avatar_url: profile.avatar_url ?? null,
+      shop_description: profile.shop_description?.slice(0, 1000) ?? null,
+      shop_logo_url: profile.shop_logo_url ?? null,
+      shop_banner_url: profile.shop_banner_url ?? null,
+      shop_address: profile.shop_address?.slice(0, 300) ?? null,
+      shop_city: profile.shop_city?.slice(0, 100) ?? null,
+      shop_email: profile.shop_email?.slice(0, 200) ?? null,
     }, { onConflict: "id" });
     if (error) toast.error(error.message); else toast.success("Mağaza məlumatları yadda saxlanıldı");
     setSavingShop(false);
   };
 
+  const uploadShopImage = async (file: File, field: "shop_logo_url" | "shop_banner_url") => {
+    if (!user || !profile) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Şəkil 5MB-dan böyükdür"); return; }
+    const ext = file.name.split(".").pop();
+    const path = `${user.id}/shop-${field}-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("product-images").upload(path, file);
+    if (error) { toast.error(error.message); return; }
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    setProfile({ ...profile, [field]: data.publicUrl });
+    toast.success("Yükləndi");
+  };
+
+  const navItems: PanelNavItem[] = [
+    { to: "/seller#dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/seller#products", label: "Məhsullar", icon: Package, badge: products.length },
+    { to: "/seller#orders", label: "Sifarişlər", icon: ShoppingBag, badge: pendingOrders },
+    { to: "/seller#shop", label: "Mağaza ayarları", icon: Settings },
+  ];
+
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex flex-wrap items-center gap-4 justify-between mb-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold">Satıcı paneli</h1>
-          {profile?.shop_name && <p className="text-sm text-muted-foreground mt-1">{profile.shop_name}</p>}
-        </div>
-        <div className="flex gap-1 bg-secondary rounded-xl p-1 overflow-x-auto">
-          {([
-            ["dashboard", "Dashboard"],
-            ["products", "Məhsullar"],
-            ["orders", "Sifarişlər"],
-            ["shop", "Mağaza"],
-          ] as const).map(([t, l]) => (
-            <button key={t} onClick={() => setTab(t)}
-                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap ${tab === t ? "bg-card shadow-sm" : "text-muted-foreground"}`}>
-              {l}
-            </button>
-          ))}
+    <PanelLayout title="Satıcı paneli" subtitle={profile?.shop_name ?? "Mağazam"} items={navItems.map((it) => ({
+      ...it,
+      // Override Link click: use tab instead of route
+    }))}>
+      <div className="flex flex-wrap items-center gap-2 mb-4 lg:hidden">
+        {([
+          ["dashboard", "Dashboard"],
+          ["products", "Məhsullar"],
+          ["orders", "Sifarişlər"],
+          ["shop", "Mağaza"],
+        ] as const).map(([t, l]) => (
+          <button key={t} onClick={() => setTab(t)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${tab === t ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}>
+            {l}
+          </button>
+        ))}
+      </div>
+      <div className="hidden lg:flex gap-1 bg-secondary rounded-xl p-1 mb-4 w-fit">
+        {([
+          ["dashboard", "Dashboard"],
+          ["products", "Məhsullar"],
+          ["orders", "Sifarişlər"],
+          ["shop", "Mağaza"],
+        ] as const).map(([t, l]) => (
+          <button key={t} onClick={() => setTab(t)}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${tab === t ? "bg-card shadow-sm" : "text-muted-foreground"}`}>
+            {l}
+          </button>
+        ))}
+      </div>
         </div>
       </div>
 
