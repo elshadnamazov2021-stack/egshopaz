@@ -39,7 +39,7 @@ const productSchema = z.object({
 
 const ORDER_STATUSES = [
   { v: "pending", l: "Gözləyir", c: "bg-warning/10 text-warning" },
-  { v: "processing", l: "Hazırlanır", c: "bg-info/10 text-info" },
+  { v: "processing", l: "Hazırlanır", c: "bg-primary/10 text-primary" },
   { v: "shipped", l: "Göndərildi", c: "bg-primary/10 text-primary" },
   { v: "delivered", l: "Çatdırıldı", c: "bg-success/10 text-success" },
   { v: "cancelled", l: "Ləğv edildi", c: "bg-destructive/10 text-destructive" },
