@@ -39,7 +39,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
       <div className="container mx-auto px-4 h-16 flex items-center gap-4">
         <Link to="/" className="flex items-center gap-2 font-extrabold text-2xl shrink-0">
-          <span className="bg-gradient-brand text-primary-foreground px-2 py-1 rounded-md">WB</span>
+          <span className="bg-gradient-brand text-primary-foreground px-2 py-1 rounded-md">OBM</span>
           <span className="hidden sm:inline text-gradient-brand">market</span>
         </Link>
 

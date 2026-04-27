@@ -30,8 +30,8 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "WB market — Azərbaycanın onlayn marketi" },
-      { name: "description", content: "Milyonlarla məhsul, sürətli çatdırılma və sərfəli qiymətlər. WB market Azərbaycanda." },
+      { title: "One Board Market — Azərbaycanın onlayn marketi" },
+      { name: "description", content: "Milyonlarla məhsul, sürətli çatdırılma və sərfəli qiymətlər. One Board Market Azərbaycanda." },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),
