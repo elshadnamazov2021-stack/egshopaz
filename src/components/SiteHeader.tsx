@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Search, ShoppingCart, User, Heart, Menu, Store, Shield, LogOut } from "lucide-react";
+import { Search, ShoppingCart, User, Heart, Menu, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function SiteHeader() {
-  const { user, isSeller, isAdmin, signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [cartCount, setCartCount] = useState(0);
@@ -86,21 +86,6 @@ export function SiteHeader() {
                 <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
                   <User className="h-4 w-4 mr-2" /> Şəxsi kabinet
                 </DropdownMenuItem>
-                {isSeller && (
-                  <DropdownMenuItem onClick={() => navigate({ to: "/seller" })}>
-                    <Store className="h-4 w-4 mr-2" /> Satıcı paneli
-                  </DropdownMenuItem>
-                )}
-                {!isSeller && (
-                  <DropdownMenuItem onClick={() => navigate({ to: "/become-seller" })}>
-                    <Store className="h-4 w-4 mr-2" /> Satıcı ol
-                  </DropdownMenuItem>
-                )}
-                {isAdmin && (
-                  <DropdownMenuItem onClick={() => navigate({ to: "/admin" })}>
-                    <Shield className="h-4 w-4 mr-2" /> Admin paneli
-                  </DropdownMenuItem>
-                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={async () => { await signOut(); navigate({ to: "/" }); }}>
                   <LogOut className="h-4 w-4 mr-2" /> Çıxış
