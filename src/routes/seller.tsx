@@ -3,9 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN } from "@/lib/format";
-import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon } from "lucide-react";
+import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon, LayoutDashboard, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 
 export const Route = createFileRoute("/seller")({
   head: () => ({ meta: [{ title: "Satıcı paneli — One Board Market" }] }),
@@ -23,7 +24,11 @@ interface OrderItem {
   id: string; title: string; price: number; quantity: number;
   image_url: string | null; order_id: string; status: string; product_id: string;
 }
-interface Profile { full_name: string | null; shop_name: string | null; phone: string | null; avatar_url: string | null }
+interface Profile {
+  full_name: string | null; shop_name: string | null; phone: string | null; avatar_url: string | null;
+  shop_description: string | null; shop_logo_url: string | null; shop_banner_url: string | null;
+  shop_address: string | null; shop_city: string | null; shop_email: string | null;
+}
 
 const productSchema = z.object({
   title: z.string().trim().min(2, "Başlıq minimum 2 simvol").max(200),
