@@ -385,27 +385,75 @@ function SellerPanel() {
       )}
 
       {tab === "shop" && profile && (
-        <div className="bg-card border border-border rounded-2xl p-6 max-w-2xl space-y-4">
-          <h3 className="font-bold text-lg flex items-center gap-2"><Store className="h-5 w-5 text-primary" /> Mağaza məlumatları</h3>
-          <div>
-            <label className="text-sm font-semibold">Mağaza adı</label>
-            <input value={profile.shop_name ?? ""} onChange={(e) => setProfile({ ...profile, shop_name: e.target.value })}
-                   maxLength={100} className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+        <div className="space-y-6 max-w-3xl">
+          {/* Banner & Logo */}
+          <div className="bg-card border border-border rounded-2xl overflow-hidden">
+            <div className="relative h-40 bg-gradient-soft">
+              {profile.shop_banner_url && <img src={profile.shop_banner_url} alt="" className="w-full h-full object-cover" />}
+              <label className="absolute bottom-2 right-2 bg-background/90 backdrop-blur px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer hover:bg-background inline-flex items-center gap-1">
+                <Upload className="h-3 w-3" /> Banner yüklə
+                <input type="file" accept="image/*" className="hidden"
+                       onChange={(e) => e.target.files?.[0] && uploadShopImage(e.target.files[0], "shop_banner_url")} />
+              </label>
+              <div className="absolute -bottom-10 left-6 w-20 h-20 rounded-2xl border-4 border-card bg-secondary overflow-hidden">
+                {profile.shop_logo_url && <img src={profile.shop_logo_url} alt="" className="w-full h-full object-cover" />}
+              </div>
+            </div>
+            <div className="pt-12 pb-4 px-6">
+              <label className="text-xs text-primary font-semibold cursor-pointer inline-flex items-center gap-1 hover:underline">
+                <Upload className="h-3 w-3" /> Loqo dəyişdir
+                <input type="file" accept="image/*" className="hidden"
+                       onChange={(e) => e.target.files?.[0] && uploadShopImage(e.target.files[0], "shop_logo_url")} />
+              </label>
+            </div>
           </div>
-          <div>
-            <label className="text-sm font-semibold">Tam ad</label>
-            <input value={profile.full_name ?? ""} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                   maxLength={100} className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+
+          {/* Form */}
+          <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+            <h3 className="font-bold text-lg flex items-center gap-2"><Store className="h-5 w-5 text-primary" /> Mağaza məlumatları</h3>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <div className="sm:col-span-2">
+                <label className="text-sm font-semibold">Mağaza adı *</label>
+                <input value={profile.shop_name ?? ""} onChange={(e) => setProfile({ ...profile, shop_name: e.target.value })}
+                       maxLength={100} className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-sm font-semibold">Mağaza haqqında</label>
+                <textarea value={profile.shop_description ?? ""} onChange={(e) => setProfile({ ...profile, shop_description: e.target.value })}
+                          maxLength={1000} placeholder="Müştərilərinizə özünüzdən bəhs edin..."
+                          className="mt-1 w-full px-3 py-2 rounded-lg border border-input bg-background min-h-24" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold">Tam ad</label>
+                <input value={profile.full_name ?? ""} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                       maxLength={100} className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold">Telefon</label>
+                <input value={profile.phone ?? ""} onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                       maxLength={20} placeholder="+994 ..." className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold">E-poçt (mağaza)</label>
+                <input type="email" value={profile.shop_email ?? ""} onChange={(e) => setProfile({ ...profile, shop_email: e.target.value })}
+                       maxLength={200} placeholder="info@magaza.az" className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold">Şəhər</label>
+                <input value={profile.shop_city ?? ""} onChange={(e) => setProfile({ ...profile, shop_city: e.target.value })}
+                       maxLength={100} placeholder="Bakı" className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-sm font-semibold">Ünvan</label>
+                <input value={profile.shop_address ?? ""} onChange={(e) => setProfile({ ...profile, shop_address: e.target.value })}
+                       maxLength={300} placeholder="H. Əliyev pr. 12" className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+              </div>
+            </div>
+            <button onClick={saveShop} disabled={savingShop}
+                    className="bg-primary text-primary-foreground rounded-lg px-6 h-11 font-bold hover:bg-primary/90 disabled:opacity-60">
+              {savingShop ? "..." : "Mağazanı yadda saxla"}
+            </button>
           </div>
-          <div>
-            <label className="text-sm font-semibold">Telefon</label>
-            <input value={profile.phone ?? ""} onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                   maxLength={20} placeholder="+994 ..." className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
-          </div>
-          <button onClick={saveShop} disabled={savingShop}
-                  className="bg-primary text-primary-foreground rounded-lg px-6 h-11 font-bold hover:bg-primary/90 disabled:opacity-60">
-            {savingShop ? "..." : "Yadda saxla"}
-          </button>
         </div>
       )}
 
