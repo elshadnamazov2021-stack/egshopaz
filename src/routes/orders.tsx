@@ -13,7 +13,7 @@ export const Route = createFileRoute("/orders")({
   component: OrdersPage,
 });
 
-interface OrderItem { id: string; title: string; price: number; quantity: number; image_url: string | null; status: string }
+interface OrderItem { id: string; title: string; price: number; quantity: number; image_url: string | null; status: string; seller_id: string; product_id: string }
 interface Order { id: string; total: number; status: string; created_at: string; shipping_address: string | null; payment_method: string; order_items: OrderItem[] }
 
 const statusLabel: Record<string, string> = {
