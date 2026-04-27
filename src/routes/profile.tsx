@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN } from "@/lib/format";
-import { Package, User as UserIcon, Heart, Store, Shield, LogOut, MapPin } from "lucide-react";
+import { Package, User as UserIcon, LogOut, MapPin } from "lucide-react";
 import { toast } from "sonner";
-import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
+import { PanelLayout } from "@/components/PanelLayout";
+import { useBuyerNav } from "@/hooks/useBuyerNav";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "Şəxsi kabinet — One Board Market" }] }),
