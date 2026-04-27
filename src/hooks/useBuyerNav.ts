@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import {
   User as UserIcon, Heart, Package, MapPin, CreditCard, Star,
-  Gift, Bell, MessageCircle, Coins,
+  Gift, Bell, MessageCircle, Coins, Store,
 } from "lucide-react";
 import type { PanelNavItem } from "@/components/PanelLayout";
 
