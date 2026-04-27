@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN, calcDiscount } from "@/lib/format";
 import { useAuth } from "@/contexts/AuthContext";
-import { Star, ShoppingCart, Heart, Truck, ShieldCheck } from "lucide-react";
+import { Star, ShoppingCart, Heart, Truck, ShieldCheck, MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/product/$id")({
@@ -24,6 +24,30 @@ function ProductPage() {
   const [p, setP] = useState<Product | null>(null);
   const [shopName, setShopName] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [msgOpen, setMsgOpen] = useState(false);
+  const [msgBody, setMsgBody] = useState("");
+  const [msgSending, setMsgSending] = useState(false);
+
+  const sendMessage = async () => {
+    if (!user) { navigate({ to: "/auth" }); return; }
+    if (!p) return;
+    const body = msgBody.trim();
+    if (body.length < 2) { toast.error("Mesaj çox qısadır"); return; }
+    if (user.id === p.seller_id) { toast.error("Öz mağazanıza mesaj göndərə bilməzsiniz"); return; }
+    setMsgSending(true);
+    const { error } = await supabase.from("shop_messages").insert({
+      buyer_id: user.id,
+      seller_id: p.seller_id,
+      product_id: p.id,
+      sender_role: "buyer",
+      body,
+    });
+    setMsgSending(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Mesaj göndərildi");
+    setMsgBody("");
+    setMsgOpen(false);
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -125,7 +149,45 @@ function ProductPage() {
 
           <div className="pt-2">
             <div className="text-sm text-muted-foreground">Satıcı</div>
-            <div className="font-semibold">{shopName}</div>
+            <div className="flex items-center justify-between gap-3">
+              <div className="font-semibold">{shopName}</div>
+              {user?.id !== p.seller_id && (
+                <button
+                  onClick={() => setMsgOpen((v) => !v)}
+                  className="text-sm flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border hover:border-primary hover:text-primary transition font-semibold"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  Mağazaya yaz
+                </button>
+              )}
+            </div>
+            {msgOpen && (
+              <div className="mt-3 bg-secondary/50 border border-border rounded-xl p-3 space-y-2">
+                <textarea
+                  value={msgBody}
+                  onChange={(e) => setMsgBody(e.target.value)}
+                  placeholder="Mağazaya mesajınızı yazın..."
+                  rows={3}
+                  className="w-full p-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => { setMsgOpen(false); setMsgBody(""); }}
+                    className="text-sm px-3 py-1.5 rounded-lg hover:bg-secondary"
+                  >
+                    Ləğv
+                  </button>
+                  <button
+                    onClick={sendMessage}
+                    disabled={msgSending || msgBody.trim().length < 2}
+                    className="text-sm px-4 py-1.5 rounded-lg bg-primary text-primary-foreground font-bold hover:bg-primary/90 disabled:opacity-50 flex items-center gap-1.5"
+                  >
+                    <Send className="h-3.5 w-3.5" />
+                    {msgSending ? "..." : "Göndər"}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {p.description && (
