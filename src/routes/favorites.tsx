@@ -4,8 +4,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { Heart } from "lucide-react";
-import { PanelLayout } from "@/components/PanelLayout";
-import { useBuyerNav } from "@/hooks/useBuyerNav";
 
 export const Route = createFileRoute("/favorites")({
   head: () => ({ meta: [{ title: "Sevimlilər — One Board Market" }] }),
@@ -15,7 +13,6 @@ export const Route = createFileRoute("/favorites")({
 function Favorites() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const { items: navItems } = useBuyerNav();
   const [products, setProducts] = useState<ProductCardData[]>([]);
 
   useEffect(() => {
