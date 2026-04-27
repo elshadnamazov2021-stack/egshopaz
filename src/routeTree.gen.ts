@@ -19,6 +19,7 @@ import { Route as MyReviewsRouteImport } from './routes/my-reviews'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as BonusRouteImport } from './routes/bonus'
 import { Route as BecomeSellerRouteImport } from './routes/become-seller'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -76,6 +77,11 @@ const CartRoute = CartRouteImport.update({
   path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BonusRoute = BonusRouteImport.update({
+  id: '/bonus',
+  path: '/bonus',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BecomeSellerRoute = BecomeSellerRouteImport.update({
   id: '/become-seller',
   path: '/become-seller',
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-seller': typeof BecomeSellerRoute
+  '/bonus': typeof BonusRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
   '/favorites': typeof FavoritesRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-seller': typeof BecomeSellerRoute
+  '/bonus': typeof BonusRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
   '/favorites': typeof FavoritesRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/become-seller': typeof BecomeSellerRoute
+  '/bonus': typeof BonusRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
   '/favorites': typeof FavoritesRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/become-seller'
+    | '/bonus'
     | '/cart'
     | '/catalog'
     | '/favorites'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/become-seller'
+    | '/bonus'
     | '/cart'
     | '/catalog'
     | '/favorites'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/become-seller'
+    | '/bonus'
     | '/cart'
     | '/catalog'
     | '/favorites'
@@ -225,6 +237,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   BecomeSellerRoute: typeof BecomeSellerRoute
+  BonusRoute: typeof BonusRoute
   CartRoute: typeof CartRoute
   CatalogRoute: typeof CatalogRoute
   FavoritesRoute: typeof FavoritesRoute
@@ -310,6 +323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/bonus': {
+      id: '/bonus'
+      path: '/bonus'
+      fullPath: '/bonus'
+      preLoaderRoute: typeof BonusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/become-seller': {
       id: '/become-seller'
       path: '/become-seller'
@@ -361,6 +381,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   BecomeSellerRoute: BecomeSellerRoute,
+  BonusRoute: BonusRoute,
   CartRoute: CartRoute,
   CatalogRoute: CatalogRoute,
   FavoritesRoute: FavoritesRoute,
