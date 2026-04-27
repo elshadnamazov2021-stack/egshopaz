@@ -393,6 +393,8 @@ function SellerPanel() {
         </div>
       )}
 
+      {tab === "messages" && <SellerMessages sellerId={user.id} />}
+
       {tab === "shop" && profile && (
         <div className="space-y-6 max-w-3xl">
           {/* Banner & Logo */}
