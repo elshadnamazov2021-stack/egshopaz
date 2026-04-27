@@ -8,7 +8,7 @@ import {
 import type { PanelNavItem } from "@/components/PanelLayout";
 
 export function useBuyerNav(): { items: PanelNavItem[]; bonusBalance: number } {
-  const { user } = useAuth();
+  const { user, isSeller } = useAuth();
   const [favCount, setFavCount] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
   const [bonusBalance, setBonusBalance] = useState(0);
