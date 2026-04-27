@@ -226,20 +226,6 @@ function SellerPanel() {
 
   return (
     <PanelLayout title="Satıcı paneli" subtitle={profile?.shop_name ?? "Mağazam"} items={navItems}>
-      <div className="flex flex-wrap items-center gap-2 mb-4 lg:hidden">
-        {([
-          ["dashboard", "Dashboard"],
-          ["products", "Məhsullar"],
-          ["orders", "Sifarişlər"],
-          ["shop", "Mağaza"],
-        ] as const).map(([t, l]) => (
-          <button key={t} onClick={() => setTab(t)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${tab === t ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}>
-            {l}
-          </button>
-        ))}
-      </div>
-
       {tab === "dashboard" && (
         <div className="space-y-6">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
