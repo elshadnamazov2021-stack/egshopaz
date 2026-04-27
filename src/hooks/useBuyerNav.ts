@@ -37,6 +37,7 @@ export function useBuyerNav(): { items: PanelNavItem[]; bonusBalance: number } {
   const items: PanelNavItem[] = [
     { to: "/profile", label: "Profil", icon: UserIcon },
     { to: "/orders", label: "Sifarişlərim", icon: Package, badge: orderCount },
+    { to: "/messages", label: "Mesajlarım", icon: MessageCircle, badge: unreadMsgs },
     { to: "/addresses", label: "Ünvanlarım", icon: MapPin },
     { to: "/pickup-points", label: "Çatdırış nöqtələri", icon: MapPin },
     { to: "/payment-methods", label: "Ödəniş üsulları", icon: CreditCard },
