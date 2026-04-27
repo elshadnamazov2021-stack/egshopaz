@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as SellerRouteImport } from './routes/seller'
 import { Route as PromotionsRouteImport } from './routes/promotions'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -28,6 +29,11 @@ import { Route as AddressesRouteImport } from './routes/addresses'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SellerRoute = SellerRouteImport.update({
   id: '/seller',
   path: '/seller',
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
   '/seller': typeof SellerRoute
+  '/support': typeof SupportRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRoutesByTo {
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
   '/seller': typeof SellerRoute
+  '/support': typeof SupportRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRoutesById {
@@ -178,6 +186,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
   '/seller': typeof SellerRoute
+  '/support': typeof SupportRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRouteTypes {
@@ -200,6 +209,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/promotions'
     | '/seller'
+    | '/support'
     | '/product/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/promotions'
     | '/seller'
+    | '/support'
     | '/product/$id'
   id:
     | '__root__'
@@ -240,6 +251,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/promotions'
     | '/seller'
+    | '/support'
     | '/product/$id'
   fileRoutesById: FileRoutesById
 }
@@ -261,11 +273,19 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   PromotionsRoute: typeof PromotionsRoute
   SellerRoute: typeof SellerRoute
+  SupportRoute: typeof SupportRoute
   ProductIdRoute: typeof ProductIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/seller': {
       id: '/seller'
       path: '/seller'
@@ -413,6 +433,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   PromotionsRoute: PromotionsRoute,
   SellerRoute: SellerRoute,
+  SupportRoute: SupportRoute,
   ProductIdRoute: ProductIdRoute,
 }
 export const routeTree = rootRouteImport
