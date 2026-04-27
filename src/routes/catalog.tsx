@@ -1,0 +1,104 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { ProductCard, type ProductCardData } from "@/components/ProductCard";
+import { z } from "zod";
+
+const searchSchema = z.object({
+  q: z.string().optional(),
+  cat: z.string().optional(),
+});
+
+export const Route = createFileRoute("/catalog")({
+  validateSearch: searchSchema,
+  head: () => ({
+    meta: [
+      { title: "Kataloq — WB market" },
+      { name: "description", content: "Bütün məhsullar bir yerdə. Kateqoriya, marka və qiymətə görə filter." },
+    ],
+  }),
+  component: Catalog,
+});
+
+interface Category { id: string; name: string; slug: string; icon: string | null }
+
+function Catalog() {
+  const { q, cat } = Route.useSearch();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<ProductCardData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.from("categories").select("*").order("sort_order").then(({ data }) => setCategories(data ?? []));
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    let query = supabase.from("products")
+      .select("id,title,price,old_price,image_url,rating,reviews_count,brand,categories!inner(slug)")
+      .eq("is_active", true);
+    if (q) query = query.ilike("title", `%${q}%`);
+    if (cat) query = query.eq("categories.slug", cat);
+    query.order("created_at", { ascending: false }).limit(60).then(({ data }) => {
+      setProducts((data ?? []) as ProductCardData[]);
+      setLoading(false);
+    });
+  }, [q, cat]);
+
+  const activeCat = categories.find((c) => c.slug === cat);
+
+  return (
+    <div className="container mx-auto px-4 py-6">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+        <Link to="/" className="hover:text-primary">Ana səhifə</Link>
+        <span>/</span>
+        <span className="text-foreground font-medium">{activeCat?.name ?? (q ? `"${q}" üzrə axtarış` : "Kataloq")}</span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6">
+        <aside className="hidden md:block">
+          <h3 className="font-bold mb-3">Kateqoriyalar</h3>
+          <ul className="space-y-1">
+            <li>
+              <Link to="/catalog" search={{ q, cat: undefined } as never}
+                    className={`block px-3 py-2 rounded-lg text-sm hover:bg-secondary ${!cat ? "bg-secondary font-semibold text-primary" : ""}`}>
+                Hamısı
+              </Link>
+            </li>
+            {categories.map((c) => (
+              <li key={c.id}>
+                <Link to="/catalog" search={{ q, cat: c.slug } as never}
+                      className={`block px-3 py-2 rounded-lg text-sm hover:bg-secondary ${cat === c.slug ? "bg-secondary font-semibold text-primary" : ""}`}>
+                  {c.icon} {c.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </aside>
+
+        <div>
+          <h1 className="text-2xl md:text-3xl font-extrabold mb-4">
+            {activeCat?.name ?? (q ? `"${q}" üzrə nəticələr` : "Bütün məhsullar")}
+            <span className="ml-2 text-sm text-muted-foreground font-normal">{products.length} məhsul</span>
+          </h1>
+
+          {loading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="aspect-[3/4] bg-secondary rounded-xl animate-pulse" />
+              ))}
+            </div>
+          ) : products.length === 0 ? (
+            <div className="text-center py-20 bg-secondary/40 rounded-2xl">
+              <p className="text-muted-foreground">Heç bir məhsul tapılmadı</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+              {products.map((p) => <ProductCard key={p.id} p={p} />)}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
