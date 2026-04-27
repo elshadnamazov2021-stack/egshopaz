@@ -12,6 +12,7 @@ export function useBuyerNav(): { items: PanelNavItem[]; bonusBalance: number } {
   const [orderCount, setOrderCount] = useState(0);
   const [bonusBalance, setBonusBalance] = useState(0);
   const [openTickets, setOpenTickets] = useState(0);
+  const [unreadMsgs, setUnreadMsgs] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -21,6 +22,16 @@ export function useBuyerNav(): { items: PanelNavItem[]; bonusBalance: number } {
       .then(({ data }) => setBonusBalance((data as { bonus_balance?: number } | null)?.bonus_balance ?? 0));
     supabase.from("support_tickets").select("*", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "open")
       .then(({ count }) => setOpenTickets(count ?? 0));
+    const loadUnread = () => {
+      supabase.from("shop_messages").select("*", { count: "exact", head: true })
+        .eq("buyer_id", user.id).eq("sender_role", "seller").is("read_at", null)
+        .then(({ count }) => setUnreadMsgs(count ?? 0));
+    };
+    loadUnread();
+    const ch = supabase.channel(`buyer-msg-badge-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "shop_messages", filter: `buyer_id=eq.${user.id}` }, loadUnread)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
   }, [user]);
 
   const items: PanelNavItem[] = [
