@@ -57,7 +57,7 @@ function OrdersPage() {
   const filtered = filter === "all" ? orders : orders.filter((o) => o.status === filter);
 
   return (
-    <PanelLayout title="Şəxsi kabinet" subtitle={user.email ?? undefined} items={items}>
+    <PanelLayout title="Müştərinin şəxsi kabineti" subtitle={user.email ?? undefined} items={items}>
       <div>
         <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2"><Package className="h-6 w-6 text-primary" /> Sifarişlərim</h1>
         <div className="flex gap-2 overflow-x-auto pb-2 mb-4">

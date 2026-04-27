@@ -68,7 +68,7 @@ function Profile() {
   if (!user) return null;
 
   return (
-    <PanelLayout title="Şəxsi kabinet" subtitle={user.email ?? undefined} items={items}>
+    <PanelLayout title="Müştərinin şəxsi kabineti" subtitle={user.email ?? undefined} items={items}>
       <div className="space-y-6">
         <section className="bg-card border border-border rounded-2xl p-6">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><UserIcon className="h-5 w-5 text-primary" /> Şəxsi məlumatlar</h2>
