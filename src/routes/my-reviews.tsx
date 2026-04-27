@@ -28,7 +28,7 @@ function MyReviewsPage() {
   const load = () => {
     if (!user) return;
     supabase.from("reviews").select("*, products(title,image_url)").eq("user_id", user.id).order("created_at", { ascending: false })
-      .then(({ data }) => setReviews((data ?? []) as Review[]));
+      .then(({ data }) => setReviews((data ?? []) as unknown as Review[]));
   };
   useEffect(load, [user]);
 
