@@ -218,17 +218,14 @@ function SellerPanel() {
   };
 
   const navItems: PanelNavItem[] = [
-    { to: "/seller#dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/seller#products", label: "Məhsullar", icon: Package, badge: products.length },
-    { to: "/seller#orders", label: "Sifarişlər", icon: ShoppingBag, badge: pendingOrders },
-    { to: "/seller#shop", label: "Mağaza ayarları", icon: Settings },
+    { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, active: tab === "dashboard", onClick: () => setTab("dashboard") },
+    { key: "products", label: "Məhsullar", icon: Package, badge: products.length, active: tab === "products", onClick: () => setTab("products") },
+    { key: "orders", label: "Sifarişlər", icon: ShoppingBag, badge: pendingOrders, active: tab === "orders", onClick: () => setTab("orders") },
+    { key: "shop", label: "Mağaza ayarları", icon: Settings, active: tab === "shop", onClick: () => setTab("shop") },
   ];
 
   return (
-    <PanelLayout title="Satıcı paneli" subtitle={profile?.shop_name ?? "Mağazam"} items={navItems.map((it) => ({
-      ...it,
-      // Override Link click: use tab instead of route
-    }))}>
+    <PanelLayout title="Satıcı paneli" subtitle={profile?.shop_name ?? "Mağazam"} items={navItems}>
       <div className="flex flex-wrap items-center gap-2 mb-4 lg:hidden">
         {([
           ["dashboard", "Dashboard"],
@@ -241,21 +238,6 @@ function SellerPanel() {
             {l}
           </button>
         ))}
-      </div>
-      <div className="hidden lg:flex gap-1 bg-secondary rounded-xl p-1 mb-4 w-fit">
-        {([
-          ["dashboard", "Dashboard"],
-          ["products", "Məhsullar"],
-          ["orders", "Sifarişlər"],
-          ["shop", "Mağaza"],
-        ] as const).map(([t, l]) => (
-          <button key={t} onClick={() => setTab(t)}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${tab === t ? "bg-card shadow-sm" : "text-muted-foreground"}`}>
-            {l}
-          </button>
-        ))}
-      </div>
-        </div>
       </div>
 
       {tab === "dashboard" && (
