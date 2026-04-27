@@ -7,7 +7,7 @@ import { Users, Package, ShoppingBag, DollarSign, Shield } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin paneli — WB market" }] }),
+  head: () => ({ meta: [{ title: "Admin paneli — One Board Market" }] }),
   component: AdminPanel,
 });
 

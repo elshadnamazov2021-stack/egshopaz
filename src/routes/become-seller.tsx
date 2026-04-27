@@ -6,7 +6,7 @@ import { Store, TrendingUp, Package } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/become-seller")({
-  head: () => ({ meta: [{ title: "Satıcı ol — WB market" }] }),
+  head: () => ({ meta: [{ title: "Satıcı ol — One Board Market" }] }),
   component: BecomeSeller,
 });
 
@@ -44,7 +44,7 @@ function BecomeSeller() {
     <div className="container mx-auto px-4 py-10 max-w-3xl">
       <div className="bg-gradient-brand text-primary-foreground rounded-3xl p-8 mb-6 shadow-elegant">
         <Store className="h-12 w-12 mb-3 opacity-90" />
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-2">WB market-də satıcı olun</h1>
+        <h1 className="text-3xl md:text-4xl font-extrabold mb-2">One Board Market-də satıcı olun</h1>
         <p className="opacity-90">Milyonlarla alıcıya çıxış əldə edin. Pulsuz qeydiyyat, sadə idarəetmə.</p>
       </div>
 

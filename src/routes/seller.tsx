@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 export const Route = createFileRoute("/seller")({
-  head: () => ({ meta: [{ title: "Satıcı paneli — WB market" }] }),
+  head: () => ({ meta: [{ title: "Satıcı paneli — One Board Market" }] }),
   component: SellerPanel,
 });
 

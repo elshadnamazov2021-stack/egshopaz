@@ -7,9 +7,9 @@ import { Truck, ShieldCheck, Tag, Clock } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "WB market — Azərbaycanın onlayn marketi" },
+      { title: "One Board Market — Azərbaycanın onlayn marketi" },
       { name: "description", content: "Geyim, texnika, ev üçün mallar — sərfəli qiymətlərlə. Azərbaycan üzrə çatdırılma." },
-      { property: "og:title", content: "WB market — Azərbaycanın onlayn marketi" },
+      { property: "og:title", content: "One Board Market — Azərbaycanın onlayn marketi" },
       { property: "og:description", content: "Milyonlarla məhsul, sürətli çatdırılma." },
     ],
   }),

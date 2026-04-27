@@ -7,7 +7,7 @@ import { Package, MapPin, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/profile")({
-  head: () => ({ meta: [{ title: "Şəxsi kabinet — WB market" }] }),
+  head: () => ({ meta: [{ title: "Şəxsi kabinet — One Board Market" }] }),
   component: Profile,
 });
 
