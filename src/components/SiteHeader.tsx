@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Search, ShoppingCart, User, Heart, Menu, LogOut, Store } from "lucide-react";
+import { Search, ShoppingCart, User, Heart, LogOut, Store } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
