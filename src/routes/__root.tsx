@@ -3,6 +3,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { MainSidebar } from "@/components/MainSidebar";
 
 import appCss from "../styles.css?url";
 
@@ -55,13 +57,18 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <AuthProvider>
-      <div className="min-h-screen flex flex-col bg-background">
-        <SiteHeader />
-        <main className="flex-1">
-          <Outlet />
-        </main>
-        <SiteFooter />
-      </div>
+      <SidebarProvider defaultOpen={false}>
+        <div className="min-h-screen flex flex-col bg-background w-full">
+          <MainSidebar />
+          <div className="flex-1 flex flex-col min-w-0">
+            <SiteHeader />
+            <main className="flex-1">
+              <Outlet />
+            </main>
+            <SiteFooter />
+          </div>
+        </div>
+      </SidebarProvider>
       <Toaster position="top-center" richColors />
     </AuthProvider>
   );

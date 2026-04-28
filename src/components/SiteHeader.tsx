@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Search, ShoppingCart, User, Heart, Menu, LogOut, Store } from "lucide-react";
+import { Search, ShoppingCart, User, Heart, LogOut, Store } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -38,14 +39,12 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
       <div className="container mx-auto px-4 h-16 flex items-center gap-4">
+        <SidebarTrigger className="shrink-0" />
+
         <Link to="/" className="flex items-center gap-2 font-extrabold text-2xl shrink-0">
           <span className="bg-gradient-brand text-primary-foreground px-2 py-1 rounded-md">OBM</span>
           <span className="hidden sm:inline text-gradient-brand">market</span>
         </Link>
-
-        <button className="md:hidden p-2" aria-label="Menu">
-          <Menu className="h-5 w-5" />
-        </button>
 
         <form onSubmit={onSearch} className="flex-1 max-w-2xl hidden md:flex">
           <div className="relative w-full">

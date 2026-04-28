@@ -1,0 +1,193 @@
+import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
+  SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton,
+  SidebarMenuItem, useSidebar,
+} from "@/components/ui/sidebar";
+import {
+  Home, LayoutGrid, Heart, ShoppingCart, MessageCircle, Package,
+  Bell, Tag, Gift, Store, User, HelpCircle, ChevronDown, ChevronRight,
+} from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+
+interface Category { id: string; name: string; slug: string; icon: string | null; parent_id: string | null }
+
+export function MainSidebar() {
+  const { user, isSeller } = useAuth();
+  const { setOpenMobile, isMobile } = useSidebar();
+  const [cats, setCats] = useState<Category[]>([]);
+  const [openCat, setOpenCat] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.from("categories").select("*").order("sort_order").then(({ data }) => {
+      setCats((data ?? []) as Category[]);
+    });
+  }, []);
+
+  const close = () => { if (isMobile) setOpenMobile(false); };
+
+  const parents = cats.filter((c) => !c.parent_id);
+  const childrenOf = (pid: string) => cats.filter((c) => c.parent_id === pid);
+
+  const mainLinks = [
+    { to: "/", label: "Ana səhifə", icon: Home },
+    { to: "/catalog", label: "Kataloq", icon: LayoutGrid, search: { q: undefined, cat: undefined } as never },
+    { to: "/promotions", label: "Aksiyalar", icon: Tag },
+    { to: "/bonus", label: "Bonuslar", icon: Gift },
+  ];
+
+  const userLinks = user ? [
+    { to: "/profile", label: "Şəxsi kabinet", icon: User },
+    { to: "/orders", label: "Sifarişlərim", icon: Package },
+    { to: "/favorites", label: "Sevimlilər", icon: Heart },
+    { to: "/cart", label: "Səbət", icon: ShoppingCart },
+    { to: "/messages", label: "Mesajlar", icon: MessageCircle },
+    { to: "/notifications", label: "Bildirişlər", icon: Bell },
+  ] : [];
+
+  return (
+    <Sidebar collapsible="offcanvas">
+      <SidebarHeader className="border-b border-sidebar-border">
+        <Link to="/" onClick={close} className="flex items-center gap-2 font-extrabold text-xl px-2 py-2">
+          <span className="bg-gradient-brand text-primary-foreground px-2 py-1 rounded-md">OBM</span>
+          <span className="text-gradient-brand">market</span>
+        </Link>
+      </SidebarHeader>
+
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Əsas menyu</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {mainLinks.map((l) => (
+                <SidebarMenuItem key={l.to}>
+                  <SidebarMenuButton asChild>
+                    <Link to={l.to} search={l.search} onClick={close}>
+                      <l.icon className="h-4 w-4" />
+                      <span>{l.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Kateqoriyalar</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {parents.map((p) => {
+                const kids = childrenOf(p.id);
+                const open = openCat === p.id;
+                return (
+                  <SidebarMenuItem key={p.id}>
+                    {kids.length > 0 ? (
+                      <>
+                        <SidebarMenuButton onClick={() => setOpenCat(open ? null : p.id)}>
+                          <span className="text-base">{p.icon}</span>
+                          <span className="flex-1 text-left">{p.name}</span>
+                          {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                        </SidebarMenuButton>
+                        {open && (
+                          <ul className="ml-7 mt-1 space-y-1 border-l border-sidebar-border pl-2">
+                            <li>
+                              <Link
+                                to="/catalog"
+                                search={{ cat: p.slug, q: undefined } as never}
+                                onClick={close}
+                                className="block text-xs py-1.5 px-2 rounded hover:bg-sidebar-accent hover:text-sidebar-accent-foreground font-medium"
+                              >
+                                Hamısı
+                              </Link>
+                            </li>
+                            {kids.map((k) => (
+                              <li key={k.id}>
+                                <Link
+                                  to="/catalog"
+                                  search={{ cat: k.slug, q: undefined } as never}
+                                  onClick={close}
+                                  className="block text-xs py-1.5 px-2 rounded hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                                >
+                                  {k.name}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </>
+                    ) : (
+                      <SidebarMenuButton asChild>
+                        <Link to="/catalog" search={{ cat: p.slug, q: undefined } as never} onClick={close}>
+                          <span className="text-base">{p.icon}</span>
+                          <span>{p.name}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    )}
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {user && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Kabinetim</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {userLinks.map((l) => (
+                  <SidebarMenuItem key={l.to}>
+                    <SidebarMenuButton asChild>
+                      <Link to={l.to} onClick={close}>
+                        <l.icon className="h-4 w-4" />
+                        <span>{l.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+                {isSeller && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link to="/seller" onClick={close}>
+                        <Store className="h-4 w-4" />
+                        <span>Satıcı paneli</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {!isSeller && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <Link to="/become-seller" onClick={close}>
+                      <Store className="h-4 w-4" />
+                      <span>Mağaza aç</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link to="/support" onClick={close}>
+                    <HelpCircle className="h-4 w-4" />
+                    <span>Dəstək</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  );
+}
