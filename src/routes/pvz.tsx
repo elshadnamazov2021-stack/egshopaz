@@ -48,26 +48,27 @@ const mockStorage = [
 ];
 
 function PvzPanel() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<TabKey>("dashboard");
   const [shiftOpen, setShiftOpen] = useState(false);
   const [scan, setScan] = useState("");
   const [search, setSearch] = useState("");
 
   const items: PanelNavItem[] = [
-    { key: "dashboard", label: "Ana səhifə", icon: Home, active: tab === "dashboard", onClick: () => setTab("dashboard") },
-    { key: "intake", label: "Qəbul", icon: PackageOpen, active: tab === "intake", onClick: () => setTab("intake"), badge: mockExpected.length },
-    { key: "delivery", label: "Təhvil vermək", icon: ShoppingBag, active: tab === "delivery", onClick: () => setTab("delivery"), badge: mockPending.length },
-    { key: "returns", label: "Qaytarmalar", icon: Undo2, active: tab === "returns", onClick: () => setTab("returns") },
-    { key: "storage", label: "Saxlama", icon: Archive, active: tab === "storage", onClick: () => setTab("storage"), badge: 1 },
-    { key: "reports", label: "Hesabatlar", icon: BarChart3, active: tab === "reports", onClick: () => setTab("reports") },
-    { key: "finance", label: "Maliyyə", icon: Wallet, active: tab === "finance", onClick: () => setTab("finance") },
-    { key: "shift", label: "Növbə", icon: ClipboardList, active: tab === "shift", onClick: () => setTab("shift") },
-    { key: "settings", label: "Ayarlar", icon: Settings, active: tab === "settings", onClick: () => setTab("settings") },
-    { key: "support", label: "Dəstək", icon: LifeBuoy, active: tab === "support", onClick: () => setTab("support") },
+    { key: "dashboard", label: t("pvz.dashboard"), icon: Home, active: tab === "dashboard", onClick: () => setTab("dashboard") },
+    { key: "intake", label: t("pvz.intake"), icon: PackageOpen, active: tab === "intake", onClick: () => setTab("intake"), badge: mockExpected.length },
+    { key: "delivery", label: t("pvz.delivery"), icon: ShoppingBag, active: tab === "delivery", onClick: () => setTab("delivery"), badge: mockPending.length },
+    { key: "returns", label: t("pvz.returns"), icon: Undo2, active: tab === "returns", onClick: () => setTab("returns") },
+    { key: "storage", label: t("pvz.storage"), icon: Archive, active: tab === "storage", onClick: () => setTab("storage"), badge: 1 },
+    { key: "reports", label: t("pvz.reports"), icon: BarChart3, active: tab === "reports", onClick: () => setTab("reports") },
+    { key: "finance", label: t("pvz.finance"), icon: Wallet, active: tab === "finance", onClick: () => setTab("finance") },
+    { key: "shift", label: t("pvz.shift"), icon: ClipboardList, active: tab === "shift", onClick: () => setTab("shift") },
+    { key: "settings", label: t("pvz.settings"), icon: Settings, active: tab === "settings", onClick: () => setTab("settings") },
+    { key: "support", label: t("pvz.support"), icon: LifeBuoy, active: tab === "support", onClick: () => setTab("support") },
   ];
 
   return (
-    <PanelLayout title="PVZ İŞÇİ PANELİ" subtitle="Bakı — N-12 nöqtə" items={items}>
+    <PanelLayout title={t("pvz.title")} subtitle="Bakı — N-12 nöqtə" items={items}>
       {!shiftOpen && tab !== "shift" && (
         <div className="mb-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-3 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm">
