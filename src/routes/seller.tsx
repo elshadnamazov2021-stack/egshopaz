@@ -26,6 +26,7 @@ interface Category { id: string; name: string }
 interface OrderItem {
   id: string; title: string; price: number; quantity: number;
   image_url: string | null; order_id: string; status: string; product_id: string;
+  pickup_code: string | null;
 }
 interface Profile {
   full_name: string | null; shop_name: string | null; phone: string | null; avatar_url: string | null;
