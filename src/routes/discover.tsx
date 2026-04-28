@@ -32,12 +32,13 @@ function Discover() {
   useEffect(() => {
     setLoading(true);
     const run = async () => {
-      let q = supabase.from("products")
+      const base = () => supabase.from("products")
         .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
         .eq("is_active", true);
 
       if (tab === "discounted") {
-        q = q.not("old_price", "is", null).order("old_price", { ascending: false });
+        const { data } = await base().not("old_price", "is", null).order("old_price", { ascending: false }).limit(40);
+        setProducts((data ?? []) as ProductCardData[]); setLoading(false); return;
       } else if (tab === "favorites") {
         // Most-favorited via aggregate
         const { data: favAgg } = await supabase
