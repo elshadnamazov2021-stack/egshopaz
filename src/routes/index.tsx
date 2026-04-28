@@ -23,7 +23,7 @@ function Index() {
   const [products, setProducts] = useState<ProductCardData[]>([]);
 
   useEffect(() => {
-    supabase.from("categories").select("*").order("sort_order").then(({ data }) => setCategories(data ?? []));
+    supabase.from("categories").select("*").is("parent_id", null).order("sort_order").then(({ data }) => setCategories(data ?? []));
     supabase.from("products")
       .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
       .eq("is_active", true)
