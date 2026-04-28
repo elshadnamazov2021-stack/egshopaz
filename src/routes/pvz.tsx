@@ -9,7 +9,7 @@ import {
   Home, PackageOpen, ShoppingBag, Undo2, Archive, BarChart3,
   Wallet, ClipboardList, Settings, LifeBuoy, ScanLine, Search,
   CheckCircle2, AlertTriangle, Printer, Camera, PhoneCall, Clock,
-  Plus, XCircle, FileText, TrendingUp,
+  Plus, XCircle, FileText, TrendingUp, Bell,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -106,45 +106,72 @@ function StatCard({ icon: Icon, label, value, accent }: { icon: any; label: stri
   );
 }
 
+interface PvzNotif { id: string; title: string; body: string; type: string; pickup_code: string | null; is_read: boolean; created_at: string }
+
 function Dashboard() {
+  const [notifs, setNotifs] = useState<PvzNotif[]>([]);
+  const unread = notifs.filter((n) => !n.is_read).length;
+
+  const load = () => {
+    supabase.from("pvz_notifications").select("*")
+      .order("created_at", { ascending: false }).limit(15)
+      .then(({ data }) => setNotifs((data ?? []) as PvzNotif[]));
+  };
+  useEffect(() => {
+    load();
+    const ch = supabase.channel("pvz-dash-notif")
+      .on("postgres_changes", { event: "*", schema: "public", table: "pvz_notifications" }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
+
+  const markAll = async () => {
+    await supabase.from("pvz_notifications").update({ is_read: true }).eq("is_read", false);
+    toast.success("Hamısı oxundu");
+  };
+
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-extrabold flex items-center gap-2"><Home className="h-6 w-6 text-primary" /> Ana səhifə</h1>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard icon={PackageOpen} label="Bu gün gözlənilən" value="14" />
+        <StatCard icon={Bell} label="Yeni bildiriş" value={String(unread)} accent={unread > 0 ? "text-rose-500" : "text-primary"} />
         <StatCard icon={ShoppingBag} label="Təhvil verilməmiş" value="23" accent="text-amber-500" />
         <StatCard icon={Undo2} label="Qaytarılacaq" value="5" accent="text-rose-500" />
         <StatCard icon={TrendingUp} label="Bugün təhvil" value="38" accent="text-emerald-500" />
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-4">
-        <div className="bg-card border border-border rounded-2xl p-4">
-          <div className="font-bold mb-3 flex items-center gap-2"><Clock className="h-4 w-4" /> Bu gün gözlənilən sifarişlər</div>
-          <Table>
-            <TableHeader><TableRow><TableHead>Kod</TableHead><TableHead>Müştəri</TableHead><TableHead>ETA</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
-            <TableBody>
-              {mockExpected.map((o) => (
-                <TableRow key={o.id}>
-                  <TableCell className="font-mono">{o.id}</TableCell>
-                  <TableCell>{o.buyer}</TableCell>
-                  <TableCell>{o.eta}</TableCell>
-                  <TableCell><span className={o.status === "Çatıb" ? "text-emerald-600 font-semibold" : "text-amber-600"}>{o.status}</span></TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+      <div className="bg-card border border-border rounded-2xl p-4">
+        <div className="font-bold mb-3 flex items-center justify-between">
+          <span className="flex items-center gap-2"><Bell className="h-4 w-4 text-primary" /> PVZ bildirişləri</span>
+          {unread > 0 && (
+            <Button size="sm" variant="ghost" onClick={markAll}>Hamısı oxundu</Button>
+          )}
         </div>
-
-        <div className="bg-card border border-border rounded-2xl p-4">
-          <div className="font-bold mb-3 flex items-center gap-2"><BarChart3 className="h-4 w-4" /> Ümumi statistika (gün)</div>
-          <ul className="text-sm space-y-2">
-            <li className="flex justify-between"><span>Qəbul edilən</span><b>21</b></li>
-            <li className="flex justify-between"><span>Təhvil verilən</span><b>38</b></li>
-            <li className="flex justify-between"><span>Qaytarılan</span><b>4</b></li>
-            <li className="flex justify-between"><span>Saxlamada</span><b>62</b></li>
-            <li className="flex justify-between text-emerald-600"><span>Qazanc (komissiya)</span><b>{formatAZN(48.5)}</b></li>
-          </ul>
-        </div>
+        {notifs.length === 0 ? (
+          <div className="text-sm text-muted-foreground text-center py-6">Hələ bildiriş yoxdur</div>
+        ) : (
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {notifs.map((n) => (
+              <div key={n.id} className={`p-3 rounded-xl border ${!n.is_read ? "border-primary/40 bg-primary/5" : "border-border bg-card"}`}>
+                <div className="flex items-start gap-2">
+                  {!n.is_read && <span className="w-2 h-2 rounded-full bg-primary mt-2 shrink-0" />}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-sm">{n.title}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">{n.body}</div>
+                    {n.pickup_code && (
+                      <div className="mt-1.5 inline-block font-mono text-xs font-bold bg-primary/10 text-primary px-2 py-1 rounded">
+                        Kod: {n.pickup_code}
+                      </div>
+                    )}
+                    <div className="text-[10px] text-muted-foreground mt-1">
+                      {new Date(n.created_at).toLocaleString("az-AZ")}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
