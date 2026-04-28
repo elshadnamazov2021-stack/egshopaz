@@ -78,6 +78,9 @@ function Index() {
         <div className="absolute right-20 top-10 w-40 h-40 bg-background/10 rounded-full blur-2xl" />
       </section>
 
+      {/* Sponsored products (paid placement) */}
+      <SponsoredProducts limit={6} />
+
       {/* Benefits */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
