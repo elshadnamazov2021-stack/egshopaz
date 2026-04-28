@@ -8,7 +8,7 @@ import { MessageCircle, Send, Search } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/messages")({
-  head: () => ({ meta: [{ title: "Mesajlarım — One Board Market" }] }),
+  head: () => ({ meta: [{ title: "Mesajlarım — Elzan Shop" }] }),
   component: MessagesPage,
 });
 

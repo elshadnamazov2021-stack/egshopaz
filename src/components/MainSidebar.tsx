@@ -51,7 +51,7 @@ export function MainSidebar() {
     <Sidebar collapsible="offcanvas">
       <SidebarHeader className="border-b border-sidebar-border">
         <Link to="/" onClick={close} className="flex items-center gap-2 font-extrabold text-xl px-2 py-2">
-          <span className="bg-gradient-brand text-primary-foreground px-2 py-1 rounded-md">OBM</span>
+          <span className="bg-gradient-brand text-primary-foreground px-2 py-1 rounded-md">Elzan Shop</span>
           <span className="text-gradient-brand">market</span>
         </Link>
       </SidebarHeader>

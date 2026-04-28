@@ -10,7 +10,7 @@ import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { SellerMessages } from "@/components/SellerMessages";
 
 export const Route = createFileRoute("/seller")({
-  head: () => ({ meta: [{ title: "Satıcı paneli — One Board Market" }] }),
+  head: () => ({ meta: [{ title: "Satıcı paneli — Elzan Shop" }] }),
   component: SellerPanel,
 });
 

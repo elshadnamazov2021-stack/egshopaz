@@ -7,7 +7,7 @@ import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { Coins, TrendingUp, TrendingDown } from "lucide-react";
 
 export const Route = createFileRoute("/bonus")({
-  head: () => ({ meta: [{ title: "Bonus xallar — One Board Market" }] }),
+  head: () => ({ meta: [{ title: "Bonus xallar — Elzan Shop" }] }),
   component: BonusPage,
 });
 

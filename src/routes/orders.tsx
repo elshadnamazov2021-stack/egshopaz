@@ -9,7 +9,7 @@ import { Package, MapPin, X, MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/orders")({
-  head: () => ({ meta: [{ title: "Sifarişlərim — One Board Market" }] }),
+  head: () => ({ meta: [{ title: "Sifarişlərim — Elzan Shop" }] }),
   component: OrdersPage,
 });
 

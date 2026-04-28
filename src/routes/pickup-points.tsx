@@ -7,7 +7,7 @@ import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { MapPin, Clock, Phone, Search } from "lucide-react";
 
 export const Route = createFileRoute("/pickup-points")({
-  head: () => ({ meta: [{ title: "Çatdırış nöqtələri — One Board Market" }] }),
+  head: () => ({ meta: [{ title: "Çatdırış nöqtələri — Elzan Shop" }] }),
   component: PickupPointsPage,
 });
 

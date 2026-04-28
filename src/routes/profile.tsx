@@ -9,7 +9,7 @@ import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
 
 export const Route = createFileRoute("/profile")({
-  head: () => ({ meta: [{ title: "Şəxsi kabinet — One Board Market" }] }),
+  head: () => ({ meta: [{ title: "Şəxsi kabinet — Elzan Shop" }] }),
   component: Profile,
 });
 

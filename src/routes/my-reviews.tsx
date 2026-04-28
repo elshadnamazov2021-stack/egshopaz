@@ -8,7 +8,7 @@ import { Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/my-reviews")({
-  head: () => ({ meta: [{ title: "Rəylərim — One Board Market" }] }),
+  head: () => ({ meta: [{ title: "Rəylərim — Elzan Shop" }] }),
   component: MyReviewsPage,
 });
 

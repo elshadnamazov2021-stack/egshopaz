@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import obmLogo from "@/assets/obm-logo.png";
+import elzanLogo from "@/assets/elzan-logo.png";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -43,8 +43,8 @@ export function SiteHeader() {
       <div className="container mx-auto px-4 h-24 flex items-center gap-4">
         <SidebarTrigger className="shrink-0" />
 
-        <Link to="/" className="flex items-center shrink-0" aria-label="OB market">
-          <img src={obmLogo} alt="OB market logo" width={1024} height={512} className="h-20 sm:h-24 w-auto object-contain" />
+        <Link to="/" className="flex items-center shrink-0" aria-label="Elzan Shop">
+          <img src={elzanLogo} alt="Elzan Shop logo" width={1024} height={512} className="h-20 sm:h-24 w-auto object-contain" />
         </Link>
 
         <form onSubmit={onSearch} className="flex-1 max-w-2xl hidden md:flex">

@@ -8,7 +8,7 @@ import { MessageCircle, Plus, Send } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/support")({
-  head: () => ({ meta: [{ title: "Dəstək — One Board Market" }] }),
+  head: () => ({ meta: [{ title: "Dəstək — Elzan Shop" }] }),
   component: SupportPage,
 });
 

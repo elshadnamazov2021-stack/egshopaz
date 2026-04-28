@@ -6,7 +6,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Giriş — One Board Market" }] }),
+  head: () => ({ meta: [{ title: "Giriş — Elzan Shop" }] }),
   component: AuthPage,
 });
 
