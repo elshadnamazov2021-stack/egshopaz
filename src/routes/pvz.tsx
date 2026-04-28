@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { QRScannerDialog } from "@/components/QRScannerDialog";
 import { useTranslation } from "react-i18next";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { formatAZN } from "@/lib/format";
@@ -149,22 +150,37 @@ function Dashboard() {
 }
 
 function Intake({ scan, setScan }: { scan: string; setScan: (v: string) => void }) {
+  const [scannerOpen, setScannerOpen] = useState(false);
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-extrabold flex items-center gap-2"><PackageOpen className="h-6 w-6 text-primary" /> Qəbul</h1>
 
       <div className="bg-card border border-border rounded-2xl p-4">
-        <Label className="mb-2 block">Ştrixkod skan</Label>
+        <Label className="mb-2 block">Ştrixkod / QR skan</Label>
         <div className="flex gap-2">
           <div className="relative flex-1">
             <ScanLine className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input value={scan} onChange={(e) => setScan(e.target.value)} placeholder="Ştrixkodu skan edin və ya daxil edin..." className="pl-10" />
+            <Input value={scan} onChange={(e) => setScan(e.target.value)} placeholder="Ştrixkodu daxil edin və ya kamera ilə skan edin..." className="pl-10" />
           </div>
+          <Button variant="outline" onClick={() => setScannerOpen(true)} title="Kamera ilə skan">
+            <Camera className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">Kamera</span>
+          </Button>
           <Button onClick={() => { if (!scan) return; toast.success(`${scan} qəbul edildi`); setScan(""); }}>
-            <CheckCircle2 className="h-4 w-4 mr-1" /> Qəbul et
+            <CheckCircle2 className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">Qəbul et</span>
           </Button>
         </div>
+        <p className="text-xs text-muted-foreground mt-2">📱 Telefon kamerası ilə birbaşa QR / ştrixkod oxuya bilərsiniz</p>
       </div>
+
+      <QRScannerDialog
+        open={scannerOpen}
+        onOpenChange={setScannerOpen}
+        title="Sifariş ştrixkodu skan"
+        onScan={(value) => {
+          setScan(value);
+          toast.success(`Skan edildi: ${value}`);
+        }}
+      />
 
       <div className="bg-card border border-border rounded-2xl p-4">
         <div className="font-bold mb-3">Anbardan gələn mallar</div>
@@ -190,6 +206,7 @@ function Intake({ scan, setScan }: { scan: string; setScan: (v: string) => void 
 }
 
 function Delivery({ search, setSearch }: { search: string; setSearch: (v: string) => void }) {
+  const [scannerOpen, setScannerOpen] = useState(false);
   const filtered = mockPending.filter((o) =>
     !search || o.id.includes(search) || o.phone.includes(search) || o.code.includes(search) || o.buyer.toLowerCase().includes(search.toLowerCase())
   );
@@ -199,11 +216,26 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
 
       <div className="bg-card border border-border rounded-2xl p-4">
         <Label className="mb-2 block">Müştəri axtarışı (kod / telefon / ad)</Label>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="WB-... və ya +994..." className="pl-10" />
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="WB-... və ya +994..." className="pl-10" />
+          </div>
+          <Button variant="outline" onClick={() => setScannerOpen(true)} title="Müştəri QR kodunu skan et">
+            <Camera className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">Skan</span>
+          </Button>
         </div>
       </div>
+
+      <QRScannerDialog
+        open={scannerOpen}
+        onOpenChange={setScannerOpen}
+        title="Müştəri kodunu skan et"
+        onScan={(value) => {
+          setSearch(value);
+          toast.success(`Axtarış: ${value}`);
+        }}
+      />
 
       <div className="bg-card border border-border rounded-2xl p-4">
         <div className="font-bold mb-3">Təhvil verilməmiş sifarişlər</div>
