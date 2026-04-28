@@ -149,7 +149,7 @@ function Dashboard() {
 function Intake({ scan, setScan }: { scan: string; setScan: (v: string) => void }) {
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-extrabold flex items-center gap-2"><PackageOpen className="h-6 w-6 text-primary" /> Qəbul (Приёмка)</h1>
+      <h1 className="text-2xl font-extrabold flex items-center gap-2"><PackageOpen className="h-6 w-6 text-primary" /> Qəbul</h1>
 
       <div className="bg-card border border-border rounded-2xl p-4">
         <Label className="mb-2 block">Ştrixkod skan</Label>
@@ -193,7 +193,7 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
   );
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-extrabold flex items-center gap-2"><ShoppingBag className="h-6 w-6 text-primary" /> Təhvil vermək (Выдача)</h1>
+      <h1 className="text-2xl font-extrabold flex items-center gap-2"><ShoppingBag className="h-6 w-6 text-primary" /> Təhvil vermək</h1>
 
       <div className="bg-card border border-border rounded-2xl p-4">
         <Label className="mb-2 block">Müştəri axtarışı (kod / telefon / ad)</Label>
@@ -232,7 +232,7 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
 function Returns() {
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-extrabold flex items-center gap-2"><Undo2 className="h-6 w-6 text-primary" /> Qaytarmalar (Возвраты)</h1>
+      <h1 className="text-2xl font-extrabold flex items-center gap-2"><Undo2 className="h-6 w-6 text-primary" /> Qaytarmalar</h1>
       <div className="bg-card border border-border rounded-2xl p-4">
         <div className="font-bold mb-3">Qəbul olunmuş qaytarmalar</div>
         <Table>
@@ -261,7 +261,7 @@ function Returns() {
 function Storage() {
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-extrabold flex items-center gap-2"><Archive className="h-6 w-6 text-primary" /> Saxlama (Хранение)</h1>
+      <h1 className="text-2xl font-extrabold flex items-center gap-2"><Archive className="h-6 w-6 text-primary" /> Saxlama</h1>
       <div className="grid grid-cols-3 gap-3">
         <StatCard icon={Archive} label="Cəmi saxlamada" value="62" />
         <StatCard icon={Clock} label="Müddəti azalan" value="7" accent="text-amber-500" />
