@@ -161,7 +161,11 @@ export function SiteHeader() {
         </div>
       </form>
 
-      <VisualSearchDialog open={visualOpen} onOpenChange={setVisualOpen} />
+      {visualOpen && (
+        <Suspense fallback={null}>
+          <VisualSearchDialog open={visualOpen} onOpenChange={setVisualOpen} />
+        </Suspense>
+      )}
     </header>
   );
 }
