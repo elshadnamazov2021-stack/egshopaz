@@ -19,19 +19,22 @@ export function SiteHeader() {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [cartCount, setCartCount] = useState(0);
+  const [favCount, setFavCount] = useState(0);
 
   useEffect(() => {
-    if (!user) { setCartCount(0); return; }
+    if (!user) { setCartCount(0); setFavCount(0); return; }
     let active = true;
     const load = async () => {
-      const { count } = await supabase
-        .from("cart_items").select("*", { count: "exact", head: true })
-        .eq("user_id", user.id);
-      if (active) setCartCount(count ?? 0);
+      const [{ count: c }, { count: f }] = await Promise.all([
+        supabase.from("cart_items").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+        supabase.from("favorites").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+      ]);
+      if (active) { setCartCount(c ?? 0); setFavCount(f ?? 0); }
     };
     load();
-    const ch = supabase.channel("cart-count")
+    const ch = supabase.channel("hdr-counts")
       .on("postgres_changes", { event: "*", schema: "public", table: "cart_items", filter: `user_id=eq.${user.id}` }, load)
+      .on("postgres_changes", { event: "*", schema: "public", table: "favorites", filter: `user_id=eq.${user.id}` }, load)
       .subscribe();
     return () => { active = false; supabase.removeChannel(ch); };
   }, [user]);
@@ -64,8 +67,17 @@ export function SiteHeader() {
 
         <nav className="ml-auto flex items-center gap-1 sm:gap-2">
           <LanguageSwitcher />
-          <Link to="/favorites" className="hidden sm:flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
+          <Link to="/discover" className="hidden md:flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
+            <span className="h-5 w-5 mb-0.5 text-base">🔥</span>
+            <span>Kəşfet</span>
+          </Link>
+          <Link to="/favorites" className="relative flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
             <Heart className="h-5 w-5 mb-0.5" />
+            {favCount > 0 && (
+              <span className="absolute top-0 right-1 bg-discount text-discount-foreground text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
+                {favCount}
+              </span>
+            )}
             <span>{t("header.favorites")}</span>
           </Link>
           <Link to="/cart" className="relative flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">

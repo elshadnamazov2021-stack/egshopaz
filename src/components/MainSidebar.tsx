@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/sidebar";
 import {
   Home, LayoutGrid, Heart, ShoppingCart, MessageCircle, Package,
-  Bell, Tag, Gift, Store, User, HelpCircle, ChevronDown, ChevronRight, Shield, PackageOpen,
+  Bell, Tag, Gift, Store, User, HelpCircle, ChevronDown, ChevronRight, Shield, PackageOpen, Flame,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -36,6 +36,7 @@ export function MainSidebar() {
   const mainLinks = [
     { to: "/", label: t("sidebar.home"), icon: Home },
     { to: "/catalog", label: t("sidebar.catalog"), icon: LayoutGrid, search: { q: undefined, cat: undefined } as never },
+    { to: "/discover", label: "Kəşfet", icon: Flame },
     { to: "/promotions", label: t("sidebar.promotions"), icon: Tag },
     { to: "/bonus", label: t("sidebar.bonuses"), icon: Gift },
   ];

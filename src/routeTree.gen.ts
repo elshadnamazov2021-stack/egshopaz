@@ -21,6 +21,7 @@ import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MyReviewsRouteImport } from './routes/my-reviews'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as FavoritesRouteImport } from './routes/favorites'
+import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as BonusRouteImport } from './routes/bonus'
@@ -91,6 +92,11 @@ const FavoritesRoute = FavoritesRouteImport.update({
   path: '/favorites',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiscoverRoute = DiscoverRouteImport.update({
+  id: '/discover',
+  path: '/discover',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CatalogRoute = CatalogRouteImport.update({
   id: '/catalog',
   path: '/catalog',
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/bonus': typeof BonusRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
+  '/discover': typeof DiscoverRoute
   '/favorites': typeof FavoritesRoute
   '/messages': typeof MessagesRoute
   '/my-reviews': typeof MyReviewsRoute
@@ -169,6 +176,7 @@ export interface FileRoutesByTo {
   '/bonus': typeof BonusRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
+  '/discover': typeof DiscoverRoute
   '/favorites': typeof FavoritesRoute
   '/messages': typeof MessagesRoute
   '/my-reviews': typeof MyReviewsRoute
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/bonus': typeof BonusRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
+  '/discover': typeof DiscoverRoute
   '/favorites': typeof FavoritesRoute
   '/messages': typeof MessagesRoute
   '/my-reviews': typeof MyReviewsRoute
@@ -218,6 +227,7 @@ export interface FileRouteTypes {
     | '/bonus'
     | '/cart'
     | '/catalog'
+    | '/discover'
     | '/favorites'
     | '/messages'
     | '/my-reviews'
@@ -241,6 +251,7 @@ export interface FileRouteTypes {
     | '/bonus'
     | '/cart'
     | '/catalog'
+    | '/discover'
     | '/favorites'
     | '/messages'
     | '/my-reviews'
@@ -264,6 +275,7 @@ export interface FileRouteTypes {
     | '/bonus'
     | '/cart'
     | '/catalog'
+    | '/discover'
     | '/favorites'
     | '/messages'
     | '/my-reviews'
@@ -288,6 +300,7 @@ export interface RootRouteChildren {
   BonusRoute: typeof BonusRoute
   CartRoute: typeof CartRoute
   CatalogRoute: typeof CatalogRoute
+  DiscoverRoute: typeof DiscoverRoute
   FavoritesRoute: typeof FavoritesRoute
   MessagesRoute: typeof MessagesRoute
   MyReviewsRoute: typeof MyReviewsRoute
@@ -389,6 +402,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FavoritesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/discover': {
+      id: '/discover'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof DiscoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/catalog': {
       id: '/catalog'
       path: '/catalog'
@@ -464,6 +484,7 @@ const rootRouteChildren: RootRouteChildren = {
   BonusRoute: BonusRoute,
   CartRoute: CartRoute,
   CatalogRoute: CatalogRoute,
+  DiscoverRoute: DiscoverRoute,
   FavoritesRoute: FavoritesRoute,
   MessagesRoute: MessagesRoute,
   MyReviewsRoute: MyReviewsRoute,
