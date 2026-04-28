@@ -615,6 +615,32 @@ function SellerPanel() {
           </div>
         </div>
       )}
+
+      {qrProduct && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setQrProduct(null)}>
+          <div className="bg-card rounded-2xl p-6 max-w-sm w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-lg">Məhsul QR kodu</h3>
+              <button onClick={() => setQrProduct(null)} className="p-1 hover:bg-secondary rounded"><X className="h-5 w-5" /></button>
+            </div>
+            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{qrProduct.title}</p>
+            {qrDataUrl && (
+              <div className="bg-white p-4 rounded-xl flex items-center justify-center mb-4">
+                <img src={qrDataUrl} alt="QR" className="w-full max-w-[280px]" />
+              </div>
+            )}
+            <div className="text-xs text-muted-foreground mb-4 break-all bg-secondary/50 p-2 rounded">
+              {window.location.origin}/product/{qrProduct.id}
+            </div>
+            <div className="flex gap-2">
+              <button onClick={downloadQR} className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold hover:bg-primary/90 inline-flex items-center justify-center gap-2">
+                <Download className="h-4 w-4" /> Yüklə (PNG)
+              </button>
+              <button onClick={() => setQrProduct(null)} className="px-4 py-2 rounded-lg border border-border hover:bg-secondary">Bağla</button>
+            </div>
+          </div>
+        </div>
+      )}
     </PanelLayout>
   );
 }
