@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -16,6 +17,7 @@ interface Category { id: string; name: string; slug: string; icon: string | null
 
 export function MainSidebar() {
   const { user, isSeller } = useAuth();
+  const { t } = useTranslation();
   const { setOpenMobile, isMobile } = useSidebar();
   const [cats, setCats] = useState<Category[]>([]);
   const [openCat, setOpenCat] = useState<string | null>(null);
