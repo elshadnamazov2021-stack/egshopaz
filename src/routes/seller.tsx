@@ -229,6 +229,56 @@ function SellerPanel() {
     else { toast.success("Status yeniləndi"); load(); }
   };
 
+  const printShippingLabel = async (item: OrderItem) => {
+    const url = `${window.location.origin}/product/${item.product_id}`;
+    const qrDataUrl = await QRCode.toDataURL(url, { width: 280, margin: 1 });
+    const orderCode = item.order_id.slice(0, 8).toUpperCase();
+    const shopName = profile?.shop_name ?? "Mağaza";
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>Etiket ${orderCode}</title>
+<style>
+  @page { size: 100mm 150mm; margin: 4mm; }
+  * { box-sizing: border-box; font-family: -apple-system, system-ui, Arial, sans-serif; }
+  body { margin: 0; padding: 6mm; color: #000; }
+  .label { border: 2px solid #000; padding: 6mm; height: 138mm; display: flex; flex-direction: column; }
+  .top { display:flex; justify-content:space-between; border-bottom: 1px dashed #999; padding-bottom: 4mm; margin-bottom: 4mm;}
+  .shop { font-weight: 800; font-size: 14pt; }
+  .code { font-family: monospace; font-weight: 800; font-size: 14pt; }
+  .title { font-size: 13pt; font-weight: 700; margin: 3mm 0; line-height: 1.3; }
+  .row { display:flex; justify-content:space-between; font-size: 11pt; margin: 2mm 0; }
+  .qr { text-align:center; margin-top: auto; }
+  .qr img { width: 50mm; height: 50mm; }
+  .qr-cap { font-size: 9pt; color: #555; margin-top: 1mm; }
+  .price { font-size: 16pt; font-weight: 800; }
+  .footer { border-top: 1px dashed #999; padding-top: 3mm; margin-top: 3mm; font-size: 9pt; color: #555; text-align:center; }
+  @media print { .noprint { display:none; } }
+  .btn { background:#000; color:#fff; border:0; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:700; }
+</style></head><body>
+<div class="noprint" style="text-align:center;margin-bottom:8px;">
+  <button class="btn" onclick="window.print()">🖨️ Çap et</button>
+</div>
+<div class="label">
+  <div class="top">
+    <div class="shop">📦 ${shopName}</div>
+    <div class="code">#${orderCode}</div>
+  </div>
+  <div class="title">${item.title}</div>
+  <div class="row"><span>Say:</span><b>${item.quantity} ədəd</b></div>
+  <div class="row"><span>Vahid qiymət:</span><b>${Number(item.price).toFixed(2)} ₼</b></div>
+  <div class="row"><span>Cəmi:</span><span class="price">${(Number(item.price) * item.quantity).toFixed(2)} ₼</span></div>
+  <div class="qr">
+    <img src="${qrDataUrl}" alt="QR"/>
+    <div class="qr-cap">Skan et → məhsul səhifəsi</div>
+  </div>
+  <div class="footer">Elzan Shop · ${new Date().toLocaleDateString("az-AZ")}</div>
+</div>
+<script>setTimeout(()=>window.print(),300);</script>
+</body></html>`;
+    const w = window.open("", "_blank", "width=420,height=640");
+    if (!w) { toast.error("Pop-up bloklanıb. İcazə verin."); return; }
+    w.document.write(html);
+    w.document.close();
+  };
+
   const saveShop = async () => {
     if (!user || !profile) return;
     setSavingShop(true);
