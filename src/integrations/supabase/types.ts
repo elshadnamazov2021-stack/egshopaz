@@ -112,7 +112,9 @@ export type Database = {
           is_active: boolean
           link_url: string | null
           position: string
+          seller_id: string | null
           starts_at: string | null
+          subscription_id: string | null
           title: string
           updated_at: string
         }
@@ -126,7 +128,9 @@ export type Database = {
           is_active?: boolean
           link_url?: string | null
           position?: string
+          seller_id?: string | null
           starts_at?: string | null
+          subscription_id?: string | null
           title: string
           updated_at?: string
         }
@@ -140,7 +144,9 @@ export type Database = {
           is_active?: boolean
           link_url?: string | null
           position?: string
+          seller_id?: string | null
           starts_at?: string | null
+          subscription_id?: string | null
           title?: string
           updated_at?: string
         }

@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatAZN } from "@/lib/format";
-import { Check, Crown, Sparkles, Star, CreditCard, Calendar, TrendingUp, Receipt, Loader2, X } from "lucide-react";
+import {
+  Check, Crown, Sparkles, Star, CreditCard, Calendar, TrendingUp,
+  Receipt, Loader2, X, Image as ImageIcon, Plus, Trash2, Megaphone, Package,
+} from "lucide-react";
 import { toast } from "sonner";
 
 interface Pkg {
@@ -34,6 +37,29 @@ interface Tx {
   description: string | null;
   created_at: string;
 }
+interface Banner {
+  id: string;
+  title: string;
+  image_url: string | null;
+  link_url: string | null;
+  position: string;
+  is_active: boolean;
+  ends_at: string | null;
+}
+interface Product {
+  id: string;
+  title: string;
+  image_url: string | null;
+  price: number;
+}
+interface Sponsored {
+  id: string;
+  product_id: string;
+  position: string;
+  is_active: boolean;
+  ends_at: string;
+  products?: Product | null;
+}
 
 const TIER_ICONS: Record<string, typeof Crown> = {
   premium: Sparkles,
@@ -46,28 +72,49 @@ export function SellerAdvertising() {
   const [packages, setPackages] = useState<Pkg[]>([]);
   const [subs, setSubs] = useState<Sub[]>([]);
   const [txs, setTxs] = useState<Tx[]>([]);
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const [sponsored, setSponsored] = useState<Sponsored[]>([]);
+  const [myProducts, setMyProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState<string | null>(null);
   const [checkout, setCheckout] = useState<Pkg | null>(null);
   const [card, setCard] = useState({ number: "", name: "", expiry: "", cvc: "" });
 
+  // Banner form
+  const [bannerForm, setBannerForm] = useState<{ title: string; link_url: string; image_url: string } | null>(null);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+
+  // Sponsored form
+  const [pickProduct, setPickProduct] = useState(false);
+
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const [pk, sb, tx] = await Promise.all([
+    const [pk, sb, tx, bn, sp, pr] = await Promise.all([
       supabase.from("ad_packages").select("*").eq("is_active", true).order("sort_order"),
       supabase.from("seller_subscriptions").select("*, ad_packages(*)").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("payment_transactions").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }).limit(20),
+      supabase.from("banners").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }),
+      supabase.from("sponsored_products").select("*, products(id,title,image_url,price)").eq("seller_id", user.id).order("created_at", { ascending: false }),
+      supabase.from("products").select("id,title,image_url,price").eq("seller_id", user.id).eq("is_active", true).order("created_at", { ascending: false }),
     ]);
     setPackages((pk.data ?? []) as unknown as Pkg[]);
     setSubs((sb.data ?? []) as unknown as Sub[]);
     setTxs((tx.data ?? []) as unknown as Tx[]);
+    setBanners((bn.data ?? []) as unknown as Banner[]);
+    setSponsored((sp.data ?? []) as unknown as Sponsored[]);
+    setMyProducts((pr.data ?? []) as unknown as Product[]);
     setLoading(false);
   };
 
   useEffect(() => { void load(); }, [user]);
 
   const activeSub = subs.find((s) => s.is_active && new Date(s.ends_at) > new Date());
+  const activeBanners = banners.filter((b) => b.is_active && (!b.ends_at || new Date(b.ends_at) > new Date()));
+  const activeSponsored = sponsored.filter((s) => s.is_active && new Date(s.ends_at) > new Date());
+
+  const bannersLeft = (activeSub?.ad_packages?.banner_slots ?? 0) - activeBanners.length;
+  const sponsoredLeft = (activeSub?.ad_packages?.sponsored_product_slots ?? 0) - activeSponsored.length;
 
   const purchase = async () => {
     if (!user || !checkout) return;
@@ -111,6 +158,82 @@ export function SellerAdvertising() {
     }
   };
 
+  const uploadBannerImage = async (file: File) => {
+    if (!user) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Şəkil 5MB-dan böyükdür"); return; }
+    setUploadingBanner(true);
+    const ext = file.name.split(".").pop();
+    const path = `${user.id}/banner-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("product-images").upload(path, file);
+    if (error) { toast.error(error.message); setUploadingBanner(false); return; }
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    setBannerForm((f) => f ? { ...f, image_url: data.publicUrl } : f);
+    setUploadingBanner(false);
+  };
+
+  const saveBanner = async () => {
+    if (!user || !bannerForm || !activeSub) return;
+    if (!bannerForm.title.trim()) { toast.error("Başlıq daxil edin"); return; }
+    if (!bannerForm.image_url) { toast.error("Şəkil yükləyin"); return; }
+    if (bannersLeft <= 0) { toast.error("Banner limiti dolub. Yeni paket alın."); return; }
+
+    const { error } = await supabase.from("banners").insert({
+      seller_id: user.id,
+      subscription_id: activeSub.id,
+      title: bannerForm.title.trim().slice(0, 200),
+      image_url: bannerForm.image_url,
+      link_url: bannerForm.link_url.trim().slice(0, 500) || null,
+      position: "home_top",
+      is_active: true,
+      ends_at: activeSub.ends_at,
+    });
+    if (error) { toast.error(error.message); return; }
+    toast.success("Banner əlavə olundu");
+    setBannerForm(null);
+    await load();
+  };
+
+  const deleteBanner = async (id: string) => {
+    if (!confirm("Bu banner silinsin?")) return;
+    const { error } = await supabase.from("banners").delete().eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Silindi");
+    await load();
+  };
+
+  const toggleBanner = async (b: Banner) => {
+    await supabase.from("banners").update({ is_active: !b.is_active }).eq("id", b.id);
+    await load();
+  };
+
+  const promoteProduct = async (productId: string) => {
+    if (!user || !activeSub) return;
+    if (sponsoredLeft <= 0) { toast.error("Sponsor məhsul limiti dolub"); return; }
+    const exists = activeSponsored.find((s) => s.product_id === productId);
+    if (exists) { toast.error("Bu məhsul artıq önə çəkilib"); return; }
+
+    const { error } = await supabase.from("sponsored_products").insert({
+      seller_id: user.id,
+      subscription_id: activeSub.id,
+      product_id: productId,
+      position: "catalog_top",
+      is_active: true,
+      ends_at: activeSub.ends_at,
+    });
+    if (error) { toast.error(error.message); return; }
+    toast.success("Məhsul önə çəkildi");
+    setPickProduct(false);
+    await load();
+  };
+
+  const removeSponsored = async (id: string) => {
+    if (!confirm("Bu məhsul sponsorluqdan çıxarılsın?")) return;
+    const { error } = await supabase.from("sponsored_products").delete().eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Çıxarıldı");
+    await load();
+  };
+
   if (loading) {
     return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
@@ -137,12 +260,94 @@ export function SellerAdvertising() {
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
-            <div className="bg-card/60 rounded-xl p-3"><div className="text-xs text-muted-foreground">Banner yerləri</div><div className="font-bold text-lg">{activeSub.ad_packages.banner_slots}</div></div>
-            <div className="bg-card/60 rounded-xl p-3"><div className="text-xs text-muted-foreground">Sponsor məhsul</div><div className="font-bold text-lg">{activeSub.ad_packages.sponsored_product_slots}</div></div>
+            <div className="bg-card/60 rounded-xl p-3"><div className="text-xs text-muted-foreground">Banner (qalır / cəmi)</div><div className="font-bold text-lg">{Math.max(0, bannersLeft)} / {activeSub.ad_packages.banner_slots}</div></div>
+            <div className="bg-card/60 rounded-xl p-3"><div className="text-xs text-muted-foreground">Sponsor (qalır / cəmi)</div><div className="font-bold text-lg">{Math.max(0, sponsoredLeft)} / {activeSub.ad_packages.sponsored_product_slots}</div></div>
             <div className="bg-card/60 rounded-xl p-3"><div className="text-xs text-muted-foreground">Müddət</div><div className="font-bold text-lg">{activeSub.ad_packages.duration_days} gün</div></div>
           </div>
         </div>
       )}
+
+      {/* === BANNER MANAGER === */}
+      {activeSub ? (
+        <div className="bg-card border border-border rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <Megaphone className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-bold">Ana səhifə bannerlərim</h2>
+              <span className="text-xs bg-secondary px-2 py-0.5 rounded-full">{activeBanners.length}/{activeSub.ad_packages?.banner_slots ?? 0}</span>
+            </div>
+            <button
+              onClick={() => setBannerForm({ title: "", link_url: "", image_url: "" })}
+              disabled={bannersLeft <= 0}
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              <Plus className="h-4 w-4" /> Yeni banner
+            </button>
+          </div>
+          {banners.length === 0 ? (
+            <div className="text-center text-muted-foreground py-8 text-sm">Hələ banner yoxdur. Ana səhifədə görünmək üçün əlavə edin.</div>
+          ) : (
+            <div className="grid sm:grid-cols-2 gap-3">
+              {banners.map((b) => (
+                <div key={b.id} className="border border-border rounded-xl overflow-hidden">
+                  <div className="aspect-[3/1] bg-secondary">
+                    {b.image_url && <img src={b.image_url} alt={b.title} className="w-full h-full object-cover" />}
+                  </div>
+                  <div className="p-3 flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="font-semibold text-sm line-clamp-1">{b.title}</div>
+                      <div className="text-xs text-muted-foreground">{b.is_active ? "Aktiv" : "Pasiv"} • {b.ends_at ? new Date(b.ends_at).toLocaleDateString("az-AZ") : "—"}</div>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button onClick={() => toggleBanner(b)} className="text-xs px-2 py-1 rounded bg-secondary hover:bg-secondary/70">{b.is_active ? "Söndür" : "Yandır"}</button>
+                      <button onClick={() => deleteBanner(b.id)} className="p-1.5 text-destructive hover:bg-destructive/10 rounded"><Trash2 className="h-4 w-4" /></button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null}
+
+      {/* === SPONSORED PRODUCTS MANAGER === */}
+      {activeSub ? (
+        <div className="bg-card border border-border rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-warning" />
+              <h2 className="text-lg font-bold">Önə çəkilmiş məhsullarım</h2>
+              <span className="text-xs bg-secondary px-2 py-0.5 rounded-full">{activeSponsored.length}/{activeSub.ad_packages?.sponsored_product_slots ?? 0}</span>
+            </div>
+            <button
+              onClick={() => setPickProduct(true)}
+              disabled={sponsoredLeft <= 0}
+              className="bg-warning text-warning-foreground px-4 py-2 rounded-lg font-bold inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              <Plus className="h-4 w-4" /> Məhsul önə çək
+            </button>
+          </div>
+          {sponsored.length === 0 ? (
+            <div className="text-center text-muted-foreground py-8 text-sm">Hələ önə çəkilmiş məhsul yoxdur.</div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {sponsored.map((s) => s.products && (
+                <div key={s.id} className="border border-border rounded-xl overflow-hidden relative">
+                  <button onClick={() => removeSponsored(s.id)} className="absolute top-1 right-1 z-10 bg-destructive/90 text-destructive-foreground rounded-full p-1 hover:bg-destructive"><X className="h-3.5 w-3.5" /></button>
+                  <div className="aspect-square bg-secondary">
+                    {s.products.image_url && <img src={s.products.image_url} alt={s.products.title} className="w-full h-full object-cover" />}
+                  </div>
+                  <div className="p-2">
+                    <div className="text-xs line-clamp-2">{s.products.title}</div>
+                    <div className="font-bold text-sm">{formatAZN(s.products.price)}</div>
+                    <div className="text-[10px] text-muted-foreground">Bitir: {new Date(s.ends_at).toLocaleDateString("az-AZ")}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null}
 
       {/* Packages */}
       <div>
@@ -212,6 +417,90 @@ export function SellerAdvertising() {
           </div>
         )}
       </div>
+
+      {/* Banner form modal */}
+      {bannerForm && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setBannerForm(null)}>
+          <div className="bg-card rounded-2xl max-w-lg w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold flex items-center gap-2"><Megaphone className="h-5 w-5" /> Yeni banner</h3>
+              <button onClick={() => setBannerForm(null)} className="p-1 hover:bg-secondary rounded"><X className="h-5 w-5" /></button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground">Başlıq</label>
+                <input value={bannerForm.title} onChange={(e) => setBannerForm({ ...bannerForm, title: e.target.value })} placeholder="Yay endirimi 50%" className="w-full mt-1 px-3 py-2 rounded-lg bg-secondary border border-border focus:border-primary outline-none" />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground">Link (məhsul və ya kateqoriya)</label>
+                <input value={bannerForm.link_url} onChange={(e) => setBannerForm({ ...bannerForm, link_url: e.target.value })} placeholder="/catalog və ya /product/..." className="w-full mt-1 px-3 py-2 rounded-lg bg-secondary border border-border focus:border-primary outline-none" />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground">Şəkil (3:1 nisbət tövsiyə olunur)</label>
+                <div className="mt-1 border-2 border-dashed border-border rounded-lg p-4 text-center">
+                  {bannerForm.image_url ? (
+                    <div className="relative">
+                      <img src={bannerForm.image_url} alt="" className="w-full max-h-40 object-cover rounded" />
+                      <button onClick={() => setBannerForm({ ...bannerForm, image_url: "" })} className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1"><X className="h-3 w-3" /></button>
+                    </div>
+                  ) : (
+                    <label className="cursor-pointer block">
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && uploadBannerImage(e.target.files[0])} />
+                      <ImageIcon className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                      <span className="text-sm text-muted-foreground">{uploadingBanner ? "Yüklənir..." : "Şəkil seç (max 5MB)"}</span>
+                    </label>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-5">
+              <button onClick={() => setBannerForm(null)} className="px-4 py-2 rounded-lg border border-border">Ləğv et</button>
+              <button onClick={saveBanner} disabled={uploadingBanner} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold disabled:opacity-60">Yarat</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pick product to promote */}
+      {pickProduct && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setPickProduct(false)}>
+          <div className="bg-card rounded-2xl max-w-2xl w-full p-6 shadow-2xl max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold flex items-center gap-2"><Sparkles className="h-5 w-5 text-warning" /> Önə çəkmək üçün məhsul seç</h3>
+              <button onClick={() => setPickProduct(false)} className="p-1 hover:bg-secondary rounded"><X className="h-5 w-5" /></button>
+            </div>
+            {myProducts.length === 0 ? (
+              <div className="text-center py-10 text-muted-foreground">
+                <Package className="h-10 w-10 mx-auto mb-2" />
+                <p>Aktiv məhsul yoxdur. Əvvəlcə məhsul əlavə edin.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {myProducts.map((p) => {
+                  const already = activeSponsored.some((s) => s.product_id === p.id);
+                  return (
+                    <button
+                      key={p.id}
+                      disabled={already}
+                      onClick={() => promoteProduct(p.id)}
+                      className="border border-border rounded-xl overflow-hidden text-left hover:border-warning disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    >
+                      <div className="aspect-square bg-secondary">
+                        {p.image_url && <img src={p.image_url} alt={p.title} className="w-full h-full object-cover" />}
+                      </div>
+                      <div className="p-2">
+                        <div className="text-xs line-clamp-2">{p.title}</div>
+                        <div className="font-bold text-sm">{formatAZN(p.price)}</div>
+                        {already && <div className="text-[10px] text-warning">✓ Artıq önə çəkilib</div>}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Checkout modal (mock) */}
       {checkout && (
