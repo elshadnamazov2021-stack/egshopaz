@@ -289,6 +289,8 @@ function Index() {
           </div>
         )}
       </section>
+
+      <VisualSearchDialog open={visualOpen} onOpenChange={setVisualOpen} />
     </div>
   );
 }
