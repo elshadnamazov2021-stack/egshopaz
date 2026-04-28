@@ -40,6 +40,8 @@ function OrdersPage() {
   const [msgOrderId, setMsgOrderId] = useState<string | null>(null);
   const [msgBody, setMsgBody] = useState("");
   const [msgSending, setMsgSending] = useState(false);
+  const [qrItem, setQrItem] = useState<OrderItem | null>(null);
+  const qrOrder = qrItem ? orders.find((o) => o.order_items?.some((i) => i.id === qrItem.id)) : null;
 
   const sendMessage = async () => {
     if (!user || !msgItem) return;
