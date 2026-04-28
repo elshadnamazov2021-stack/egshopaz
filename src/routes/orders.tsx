@@ -120,15 +120,30 @@ function OrdersPage() {
                       <div className="flex-1 min-w-0">
                         <div className="truncate">{it.title}</div>
                         <div className="text-xs text-muted-foreground">{it.quantity} × {formatAZN(it.price)}</div>
+                        {it.delivered_at ? (
+                          <div className="text-[10px] text-success font-semibold mt-0.5">✓ Təhvil alındı</div>
+                        ) : it.accepted_at ? (
+                          <div className="text-[10px] text-primary font-semibold mt-0.5">📦 PVZ-də gözləyir — götürmək üçün QR göstərin</div>
+                        ) : null}
                       </div>
-                      {user.id !== it.seller_id && (
-                        <button
-                          onClick={() => { setMsgItem(it); setMsgOrderId(o.id); setMsgBody(""); }}
-                          className="text-xs px-2.5 py-1.5 rounded-lg border border-border hover:border-primary hover:text-primary transition inline-flex items-center gap-1 shrink-0"
-                        >
-                          <MessageCircle className="h-3.5 w-3.5" /> Satıcıya yaz
-                        </button>
-                      )}
+                      <div className="flex flex-col gap-1 shrink-0">
+                        {it.pickup_code && !it.delivered_at && (
+                          <button
+                            onClick={() => setQrItem(it)}
+                            className="text-xs px-2.5 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 transition inline-flex items-center gap-1"
+                          >
+                            <QrCode className="h-3.5 w-3.5" /> QR
+                          </button>
+                        )}
+                        {user.id !== it.seller_id && (
+                          <button
+                            onClick={() => { setMsgItem(it); setMsgOrderId(o.id); setMsgBody(""); }}
+                            className="text-xs px-2.5 py-1.5 rounded-lg border border-border hover:border-primary hover:text-primary transition inline-flex items-center gap-1"
+                          >
+                            <MessageCircle className="h-3.5 w-3.5" /> Yaz
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
