@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
+import { SponsoredProducts } from "@/components/SponsoredProducts";
 import { Truck, ShieldCheck, Tag, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/")({
