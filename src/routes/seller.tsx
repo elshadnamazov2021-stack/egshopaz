@@ -3,9 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN } from "@/lib/format";
-import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon, LayoutDashboard, Settings, MessageCircle } from "lucide-react";
+import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon, LayoutDashboard, Settings, MessageCircle, QrCode, Download } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import QRCode from "qrcode";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { SellerMessages } from "@/components/SellerMessages";
 
@@ -61,6 +62,8 @@ function SellerPanel() {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [editing, setEditing] = useState<Partial<Product> | null>(null);
+  const [qrProduct, setQrProduct] = useState<Product | null>(null);
+  const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const [savingShop, setSavingShop] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -191,9 +194,26 @@ function SellerPanel() {
   };
 
   const remove = async (id: string) => {
-    if (!confirm("Bu məhsul silinsin?")) return;
-    await supabase.from("products").delete().eq("id", id);
+    if (!confirm("Bu məhsul silinsin? Bu əməliyyat geri qaytarıla bilməz.")) return;
+    const { error } = await supabase.from("products").delete().eq("id", id);
+    if (error) { toast.error("Silinmədi: " + error.message); return; }
+    toast.success("Məhsul silindi");
     load();
+  };
+
+  const openQR = async (p: Product) => {
+    const url = `${window.location.origin}/product/${p.id}`;
+    const dataUrl = await QRCode.toDataURL(url, { width: 512, margin: 2 });
+    setQrDataUrl(dataUrl);
+    setQrProduct(p);
+  };
+
+  const downloadQR = () => {
+    if (!qrDataUrl || !qrProduct) return;
+    const a = document.createElement("a");
+    a.href = qrDataUrl;
+    a.download = `qr-${qrProduct.title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.png`;
+    a.click();
   };
 
   const toggleActive = async (p: Product) => {
@@ -352,7 +372,10 @@ function SellerPanel() {
                       <td className="p-3">
                         <div className="flex gap-1 justify-end">
                           <button onClick={() => setEditing(p)} className="p-2 hover:bg-secondary rounded" title="Redaktə"><Edit className="h-4 w-4" /></button>
-                          <button onClick={() => remove(p.id)} className="p-2 hover:bg-destructive/10 hover:text-destructive rounded" title="Sil"><Trash2 className="h-4 w-4" /></button>
+                          <button onClick={() => openQR(p)} className="p-2 hover:bg-primary/10 hover:text-primary rounded" title="QR kod"><QrCode className="h-4 w-4" /></button>
+                          <button onClick={() => remove(p.id)} className="p-2 bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground rounded inline-flex items-center gap-1" title="Sil">
+                            <Trash2 className="h-4 w-4" /><span className="text-xs font-semibold hidden sm:inline">Sil</span>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -588,6 +611,32 @@ function SellerPanel() {
                   Yadda saxla
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {qrProduct && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setQrProduct(null)}>
+          <div className="bg-card rounded-2xl p-6 max-w-sm w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-lg">Məhsul QR kodu</h3>
+              <button onClick={() => setQrProduct(null)} className="p-1 hover:bg-secondary rounded"><X className="h-5 w-5" /></button>
+            </div>
+            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{qrProduct.title}</p>
+            {qrDataUrl && (
+              <div className="bg-white p-4 rounded-xl flex items-center justify-center mb-4">
+                <img src={qrDataUrl} alt="QR" className="w-full max-w-[280px]" />
+              </div>
+            )}
+            <div className="text-xs text-muted-foreground mb-4 break-all bg-secondary/50 p-2 rounded">
+              {window.location.origin}/product/{qrProduct.id}
+            </div>
+            <div className="flex gap-2">
+              <button onClick={downloadQR} className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold hover:bg-primary/90 inline-flex items-center justify-center gap-2">
+                <Download className="h-4 w-4" /> Yüklə (PNG)
+              </button>
+              <button onClick={() => setQrProduct(null)} className="px-4 py-2 rounded-lg border border-border hover:bg-secondary">Bağla</button>
             </div>
           </div>
         </div>
