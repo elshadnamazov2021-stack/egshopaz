@@ -84,7 +84,7 @@ function AdminPanel() {
 
   useEffect(() => { if (isAdmin && unlocked) reload(); }, [isAdmin, unlocked]);
 
-  if (!user || !isAdmin) return null;
+  if (!user) return null;
 
   if (!unlocked) {
     return (
