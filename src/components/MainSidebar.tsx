@@ -34,19 +34,19 @@ export function MainSidebar() {
   const childrenOf = (pid: string) => cats.filter((c) => c.parent_id === pid);
 
   const mainLinks = [
-    { to: "/", label: "Ana səhifə", icon: Home },
-    { to: "/catalog", label: "Kataloq", icon: LayoutGrid, search: { q: undefined, cat: undefined } as never },
-    { to: "/promotions", label: "Aksiyalar", icon: Tag },
-    { to: "/bonus", label: "Bonuslar", icon: Gift },
+    { to: "/", label: t("sidebar.home"), icon: Home },
+    { to: "/catalog", label: t("sidebar.catalog"), icon: LayoutGrid, search: { q: undefined, cat: undefined } as never },
+    { to: "/promotions", label: t("sidebar.promotions"), icon: Tag },
+    { to: "/bonus", label: t("sidebar.bonuses"), icon: Gift },
   ];
 
   const userLinks = user ? [
-    { to: "/profile", label: "Şəxsi kabinet", icon: User },
-    { to: "/orders", label: "Sifarişlərim", icon: Package },
-    { to: "/favorites", label: "Sevimlilər", icon: Heart },
-    { to: "/cart", label: "Səbət", icon: ShoppingCart },
-    { to: "/messages", label: "Mesajlar", icon: MessageCircle },
-    { to: "/notifications", label: "Bildirişlər", icon: Bell },
+    { to: "/profile", label: t("sidebar.profile"), icon: User },
+    { to: "/orders", label: t("sidebar.orders"), icon: Package },
+    { to: "/favorites", label: t("sidebar.favorites"), icon: Heart },
+    { to: "/cart", label: t("sidebar.cart"), icon: ShoppingCart },
+    { to: "/messages", label: t("sidebar.messages"), icon: MessageCircle },
+    { to: "/notifications", label: t("sidebar.notifications"), icon: Bell },
   ] : [];
 
   return (
