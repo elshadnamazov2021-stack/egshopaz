@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { formatAZN } from "@/lib/format";
 import {
