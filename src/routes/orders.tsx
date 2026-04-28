@@ -66,10 +66,10 @@ function OrdersPage() {
   const load = () => {
     if (!user) return;
     supabase.from("orders")
-      .select("*, order_items(id,title,price,quantity,image_url,status,seller_id,product_id)")
+      .select("*, pickup_points(name,address,city), order_items(id,title,price,quantity,image_url,status,seller_id,product_id,pickup_code,accepted_at,delivered_at,pickup_point_id)")
       .eq("buyer_id", user.id)
       .order("created_at", { ascending: false })
-      .then(({ data }) => setOrders((data ?? []) as Order[]));
+      .then(({ data }) => setOrders((data ?? []) as unknown as Order[]));
   };
   useEffect(load, [user]);
 
