@@ -2,9 +2,11 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Search, ShoppingCart, User, Heart, LogOut, Store } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import elzanLogo from "@/assets/elzan-logo.png";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -13,6 +15,7 @@ import {
 // Header with sidebar trigger
 export function SiteHeader() {
   const { user, signOut, isSeller } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [cartCount, setCartCount] = useState(0);
