@@ -38,7 +38,7 @@ function Catalog() {
 
   useEffect(() => {
     setLoading(true);
-    let query = supabase.from("products")
+    let query: any = supabase.from("products")
       .select("id,title,price,old_price,image_url,rating,reviews_count,brand,categories!inner(slug)")
       .eq("is_active", true);
     if (q) query = query.ilike("title", `%${q}%`);
@@ -55,7 +55,7 @@ function Catalog() {
     else if (filters.sort === "popular") query = query.order("reviews_count", { ascending: false });
     else query = query.order("created_at", { ascending: false });
 
-    query.limit(80).then(({ data }) => {
+    query.limit(80).then(({ data }: { data: ProductCardData[] | null }) => {
       setProducts((data ?? []) as ProductCardData[]);
       setLoading(false);
     });
