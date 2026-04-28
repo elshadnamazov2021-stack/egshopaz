@@ -365,9 +365,13 @@ export type Database = {
       }
       order_items: {
         Row: {
+          accepted_at: string | null
+          delivered_at: string | null
           id: string
           image_url: string | null
           order_id: string
+          pickup_code: string | null
+          pickup_point_id: string | null
           price: number
           product_id: string
           quantity: number
@@ -376,9 +380,13 @@ export type Database = {
           title: string
         }
         Insert: {
+          accepted_at?: string | null
+          delivered_at?: string | null
           id?: string
           image_url?: string | null
           order_id: string
+          pickup_code?: string | null
+          pickup_point_id?: string | null
           price: number
           product_id: string
           quantity: number
@@ -387,9 +395,13 @@ export type Database = {
           title: string
         }
         Update: {
+          accepted_at?: string | null
+          delivered_at?: string | null
           id?: string
           image_url?: string | null
           order_id?: string
+          pickup_code?: string | null
+          pickup_point_id?: string | null
           price?: number
           product_id?: string
           quantity?: number
