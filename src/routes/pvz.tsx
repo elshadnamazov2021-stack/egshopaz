@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { QRScannerDialog } from "@/components/QRScannerDialog";
+import { PvzOrderChat } from "@/components/PvzOrderChat";
+import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { formatAZN } from "@/lib/format";
@@ -585,6 +587,24 @@ function Support() {
           <div className="text-xs text-muted-foreground">Foto ilə birlikdə</div>
         </button>
       </div>
+    </div>
+  );
+}
+
+function PvzMessagesTab() {
+  const { user } = useAuth();
+  if (!user) {
+    return <div className="text-sm text-muted-foreground">Giriş tələb olunur</div>;
+  }
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-extrabold flex items-center gap-2">
+        <MessageCircle className="h-6 w-6 text-primary" /> Müştəri mesajları
+      </h1>
+      <p className="text-sm text-muted-foreground">
+        Hər sifariş üzrə müştəri ilə birbaşa yazışın. Paket qəbul edildikdə müştəriyə avtomatik bildiriş və mesaj gedir.
+      </p>
+      <PvzOrderChat mode="pvz" currentUserId={user.id} />
     </div>
   );
 }
