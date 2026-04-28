@@ -778,6 +778,45 @@ export type Database = {
         }
         Relationships: []
       }
+      pvz_messages: {
+        Row: {
+          body: string
+          buyer_id: string
+          created_at: string
+          id: string
+          order_id: string
+          order_item_id: string | null
+          pickup_point_id: string
+          read_at: string | null
+          sender_id: string | null
+          sender_role: string
+        }
+        Insert: {
+          body: string
+          buyer_id: string
+          created_at?: string
+          id?: string
+          order_id: string
+          order_item_id?: string | null
+          pickup_point_id: string
+          read_at?: string | null
+          sender_id?: string | null
+          sender_role: string
+        }
+        Update: {
+          body?: string
+          buyer_id?: string
+          created_at?: string
+          id?: string
+          order_id?: string
+          order_item_id?: string | null
+          pickup_point_id?: string
+          read_at?: string | null
+          sender_id?: string | null
+          sender_role?: string
+        }
+        Relationships: []
+      }
       pvz_notifications: {
         Row: {
           body: string

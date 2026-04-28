@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { QRScannerDialog } from "@/components/QRScannerDialog";
+import { PvzOrderChat } from "@/components/PvzOrderChat";
+import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { formatAZN } from "@/lib/format";
@@ -9,7 +11,7 @@ import {
   Home, PackageOpen, ShoppingBag, Undo2, Archive, BarChart3,
   Wallet, ClipboardList, Settings, LifeBuoy, ScanLine, Search,
   CheckCircle2, AlertTriangle, Printer, Camera, PhoneCall, Clock,
-  Plus, XCircle, FileText, TrendingUp, Bell,
+  Plus, XCircle, FileText, TrendingUp, Bell, MessageCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -26,7 +28,7 @@ export const Route = createFileRoute("/pvz")({
 
 type TabKey =
   | "dashboard" | "intake" | "delivery" | "returns" | "storage"
-  | "reports" | "finance" | "shift" | "settings" | "support";
+  | "reports" | "finance" | "shift" | "messages" | "settings" | "support";
 
 // ---------------- MOCK DATA ----------------
 const mockExpected = [
@@ -65,6 +67,7 @@ function PvzPanel() {
     { key: "reports", label: t("pvz.reports"), icon: BarChart3, active: tab === "reports", onClick: () => setTab("reports") },
     { key: "finance", label: t("pvz.finance"), icon: Wallet, active: tab === "finance", onClick: () => setTab("finance") },
     { key: "shift", label: t("pvz.shift"), icon: ClipboardList, active: tab === "shift", onClick: () => setTab("shift") },
+    { key: "messages", label: "Müştəri mesajları", icon: MessageCircle, active: tab === "messages", onClick: () => setTab("messages") },
     { key: "settings", label: t("pvz.settings"), icon: Settings, active: tab === "settings", onClick: () => setTab("settings") },
     { key: "support", label: t("pvz.support"), icon: LifeBuoy, active: tab === "support", onClick: () => setTab("support") },
   ];
@@ -88,6 +91,7 @@ function PvzPanel() {
       {tab === "reports" && <Reports />}
       {tab === "finance" && <Finance />}
       {tab === "shift" && <Shift open={shiftOpen} setOpen={setShiftOpen} />}
+      {tab === "messages" && <PvzMessagesTab />}
       {tab === "settings" && <SettingsSec />}
       {tab === "support" && <Support />}
     </PanelLayout>
@@ -583,6 +587,24 @@ function Support() {
           <div className="text-xs text-muted-foreground">Foto ilə birlikdə</div>
         </button>
       </div>
+    </div>
+  );
+}
+
+function PvzMessagesTab() {
+  const { user } = useAuth();
+  if (!user) {
+    return <div className="text-sm text-muted-foreground">Giriş tələb olunur</div>;
+  }
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-extrabold flex items-center gap-2">
+        <MessageCircle className="h-6 w-6 text-primary" /> Müştəri mesajları
+      </h1>
+      <p className="text-sm text-muted-foreground">
+        Hər sifariş üzrə müştəri ilə birbaşa yazışın. Paket qəbul edildikdə müştəriyə avtomatik bildiriş və mesaj gedir.
+      </p>
+      <PvzOrderChat mode="pvz" currentUserId={user.id} />
     </div>
   );
 }
