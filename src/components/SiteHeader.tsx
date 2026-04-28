@@ -56,16 +56,17 @@ export function SiteHeader() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Məhsul, marka və ya kateqoriya axtar..."
+              placeholder={t("common.searchPlaceholder")}
               className="w-full pl-10 pr-4 h-11 rounded-lg border border-input bg-secondary/50 focus:bg-background focus:outline-none focus:ring-2 focus:ring-ring transition"
             />
           </div>
         </form>
 
         <nav className="ml-auto flex items-center gap-1 sm:gap-2">
+          <LanguageSwitcher />
           <Link to="/favorites" className="hidden sm:flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
             <Heart className="h-5 w-5 mb-0.5" />
-            <span>Sevimli</span>
+            <span>{t("header.favorites")}</span>
           </Link>
           <Link to="/cart" className="relative flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
             <ShoppingCart className="h-5 w-5 mb-0.5" />
@@ -74,41 +75,41 @@ export function SiteHeader() {
                 {cartCount}
               </span>
             )}
-            <span>Səbət</span>
+            <span>{t("header.cart")}</span>
           </Link>
 
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition outline-none">
                 <User className="h-5 w-5 mb-0.5" />
-                <span>Kabinet</span>
+                <span>{t("header.cabinet")}</span>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
-                  <User className="h-4 w-4 mr-2" /> Şəxsi kabinet
+                  <User className="h-4 w-4 mr-2" /> {t("header.personalCabinet")}
                 </DropdownMenuItem>
                 {!isSeller && (
                   <DropdownMenuItem onClick={() => navigate({ to: "/become-seller" })}>
-                    <Store className="h-4 w-4 mr-2" /> Mağaza aç
+                    <Store className="h-4 w-4 mr-2" /> {t("header.openShop")}
                   </DropdownMenuItem>
                 )}
                 {isSeller && (
                   <DropdownMenuItem onClick={() => navigate({ to: "/seller" })}>
-                    <Store className="h-4 w-4 mr-2" /> Satıcı paneli
+                    <Store className="h-4 w-4 mr-2" /> {t("header.sellerPanel")}
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={async () => { await signOut(); navigate({ to: "/" }); }}>
-                  <LogOut className="h-4 w-4 mr-2" /> Çıxış
+                  <LogOut className="h-4 w-4 mr-2" /> {t("header.logout")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Link to="/auth" className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
               <User className="h-5 w-5 mb-0.5" />
-              <span>Giriş</span>
+              <span>{t("header.login")}</span>
             </Link>
           )}
         </nav>
@@ -121,7 +122,7 @@ export function SiteHeader() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Axtar..."
+            placeholder={t("common.search")}
             className="w-full pl-10 pr-4 h-10 rounded-lg border border-input bg-secondary/50 focus:bg-background focus:outline-none focus:ring-2 focus:ring-ring transition text-sm"
           />
         </div>
