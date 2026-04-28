@@ -7,6 +7,7 @@ import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { formatAZN } from "@/lib/format";
 import { Package, MapPin, X, MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
+import { OrderTimeline } from "@/components/OrderTimeline";
 
 export const Route = createFileRoute("/orders")({
   head: () => ({ meta: [{ title: "Sifarişlərim — Elzan Shop" }] }),
@@ -108,7 +109,8 @@ function OrdersPage() {
                     <span className="font-extrabold">{formatAZN(o.total)}</span>
                   </div>
                 </div>
-                <div className="space-y-2">
+                <OrderTimeline status={o.status} />
+                <div className="space-y-2 mt-3">
                   {o.order_items?.map((it) => (
                     <div key={it.id} className="flex items-start gap-3 text-sm">
                       <div className="w-12 h-12 rounded-lg bg-secondary overflow-hidden shrink-0">

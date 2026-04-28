@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN, calcDiscount } from "@/lib/format";
 import { useAuth } from "@/contexts/AuthContext";
-import { Star, ShoppingCart, Heart, Truck, ShieldCheck, MessageCircle, Send } from "lucide-react";
+import { Star, ShoppingCart, Heart, Truck, ShieldCheck, MessageCircle, Send, Store } from "lucide-react";
 import { toast } from "sonner";
+import { ProductReviews } from "@/components/ProductReviews";
 
 export const Route = createFileRoute("/product/$id")({
   component: ProductPage,
@@ -150,7 +151,9 @@ function ProductPage() {
           <div className="pt-2">
             <div className="text-sm text-muted-foreground">Satıcı</div>
             <div className="flex items-center justify-between gap-3">
-              <div className="font-semibold">{shopName}</div>
+              <Link to="/shop/$id" params={{ id: p.seller_id }} className="font-semibold hover:text-primary inline-flex items-center gap-1.5">
+                <Store className="h-4 w-4" /> {shopName}
+              </Link>
               {user?.id !== p.seller_id && (
                 <button
                   onClick={() => setMsgOpen((v) => !v)}
@@ -197,6 +200,10 @@ function ProductPage() {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="mt-10">
+        <ProductReviews productId={p.id} />
       </div>
     </div>
   );
