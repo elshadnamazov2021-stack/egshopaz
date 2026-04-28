@@ -363,6 +363,48 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_read: boolean
+          link: string | null
+          order_id: string | null
+          order_item_id: string | null
+          pickup_code: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          order_id?: string | null
+          order_item_id?: string | null
+          pickup_code?: string | null
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          order_id?: string | null
+          order_item_id?: string | null
+          pickup_code?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           accepted_at: string | null
@@ -733,6 +775,45 @@ export type Database = {
           min_order?: number
           usage_limit?: number | null
           used_count?: number
+        }
+        Relationships: []
+      }
+      pvz_notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_read: boolean
+          order_id: string | null
+          order_item_id: string | null
+          pickup_code: string | null
+          pickup_point_id: string
+          title: string
+          type: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          order_id?: string | null
+          order_item_id?: string | null
+          pickup_code?: string | null
+          pickup_point_id: string
+          title: string
+          type?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          order_id?: string | null
+          order_item_id?: string | null
+          pickup_code?: string | null
+          pickup_point_id?: string
+          title?: string
+          type?: string
         }
         Relationships: []
       }

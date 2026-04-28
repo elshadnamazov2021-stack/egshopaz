@@ -2,6 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Search, ShoppingCart, User, Heart, LogOut, Store, Camera } from "lucide-react";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { NotificationsBell } from "@/components/NotificationsBell";
 
 const VisualSearchDialog = lazy(() =>
   import("@/components/VisualSearchDialog").then((m) => ({ default: m.VisualSearchDialog }))
@@ -93,6 +94,7 @@ export function SiteHeader() {
             )}
             <span>{t("header.favorites")}</span>
           </Link>
+          <NotificationsBell />
           <Link to="/cart" className="relative flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
             <ShoppingCart className="h-5 w-5 mb-0.5" />
             {cartCount > 0 && (
