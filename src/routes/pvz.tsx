@@ -1,14 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { QRScannerDialog } from "@/components/QRScannerDialog";
 import { useTranslation } from "react-i18next";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { formatAZN } from "@/lib/format";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Home, PackageOpen, ShoppingBag, Undo2, Archive, BarChart3,
   Wallet, ClipboardList, Settings, LifeBuoy, ScanLine, Search,
   CheckCircle2, AlertTriangle, Printer, Camera, PhoneCall, Clock,
-  Plus, XCircle, FileText, TrendingUp,
+  Plus, XCircle, FileText, TrendingUp, MapPin,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
