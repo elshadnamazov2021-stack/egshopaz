@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { SponsoredProducts } from "@/components/SponsoredProducts";
 import { SellerBanners } from "@/components/SellerBanners";
-import { Truck, ShieldCheck, Tag, Clock, Flame, Heart, TicketPercent, TrendingUp, Sparkles, ArrowRight, Copy } from "lucide-react";
+import { Truck, ShieldCheck, Tag, Clock, Flame, Heart, TicketPercent, TrendingUp, Sparkles, ArrowRight, Copy, Camera } from "lucide-react";
 import { toast } from "sonner";
+import { VisualSearchDialog } from "@/components/VisualSearchDialog";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -29,6 +30,7 @@ function Index() {
   const [trending, setTrending] = useState<ProductCardData[]>([]);
   const [topFav, setTopFav] = useState<ProductCardData[]>([]);
   const [promos, setPromos] = useState<PromoCode[]>([]);
+  const [visualOpen, setVisualOpen] = useState(false);
 
   useEffect(() => {
     supabase.from("categories").select("*").is("parent_id", null).order("sort_order").then(({ data }) => setCategories(data ?? []));
@@ -122,7 +124,30 @@ function Index() {
         </div>
       </section>
 
-      {/* Discount section — bold red banner with carousel */}
+      {/* Visual Search Banner — bold AI-powered */}
+      <section className="rounded-3xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-500 p-6 md:p-8 text-white shadow-elegant relative overflow-hidden">
+        <div className="absolute -right-10 -top-10 w-48 h-48 bg-white/20 rounded-full blur-3xl" />
+        <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-yellow-300/30 rounded-full blur-2xl" />
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-bold">
+              <Sparkles className="h-3.5 w-3.5" /> AI POWERED · YENİ
+            </div>
+            <h2 className="text-2xl md:text-4xl font-black leading-tight">
+              Şəkillə axtar 📸
+            </h2>
+            <p className="text-sm md:text-base opacity-95 max-w-md">
+              Bəyəndiyin məhsulun şəklini çək — AI tanıyıb dərhal sənə oxşarını tapsın.
+            </p>
+          </div>
+          <button
+            onClick={() => setVisualOpen(true)}
+            className="inline-flex items-center gap-2 bg-white text-fuchsia-700 px-6 py-4 rounded-xl font-extrabold hover:scale-105 transition shadow-elegant whitespace-nowrap"
+          >
+            <Camera className="h-5 w-5" /> İndi sına
+          </button>
+        </div>
+      </section>
       {discounted.length > 0 && (
         <section className="rounded-3xl bg-gradient-to-br from-discount via-discount to-rose-700 p-6 md:p-8 text-white shadow-elegant">
           <div className="flex items-center justify-between mb-5">
@@ -264,6 +289,8 @@ function Index() {
           </div>
         )}
       </section>
+
+      <VisualSearchDialog open={visualOpen} onOpenChange={setVisualOpen} />
     </div>
   );
 }

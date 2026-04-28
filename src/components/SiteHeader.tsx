@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Search, ShoppingCart, User, Heart, LogOut, Store } from "lucide-react";
+import { Search, ShoppingCart, User, Heart, LogOut, Store, Camera } from "lucide-react";
+import { VisualSearchDialog } from "@/components/VisualSearchDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -20,6 +21,7 @@ export function SiteHeader() {
   const [q, setQ] = useState("");
   const [cartCount, setCartCount] = useState(0);
   const [favCount, setFavCount] = useState(0);
+  const [visualOpen, setVisualOpen] = useState(false);
 
   useEffect(() => {
     if (!user) { setCartCount(0); setFavCount(0); return; }
@@ -60,8 +62,16 @@ export function SiteHeader() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder={t("common.searchPlaceholder")}
-              className="w-full pl-10 pr-4 h-11 rounded-lg border border-input bg-secondary/50 focus:bg-background focus:outline-none focus:ring-2 focus:ring-ring transition"
+              className="w-full pl-10 pr-12 h-11 rounded-lg border border-input bg-secondary/50 focus:bg-background focus:outline-none focus:ring-2 focus:ring-ring transition"
             />
+            <button
+              type="button"
+              onClick={() => setVisualOpen(true)}
+              title="Şəkillə axtar (AI)"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-primary/10 text-primary transition"
+            >
+              <Camera className="h-5 w-5" />
+            </button>
           </div>
         </form>
 
@@ -135,10 +145,21 @@ export function SiteHeader() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={t("common.search")}
-            className="w-full pl-10 pr-4 h-10 rounded-lg border border-input bg-secondary/50 focus:bg-background focus:outline-none focus:ring-2 focus:ring-ring transition text-sm"
+            className="w-full pl-10 pr-11 h-10 rounded-lg border border-input bg-secondary/50 focus:bg-background focus:outline-none focus:ring-2 focus:ring-ring transition text-sm"
           />
+          <button
+            type="button"
+            onClick={() => setVisualOpen(true)}
+            title="Şəkillə axtar"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-primary/10 text-primary transition"
+          >
+            <Camera className="h-4 w-4" />
+          </button>
         </div>
       </form>
+
+      <VisualSearchDialog open={visualOpen} onOpenChange={setVisualOpen} />
     </header>
   );
 }
+
