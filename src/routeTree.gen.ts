@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as SellerRouteImport } from './routes/seller'
+import { Route as PvzRouteImport } from './routes/pvz'
 import { Route as PromotionsRouteImport } from './routes/promotions'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PickupPointsRouteImport } from './routes/pickup-points'
@@ -38,6 +39,11 @@ const SupportRoute = SupportRouteImport.update({
 const SellerRoute = SellerRouteImport.update({
   id: '/seller',
   path: '/seller',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PvzRoute = PvzRouteImport.update({
+  id: '/pvz',
+  path: '/pvz',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PromotionsRoute = PromotionsRouteImport.update({
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/pickup-points': typeof PickupPointsRoute
   '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
+  '/pvz': typeof PvzRoute
   '/seller': typeof SellerRoute
   '/support': typeof SupportRoute
   '/product/$id': typeof ProductIdRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/pickup-points': typeof PickupPointsRoute
   '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
+  '/pvz': typeof PvzRoute
   '/seller': typeof SellerRoute
   '/support': typeof SupportRoute
   '/product/$id': typeof ProductIdRoute
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/pickup-points': typeof PickupPointsRoute
   '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
+  '/pvz': typeof PvzRoute
   '/seller': typeof SellerRoute
   '/support': typeof SupportRoute
   '/product/$id': typeof ProductIdRoute
@@ -218,6 +227,7 @@ export interface FileRouteTypes {
     | '/pickup-points'
     | '/profile'
     | '/promotions'
+    | '/pvz'
     | '/seller'
     | '/support'
     | '/product/$id'
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
     | '/pickup-points'
     | '/profile'
     | '/promotions'
+    | '/pvz'
     | '/seller'
     | '/support'
     | '/product/$id'
@@ -262,6 +273,7 @@ export interface FileRouteTypes {
     | '/pickup-points'
     | '/profile'
     | '/promotions'
+    | '/pvz'
     | '/seller'
     | '/support'
     | '/product/$id'
@@ -285,6 +297,7 @@ export interface RootRouteChildren {
   PickupPointsRoute: typeof PickupPointsRoute
   ProfileRoute: typeof ProfileRoute
   PromotionsRoute: typeof PromotionsRoute
+  PvzRoute: typeof PvzRoute
   SellerRoute: typeof SellerRoute
   SupportRoute: typeof SupportRoute
   ProductIdRoute: typeof ProductIdRoute
@@ -304,6 +317,13 @@ declare module '@tanstack/react-router' {
       path: '/seller'
       fullPath: '/seller'
       preLoaderRoute: typeof SellerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pvz': {
+      id: '/pvz'
+      path: '/pvz'
+      fullPath: '/pvz'
+      preLoaderRoute: typeof PvzRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/promotions': {
@@ -453,6 +473,7 @@ const rootRouteChildren: RootRouteChildren = {
   PickupPointsRoute: PickupPointsRoute,
   ProfileRoute: ProfileRoute,
   PromotionsRoute: PromotionsRoute,
+  PvzRoute: PvzRoute,
   SellerRoute: SellerRoute,
   SupportRoute: SupportRoute,
   ProductIdRoute: ProductIdRoute,
