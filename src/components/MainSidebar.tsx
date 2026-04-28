@@ -60,7 +60,7 @@ export function MainSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Əsas menyu</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("sidebar.mainMenu")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainLinks.map((l) => (
@@ -78,7 +78,7 @@ export function MainSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Kateqoriyalar</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("sidebar.categories")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {parents.map((p) => {
@@ -102,7 +102,7 @@ export function MainSidebar() {
                                 onClick={close}
                                 className="block text-xs py-1.5 px-2 rounded hover:bg-sidebar-accent hover:text-sidebar-accent-foreground font-medium"
                               >
-                                Hamısı
+                                {t("common.all")}
                               </Link>
                             </li>
                             {kids.map((k) => (
@@ -137,7 +137,7 @@ export function MainSidebar() {
 
         {user && (
           <SidebarGroup>
-            <SidebarGroupLabel>Kabinetim</SidebarGroupLabel>
+            <SidebarGroupLabel>{t("sidebar.myCabinet")}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {userLinks.map((l) => (
@@ -155,7 +155,7 @@ export function MainSidebar() {
                     <SidebarMenuButton asChild>
                       <Link to="/seller" onClick={close}>
                         <Store className="h-4 w-4" />
-                        <span>Satıcı paneli</span>
+                        <span>{t("sidebar.sellerPanel")}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -173,7 +173,7 @@ export function MainSidebar() {
                   <SidebarMenuButton asChild>
                     <Link to="/become-seller" onClick={close}>
                       <Store className="h-4 w-4" />
-                      <span>Mağaza aç</span>
+                      <span>{t("sidebar.openShop")}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -182,7 +182,7 @@ export function MainSidebar() {
                 <SidebarMenuButton asChild>
                   <Link to="/support" onClick={close}>
                     <HelpCircle className="h-4 w-4" />
-                    <span>Dəstək</span>
+                    <span>{t("sidebar.support")}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -190,7 +190,7 @@ export function MainSidebar() {
                 <SidebarMenuButton asChild>
                   <Link to="/admin" onClick={close}>
                     <Shield className="h-4 w-4" />
-                    <span>Admin panel</span>
+                    <span>{t("sidebar.adminPanel")}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -198,7 +198,7 @@ export function MainSidebar() {
                 <SidebarMenuButton asChild>
                   <Link to="/pvz" onClick={close}>
                     <PackageOpen className="h-4 w-4" />
-                    <span>PVZ işçi paneli</span>
+                    <span>{t("sidebar.pvzPanel")}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
