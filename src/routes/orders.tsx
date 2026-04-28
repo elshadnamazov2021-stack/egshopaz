@@ -5,17 +5,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { formatAZN } from "@/lib/format";
-import { Package, MapPin, X, MessageCircle, Send } from "lucide-react";
+import { Package, MapPin, X, MessageCircle, Send, QrCode } from "lucide-react";
 import { toast } from "sonner";
 import { OrderTimeline } from "@/components/OrderTimeline";
+import { OrderQRDialog } from "@/components/OrderQRDialog";
 
 export const Route = createFileRoute("/orders")({
   head: () => ({ meta: [{ title: "Sifarişlərim — Elzan Shop" }] }),
   component: OrdersPage,
 });
 
-interface OrderItem { id: string; title: string; price: number; quantity: number; image_url: string | null; status: string; seller_id: string; product_id: string }
-interface Order { id: string; total: number; status: string; created_at: string; shipping_address: string | null; payment_method: string; order_items: OrderItem[] }
+interface OrderItem { id: string; title: string; price: number; quantity: number; image_url: string | null; status: string; seller_id: string; product_id: string; pickup_code: string | null; accepted_at: string | null; delivered_at: string | null; pickup_point_id: string | null }
+interface Order { id: string; total: number; status: string; created_at: string; shipping_address: string | null; payment_method: string; pickup_point_id: string | null; pickup_points: { name: string; address: string; city: string } | null; order_items: OrderItem[] }
 
 const statusLabel: Record<string, string> = {
   pending: "Gözləyir", paid: "Ödənildi", shipped: "Göndərildi",
@@ -39,6 +40,8 @@ function OrdersPage() {
   const [msgOrderId, setMsgOrderId] = useState<string | null>(null);
   const [msgBody, setMsgBody] = useState("");
   const [msgSending, setMsgSending] = useState(false);
+  const [qrItem, setQrItem] = useState<OrderItem | null>(null);
+  const qrOrder = qrItem ? orders.find((o) => o.order_items?.some((i) => i.id === qrItem.id)) : null;
 
   const sendMessage = async () => {
     if (!user || !msgItem) return;
@@ -65,10 +68,10 @@ function OrdersPage() {
   const load = () => {
     if (!user) return;
     supabase.from("orders")
-      .select("*, order_items(id,title,price,quantity,image_url,status,seller_id,product_id)")
+      .select("*, pickup_points(name,address,city), order_items(id,title,price,quantity,image_url,status,seller_id,product_id,pickup_code,accepted_at,delivered_at,pickup_point_id)")
       .eq("buyer_id", user.id)
       .order("created_at", { ascending: false })
-      .then(({ data }) => setOrders((data ?? []) as Order[]));
+      .then(({ data }) => setOrders((data ?? []) as unknown as Order[]));
   };
   useEffect(load, [user]);
 
@@ -119,15 +122,30 @@ function OrdersPage() {
                       <div className="flex-1 min-w-0">
                         <div className="truncate">{it.title}</div>
                         <div className="text-xs text-muted-foreground">{it.quantity} × {formatAZN(it.price)}</div>
+                        {it.delivered_at ? (
+                          <div className="text-[10px] text-success font-semibold mt-0.5">✓ Təhvil alındı</div>
+                        ) : it.accepted_at ? (
+                          <div className="text-[10px] text-primary font-semibold mt-0.5">📦 PVZ-də gözləyir — götürmək üçün QR göstərin</div>
+                        ) : null}
                       </div>
-                      {user.id !== it.seller_id && (
-                        <button
-                          onClick={() => { setMsgItem(it); setMsgOrderId(o.id); setMsgBody(""); }}
-                          className="text-xs px-2.5 py-1.5 rounded-lg border border-border hover:border-primary hover:text-primary transition inline-flex items-center gap-1 shrink-0"
-                        >
-                          <MessageCircle className="h-3.5 w-3.5" /> Satıcıya yaz
-                        </button>
-                      )}
+                      <div className="flex flex-col gap-1 shrink-0">
+                        {it.pickup_code && !it.delivered_at && (
+                          <button
+                            onClick={() => setQrItem(it)}
+                            className="text-xs px-2.5 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 transition inline-flex items-center gap-1"
+                          >
+                            <QrCode className="h-3.5 w-3.5" /> QR
+                          </button>
+                        )}
+                        {user.id !== it.seller_id && (
+                          <button
+                            onClick={() => { setMsgItem(it); setMsgOrderId(o.id); setMsgBody(""); }}
+                            className="text-xs px-2.5 py-1.5 rounded-lg border border-border hover:border-primary hover:text-primary transition inline-flex items-center gap-1"
+                          >
+                            <MessageCircle className="h-3.5 w-3.5" /> Yaz
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -141,6 +159,19 @@ function OrdersPage() {
           </div>
         )}
       </div>
+
+      {qrItem?.pickup_code && (
+        <OrderQRDialog
+          open={!!qrItem}
+          onOpenChange={(v) => !v && setQrItem(null)}
+          pickupCode={qrItem.pickup_code}
+          title={qrItem.title}
+          subtitle={`Sifariş №${qrOrder?.id.slice(0, 8).toUpperCase()}`}
+          pvzName={qrOrder?.pickup_points?.name ?? null}
+          pvzAddress={qrOrder?.pickup_points ? `${qrOrder.pickup_points.city}, ${qrOrder.pickup_points.address}` : null}
+          mode="buyer"
+        />
+      )}
 
       {msgItem && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setMsgItem(null)}>

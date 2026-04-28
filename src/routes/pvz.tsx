@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { QRScannerDialog } from "@/components/QRScannerDialog";
 import { useTranslation } from "react-i18next";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { formatAZN } from "@/lib/format";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Home, PackageOpen, ShoppingBag, Undo2, Archive, BarChart3,
   Wallet, ClipboardList, Settings, LifeBuoy, ScanLine, Search,
@@ -149,57 +150,111 @@ function Dashboard() {
   );
 }
 
+interface DBOrderItem {
+  id: string; title: string; price: number; quantity: number;
+  pickup_code: string; status: string; accepted_at: string | null; delivered_at: string | null;
+  pickup_point_id: string | null;
+  orders: { id: string; recipient_name: string | null; recipient_phone: string | null; pickup_point_id: string | null } | null;
+}
+
+async function findItemByCode(code: string): Promise<DBOrderItem | null> {
+  const trimmed = code.trim().toUpperCase();
+  if (!trimmed) return null;
+  const { data, error } = await supabase
+    .from("order_items")
+    .select("id,title,price,quantity,pickup_code,status,accepted_at,delivered_at,pickup_point_id,orders(id,recipient_name,recipient_phone,pickup_point_id)")
+    .eq("pickup_code", trimmed)
+    .maybeSingle();
+  if (error) { toast.error(error.message); return null; }
+  return data as unknown as DBOrderItem | null;
+}
+
 function Intake({ scan, setScan }: { scan: string; setScan: (v: string) => void }) {
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [pending, setPending] = useState<DBOrderItem[]>([]);
+  const [busy, setBusy] = useState(false);
+
+  const load = () => {
+    supabase.from("order_items")
+      .select("id,title,price,quantity,pickup_code,status,accepted_at,delivered_at,pickup_point_id,orders(id,recipient_name,recipient_phone,pickup_point_id)")
+      .in("status", ["packed", "shipped"])
+      .is("accepted_at", null)
+      .order("id", { ascending: false })
+      .limit(50)
+      .then(({ data }) => setPending((data ?? []) as unknown as DBOrderItem[]));
+  };
+  useEffect(load, []);
+
+  const acceptByCode = async (code: string) => {
+    setBusy(true);
+    const item = await findItemByCode(code);
+    if (!item) { toast.error("Bu kod tapılmadı"); setBusy(false); return; }
+    if (item.accepted_at) { toast.info("Bu məhsul artıq qəbul edilib"); setBusy(false); return; }
+    const pvzId = item.orders?.pickup_point_id ?? item.pickup_point_id;
+    const { error } = await supabase
+      .from("order_items")
+      .update({ status: "shipped", accepted_at: new Date().toISOString(), pickup_point_id: pvzId })
+      .eq("id", item.id);
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`✓ ${item.title.slice(0, 30)} qəbul edildi`);
+    setScan(""); load();
+  };
+
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-extrabold flex items-center gap-2"><PackageOpen className="h-6 w-6 text-primary" /> Qəbul</h1>
 
       <div className="bg-card border border-border rounded-2xl p-4">
-        <Label className="mb-2 block">Ştrixkod / QR skan</Label>
+        <Label className="mb-2 block">Satıcı paketinin QR / pickup kodu</Label>
         <div className="flex gap-2">
           <div className="relative flex-1">
             <ScanLine className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input value={scan} onChange={(e) => setScan(e.target.value)} placeholder="Ştrixkodu daxil edin və ya kamera ilə skan edin..." className="pl-10" />
+            <Input value={scan} onChange={(e) => setScan(e.target.value.toUpperCase())} placeholder="Pickup kodu daxil edin..." className="pl-10 font-mono uppercase" onKeyDown={(e) => e.key === "Enter" && scan && acceptByCode(scan)} />
           </div>
-          <Button variant="outline" onClick={() => setScannerOpen(true)} title="Kamera ilə skan">
+          <Button variant="outline" onClick={() => setScannerOpen(true)}>
             <Camera className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">Kamera</span>
           </Button>
-          <Button onClick={() => { if (!scan) return; toast.success(`${scan} qəbul edildi`); setScan(""); }}>
+          <Button disabled={busy || !scan} onClick={() => acceptByCode(scan)}>
             <CheckCircle2 className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">Qəbul et</span>
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2">📱 Telefon kamerası ilə birbaşa QR / ştrixkod oxuya bilərsiniz</p>
+        <p className="text-xs text-muted-foreground mt-2">📱 Telefon kamerası ilə paketin üzərindəki QR-ı oxuyun — sistem avtomatik tapıb qəbul edəcək</p>
       </div>
 
       <QRScannerDialog
         open={scannerOpen}
         onOpenChange={setScannerOpen}
-        title="Sifariş ştrixkodu skan"
-        onScan={(value) => {
-          setScan(value);
-          toast.success(`Skan edildi: ${value}`);
-        }}
+        title="Paket QR skan"
+        onScan={(value) => { setScan(value); acceptByCode(value); }}
       />
 
       <div className="bg-card border border-border rounded-2xl p-4">
-        <div className="font-bold mb-3">Anbardan gələn mallar</div>
-        <Table>
-          <TableHeader><TableRow><TableHead>Kod</TableHead><TableHead>Müştəri</TableHead><TableHead>Saylar</TableHead><TableHead className="text-right">Əməliyyat</TableHead></TableRow></TableHeader>
-          <TableBody>
-            {mockExpected.map((o) => (
-              <TableRow key={o.id}>
-                <TableCell className="font-mono">{o.id}</TableCell>
-                <TableCell>{o.buyer}</TableCell>
-                <TableCell>{o.items}</TableCell>
-                <TableCell className="text-right space-x-2">
-                  <Button size="sm" variant="outline" onClick={() => toast.success("Qəbul akti yaradıldı")}><FileText className="h-4 w-4 mr-1" /> Akt</Button>
-                  <Button size="sm" variant="ghost" className="text-rose-600" onClick={() => toast.error("Çatışmazlıq qeyd edildi")}><AlertTriangle className="h-4 w-4 mr-1" /> Problem</Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="font-bold mb-3 flex items-center justify-between">
+          <span>Gözləyən paketlər ({pending.length})</span>
+          <Button size="sm" variant="ghost" onClick={load}>Yenilə</Button>
+        </div>
+        {pending.length === 0 ? (
+          <div className="text-sm text-muted-foreground text-center py-6">Hazırda gözləyən paket yoxdur</div>
+        ) : (
+          <Table>
+            <TableHeader><TableRow><TableHead>Pickup kodu</TableHead><TableHead>Məhsul</TableHead><TableHead>Müştəri</TableHead><TableHead className="text-right">Əməliyyat</TableHead></TableRow></TableHeader>
+            <TableBody>
+              {pending.map((o) => (
+                <TableRow key={o.id}>
+                  <TableCell className="font-mono font-bold text-primary">{o.pickup_code}</TableCell>
+                  <TableCell className="max-w-xs truncate">{o.title}</TableCell>
+                  <TableCell className="text-xs">{o.orders?.recipient_name ?? "—"}</TableCell>
+                  <TableCell className="text-right">
+                    <Button size="sm" disabled={busy} onClick={() => acceptByCode(o.pickup_code)}>
+                      <CheckCircle2 className="h-4 w-4 mr-1" /> Qəbul et
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
     </div>
   );
@@ -207,22 +262,58 @@ function Intake({ scan, setScan }: { scan: string; setScan: (v: string) => void 
 
 function Delivery({ search, setSearch }: { search: string; setSearch: (v: string) => void }) {
   const [scannerOpen, setScannerOpen] = useState(false);
-  const filtered = mockPending.filter((o) =>
-    !search || o.id.includes(search) || o.phone.includes(search) || o.code.includes(search) || o.buyer.toLowerCase().includes(search.toLowerCase())
+  const [list, setList] = useState<DBOrderItem[]>([]);
+  const [busy, setBusy] = useState(false);
+
+  const load = () => {
+    supabase.from("order_items")
+      .select("id,title,price,quantity,pickup_code,status,accepted_at,delivered_at,pickup_point_id,orders(id,recipient_name,recipient_phone,pickup_point_id)")
+      .not("accepted_at", "is", null)
+      .is("delivered_at", null)
+      .order("accepted_at", { ascending: true })
+      .limit(100)
+      .then(({ data }) => setList((data ?? []) as unknown as DBOrderItem[]));
+  };
+  useEffect(load, []);
+
+  const deliverByCode = async (code: string) => {
+    setBusy(true);
+    const item = await findItemByCode(code);
+    if (!item) { toast.error("Bu kod tapılmadı"); setBusy(false); return; }
+    if (!item.accepted_at) { toast.error("Bu məhsul hələ PVZ-yə qəbul edilməyib"); setBusy(false); return; }
+    if (item.delivered_at) { toast.info("Artıq təhvil verilib"); setBusy(false); return; }
+    const { error } = await supabase
+      .from("order_items")
+      .update({ status: "delivered", delivered_at: new Date().toISOString() })
+      .eq("id", item.id);
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`✓ ${item.title.slice(0, 30)} müştəriyə təhvil verildi`);
+    setSearch(""); load();
+  };
+
+  const filtered = list.filter((o) =>
+    !search || o.pickup_code.includes(search.toUpperCase()) ||
+    (o.orders?.recipient_phone ?? "").includes(search) ||
+    (o.orders?.recipient_name ?? "").toLowerCase().includes(search.toLowerCase())
   );
+
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-extrabold flex items-center gap-2"><ShoppingBag className="h-6 w-6 text-primary" /> Təhvil vermək</h1>
 
       <div className="bg-card border border-border rounded-2xl p-4">
-        <Label className="mb-2 block">Müştəri axtarışı (kod / telefon / ad)</Label>
+        <Label className="mb-2 block">Müştəri QR kodu / pickup kodu / telefon</Label>
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="WB-... və ya +994..." className="pl-10" />
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Pickup kodu və ya telefon..." className="pl-10" onKeyDown={(e) => e.key === "Enter" && search && deliverByCode(search)} />
           </div>
-          <Button variant="outline" onClick={() => setScannerOpen(true)} title="Müştəri QR kodunu skan et">
+          <Button variant="outline" onClick={() => setScannerOpen(true)}>
             <Camera className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">Skan</span>
+          </Button>
+          <Button disabled={busy || !search} onClick={() => deliverByCode(search)}>
+            <CheckCircle2 className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">Təhvil ver</span>
           </Button>
         </div>
       </div>
@@ -230,34 +321,37 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
       <QRScannerDialog
         open={scannerOpen}
         onOpenChange={setScannerOpen}
-        title="Müştəri kodunu skan et"
-        onScan={(value) => {
-          setSearch(value);
-          toast.success(`Axtarış: ${value}`);
-        }}
+        title="Müştəri QR skan"
+        onScan={(value) => { setSearch(value); deliverByCode(value); }}
       />
 
       <div className="bg-card border border-border rounded-2xl p-4">
-        <div className="font-bold mb-3">Təhvil verilməmiş sifarişlər</div>
-        <Table>
-          <TableHeader><TableRow><TableHead>Kod</TableHead><TableHead>Müştəri</TableHead><TableHead>Telefon</TableHead><TableHead>SMS kod</TableHead><TableHead>Saxlama</TableHead><TableHead className="text-right">Əməliyyat</TableHead></TableRow></TableHeader>
-          <TableBody>
-            {filtered.map((o) => (
-              <TableRow key={o.id}>
-                <TableCell className="font-mono">{o.id}</TableCell>
-                <TableCell>{o.buyer}</TableCell>
-                <TableCell className="text-xs">{o.phone}</TableCell>
-                <TableCell className="font-mono font-bold text-primary">{o.code}</TableCell>
-                <TableCell>{o.days} gün</TableCell>
-                <TableCell className="text-right">
-                  <Button size="sm" onClick={() => toast.success(`${o.id} təhvil verildi`)}>
-                    <CheckCircle2 className="h-4 w-4 mr-1" /> Təhvil ver
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="font-bold mb-3 flex items-center justify-between">
+          <span>PVZ-də gözləyən sifarişlər ({filtered.length})</span>
+          <Button size="sm" variant="ghost" onClick={load}>Yenilə</Button>
+        </div>
+        {filtered.length === 0 ? (
+          <div className="text-sm text-muted-foreground text-center py-6">Təhvil veriləcək məhsul yoxdur</div>
+        ) : (
+          <Table>
+            <TableHeader><TableRow><TableHead>Pickup kodu</TableHead><TableHead>Məhsul</TableHead><TableHead>Müştəri</TableHead><TableHead>Telefon</TableHead><TableHead className="text-right">Əməliyyat</TableHead></TableRow></TableHeader>
+            <TableBody>
+              {filtered.map((o) => (
+                <TableRow key={o.id}>
+                  <TableCell className="font-mono font-bold text-primary">{o.pickup_code}</TableCell>
+                  <TableCell className="max-w-xs truncate">{o.title}</TableCell>
+                  <TableCell className="text-xs">{o.orders?.recipient_name ?? "—"}</TableCell>
+                  <TableCell className="text-xs">{o.orders?.recipient_phone ?? "—"}</TableCell>
+                  <TableCell className="text-right">
+                    <Button size="sm" disabled={busy} onClick={() => deliverByCode(o.pickup_code)}>
+                      <CheckCircle2 className="h-4 w-4 mr-1" /> Təhvil ver
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
     </div>
   );
