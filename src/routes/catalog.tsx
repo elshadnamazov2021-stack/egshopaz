@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { SponsoredProducts } from "@/components/SponsoredProducts";
+import { CatalogFilters, type Filters } from "@/components/CatalogFilters";
 import { z } from "zod";
 
 const searchSchema = z.object({
@@ -29,6 +30,7 @@ function Catalog() {
   const [products, setProducts] = useState<ProductCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [openParents, setOpenParents] = useState<Record<string, boolean>>({});
+  const [filters, setFilters] = useState<Filters>({ sort: "newest" });
 
   useEffect(() => {
     supabase.from("categories").select("*").order("sort_order").then(({ data }) => setCategories((data ?? []) as Category[]));
@@ -41,11 +43,29 @@ function Catalog() {
       .eq("is_active", true);
     if (q) query = query.ilike("title", `%${q}%`);
     if (cat) query = query.eq("categories.slug", cat);
-    query.order("created_at", { ascending: false }).limit(60).then(({ data }) => {
+    if (filters.minPrice != null) query = query.gte("price", filters.minPrice);
+    if (filters.maxPrice != null) query = query.lte("price", filters.maxPrice);
+    if (filters.brand) query = query.eq("brand", filters.brand);
+    if (filters.minRating) query = query.gte("rating", filters.minRating);
+    if (filters.onlyDiscount) query = query.not("old_price", "is", null);
+
+    if (filters.sort === "price_asc") query = query.order("price", { ascending: true });
+    else if (filters.sort === "price_desc") query = query.order("price", { ascending: false });
+    else if (filters.sort === "rating") query = query.order("rating", { ascending: false });
+    else if (filters.sort === "popular") query = query.order("reviews_count", { ascending: false });
+    else query = query.order("created_at", { ascending: false });
+
+    query.limit(80).then(({ data }) => {
       setProducts((data ?? []) as ProductCardData[]);
       setLoading(false);
     });
-  }, [q, cat]);
+  }, [q, cat, filters]);
+
+  const allBrandsList = useMemo(() => {
+    const s = new Set<string>();
+    products.forEach((p) => p.brand && s.add(p.brand));
+    return [...s].sort();
+  }, [products]);
 
   const parents = categories.filter((c) => !c.parent_id);
   const childrenOf = (pid: string) => categories.filter((c) => c.parent_id === pid);
