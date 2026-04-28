@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import obmLogo from "@/assets/obm-logo.png";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -42,9 +43,8 @@ export function SiteHeader() {
       <div className="container mx-auto px-4 h-16 flex items-center gap-4">
         <SidebarTrigger className="shrink-0" />
 
-        <Link to="/" className="flex items-center gap-2 font-extrabold text-2xl shrink-0">
-          <span className="bg-gradient-brand text-primary-foreground px-2 py-1 rounded-md">OBM</span>
-          <span className="hidden sm:inline text-gradient-brand">market</span>
+        <Link to="/" className="flex items-center shrink-0" aria-label="OBM market">
+          <img src={obmLogo} alt="OBM market logo" width={140} height={44} className="h-10 sm:h-11 w-auto object-contain" />
         </Link>
 
         <form onSubmit={onSearch} className="flex-1 max-w-2xl hidden md:flex">
