@@ -7,8 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-// @ts-expect-error – static field on the default export
-QrScanner.WORKER_PATH = qrWorkerUrl;
+(QrScanner as unknown as { WORKER_PATH: string }).WORKER_PATH = qrWorkerUrl;
 
 interface Props {
   open: boolean;
