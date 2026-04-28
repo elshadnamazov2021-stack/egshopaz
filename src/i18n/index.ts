@@ -1,12 +1,10 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
 import az from "./locales/az.json";
 import ru from "./locales/ru.json";
 import en from "./locales/en.json";
 
 void i18n
-  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
@@ -14,14 +12,19 @@ void i18n
       ru: { translation: ru },
       en: { translation: en },
     },
+    lng: "az",
     fallbackLng: "az",
     supportedLngs: ["az", "ru", "en"],
     interpolation: { escapeValue: false },
-    detection: {
-      order: ["localStorage", "navigator"],
-      caches: ["localStorage"],
-      lookupLocalStorage: "elzan_lang",
-    },
   });
+
+// After hydration, sync with user-selected language from localStorage
+if (typeof window !== "undefined") {
+  const saved = localStorage.getItem("elzan_lang");
+  if (saved && ["az", "ru", "en"].includes(saved) && saved !== "az") {
+    // Defer change until after hydration completes
+    setTimeout(() => { void i18n.changeLanguage(saved); }, 0);
+  }
+}
 
 export default i18n;

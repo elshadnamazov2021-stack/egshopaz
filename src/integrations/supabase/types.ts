@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_packages: {
+        Row: {
+          banner_slots: number
+          color: string
+          created_at: string
+          duration_days: number
+          features: Json
+          id: string
+          is_active: boolean
+          name: string
+          price: number
+          sort_order: number
+          sponsored_product_slots: number
+          tier: string
+        }
+        Insert: {
+          banner_slots?: number
+          color?: string
+          created_at?: string
+          duration_days?: number
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name: string
+          price: number
+          sort_order?: number
+          sponsored_product_slots?: number
+          tier: string
+        }
+        Update: {
+          banner_slots?: number
+          color?: string
+          created_at?: string
+          duration_days?: number
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name?: string
+          price?: number
+          sort_order?: number
+          sponsored_product_slots?: number
+          tier?: string
+        }
+        Relationships: []
+      }
       addresses: {
         Row: {
           apartment: string | null
@@ -408,6 +453,47 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          method: string
+          seller_id: string
+          status: string
+          subscription_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          method?: string
+          seller_id: string
+          status?: string
+          subscription_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          method?: string
+          seller_id?: string
+          status?: string
+          subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "seller_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pickup_points: {
         Row: {
           address: string
@@ -700,6 +786,56 @@ export type Database = {
         }
         Relationships: []
       }
+      seller_subscriptions: {
+        Row: {
+          amount: number
+          created_at: string
+          ends_at: string
+          id: string
+          is_active: boolean
+          package_id: string
+          payment_method: string
+          payment_status: string
+          seller_id: string
+          starts_at: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          ends_at: string
+          id?: string
+          is_active?: boolean
+          package_id: string
+          payment_method?: string
+          payment_status?: string
+          seller_id: string
+          starts_at?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          ends_at?: string
+          id?: string
+          is_active?: boolean
+          package_id?: string
+          payment_method?: string
+          payment_status?: string
+          seller_id?: string
+          starts_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_subscriptions_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "ad_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_messages: {
         Row: {
           body: string
@@ -735,6 +871,53 @@ export type Database = {
           sender_role?: string
         }
         Relationships: []
+      }
+      sponsored_products: {
+        Row: {
+          clicks: number
+          created_at: string
+          ends_at: string
+          id: string
+          impressions: number
+          is_active: boolean
+          position: string
+          product_id: string
+          seller_id: string
+          subscription_id: string | null
+        }
+        Insert: {
+          clicks?: number
+          created_at?: string
+          ends_at: string
+          id?: string
+          impressions?: number
+          is_active?: boolean
+          position?: string
+          product_id: string
+          seller_id: string
+          subscription_id?: string | null
+        }
+        Update: {
+          clicks?: number
+          created_at?: string
+          ends_at?: string
+          id?: string
+          impressions?: number
+          is_active?: boolean
+          position?: string
+          product_id?: string
+          seller_id?: string
+          subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sponsored_products_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "seller_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       support_tickets: {
         Row: {

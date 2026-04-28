@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
+import { SponsoredProducts } from "@/components/SponsoredProducts";
 import { Truck, ShieldCheck, Tag, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -76,6 +77,9 @@ function Index() {
         <div className="absolute -right-10 -bottom-10 w-72 h-72 bg-background/10 rounded-full blur-3xl" />
         <div className="absolute right-20 top-10 w-40 h-40 bg-background/10 rounded-full blur-2xl" />
       </section>
+
+      {/* Sponsored products (paid placement) */}
+      <SponsoredProducts limit={6} />
 
       {/* Benefits */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-4">

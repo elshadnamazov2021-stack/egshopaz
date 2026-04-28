@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
+import { SponsoredProducts } from "@/components/SponsoredProducts";
 import { z } from "zod";
 
 const searchSchema = z.object({
@@ -60,6 +61,10 @@ function Catalog() {
         <Link to="/" className="hover:text-primary">Ana səhifə</Link>
         <span>/</span>
         <span className="text-foreground font-medium">{activeCat?.name ?? (q ? `"${q}" üzrə axtarış` : "Kataloq")}</span>
+      </div>
+
+      <div className="mb-6">
+        <SponsoredProducts limit={6} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6">
