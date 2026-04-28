@@ -150,22 +150,37 @@ function Dashboard() {
 }
 
 function Intake({ scan, setScan }: { scan: string; setScan: (v: string) => void }) {
+  const [scannerOpen, setScannerOpen] = useState(false);
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-extrabold flex items-center gap-2"><PackageOpen className="h-6 w-6 text-primary" /> Qəbul</h1>
 
       <div className="bg-card border border-border rounded-2xl p-4">
-        <Label className="mb-2 block">Ştrixkod skan</Label>
+        <Label className="mb-2 block">Ştrixkod / QR skan</Label>
         <div className="flex gap-2">
           <div className="relative flex-1">
             <ScanLine className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input value={scan} onChange={(e) => setScan(e.target.value)} placeholder="Ştrixkodu skan edin və ya daxil edin..." className="pl-10" />
+            <Input value={scan} onChange={(e) => setScan(e.target.value)} placeholder="Ştrixkodu daxil edin və ya kamera ilə skan edin..." className="pl-10" />
           </div>
+          <Button variant="outline" onClick={() => setScannerOpen(true)} title="Kamera ilə skan">
+            <Camera className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">Kamera</span>
+          </Button>
           <Button onClick={() => { if (!scan) return; toast.success(`${scan} qəbul edildi`); setScan(""); }}>
-            <CheckCircle2 className="h-4 w-4 mr-1" /> Qəbul et
+            <CheckCircle2 className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">Qəbul et</span>
           </Button>
         </div>
+        <p className="text-xs text-muted-foreground mt-2">📱 Telefon kamerası ilə birbaşa QR / ştrixkod oxuya bilərsiniz</p>
       </div>
+
+      <QRScannerDialog
+        open={scannerOpen}
+        onOpenChange={setScannerOpen}
+        title="Sifariş ştrixkodu skan"
+        onScan={(value) => {
+          setScan(value);
+          toast.success(`Skan edildi: ${value}`);
+        }}
+      />
 
       <div className="bg-card border border-border rounded-2xl p-4">
         <div className="font-bold mb-3">Anbardan gələn mallar</div>
