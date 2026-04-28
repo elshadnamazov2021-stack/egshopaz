@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/sidebar";
 import {
   Home, LayoutGrid, Heart, ShoppingCart, MessageCircle, Package,
-  Bell, Tag, Gift, Store, User, HelpCircle, ChevronDown, ChevronRight, Shield,
+  Bell, Tag, Gift, Store, User, HelpCircle, ChevronDown, ChevronRight, Shield, PackageOpen,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -189,6 +189,14 @@ export function MainSidebar() {
                   <Link to="/admin" onClick={close}>
                     <Shield className="h-4 w-4" />
                     <span>Admin panel</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link to="/pvz" onClick={close}>
+                    <PackageOpen className="h-4 w-4" />
+                    <span>PVZ işçi paneli</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
