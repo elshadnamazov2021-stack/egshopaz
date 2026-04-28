@@ -9,6 +9,7 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+// Header with sidebar trigger
 export function SiteHeader() {
   const { user, signOut, isSeller } = useAuth();
   const navigate = useNavigate();
