@@ -56,6 +56,51 @@ export type Database = {
         }
         Relationships: []
       }
+      banners: {
+        Row: {
+          clicks: number
+          created_at: string
+          ends_at: string | null
+          id: string
+          image_url: string | null
+          impressions: number
+          is_active: boolean
+          link_url: string | null
+          position: string
+          starts_at: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          clicks?: number
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          image_url?: string | null
+          impressions?: number
+          is_active?: boolean
+          link_url?: string | null
+          position?: string
+          starts_at?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          clicks?: number
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          image_url?: string | null
+          impressions?: number
+          is_active?: boolean
+          link_url?: string | null
+          position?: string
+          starts_at?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bonus_transactions: {
         Row: {
           amount: number
@@ -152,6 +197,99 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      couriers: {
+        Row: {
+          city: string
+          created_at: string
+          current_route: string | null
+          earnings: number
+          full_name: string
+          id: string
+          is_active: boolean
+          phone: string
+          rating: number
+          total_deliveries: number
+          updated_at: string
+          user_id: string | null
+          vehicle_type: string
+        }
+        Insert: {
+          city?: string
+          created_at?: string
+          current_route?: string | null
+          earnings?: number
+          full_name: string
+          id?: string
+          is_active?: boolean
+          phone: string
+          rating?: number
+          total_deliveries?: number
+          updated_at?: string
+          user_id?: string | null
+          vehicle_type?: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          current_route?: string | null
+          earnings?: number
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          phone?: string
+          rating?: number
+          total_deliveries?: number
+          updated_at?: string
+          user_id?: string | null
+          vehicle_type?: string
+        }
+        Relationships: []
+      }
+      disputes: {
+        Row: {
+          buyer_id: string
+          compensation: number | null
+          created_at: string
+          decided_for: string | null
+          description: string | null
+          id: string
+          order_id: string | null
+          reason: string
+          resolution: string | null
+          seller_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_id: string
+          compensation?: number | null
+          created_at?: string
+          decided_for?: string | null
+          description?: string | null
+          id?: string
+          order_id?: string | null
+          reason: string
+          resolution?: string | null
+          seller_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string
+          compensation?: number | null
+          created_at?: string
+          decided_for?: string | null
+          description?: string | null
+          id?: string
+          order_id?: string | null
+          reason?: string
+          resolution?: string | null
+          seller_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       favorites: {
         Row: {
@@ -494,6 +632,44 @@ export type Database = {
         }
         Relationships: []
       }
+      pvz_staff: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          is_active: boolean
+          phone: string
+          pickup_point_id: string | null
+          position: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id?: string
+          is_active?: boolean
+          phone: string
+          pickup_point_id?: string | null
+          position?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          phone?: string
+          pickup_point_id?: string | null
+          position?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pvz_staff_pickup_point_id_fkey"
+            columns: ["pickup_point_id"]
+            isOneToOne: false
+            referencedRelation: "pickup_points"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           comment: string | null
@@ -599,6 +775,36 @@ export type Database = {
         }
         Relationships: []
       }
+      system_settings: {
+        Row: {
+          commission_percent: number
+          delivery_base_fee: number
+          id: string
+          maintenance_mode: boolean
+          min_payout: number
+          storage_fee_per_day: number
+          updated_at: string
+        }
+        Insert: {
+          commission_percent?: number
+          delivery_base_fee?: number
+          id?: string
+          maintenance_mode?: boolean
+          min_payout?: number
+          storage_fee_per_day?: number
+          updated_at?: string
+        }
+        Update: {
+          commission_percent?: number
+          delivery_base_fee?: number
+          id?: string
+          maintenance_mode?: boolean
+          min_payout?: number
+          storage_fee_per_day?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -617,6 +823,48 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      warehouses: {
+        Row: {
+          address: string
+          capacity: number
+          city: string
+          created_at: string
+          id: string
+          is_active: boolean
+          manager_name: string | null
+          name: string
+          occupied: number
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          capacity?: number
+          city: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          manager_name?: string | null
+          name: string
+          occupied?: number
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          capacity?: number
+          city?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          manager_name?: string | null
+          name?: string
+          occupied?: number
+          phone?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
