@@ -35,15 +35,16 @@ export function SponsoredProducts({ limit = 6 }: { limit?: number }) {
   if (items.length === 0) return null;
 
   return (
-    <section className="container mx-auto px-4 my-8">
+    <section>
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="h-5 w-5 text-warning" />
-        <h2 className="text-xl font-bold">Sponsor məhsullar</h2>
+        <h2 className="text-xl md:text-2xl font-bold">Sponsor məhsullar</h2>
         <span className="text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full font-semibold">REKLAM</span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
         {items.map((s) => s.products && (
-          <Link key={s.id} to="/product/$id" params={{ id: s.products.id }} className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition group">
+          <Link key={s.id} to="/product/$id" params={{ id: s.products.id }} className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition group relative">
+            <span className="absolute top-2 left-2 z-10 bg-warning text-warning-foreground text-[10px] font-bold px-1.5 py-0.5 rounded">AD</span>
             <div className="aspect-square bg-secondary overflow-hidden">
               {(s.products.image_url ?? s.products.images[0]) && (
                 <img src={s.products.image_url ?? s.products.images[0]} alt={s.products.title} className="w-full h-full object-cover group-hover:scale-105 transition" />
