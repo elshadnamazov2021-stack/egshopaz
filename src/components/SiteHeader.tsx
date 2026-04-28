@@ -67,8 +67,17 @@ export function SiteHeader() {
 
         <nav className="ml-auto flex items-center gap-1 sm:gap-2">
           <LanguageSwitcher />
-          <Link to="/favorites" className="hidden sm:flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
+          <Link to="/discover" className="hidden md:flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
+            <span className="h-5 w-5 mb-0.5 text-base">🔥</span>
+            <span>Kəşfet</span>
+          </Link>
+          <Link to="/favorites" className="relative flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
             <Heart className="h-5 w-5 mb-0.5" />
+            {favCount > 0 && (
+              <span className="absolute top-0 right-1 bg-discount text-discount-foreground text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
+                {favCount}
+              </span>
+            )}
             <span>{t("header.favorites")}</span>
           </Link>
           <Link to="/cart" className="relative flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
