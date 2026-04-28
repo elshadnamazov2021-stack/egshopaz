@@ -145,10 +145,21 @@ export function SiteHeader() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={t("common.search")}
-            className="w-full pl-10 pr-4 h-10 rounded-lg border border-input bg-secondary/50 focus:bg-background focus:outline-none focus:ring-2 focus:ring-ring transition text-sm"
+            className="w-full pl-10 pr-11 h-10 rounded-lg border border-input bg-secondary/50 focus:bg-background focus:outline-none focus:ring-2 focus:ring-ring transition text-sm"
           />
+          <button
+            type="button"
+            onClick={() => setVisualOpen(true)}
+            title="Şəkillə axtar"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-primary/10 text-primary transition"
+          >
+            <Camera className="h-4 w-4" />
+          </button>
         </div>
       </form>
+
+      <VisualSearchDialog open={visualOpen} onOpenChange={setVisualOpen} />
     </header>
   );
 }
+
