@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import QrScanner from "qr-scanner";
+// Vite: bundle the worker as an asset and give qr-scanner an explicit URL
+import qrWorkerUrl from "qr-scanner/qr-scanner-worker.min.js?url";
 import { Camera, X, RefreshCw, FlashlightOff, Flashlight, Image as ImageIcon } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+
+(QrScanner as unknown as { WORKER_PATH: string }).WORKER_PATH = qrWorkerUrl;
 
 interface Props {
   open: boolean;
@@ -26,34 +30,55 @@ export function QRScannerDialog({ open, onOpenChange, onScan, title = "QR / Ştr
     setError(null);
     setLastValue(null);
 
-    const scanner = new QrScanner(
-      videoRef.current,
-      (res) => {
-        if (!res?.data) return;
-        setLastValue(res.data);
-        scanner.stop();
-      },
-      {
-        preferredCamera: "environment",
-        highlightScanRegion: true,
-        highlightCodeOutline: true,
-        maxScansPerSecond: 5,
-      }
-    );
-    scannerRef.current = scanner;
+    let cancelled = false;
+    let scanner: QrScanner | null = null;
 
-    scanner.start()
-      .then(async () => {
-        const flash = await scanner.hasFlash();
-        setHasFlash(flash);
-      })
-      .catch((e: any) => {
-        setError(e?.message || "Kameraya giriş alınmadı. İcazələri yoxlayın.");
-      });
+    (async () => {
+      try {
+        const hasCam = await QrScanner.hasCamera();
+        if (!hasCam) {
+          setError("Bu cihazda kamera tapılmadı. Şəkildən QR oxuya bilərsiniz.");
+          return;
+        }
+        if (!videoRef.current || cancelled) return;
+        scanner = new QrScanner(
+          videoRef.current,
+          (res) => {
+            if (!res?.data) return;
+            setLastValue(res.data);
+            scanner?.stop();
+          },
+          {
+            preferredCamera: "environment",
+            highlightScanRegion: true,
+            highlightCodeOutline: true,
+            maxScansPerSecond: 5,
+            returnDetailedScanResult: true,
+          }
+        );
+        scannerRef.current = scanner;
+        await scanner.start();
+        try { setHasFlash(await scanner.hasFlash()); } catch { /* ignore */ }
+      } catch (e: any) {
+        const msg = String(e?.name || e?.message || "");
+        if (msg.includes("NotAllowed") || msg.includes("Permission")) {
+          setError("Kamera icazəsi verilməyib. Brauzer parametrlərindən icazə verin və yenidən cəhd edin.");
+        } else if (msg.includes("NotFound") || msg.includes("DevicesNotFound")) {
+          setError("Kamera tapılmadı. Şəkildən QR seçə bilərsiniz.");
+        } else if (msg.includes("NotReadable") || msg.includes("TrackStart")) {
+          setError("Kamera başqa proqram tərəfindən istifadə olunur. Digər kamera proqramlarını bağlayın.");
+        } else if (location.protocol !== "https:" && location.hostname !== "localhost") {
+          setError("Kamera yalnız HTTPS-də işləyir. Saytı HTTPS ilə açın.");
+        } else {
+          setError(e?.message || "Kameraya giriş alınmadı.");
+        }
+      }
+    })();
 
     return () => {
-      scanner.stop();
-      scanner.destroy();
+      cancelled = true;
+      try { scanner?.stop(); } catch { /* ignore */ }
+      try { scanner?.destroy(); } catch { /* ignore */ }
       scannerRef.current = null;
       setFlashOn(false);
     };
@@ -97,6 +122,9 @@ export function QRScannerDialog({ open, onOpenChange, onScan, title = "QR / Ştr
           <DialogTitle className="flex items-center gap-2">
             <Camera className="h-5 w-5 text-primary" /> {title}
           </DialogTitle>
+          <DialogDescription className="text-xs">
+            Kameranı QR koda yönəldin və ya şəkildən seçin.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="relative bg-black aspect-square">
