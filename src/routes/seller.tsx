@@ -372,7 +372,10 @@ function SellerPanel() {
                       <td className="p-3">
                         <div className="flex gap-1 justify-end">
                           <button onClick={() => setEditing(p)} className="p-2 hover:bg-secondary rounded" title="Redaktə"><Edit className="h-4 w-4" /></button>
-                          <button onClick={() => remove(p.id)} className="p-2 hover:bg-destructive/10 hover:text-destructive rounded" title="Sil"><Trash2 className="h-4 w-4" /></button>
+                          <button onClick={() => openQR(p)} className="p-2 hover:bg-primary/10 hover:text-primary rounded" title="QR kod"><QrCode className="h-4 w-4" /></button>
+                          <button onClick={() => remove(p.id)} className="p-2 bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground rounded inline-flex items-center gap-1" title="Sil">
+                            <Trash2 className="h-4 w-4" /><span className="text-xs font-semibold hidden sm:inline">Sil</span>
+                          </button>
                         </div>
                       </td>
                     </tr>
