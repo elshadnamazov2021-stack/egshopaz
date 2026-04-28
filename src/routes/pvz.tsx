@@ -9,7 +9,7 @@ import {
   Home, PackageOpen, ShoppingBag, Undo2, Archive, BarChart3,
   Wallet, ClipboardList, Settings, LifeBuoy, ScanLine, Search,
   CheckCircle2, AlertTriangle, Printer, Camera, PhoneCall, Clock,
-  Plus, XCircle, FileText, TrendingUp, Bell,
+  Plus, XCircle, FileText, TrendingUp, Bell, MessageCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/pvz")({
 
 type TabKey =
   | "dashboard" | "intake" | "delivery" | "returns" | "storage"
-  | "reports" | "finance" | "shift" | "settings" | "support";
+  | "reports" | "finance" | "shift" | "messages" | "settings" | "support";
 
 // ---------------- MOCK DATA ----------------
 const mockExpected = [
@@ -65,6 +65,7 @@ function PvzPanel() {
     { key: "reports", label: t("pvz.reports"), icon: BarChart3, active: tab === "reports", onClick: () => setTab("reports") },
     { key: "finance", label: t("pvz.finance"), icon: Wallet, active: tab === "finance", onClick: () => setTab("finance") },
     { key: "shift", label: t("pvz.shift"), icon: ClipboardList, active: tab === "shift", onClick: () => setTab("shift") },
+    { key: "messages", label: "Müştəri mesajları", icon: MessageCircle, active: tab === "messages", onClick: () => setTab("messages") },
     { key: "settings", label: t("pvz.settings"), icon: Settings, active: tab === "settings", onClick: () => setTab("settings") },
     { key: "support", label: t("pvz.support"), icon: LifeBuoy, active: tab === "support", onClick: () => setTab("support") },
   ];
@@ -88,6 +89,7 @@ function PvzPanel() {
       {tab === "reports" && <Reports />}
       {tab === "finance" && <Finance />}
       {tab === "shift" && <Shift open={shiftOpen} setOpen={setShiftOpen} />}
+      {tab === "messages" && <PvzMessagesTab />}
       {tab === "settings" && <SettingsSec />}
       {tab === "support" && <Support />}
     </PanelLayout>

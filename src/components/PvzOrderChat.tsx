@@ -120,11 +120,11 @@ export function PvzOrderChat({ mode, currentUserId }: { mode: "buyer" | "pvz"; c
     const { error } = await supabase.from("pvz_messages").insert({
       order_id: activeOrder,
       buyer_id: thread.buyerId,
-      pickup_point_id: messages.find((m) => m.order_id === activeOrder)?.pickup_point_id,
+      pickup_point_id: messages.find((m) => m.order_id === activeOrder)?.pickup_point_id ?? "",
       sender_role: mode === "buyer" ? "buyer" : "pvz",
       sender_id: currentUserId,
       body,
-    });
+    } as never);
     setSending(false);
     if (error) toast.error("Mesaj göndərilmədi");
     else { setReply(""); load(); }
