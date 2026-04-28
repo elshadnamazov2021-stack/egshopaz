@@ -1,9 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import QrScanner from "qr-scanner";
+// Vite: bundle the worker as an asset and give qr-scanner an explicit URL
+import qrWorkerUrl from "qr-scanner/qr-scanner-worker.min.js?url";
 import { Camera, X, RefreshCw, FlashlightOff, Flashlight, Image as ImageIcon } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+
+// @ts-expect-error – static field on the default export
+QrScanner.WORKER_PATH = qrWorkerUrl;
 
 interface Props {
   open: boolean;
