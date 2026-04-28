@@ -55,17 +55,15 @@ function Discover() {
         const sorted = (data ?? []).sort((a, b) => (counts.get(b.id) ?? 0) - (counts.get(a.id) ?? 0));
         setProducts(sorted as ProductCardData[]); setLoading(false); return;
       } else if (tab === "topRated") {
-        q = q.order("rating", { ascending: false }).order("reviews_count", { ascending: false });
+        const { data } = await base().order("rating", { ascending: false }).order("reviews_count", { ascending: false }).limit(40);
+        setProducts((data ?? []) as ProductCardData[]); setLoading(false); return;
       } else if (tab === "newest") {
-        q = q.order("created_at", { ascending: false });
+        const { data } = await base().order("created_at", { ascending: false }).limit(40);
+        setProducts((data ?? []) as ProductCardData[]); setLoading(false); return;
       } else {
-        // trending — by reviews_count + recent
-        q = q.order("reviews_count", { ascending: false });
+        const { data } = await base().order("reviews_count", { ascending: false }).limit(40);
+        setProducts((data ?? []) as ProductCardData[]); setLoading(false); return;
       }
-
-      const { data } = await q.limit(40);
-      setProducts((data ?? []) as ProductCardData[]);
-      setLoading(false);
     };
     run();
   }, [tab]);
