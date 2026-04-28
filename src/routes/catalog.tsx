@@ -138,6 +138,10 @@ function Catalog() {
             <span className="ml-2 text-sm text-muted-foreground font-normal">{products.length} məhsul</span>
           </h1>
 
+          <div className="mb-4">
+            <CatalogFilters brands={allBrandsList} value={filters} onChange={setFilters} />
+          </div>
+
           {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {Array.from({ length: 8 }).map((_, i) => (
