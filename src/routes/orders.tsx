@@ -15,8 +15,8 @@ export const Route = createFileRoute("/orders")({
   component: OrdersPage,
 });
 
-interface OrderItem { id: string; title: string; price: number; quantity: number; image_url: string | null; status: string; seller_id: string; product_id: string }
-interface Order { id: string; total: number; status: string; created_at: string; shipping_address: string | null; payment_method: string; order_items: OrderItem[] }
+interface OrderItem { id: string; title: string; price: number; quantity: number; image_url: string | null; status: string; seller_id: string; product_id: string; pickup_code: string | null; accepted_at: string | null; delivered_at: string | null; pickup_point_id: string | null }
+interface Order { id: string; total: number; status: string; created_at: string; shipping_address: string | null; payment_method: string; pickup_point_id: string | null; pickup_points: { name: string; address: string; city: string } | null; order_items: OrderItem[] }
 
 const statusLabel: Record<string, string> = {
   pending: "Gözləyir", paid: "Ödənildi", shipped: "Göndərildi",
