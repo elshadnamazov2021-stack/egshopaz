@@ -122,6 +122,9 @@ export function QRScannerDialog({ open, onOpenChange, onScan, title = "QR / Ştr
           <DialogTitle className="flex items-center gap-2">
             <Camera className="h-5 w-5 text-primary" /> {title}
           </DialogTitle>
+          <DialogDescription className="text-xs">
+            Kameranı QR koda yönəldin və ya şəkildən seçin.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="relative bg-black aspect-square">
