@@ -63,6 +63,10 @@ function Catalog() {
         <span className="text-foreground font-medium">{activeCat?.name ?? (q ? `"${q}" üzrə axtarış` : "Kataloq")}</span>
       </div>
 
+      <div className="mb-6">
+        <SponsoredProducts limit={6} />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6">
         <aside className="hidden md:block">
           <h3 className="font-bold mb-3">Kateqoriyalar</h3>
