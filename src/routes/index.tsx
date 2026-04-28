@@ -1,12 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { SponsoredProducts } from "@/components/SponsoredProducts";
 import { SellerBanners } from "@/components/SellerBanners";
 import { Truck, ShieldCheck, Tag, Clock, Flame, Heart, TicketPercent, TrendingUp, Sparkles, ArrowRight, Copy, Camera } from "lucide-react";
 import { toast } from "sonner";
-import { VisualSearchDialog } from "@/components/VisualSearchDialog";
+
+const VisualSearchDialog = lazy(() =>
+  import("@/components/VisualSearchDialog").then((m) => ({ default: m.VisualSearchDialog }))
+);
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -33,42 +36,53 @@ function Index() {
   const [visualOpen, setVisualOpen] = useState(false);
 
   useEffect(() => {
-    supabase.from("categories").select("*").is("parent_id", null).order("sort_order").then(({ data }) => setCategories(data ?? []));
+    // Kritik: ana məhsullar + kateqoriyalar dərhal
+    supabase.from("categories").select("id,name,slug,icon").is("parent_id", null).order("sort_order").then(({ data }) => setCategories(data ?? []));
 
     supabase.from("products")
       .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
       .eq("is_active", true)
       .order("created_at", { ascending: false })
-      .limit(20)
+      .limit(10)
       .then(({ data }) => setAllProducts((data ?? []) as ProductCardData[]));
 
-    supabase.from("products")
-      .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
-      .eq("is_active", true).not("old_price", "is", null)
-      .order("old_price", { ascending: false }).limit(10)
-      .then(({ data }) => setDiscounted((data ?? []) as ProductCardData[]));
-
-    supabase.from("products")
-      .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
-      .eq("is_active", true)
-      .order("reviews_count", { ascending: false }).limit(10)
-      .then(({ data }) => setTrending((data ?? []) as ProductCardData[]));
-
-    supabase.from("promo_codes").select("*").eq("is_active", true).limit(6)
-      .then(({ data }) => setPromos((data ?? []) as PromoCode[]));
-
-    // Most-favorited
-    supabase.from("favorites").select("product_id").limit(500).then(async ({ data }) => {
-      const counts = new Map<string, number>();
-      (data ?? []).forEach((f: { product_id: string }) => counts.set(f.product_id, (counts.get(f.product_id) ?? 0) + 1));
-      const ids = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([id]) => id);
-      if (ids.length === 0) return;
-      const { data: prod } = await supabase.from("products")
+    // Ləng: ikinci dərəcəli bölmələr — idle vaxtında
+    const loadSecondary = () => {
+      supabase.from("products")
         .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
-        .in("id", ids).eq("is_active", true);
-      const sorted = (prod ?? []).sort((a, b) => (counts.get(b.id) ?? 0) - (counts.get(a.id) ?? 0));
-      setTopFav(sorted as ProductCardData[]);
-    });
+        .eq("is_active", true).not("old_price", "is", null)
+        .order("old_price", { ascending: false }).limit(5)
+        .then(({ data }) => setDiscounted((data ?? []) as ProductCardData[]));
+
+      supabase.from("products")
+        .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
+        .eq("is_active", true)
+        .order("reviews_count", { ascending: false }).limit(10)
+        .then(({ data }) => setTrending((data ?? []) as ProductCardData[]));
+
+      supabase.from("promo_codes").select("id,code,discount_percent,discount_amount,min_order,expires_at").eq("is_active", true).limit(6)
+        .then(({ data }) => setPromos((data ?? []) as PromoCode[]));
+
+      // Favoritlər — RPC olmadığı üçün məhdudlaşdırılmış
+      supabase.from("favorites").select("product_id").limit(200).then(async ({ data }) => {
+        const counts = new Map<string, number>();
+        (data ?? []).forEach((f: { product_id: string }) => counts.set(f.product_id, (counts.get(f.product_id) ?? 0) + 1));
+        const ids = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([id]) => id);
+        if (ids.length === 0) return;
+        const { data: prod } = await supabase.from("products")
+          .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
+          .in("id", ids).eq("is_active", true);
+        const sorted = (prod ?? []).sort((a, b) => (counts.get(b.id) ?? 0) - (counts.get(a.id) ?? 0));
+        setTopFav(sorted as ProductCardData[]);
+      });
+    };
+
+    const w = typeof window !== "undefined" ? window : null;
+    if (w && "requestIdleCallback" in w) {
+      (w as unknown as { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(loadSecondary);
+    } else {
+      setTimeout(loadSecondary, 200);
+    }
   }, []);
 
   const copyCode = (code: string) => {
@@ -290,7 +304,11 @@ function Index() {
         )}
       </section>
 
-      <VisualSearchDialog open={visualOpen} onOpenChange={setVisualOpen} />
+      {visualOpen && (
+        <Suspense fallback={null}>
+          <VisualSearchDialog open={visualOpen} onOpenChange={setVisualOpen} />
+        </Suspense>
+      )}
     </div>
   );
 }

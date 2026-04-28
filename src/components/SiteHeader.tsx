@@ -1,8 +1,11 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Search, ShoppingCart, User, Heart, LogOut, Store, Camera } from "lucide-react";
-import { VisualSearchDialog } from "@/components/VisualSearchDialog";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect, useState } from "react";
+
+const VisualSearchDialog = lazy(() =>
+  import("@/components/VisualSearchDialog").then((m) => ({ default: m.VisualSearchDialog }))
+);
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -158,7 +161,11 @@ export function SiteHeader() {
         </div>
       </form>
 
-      <VisualSearchDialog open={visualOpen} onOpenChange={setVisualOpen} />
+      {visualOpen && (
+        <Suspense fallback={null}>
+          <VisualSearchDialog open={visualOpen} onOpenChange={setVisualOpen} />
+        </Suspense>
+      )}
     </header>
   );
 }
