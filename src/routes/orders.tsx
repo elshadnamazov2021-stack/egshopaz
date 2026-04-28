@@ -160,6 +160,19 @@ function OrdersPage() {
         )}
       </div>
 
+      {qrItem?.pickup_code && (
+        <OrderQRDialog
+          open={!!qrItem}
+          onOpenChange={(v) => !v && setQrItem(null)}
+          pickupCode={qrItem.pickup_code}
+          title={qrItem.title}
+          subtitle={`Sifariş №${qrOrder?.id.slice(0, 8).toUpperCase()}`}
+          pvzName={qrOrder?.pickup_points?.name ?? null}
+          pvzAddress={qrOrder?.pickup_points ? `${qrOrder.pickup_points.city}, ${qrOrder.pickup_points.address}` : null}
+          mode="buyer"
+        />
+      )}
+
       {msgItem && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setMsgItem(null)}>
           <div className="bg-card rounded-2xl p-5 w-full max-w-md space-y-3" onClick={(e) => e.stopPropagation()}>
