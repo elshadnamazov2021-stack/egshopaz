@@ -20,16 +20,17 @@ export const Route = createFileRoute("/catalog")({
   component: Catalog,
 });
 
-interface Category { id: string; name: string; slug: string; icon: string | null }
+interface Category { id: string; name: string; slug: string; icon: string | null; parent_id: string | null }
 
 function Catalog() {
   const { q, cat } = Route.useSearch();
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<ProductCardData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openParents, setOpenParents] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    supabase.from("categories").select("*").order("sort_order").then(({ data }) => setCategories(data ?? []));
+    supabase.from("categories").select("*").order("sort_order").then(({ data }) => setCategories((data ?? []) as Category[]));
   }, []);
 
   useEffect(() => {
@@ -45,7 +46,13 @@ function Catalog() {
     });
   }, [q, cat]);
 
+  const parents = categories.filter((c) => !c.parent_id);
+  const childrenOf = (pid: string) => categories.filter((c) => c.parent_id === pid);
   const activeCat = categories.find((c) => c.slug === cat);
+
+  useEffect(() => {
+    if (activeCat?.parent_id) setOpenParents((p) => ({ ...p, [activeCat.parent_id!]: true }));
+  }, [activeCat?.parent_id]);
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -55,7 +62,7 @@ function Catalog() {
         <span className="text-foreground font-medium">{activeCat?.name ?? (q ? `"${q}" üzrə axtarış` : "Kataloq")}</span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6">
         <aside className="hidden md:block">
           <h3 className="font-bold mb-3">Kateqoriyalar</h3>
           <ul className="space-y-1">
@@ -65,14 +72,38 @@ function Catalog() {
                 Hamısı
               </Link>
             </li>
-            {categories.map((c) => (
-              <li key={c.id}>
-                <Link to="/catalog" search={{ q, cat: c.slug } as never}
-                      className={`block px-3 py-2 rounded-lg text-sm hover:bg-secondary ${cat === c.slug ? "bg-secondary font-semibold text-primary" : ""}`}>
-                  {c.icon} {c.name}
-                </Link>
-              </li>
-            ))}
+            {parents.map((c) => {
+              const kids = childrenOf(c.id);
+              const isOpen = openParents[c.id] || activeCat?.parent_id === c.id || cat === c.slug;
+              return (
+                <li key={c.id}>
+                  <button
+                    onClick={() => setOpenParents((p) => ({ ...p, [c.id]: !isOpen }))}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm hover:bg-secondary text-left ${cat === c.slug ? "bg-secondary font-semibold text-primary" : ""}`}>
+                    <span>{c.icon} {c.name}</span>
+                    {kids.length > 0 && <span className="text-xs">{isOpen ? "−" : "+"}</span>}
+                  </button>
+                  {isOpen && kids.length > 0 && (
+                    <ul className="ml-4 mt-1 space-y-0.5 border-l border-border pl-2">
+                      <li>
+                        <Link to="/catalog" search={{ q, cat: c.slug } as never}
+                              className={`block px-2 py-1 rounded text-xs hover:bg-secondary ${cat === c.slug ? "font-semibold text-primary" : "text-muted-foreground"}`}>
+                          Hamısı
+                        </Link>
+                      </li>
+                      {kids.map((k) => (
+                        <li key={k.id}>
+                          <Link to="/catalog" search={{ q, cat: k.slug } as never}
+                                className={`block px-2 py-1 rounded text-xs hover:bg-secondary ${cat === k.slug ? "font-semibold text-primary" : ""}`}>
+                            {k.icon} {k.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </aside>
 
