@@ -702,11 +702,43 @@ function SellerPanel() {
             <div className="text-xs text-muted-foreground mb-4 break-all bg-secondary/50 p-2 rounded">
               {window.location.origin}/product/{qrProduct.id}
             </div>
-            <div className="flex gap-2">
-              <button onClick={downloadQR} className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold hover:bg-primary/90 inline-flex items-center justify-center gap-2">
-                <Download className="h-4 w-4" /> Yüklə (PNG)
+            <div className="flex gap-2 flex-wrap">
+              <button onClick={downloadQR} className="flex-1 min-w-[120px] bg-primary text-primary-foreground px-3 py-2 rounded-lg font-bold hover:bg-primary/90 inline-flex items-center justify-center gap-2 text-sm">
+                <Download className="h-4 w-4" /> PNG yüklə
               </button>
-              <button onClick={() => setQrProduct(null)} className="px-4 py-2 rounded-lg border border-border hover:bg-secondary">Bağla</button>
+              <button onClick={() => {
+                if (!qrProduct || !qrDataUrl) return;
+                const html = `<!doctype html><html><head><meta charset="utf-8"><title>${qrProduct.title}</title>
+<style>
+  @page { size: 80mm 100mm; margin: 3mm; }
+  * { box-sizing: border-box; font-family: -apple-system, system-ui, Arial, sans-serif; }
+  body { margin: 0; padding: 4mm; }
+  .lbl { border: 2px solid #000; padding: 4mm; height: 92mm; display:flex; flex-direction:column; align-items:center; text-align:center; }
+  .t { font-weight: 800; font-size: 12pt; line-height: 1.25; margin-bottom: 2mm; }
+  .b { font-size: 9pt; color: #666; margin-bottom: 2mm; }
+  .p { font-size: 18pt; font-weight: 900; margin: 2mm 0; }
+  .qr { margin: auto 0; } .qr img { width: 45mm; height: 45mm; }
+  .sku { font-family: monospace; font-size: 9pt; margin-top: 2mm; }
+  @media print { .noprint { display:none; } }
+  .btn { background:#000; color:#fff; border:0; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:700; }
+</style></head><body>
+<div class="noprint" style="text-align:center;margin-bottom:8px;"><button class="btn" onclick="window.print()">🖨️ Çap et</button></div>
+<div class="lbl">
+  <div class="t">${qrProduct.title}</div>
+  ${qrProduct.brand ? `<div class="b">${qrProduct.brand}</div>` : ""}
+  <div class="p">${Number(qrProduct.price).toFixed(2)} ₼</div>
+  <div class="qr"><img src="${qrDataUrl}" alt="QR"/></div>
+  ${qrProduct.sku ? `<div class="sku">SKU: ${qrProduct.sku}</div>` : ""}
+</div>
+<script>setTimeout(()=>window.print(),300);</script>
+</body></html>`;
+                const w = window.open("", "_blank", "width=380,height=520");
+                if (!w) { toast.error("Pop-up bloklanıb"); return; }
+                w.document.write(html); w.document.close();
+              }} className="flex-1 min-w-[120px] bg-secondary text-foreground px-3 py-2 rounded-lg font-bold hover:bg-secondary/80 inline-flex items-center justify-center gap-2 text-sm">
+                <QrCode className="h-4 w-4" /> Etiket çap et
+              </button>
+              <button onClick={() => setQrProduct(null)} className="px-3 py-2 rounded-lg border border-border hover:bg-secondary text-sm">Bağla</button>
             </div>
           </div>
         </div>
