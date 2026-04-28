@@ -6,7 +6,7 @@ import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { Heart } from "lucide-react";
 
 export const Route = createFileRoute("/favorites")({
-  head: () => ({ meta: [{ title: "Sevimlilər — One Board Market" }] }),
+  head: () => ({ meta: [{ title: "Sevimlilər — Elzan Shop" }] }),
   component: Favorites,
 });
 

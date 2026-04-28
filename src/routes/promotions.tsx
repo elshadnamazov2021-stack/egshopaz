@@ -8,7 +8,7 @@ import { Gift, Copy, Check, Tag, Flame } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/promotions")({
-  head: () => ({ meta: [{ title: "Aksiyalar — One Board Market" }] }),
+  head: () => ({ meta: [{ title: "Aksiyalar — Elzan Shop" }] }),
   component: PromotionsPage,
 });
 

@@ -7,7 +7,7 @@ import { CreditCard, Plus, Trash2, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/payment-methods")({
-  head: () => ({ meta: [{ title: "Ödəniş üsulları — One Board Market" }] }),
+  head: () => ({ meta: [{ title: "Ödəniş üsulları — Elzan Shop" }] }),
   component: PaymentMethodsPage,
 });
 

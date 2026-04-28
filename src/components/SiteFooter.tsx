@@ -30,12 +30,12 @@ export function SiteFooter() {
           </ul>
         </div>
         <div>
-          <h4 className="font-bold mb-3">One Board Market</h4>
+          <h4 className="font-bold mb-3">Elzan Shop</h4>
           <p className="text-muted-foreground">Azərbaycanın ən böyük onlayn marketplace platforması.</p>
         </div>
       </div>
       <div className="border-t border-border py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} One Board Market — Bütün hüquqlar qorunur
+        © {new Date().getFullYear()} Elzan Shop — Bütün hüquqlar qorunur
       </div>
     </footer>
   );

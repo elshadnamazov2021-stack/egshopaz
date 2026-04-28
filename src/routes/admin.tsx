@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin paneli — One Board Market" }] }),
+  head: () => ({ meta: [{ title: "Admin paneli — Elzan Shop" }] }),
   component: AdminPanel,
 });
 

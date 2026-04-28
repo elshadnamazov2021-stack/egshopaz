@@ -9,7 +9,7 @@ import { formatAZN } from "@/lib/format";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/notifications")({
-  head: () => ({ meta: [{ title: "Bildirişlər — One Board Market" }] }),
+  head: () => ({ meta: [{ title: "Bildirişlər — Elzan Shop" }] }),
   component: NotificationsPage,
 });
 

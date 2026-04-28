@@ -8,7 +8,7 @@ import { MapPin, Plus, Trash2, Star, Edit3 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/addresses")({
-  head: () => ({ meta: [{ title: "Ünvanlarım — One Board Market" }] }),
+  head: () => ({ meta: [{ title: "Ünvanlarım — Elzan Shop" }] }),
   component: AddressesPage,
 });
 
