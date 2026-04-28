@@ -36,6 +36,7 @@ export function MainSidebar() {
   const mainLinks = [
     { to: "/", label: t("sidebar.home"), icon: Home },
     { to: "/catalog", label: t("sidebar.catalog"), icon: LayoutGrid, search: { q: undefined, cat: undefined } as never },
+    { to: "/discover", label: "Kəşfet", icon: Flame },
     { to: "/promotions", label: t("sidebar.promotions"), icon: Tag },
     { to: "/bonus", label: t("sidebar.bonuses"), icon: Gift },
   ];
