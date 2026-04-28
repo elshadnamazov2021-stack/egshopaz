@@ -194,9 +194,26 @@ function SellerPanel() {
   };
 
   const remove = async (id: string) => {
-    if (!confirm("Bu məhsul silinsin?")) return;
-    await supabase.from("products").delete().eq("id", id);
+    if (!confirm("Bu məhsul silinsin? Bu əməliyyat geri qaytarıla bilməz.")) return;
+    const { error } = await supabase.from("products").delete().eq("id", id);
+    if (error) { toast.error("Silinmədi: " + error.message); return; }
+    toast.success("Məhsul silindi");
     load();
+  };
+
+  const openQR = async (p: Product) => {
+    const url = `${window.location.origin}/product/${p.id}`;
+    const dataUrl = await QRCode.toDataURL(url, { width: 512, margin: 2 });
+    setQrDataUrl(dataUrl);
+    setQrProduct(p);
+  };
+
+  const downloadQR = () => {
+    if (!qrDataUrl || !qrProduct) return;
+    const a = document.createElement("a");
+    a.href = qrDataUrl;
+    a.download = `qr-${qrProduct.title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.png`;
+    a.click();
   };
 
   const toggleActive = async (p: Product) => {
