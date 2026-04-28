@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -16,6 +17,7 @@ interface Category { id: string; name: string; slug: string; icon: string | null
 
 export function MainSidebar() {
   const { user, isSeller } = useAuth();
+  const { t } = useTranslation();
   const { setOpenMobile, isMobile } = useSidebar();
   const [cats, setCats] = useState<Category[]>([]);
   const [openCat, setOpenCat] = useState<string | null>(null);
@@ -32,19 +34,19 @@ export function MainSidebar() {
   const childrenOf = (pid: string) => cats.filter((c) => c.parent_id === pid);
 
   const mainLinks = [
-    { to: "/", label: "Ana səhifə", icon: Home },
-    { to: "/catalog", label: "Kataloq", icon: LayoutGrid, search: { q: undefined, cat: undefined } as never },
-    { to: "/promotions", label: "Aksiyalar", icon: Tag },
-    { to: "/bonus", label: "Bonuslar", icon: Gift },
+    { to: "/", label: t("sidebar.home"), icon: Home },
+    { to: "/catalog", label: t("sidebar.catalog"), icon: LayoutGrid, search: { q: undefined, cat: undefined } as never },
+    { to: "/promotions", label: t("sidebar.promotions"), icon: Tag },
+    { to: "/bonus", label: t("sidebar.bonuses"), icon: Gift },
   ];
 
   const userLinks = user ? [
-    { to: "/profile", label: "Şəxsi kabinet", icon: User },
-    { to: "/orders", label: "Sifarişlərim", icon: Package },
-    { to: "/favorites", label: "Sevimlilər", icon: Heart },
-    { to: "/cart", label: "Səbət", icon: ShoppingCart },
-    { to: "/messages", label: "Mesajlar", icon: MessageCircle },
-    { to: "/notifications", label: "Bildirişlər", icon: Bell },
+    { to: "/profile", label: t("sidebar.profile"), icon: User },
+    { to: "/orders", label: t("sidebar.orders"), icon: Package },
+    { to: "/favorites", label: t("sidebar.favorites"), icon: Heart },
+    { to: "/cart", label: t("sidebar.cart"), icon: ShoppingCart },
+    { to: "/messages", label: t("sidebar.messages"), icon: MessageCircle },
+    { to: "/notifications", label: t("sidebar.notifications"), icon: Bell },
   ] : [];
 
   return (
@@ -58,7 +60,7 @@ export function MainSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Əsas menyu</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("sidebar.mainMenu")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainLinks.map((l) => (
@@ -76,7 +78,7 @@ export function MainSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Kateqoriyalar</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("sidebar.categories")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {parents.map((p) => {
@@ -100,7 +102,7 @@ export function MainSidebar() {
                                 onClick={close}
                                 className="block text-xs py-1.5 px-2 rounded hover:bg-sidebar-accent hover:text-sidebar-accent-foreground font-medium"
                               >
-                                Hamısı
+                                {t("common.all")}
                               </Link>
                             </li>
                             {kids.map((k) => (
@@ -135,7 +137,7 @@ export function MainSidebar() {
 
         {user && (
           <SidebarGroup>
-            <SidebarGroupLabel>Kabinetim</SidebarGroupLabel>
+            <SidebarGroupLabel>{t("sidebar.myCabinet")}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {userLinks.map((l) => (
@@ -153,7 +155,7 @@ export function MainSidebar() {
                     <SidebarMenuButton asChild>
                       <Link to="/seller" onClick={close}>
                         <Store className="h-4 w-4" />
-                        <span>Satıcı paneli</span>
+                        <span>{t("sidebar.sellerPanel")}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -171,7 +173,7 @@ export function MainSidebar() {
                   <SidebarMenuButton asChild>
                     <Link to="/become-seller" onClick={close}>
                       <Store className="h-4 w-4" />
-                      <span>Mağaza aç</span>
+                      <span>{t("sidebar.openShop")}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -180,7 +182,7 @@ export function MainSidebar() {
                 <SidebarMenuButton asChild>
                   <Link to="/support" onClick={close}>
                     <HelpCircle className="h-4 w-4" />
-                    <span>Dəstək</span>
+                    <span>{t("sidebar.support")}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -188,7 +190,7 @@ export function MainSidebar() {
                 <SidebarMenuButton asChild>
                   <Link to="/admin" onClick={close}>
                     <Shield className="h-4 w-4" />
-                    <span>Admin panel</span>
+                    <span>{t("sidebar.adminPanel")}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -196,7 +198,7 @@ export function MainSidebar() {
                 <SidebarMenuButton asChild>
                   <Link to="/pvz" onClick={close}>
                     <PackageOpen className="h-4 w-4" />
-                    <span>PVZ işçi paneli</span>
+                    <span>{t("sidebar.pvzPanel")}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

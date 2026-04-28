@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { formatAZN } from "@/lib/format";
 import {
@@ -47,26 +48,27 @@ const mockStorage = [
 ];
 
 function PvzPanel() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<TabKey>("dashboard");
   const [shiftOpen, setShiftOpen] = useState(false);
   const [scan, setScan] = useState("");
   const [search, setSearch] = useState("");
 
   const items: PanelNavItem[] = [
-    { key: "dashboard", label: "Ana səhifə", icon: Home, active: tab === "dashboard", onClick: () => setTab("dashboard") },
-    { key: "intake", label: "Qəbul", icon: PackageOpen, active: tab === "intake", onClick: () => setTab("intake"), badge: mockExpected.length },
-    { key: "delivery", label: "Təhvil vermək", icon: ShoppingBag, active: tab === "delivery", onClick: () => setTab("delivery"), badge: mockPending.length },
-    { key: "returns", label: "Qaytarmalar", icon: Undo2, active: tab === "returns", onClick: () => setTab("returns") },
-    { key: "storage", label: "Saxlama", icon: Archive, active: tab === "storage", onClick: () => setTab("storage"), badge: 1 },
-    { key: "reports", label: "Hesabatlar", icon: BarChart3, active: tab === "reports", onClick: () => setTab("reports") },
-    { key: "finance", label: "Maliyyə", icon: Wallet, active: tab === "finance", onClick: () => setTab("finance") },
-    { key: "shift", label: "Növbə", icon: ClipboardList, active: tab === "shift", onClick: () => setTab("shift") },
-    { key: "settings", label: "Ayarlar", icon: Settings, active: tab === "settings", onClick: () => setTab("settings") },
-    { key: "support", label: "Dəstək", icon: LifeBuoy, active: tab === "support", onClick: () => setTab("support") },
+    { key: "dashboard", label: t("pvz.dashboard"), icon: Home, active: tab === "dashboard", onClick: () => setTab("dashboard") },
+    { key: "intake", label: t("pvz.intake"), icon: PackageOpen, active: tab === "intake", onClick: () => setTab("intake"), badge: mockExpected.length },
+    { key: "delivery", label: t("pvz.delivery"), icon: ShoppingBag, active: tab === "delivery", onClick: () => setTab("delivery"), badge: mockPending.length },
+    { key: "returns", label: t("pvz.returns"), icon: Undo2, active: tab === "returns", onClick: () => setTab("returns") },
+    { key: "storage", label: t("pvz.storage"), icon: Archive, active: tab === "storage", onClick: () => setTab("storage"), badge: 1 },
+    { key: "reports", label: t("pvz.reports"), icon: BarChart3, active: tab === "reports", onClick: () => setTab("reports") },
+    { key: "finance", label: t("pvz.finance"), icon: Wallet, active: tab === "finance", onClick: () => setTab("finance") },
+    { key: "shift", label: t("pvz.shift"), icon: ClipboardList, active: tab === "shift", onClick: () => setTab("shift") },
+    { key: "settings", label: t("pvz.settings"), icon: Settings, active: tab === "settings", onClick: () => setTab("settings") },
+    { key: "support", label: t("pvz.support"), icon: LifeBuoy, active: tab === "support", onClick: () => setTab("support") },
   ];
 
   return (
-    <PanelLayout title="PVZ İŞÇİ PANELİ" subtitle="Bakı — N-12 nöqtə" items={items}>
+    <PanelLayout title={t("pvz.title")} subtitle="Bakı — N-12 nöqtə" items={items}>
       {!shiftOpen && tab !== "shift" && (
         <div className="mb-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-3 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm">
@@ -149,7 +151,7 @@ function Dashboard() {
 function Intake({ scan, setScan }: { scan: string; setScan: (v: string) => void }) {
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-extrabold flex items-center gap-2"><PackageOpen className="h-6 w-6 text-primary" /> Qəbul (Приёмка)</h1>
+      <h1 className="text-2xl font-extrabold flex items-center gap-2"><PackageOpen className="h-6 w-6 text-primary" /> Qəbul</h1>
 
       <div className="bg-card border border-border rounded-2xl p-4">
         <Label className="mb-2 block">Ştrixkod skan</Label>
@@ -193,7 +195,7 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
   );
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-extrabold flex items-center gap-2"><ShoppingBag className="h-6 w-6 text-primary" /> Təhvil vermək (Выдача)</h1>
+      <h1 className="text-2xl font-extrabold flex items-center gap-2"><ShoppingBag className="h-6 w-6 text-primary" /> Təhvil vermək</h1>
 
       <div className="bg-card border border-border rounded-2xl p-4">
         <Label className="mb-2 block">Müştəri axtarışı (kod / telefon / ad)</Label>
@@ -232,7 +234,7 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
 function Returns() {
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-extrabold flex items-center gap-2"><Undo2 className="h-6 w-6 text-primary" /> Qaytarmalar (Возвраты)</h1>
+      <h1 className="text-2xl font-extrabold flex items-center gap-2"><Undo2 className="h-6 w-6 text-primary" /> Qaytarmalar</h1>
       <div className="bg-card border border-border rounded-2xl p-4">
         <div className="font-bold mb-3">Qəbul olunmuş qaytarmalar</div>
         <Table>
@@ -261,7 +263,7 @@ function Returns() {
 function Storage() {
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-extrabold flex items-center gap-2"><Archive className="h-6 w-6 text-primary" /> Saxlama (Хранение)</h1>
+      <h1 className="text-2xl font-extrabold flex items-center gap-2"><Archive className="h-6 w-6 text-primary" /> Saxlama</h1>
       <div className="grid grid-cols-3 gap-3">
         <StatCard icon={Archive} label="Cəmi saxlamada" value="62" />
         <StatCard icon={Clock} label="Müddəti azalan" value="7" accent="text-amber-500" />
