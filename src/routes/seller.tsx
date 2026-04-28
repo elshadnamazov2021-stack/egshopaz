@@ -62,6 +62,8 @@ function SellerPanel() {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [editing, setEditing] = useState<Partial<Product> | null>(null);
+  const [qrProduct, setQrProduct] = useState<Product | null>(null);
+  const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const [savingShop, setSavingShop] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
