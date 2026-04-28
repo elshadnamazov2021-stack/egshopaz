@@ -9,7 +9,7 @@ import {
   Home, PackageOpen, ShoppingBag, Undo2, Archive, BarChart3,
   Wallet, ClipboardList, Settings, LifeBuoy, ScanLine, Search,
   CheckCircle2, AlertTriangle, Printer, Camera, PhoneCall, Clock,
-  Plus, XCircle, FileText, TrendingUp, MapPin,
+  Plus, XCircle, FileText, TrendingUp,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
