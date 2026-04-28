@@ -40,11 +40,11 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
-      <div className="container mx-auto px-4 h-20 flex items-center gap-4">
+      <div className="container mx-auto px-4 h-24 flex items-center gap-4">
         <SidebarTrigger className="shrink-0" />
 
         <Link to="/" className="flex items-center shrink-0" aria-label="OB market">
-          <img src={obmLogo} alt="OB market logo" width={1024} height={512} className="h-14 sm:h-16 w-auto object-contain" />
+          <img src={obmLogo} alt="OB market logo" width={1024} height={512} className="h-20 sm:h-24 w-auto object-contain" />
         </Link>
 
         <form onSubmit={onSearch} className="flex-1 max-w-2xl hidden md:flex">
