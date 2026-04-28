@@ -37,11 +37,7 @@ function AdminPanel() {
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
-    if (!loading && user && !isAdmin) {
-      // silent redirect — never reveal admin panel to non-admins
-      navigate({ to: "/" });
-    }
-  }, [user, isAdmin, loading, navigate]);
+  }, [user, loading, navigate]);
 
   const submitPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +84,7 @@ function AdminPanel() {
 
   useEffect(() => { if (isAdmin && unlocked) reload(); }, [isAdmin, unlocked]);
 
-  if (!user || !isAdmin) return null;
+  if (!user) return null;
 
   if (!unlocked) {
     return (
