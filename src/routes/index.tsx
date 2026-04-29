@@ -5,9 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { SponsoredProducts } from "@/components/SponsoredProducts";
 import { SellerBanners } from "@/components/SellerBanners";
-import { Truck, ShieldCheck, Tag, Clock, Flame, Heart, TicketPercent, TrendingUp, Sparkles, ArrowRight, Copy, Camera } from "lucide-react";
+import { Tag, Flame, Heart, TicketPercent, TrendingUp, Sparkles, Copy, Camera, Truck, ShieldCheck, Clock } from "lucide-react";
 import { toast } from "sonner";
-import { catName } from "@/lib/catName";
 import { HomeCategoryBrowser } from "@/components/HomeCategoryBrowser";
 
 const VisualSearchDialog = lazy(() =>
