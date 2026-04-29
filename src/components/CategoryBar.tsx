@@ -2,8 +2,9 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { catName } from "@/lib/catName";
 
-interface Category { id: string; name: string; slug: string; icon: string | null }
+interface Category { id: string; name: string; name_ru?: string | null; name_en?: string | null; slug: string; icon: string | null }
 
 export function CategoryBar() {
   const { t } = useTranslation();
@@ -12,7 +13,7 @@ export function CategoryBar() {
   useEffect(() => {
     supabase
       .from("categories")
-      .select("id,name,slug,icon")
+      .select("id,name,name_ru,name_en,slug,icon")
       .is("parent_id", null)
       .order("sort_order")
       .then(({ data }) => setCats((data ?? []) as Category[]));
@@ -40,7 +41,7 @@ export function CategoryBar() {
               className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-secondary hover:bg-primary/10 hover:text-primary font-semibold text-sm transition border border-transparent hover:border-primary/30"
             >
               <span className="text-lg">{c.icon}</span>
-              <span className="whitespace-nowrap">{c.name}</span>
+              <span className="whitespace-nowrap">{catName(c)}</span>
             </Link>
           ))}
         </div>

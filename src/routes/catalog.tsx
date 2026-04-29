@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { SponsoredProducts } from "@/components/SponsoredProducts";
 import { CatalogFilters, type Filters } from "@/components/CatalogFilters";
+import { catName } from "@/lib/catName";
 import { z } from "zod";
 
 const searchSchema = z.object({
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/catalog")({
   component: Catalog,
 });
 
-interface Category { id: string; name: string; slug: string; icon: string | null; parent_id: string | null }
+interface Category { id: string; name: string; name_ru?: string | null; name_en?: string | null; slug: string; icon: string | null; parent_id: string | null }
 
 function Catalog() {
   const { t } = useTranslation();
