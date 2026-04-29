@@ -11,6 +11,7 @@ import { z } from "zod";
 const searchSchema = z.object({
   q: z.string().optional(),
   cat: z.string().optional(),
+  brand: z.string().optional(),
 });
 
 export const Route = createFileRoute("/catalog")({
