@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { PanelLayout } from "@/components/PanelLayout";
@@ -18,6 +19,7 @@ interface Review {
 }
 
 function MyReviewsPage() {
+  const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { items } = useBuyerNav();
@@ -41,12 +43,12 @@ function MyReviewsPage() {
   if (!user) return null;
 
   return (
-    <PanelLayout title="Müştərinin şəxsi kabineti" subtitle={user.email ?? undefined} items={items}>
+    <PanelLayout title={t("sidebar.buyerPanelTitle")} subtitle={user.email ?? undefined} items={items}>
       <div>
-        <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2"><Star className="h-6 w-6 text-primary" /> Rəylərim</h1>
+        <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2"><Star className="h-6 w-6 text-primary" /> {t("myReviews.title")}</h1>
         {reviews.length === 0 ? (
           <div className="bg-secondary/40 rounded-2xl p-12 text-center text-muted-foreground">
-            Hələ rəy yazmamısınız. Aldığınız mallar üçün rəy yaza bilərsiniz.
+            {t("myReviews.empty")}
           </div>
         ) : (
           <div className="space-y-3">
