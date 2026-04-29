@@ -31,7 +31,14 @@
     "open": "Open",
     "view": "View",
     "details": "Details",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "send": "Send",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "saveError": "Could not save",
+    "free": "Free",
+    "apply": "Apply",
+    "retry": "Retry"
   },
   "header": {
     "favorites": "Favorites",
@@ -62,7 +69,14 @@
     "support": "Support",
     "adminPanel": "Admin panel",
     "pvzPanel": "PVZ staff panel",
-    "sellerPanel": "Seller panel"
+    "sellerPanel": "Seller panel",
+    "buyerPanelTitle": "Buyer's personal cabinet",
+    "addresses": "My addresses",
+    "paymentMethods": "Payment methods",
+    "myReviews": "My reviews",
+    "disputes": "Disputes",
+    "pickupPoints": "Pickup points",
+    "discover": "Discover"
   },
   "footer": {
     "about": "About",
@@ -78,7 +92,8 @@
     "popular": "Popular products",
     "newArrivals": "New arrivals",
     "categories": "Categories",
-    "viewAll": "View all"
+    "viewAll": "View all",
+    "breadcrumbHome": "Home"
   },
   "catalog": {
     "title": "Catalog",
@@ -87,10 +102,23 @@
     "priceAsc": "Price: low to high",
     "priceDesc": "Price: high to low",
     "newest": "Newest",
+    "popular": "Most popular",
     "rating": "Rating",
     "noResults": "No results found",
     "addToCart": "Add to cart",
-    "outOfStock": "Out of stock"
+    "outOfStock": "Out of stock",
+    "categories": "Categories",
+    "all": "All",
+    "allProducts": "All products",
+    "searchResults": "Results for \"{{q}}\"",
+    "searchBreadcrumb": "Search \"{{q}}\"",
+    "productCount": "{{count}} products",
+    "minPrice": "Min price",
+    "maxPrice": "Max price",
+    "brand": "Brand",
+    "minRating": "Min rating",
+    "onlyDiscount": "Discounted only",
+    "reset": "Reset"
   },
   "product": {
     "addToCart": "Add to cart",
@@ -107,16 +135,36 @@
   },
   "cart": {
     "title": "Cart",
-    "empty": "Cart is empty",
+    "empty": "Your cart is empty",
     "subtotal": "Subtotal",
     "discount": "Discount",
     "delivery": "Delivery",
     "total": "Total",
-    "checkout": "Checkout",
+    "checkout": "Place order",
     "remove": "Remove",
     "promoCode": "Promo code",
     "apply": "Apply",
-    "continueShopping": "Continue shopping"
+    "continueShopping": "Start shopping",
+    "loginRequired": "Sign in to view your cart",
+    "login": "Sign in",
+    "summary": "Order summary",
+    "products": "Products",
+    "free": "Free",
+    "promoApplied": "Promo applied",
+    "promoDiscount": "Promo discount",
+    "useBonus": "Use bonuses",
+    "balance": "Balance",
+    "all": "All",
+    "bonusDiscount": "Bonus discount",
+    "addressPlaceholder": "Delivery address...",
+    "addressRequired": "Please enter delivery address",
+    "placing": "Placing...",
+    "orderPlaced": "Order placed!",
+    "orderError": "Could not create order",
+    "promoNotFound": "Promo code not found",
+    "promoExpired": "Expired",
+    "promoLimit": "Limit reached",
+    "minOrder": "Min order"
   },
   "auth": {
     "login": "Login",
@@ -126,11 +174,19 @@
     "fullName": "Full name",
     "loginBtn": "Sign in",
     "registerBtn": "Sign up",
-    "noAccount": "Don't have an account?",
-    "hasAccount": "Already have an account?",
+    "noAccount": "Don't have an account? Sign up",
+    "hasAccount": "Already have an account? Sign in",
     "forgot": "Forgot password?",
     "or": "or",
-    "googleLogin": "Sign in with Google"
+    "googleLogin": "Sign in with Google",
+    "loginSubtitle": "Sign in to your account",
+    "registerSubtitle": "Create a new account",
+    "welcome": "Welcome!",
+    "registerSuccess": "Registration completed!",
+    "wrongCredentials": "Wrong email or password",
+    "invalidEmail": "Enter a valid email",
+    "minPassword": "Min 6 characters",
+    "minName": "Min 2 characters"
   },
   "profile": {
     "title": "Personal cabinet",
@@ -139,20 +195,107 @@
     "paymentMethods": "Payment methods",
     "myReviews": "My reviews",
     "settings": "Settings",
-    "logout": "Logout"
+    "logout": "Logout",
+    "personalInfo": "Personal info",
+    "fullName": "Full name",
+    "phone": "Phone",
+    "deliveryAddress": "Delivery address",
+    "addressPlaceholder": "E.g.: H. Aliyev ave. 12, apt. 5",
+    "city": "City",
+    "cityPlaceholder": "Baku",
+    "noOrders": "No orders yet"
   },
   "orders": {
     "title": "My orders",
-    "empty": "You have no orders yet",
+    "empty": "No orders",
     "orderNumber": "Order #",
     "date": "Date",
     "status": "Status",
     "items": "Items",
     "pending": "Pending",
+    "paid": "Paid",
     "processing": "Processing",
     "shipped": "Shipped",
     "delivered": "Delivered",
-    "cancelled": "Cancelled"
+    "cancelled": "Cancelled",
+    "all": "All",
+    "cancelShort": "Cancel",
+    "cancel": "Cancel order",
+    "cancelConfirm": "Cancel this order?",
+    "cancelled_msg": "Cancelled",
+    "cancelError": "Could not cancel",
+    "received": "✓ Received",
+    "atPvz": "📦 Waiting at PVZ — show QR to pick up",
+    "qr": "QR",
+    "write": "Write",
+    "messageSeller": "Message to seller",
+    "messagePlaceholder": "Write your message...",
+    "messageShort": "Message too short",
+    "messageSent": "Message sent to seller",
+    "ownShopError": "Can't message your own shop"
+  },
+  "favorites": {
+    "title": "Favorites",
+    "empty": "No favorites"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "markAll": "Mark all read"
+  },
+  "messages": {
+    "title": "Messages",
+    "empty": "No messages yet",
+    "writeMessage": "Write a message..."
+  },
+  "addresses": {
+    "title": "My addresses",
+    "addNew": "New address",
+    "noAddresses": "No addresses yet"
+  },
+  "payment": {
+    "title": "Payment methods",
+    "addCard": "Add card",
+    "noCards": "No cards yet"
+  },
+  "myReviews": {
+    "title": "My reviews",
+    "empty": "No reviews"
+  },
+  "bonus": {
+    "title": "Bonuses",
+    "balance": "Balance",
+    "history": "History"
+  },
+  "promotions": {
+    "title": "Promotions",
+    "empty": "No promotions"
+  },
+  "discover": {
+    "title": "Discover"
+  },
+  "support": {
+    "title": "Support",
+    "newTicket": "New ticket",
+    "subject": "Subject",
+    "message": "Message",
+    "submit": "Submit"
+  },
+  "becomeSeller": {
+    "title": "Become a seller",
+    "subtitle": "Open your shop and start selling",
+    "shopName": "Shop name",
+    "submit": "Apply"
+  },
+  "pickupPoints": {
+    "title": "Pickup points",
+    "noPoints": "No points found"
+  },
+  "disputes": {
+    "title": "Disputes",
+    "empty": "No disputes",
+    "open": "Open",
+    "resolved": "Resolved"
   },
   "seller": {
     "title": "Seller panel",
@@ -234,5 +377,8 @@
     "support": "Support",
     "settings": "System settings",
     "security": "Security"
+  },
+  "categoryBar": {
+    "all": "All"
   }
 }
