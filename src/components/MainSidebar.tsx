@@ -12,6 +12,7 @@ import {
   Bell, Tag, Gift, Store, User, HelpCircle, ChevronDown, ChevronRight, Shield, PackageOpen, Flame,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { catName } from "@/lib/catName";
 
 interface Category { id: string; name: string; name_ru?: string | null; name_en?: string | null; slug: string; icon: string | null; parent_id: string | null }
 
