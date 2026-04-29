@@ -94,6 +94,9 @@ function Index() {
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-12">
+      {/* Trendyol-style: axtarış altında kateqoriya seç → alt kateqoriyalar + brendlər */}
+      <HomeCategoryBrowser />
+
       {/* HERO — bold gradient */}
       <section className="relative rounded-3xl overflow-hidden bg-gradient-brand text-primary-foreground p-8 md:p-16 shadow-elegant">
         <div className="max-w-2xl space-y-5 relative z-10">
