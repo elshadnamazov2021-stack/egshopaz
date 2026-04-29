@@ -38,7 +38,10 @@
     "saveError": "Не удалось сохранить",
     "free": "Бесплатно",
     "apply": "Применить",
-    "retry": "Повторить"
+    "retry": "Повторить",
+    "loading_dots": "Загрузка...",
+    "notFound": "Не найдено",
+    "noImage": "Нет изображения"
   },
   "header": {
     "favorites": "Избранное",
@@ -83,7 +86,8 @@
     "contact": "Контакты",
     "terms": "Условия",
     "privacy": "Конфиденциальность",
-    "rights": "Все права защищены"
+    "rights": "Все права защищены",
+    "shopBrand": "Маркетплейс"
   },
   "home": {
     "heroTitle": "Всё в одном месте",
@@ -93,7 +97,41 @@
     "newArrivals": "Новинки",
     "categories": "Категории",
     "viewAll": "Смотреть все",
-    "breadcrumbHome": "Главная"
+    "breadcrumbHome": "Главная",
+    "newSeasonBadge": "Скидки нового сезона",
+    "heroLine1": "Всё",
+    "heroLine2": "в одном месте.",
+    "heroDesc": "Миллионы товаров. Скидки до 70%. Бесплатная доставка по всей стране.",
+    "startShopping": "Начать покупки",
+    "discover": "Открой для себя",
+    "categoriesTitle": "Категории",
+    "visualBadge": "AI · НОВОЕ",
+    "visualTitle": "Поиск по фото 📸",
+    "visualDesc": "Сфотографируй понравившийся товар — AI найдёт похожие моментально.",
+    "visualBtn": "Попробовать",
+    "discountBadge": "СКИДКИ 70%",
+    "discountTitle": "Сниженные цены",
+    "viewAllArrow": "Все →",
+    "promoBadge": "Активные купоны",
+    "promoTitle": "Товары с купоном",
+    "promoMinOrder": "Мин. заказ",
+    "trendingSubtitle": "Все смотрят",
+    "trendingTitle": "В тренде",
+    "favoritesSubtitle": "Выбор покупателей",
+    "favoritesTitle": "Самые любимые",
+    "benefitFreeShipping": "Бесплатная доставка",
+    "benefitFreeShippingDesc": "От 50 ₼",
+    "benefitWarranty": "Гарантия",
+    "benefitWarrantyDesc": "На все товары",
+    "benefitDiscounts": "Скидки",
+    "benefitDiscountsDesc": "Каждый день",
+    "benefitSupport": "Поддержка 24/7",
+    "benefitSupportDesc": "В любое время",
+    "forYou": "Для вас",
+    "noProducts": "Пока нет товаров",
+    "becomeFirstSeller": "Стать первым продавцом →",
+    "codeCopied": "{{code}} скопирован",
+    "visualSearchTitle": "Поиск по фото (AI)"
   },
   "catalog": {
     "title": "Каталог",
@@ -131,7 +169,22 @@
     "outOfStock": "Нет в наличии",
     "shipping": "Доставка",
     "seller": "Продавец",
-    "rating": "Рейтинг"
+    "rating": "Рейтинг",
+    "noImage": "Нет изображения",
+    "notFound": "Товар не найден",
+    "home": "Главная",
+    "reviewsShort": "{{count}} отзывов",
+    "fastDelivery": "Быстрая доставка",
+    "originalProduct": "Оригинальный товар",
+    "stockUnits": "{{count}} шт.",
+    "stockLabel": "В наличии",
+    "writeShop": "Написать магазину",
+    "shopMsgPlaceholder": "Напишите сообщение магазину...",
+    "msgSent": "Сообщение отправлено",
+    "addedToCart": "Добавлено в корзину",
+    "addedToFavorites": "Добавлено в избранное",
+    "favoriteAria": "Избранное",
+    "buyer": "Покупатель"
   },
   "cart": {
     "title": "Корзина",
@@ -272,7 +325,16 @@
     "empty": "Акций нет"
   },
   "discover": {
-    "title": "Открыть"
+    "title": "Открой для себя",
+    "tabTrending": "В тренде",
+    "tabDiscounted": "Скидки",
+    "tabFavorites": "Любимые",
+    "tabTopRated": "Высокий рейтинг",
+    "tabNewest": "Новинки",
+    "headerBadge": "ОТКРОЙ",
+    "headerDesc": "Самые интересные товары для тебя",
+    "empty": "В этой категории пока нет товаров",
+    "goToCatalog": "В каталог →"
   },
   "support": {
     "title": "Поддержка",
@@ -380,5 +442,14 @@
   },
   "categoryBar": {
     "all": "Все"
+  },
+  "shop": {
+    "title": "Магазин",
+    "notFound": "Магазин не найден",
+    "productsCount": "{{count}} товаров",
+    "reviewsCount": "({{count}} отзывов)",
+    "shopProducts": "Товары магазина",
+    "noProducts": "Пока нет товаров",
+    "defaultName": "Магазин"
   }
 }

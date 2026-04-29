@@ -38,7 +38,10 @@
     "saveError": "Yadda saxlanılmadı",
     "free": "Pulsuz",
     "apply": "Tətbiq et",
-    "retry": "Yenidən cəhd et"
+    "retry": "Yenidən cəhd et",
+    "loading_dots": "Yüklənir...",
+    "notFound": "Tapılmadı",
+    "noImage": "Şəkil yoxdur"
   },
   "header": {
     "favorites": "Sevimli",
@@ -83,7 +86,8 @@
     "contact": "Əlaqə",
     "terms": "Şərtlər və qaydalar",
     "privacy": "Məxfilik",
-    "rights": "Bütün hüquqlar qorunur"
+    "rights": "Bütün hüquqlar qorunur",
+    "shopBrand": "Marketplace"
   },
   "home": {
     "heroTitle": "Hər şey bir yerdə",
@@ -93,7 +97,41 @@
     "newArrivals": "Yeniliklər",
     "categories": "Kateqoriyalar",
     "viewAll": "Hamısına bax",
-    "breadcrumbHome": "Ana səhifə"
+    "breadcrumbHome": "Ana səhifə",
+    "newSeasonBadge": "Yeni mövsüm endirimləri",
+    "heroLine1": "Hər şey",
+    "heroLine2": "bir yerdə.",
+    "heroDesc": "Milyonlarla məhsul. 70%-ə qədər endirim. Bütün ölkə üzrə pulsuz çatdırılma.",
+    "startShopping": "Alış-verişə başla",
+    "discover": "Kəşfet",
+    "categoriesTitle": "Kateqoriyalar",
+    "visualBadge": "AI POWERED · YENİ",
+    "visualTitle": "Şəkillə axtar 📸",
+    "visualDesc": "Bəyəndiyin məhsulun şəklini çək — AI tanıyıb dərhal sənə oxşarını tapsın.",
+    "visualBtn": "İndi sına",
+    "discountBadge": "70% ENDİRİM",
+    "discountTitle": "Endirimli qiymətlər",
+    "viewAllArrow": "Hamısına bax →",
+    "promoBadge": "Aktiv kuponlar",
+    "promoTitle": "Kuponlu məhsullar",
+    "promoMinOrder": "Min. sifariş",
+    "trendingSubtitle": "Hamı baxır",
+    "trendingTitle": "Trend məhsullar",
+    "favoritesSubtitle": "Müştəri seçimi",
+    "favoritesTitle": "Ən çox sevilənlər",
+    "benefitFreeShipping": "Pulsuz çatdırılma",
+    "benefitFreeShippingDesc": "50 ₼-dən yuxarı",
+    "benefitWarranty": "Zəmanət",
+    "benefitWarrantyDesc": "Bütün məhsullara",
+    "benefitDiscounts": "Endirimlər",
+    "benefitDiscountsDesc": "Hər gün",
+    "benefitSupport": "24/7 dəstək",
+    "benefitSupportDesc": "Hər zaman",
+    "forYou": "Sizin üçün",
+    "noProducts": "Hələ məhsul əlavə olunmayıb",
+    "becomeFirstSeller": "İlk satıcı olun →",
+    "codeCopied": "{{code}} kopyalandı",
+    "visualSearchTitle": "Şəkillə axtar (AI)"
   },
   "catalog": {
     "title": "Kataloq",
@@ -131,7 +169,22 @@
     "outOfStock": "Stokda yoxdur",
     "shipping": "Çatdırılma",
     "seller": "Satıcı",
-    "rating": "Reytinq"
+    "rating": "Reytinq",
+    "noImage": "Şəkil yoxdur",
+    "notFound": "Məhsul tapılmadı",
+    "home": "Ana səhifə",
+    "reviewsShort": "{{count}} rəy",
+    "fastDelivery": "Sürətli çatdırılma",
+    "originalProduct": "Orijinal məhsul",
+    "stockUnits": "{{count}} ədəd",
+    "stockLabel": "Stokda",
+    "writeShop": "Mağazaya yaz",
+    "shopMsgPlaceholder": "Mağazaya mesajınızı yazın...",
+    "msgSent": "Mesaj göndərildi",
+    "addedToCart": "Səbətə əlavə olundu",
+    "addedToFavorites": "Sevimlilərə əlavə olundu",
+    "favoriteAria": "Sevimli",
+    "buyer": "Alıcı"
   },
   "cart": {
     "title": "Səbət",
@@ -272,7 +325,16 @@
     "empty": "Aksiya yoxdur"
   },
   "discover": {
-    "title": "Kəşf et"
+    "title": "Kəşfet",
+    "tabTrending": "Trend",
+    "tabDiscounted": "Endirimlər",
+    "tabFavorites": "Ən sevilənlər",
+    "tabTopRated": "Yüksək reytinq",
+    "tabNewest": "Yeniliklər",
+    "headerBadge": "KƏŞFET",
+    "headerDesc": "Sənin üçün ən maraqlı məhsullar bir yerdə",
+    "empty": "Bu kateqoriyada hələ məhsul yoxdur",
+    "goToCatalog": "Kataloqa keç →"
   },
   "support": {
     "title": "Dəstək",
@@ -380,5 +442,14 @@
   },
   "categoryBar": {
     "all": "Hamısı"
+  },
+  "shop": {
+    "title": "Mağaza",
+    "notFound": "Mağaza tapılmadı",
+    "productsCount": "{{count}} məhsul",
+    "reviewsCount": "({{count}} rəy)",
+    "shopProducts": "Mağazanın məhsulları",
+    "noProducts": "Hələ məhsul yoxdur",
+    "defaultName": "Mağaza"
   }
 }
