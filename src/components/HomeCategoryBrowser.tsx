@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { catName } from "@/lib/catName";
-import { ChevronRight, Sparkles, Tag, ArrowLeft } from "lucide-react";
+import { ChevronRight, ArrowLeft, ChevronLeft } from "lucide-react";
 
 interface Category {
   id: string;
@@ -16,6 +16,7 @@ interface Category {
 }
 
 interface BrandRow { brand: string | null }
+interface Banner { id: string; title: string; image_url: string | null; link_url: string | null }
 
 export function HomeCategoryBrowser() {
   const { i18n } = useTranslation();
@@ -24,6 +25,8 @@ export function HomeCategoryBrowser() {
   const [activeSubId, setActiveSubId] = useState<string | null>(null);
   const [brands, setBrands] = useState<string[]>([]);
   const [loadingBrands, setLoadingBrands] = useState(false);
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const [bannerIdx, setBannerIdx] = useState(0);
 
   useEffect(() => {
     supabase
@@ -36,7 +39,22 @@ export function HomeCategoryBrowser() {
         const firstRoot = list.find((c) => !c.parent_id);
         if (firstRoot) setActiveRootId(firstRoot.id);
       });
+
+    supabase
+      .from("banners")
+      .select("id,title,image_url,link_url")
+      .eq("is_active", true)
+      .eq("position", "home_top")
+      .limit(6)
+      .then(({ data }) => setBanners((data ?? []) as Banner[]));
   }, []);
+
+  // Auto-rotate banner
+  useEffect(() => {
+    if (banners.length < 2) return;
+    const t = setInterval(() => setBannerIdx((i) => (i + 1) % banners.length), 5000);
+    return () => clearInterval(t);
+  }, [banners.length]);
 
   const roots = useMemo(() => cats.filter((c) => !c.parent_id), [cats]);
   const activeRoot = useMemo(
@@ -48,22 +66,17 @@ export function HomeCategoryBrowser() {
     [cats, activeSubId],
   );
 
-  // 2-ci səviyyə (root-un altları)
   const subCats = useMemo(
     () => (activeRoot ? cats.filter((c) => c.parent_id === activeRoot.id) : []),
     [cats, activeRoot],
   );
-
-  // 3-cü səviyyə (sub-un altları — məhsul tipləri)
   const leafCats = useMemo(
     () => (activeSub ? cats.filter((c) => c.parent_id === activeSub.id) : []),
     [cats, activeSub],
   );
 
-  // Hazırda aktiv olan kateqoriya: əgər sub seçilibsə — sub, yoxsa root
   const current = activeSub || activeRoot;
 
-  // Brendləri çıxarmaq üçün cari kateqoriyanın bütün alt slug-larını topla
   const activeSlugs = useMemo(() => {
     if (!current) return [];
     const ids = new Set<string>([current.id]);
@@ -92,12 +105,11 @@ export function HomeCategoryBrowser() {
         (data as BrandRow[] | null ?? []).forEach((r) => {
           if (r.brand && r.brand.trim()) set.add(r.brand.trim());
         });
-        setBrands([...set].sort().slice(0, 18));
+        setBrands([...set].sort().slice(0, 12));
         setLoadingBrands(false);
       });
   }, [activeSlugs]);
 
-  // Root dəyişəndə sub seçimini sıfırla
   const selectRoot = (id: string) => {
     setActiveRootId(id);
     setActiveSubId(null);
@@ -120,57 +132,115 @@ export function HomeCategoryBrowser() {
     ? "Популярные бренды"
     : lang.startsWith("en")
       ? "Featured Brands"
-      : "Öne Çıxan Brendlər";
-  const seeAll = lang.startsWith("ru") ? "Все" : lang.startsWith("en") ? "See all" : "Hamısına bax";
+      : "Öne Çıxan Markalar";
+  const needsTitle = lang.startsWith("ru")
+    ? "Ваши потребности"
+    : lang.startsWith("en")
+      ? "Your needs"
+      : "Sizin ehtiyaclarınız";
+  const seeAll = lang.startsWith("ru") ? "Все" : lang.startsWith("en") ? "See all" : "Hamısı";
   const backLabel = lang.startsWith("ru") ? "Назад" : lang.startsWith("en") ? "Back" : "Geri";
 
+  // Loqo-stil rəng: brendin ilk hərfi ilə
+  const brandInitialColor = (b: string) => {
+    const colors = ["bg-rose-500", "bg-blue-500", "bg-emerald-500", "bg-amber-500", "bg-violet-500", "bg-cyan-500", "bg-orange-500", "bg-fuchsia-500"];
+    return colors[b.charCodeAt(0) % colors.length];
+  };
+
   return (
-    <section className="rounded-3xl bg-card border border-border shadow-sm overflow-hidden">
-      {/* Tab bar — root categories */}
-      <div className="flex gap-2 overflow-x-auto px-4 pt-4 pb-3 scrollbar-none border-b border-border bg-secondary/30">
-        {roots.map((c) => {
-          const isActive = c.id === activeRootId;
-          return (
-            <button
-              key={c.id}
-              onClick={() => selectRoot(c.id)}
-              className={`shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition border ${
-                isActive
-                  ? "bg-gradient-brand text-primary-foreground border-transparent shadow-elegant scale-105"
-                  : "bg-background border-border hover:border-primary/40 hover:text-primary"
-              }`}
-            >
-              <span className="text-base">{c.icon}</span>
-              <span className="whitespace-nowrap">{catName(c)}</span>
-            </button>
-          );
-        })}
+    <section className="space-y-4">
+      {/* TAB BAR — Trendyol stil (narıncı seçilmiş, fon dolu) */}
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
+        <div className="flex gap-1.5 overflow-x-auto px-3 py-3 scrollbar-none">
+          {roots.map((c) => {
+            const isActive = c.id === activeRootId;
+            return (
+              <button
+                key={c.id}
+                onClick={() => selectRoot(c.id)}
+                className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition whitespace-nowrap ${
+                  isActive
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-secondary/50 text-foreground hover:bg-secondary"
+                }`}
+              >
+                <span>{c.icon}</span>
+                <span>{catName(c)}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
+      {/* BANNER — Slayder */}
+      {banners.length > 0 && banners[bannerIdx] && (
+        <div className="relative rounded-2xl overflow-hidden border-2 border-warning/40 bg-gradient-to-br from-pink-100 via-purple-100 to-violet-100 aspect-[16/5] md:aspect-[16/4] group">
+          {banners[bannerIdx].image_url && /^https?:\/\//.test(banners[bannerIdx].image_url!) ? (
+            <Link
+              to={(banners[bannerIdx].link_url || "/catalog") as never}
+              className="block w-full h-full"
+            >
+              <img
+                src={banners[bannerIdx].image_url!}
+                alt={banners[bannerIdx].title}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </Link>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center p-6">
+              <h3 className="text-2xl md:text-4xl font-black text-foreground/80 text-center">
+                {banners[bannerIdx].title}
+              </h3>
+            </div>
+          )}
+
+          {banners.length > 1 && (
+            <>
+              <button
+                onClick={() => setBannerIdx((i) => (i - 1 + banners.length) % banners.length)}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow"
+                aria-label="Previous"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setBannerIdx((i) => (i + 1) % banners.length)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow"
+                aria-label="Next"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+              <div className="absolute bottom-2 right-3 bg-background/70 backdrop-blur px-2 py-0.5 rounded-full text-[10px] font-bold">
+                {bannerIdx + 1}/{banners.length}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
       {activeRoot && (
-        <div className="p-4 md:p-6 space-y-6">
+        <>
           {/* Breadcrumb / Back */}
           {activeSub && (
-            <div className="flex items-center gap-2 text-sm">
+            <div className="flex items-center gap-2 text-sm bg-card rounded-xl border border-border px-3 py-2">
               <button
                 onClick={() => setActiveSubId(null)}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary hover:bg-secondary/70 font-bold transition"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary hover:bg-secondary/70 font-bold text-xs transition"
               >
-                <ArrowLeft className="h-3.5 w-3.5" /> {backLabel}
+                <ArrowLeft className="h-3 w-3" /> {backLabel}
               </button>
-              <span className="text-muted-foreground">/</span>
-              <span className="font-bold">{catName(activeRoot)}</span>
-              <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="font-semibold text-muted-foreground">{catName(activeRoot)}</span>
+              <ChevronRight className="h-3 w-3 text-muted-foreground" />
               <span className="font-extrabold text-primary">{catName(activeSub)}</span>
             </div>
           )}
 
-          {/* SƏVIYYƏ 2: Sub-categories (yalnız sub seçilməyibsə) */}
+          {/* SƏVIYYƏ 2: Öne Çıxan Kateqoriyalar */}
           {!activeSub && (
             <div>
-              <div className="flex items-end justify-between mb-3">
-                <h3 className="text-base md:text-lg font-extrabold flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-primary" />
+              <div className="flex items-end justify-between mb-3 px-1">
+                <h3 className="text-lg md:text-xl font-black text-foreground">
                   {featuredTitle}
                 </h3>
                 <Link
@@ -186,40 +256,36 @@ export function HomeCategoryBrowser() {
                 <Link
                   to="/catalog"
                   search={{ cat: activeRoot.slug, q: undefined } as never}
-                  className="block rounded-2xl bg-gradient-soft p-6 text-center font-bold hover:scale-[1.01] transition"
+                  className="block rounded-2xl bg-card border border-border p-6 text-center font-bold hover:shadow-elegant transition"
                 >
-                  <span className="text-3xl block mb-2">{activeRoot.icon}</span>
+                  <span className="text-4xl block mb-2">{activeRoot.icon}</span>
                   {catName(activeRoot)} — {seeAll}
                 </Link>
               ) : (
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 md:gap-4">
-                  {subCats.slice(0, 12).map((s) => {
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 md:gap-3">
+                  {subCats.slice(0, 10).map((s) => {
                     const hasChildren = cats.some((c) => c.parent_id === s.id);
+                    const cardCls =
+                      "w-full aspect-square rounded-2xl bg-card border border-border hover:border-primary/50 hover:shadow-elegant flex items-center justify-center text-5xl md:text-6xl transition";
                     return (
-                      <button
-                        key={s.id}
-                        onClick={() => {
-                          if (hasChildren) setActiveSubId(s.id);
-                        }}
-                        className="group flex flex-col items-center gap-2 text-left"
-                      >
+                      <div key={s.id} className="flex flex-col items-center gap-2">
                         {hasChildren ? (
-                          <div className="w-full aspect-square rounded-2xl bg-background border border-border group-hover:border-primary/40 group-hover:shadow-elegant flex items-center justify-center text-4xl md:text-5xl group-hover:scale-[1.03] transition">
+                          <button onClick={() => setActiveSubId(s.id)} className={cardCls + " hover:scale-[1.02]"}>
                             {s.icon || activeRoot.icon || "🛍️"}
-                          </div>
+                          </button>
                         ) : (
                           <Link
                             to="/catalog"
                             search={{ cat: s.slug, q: undefined } as never}
-                            className="w-full aspect-square rounded-2xl bg-background border border-border group-hover:border-primary/40 group-hover:shadow-elegant flex items-center justify-center text-4xl md:text-5xl group-hover:scale-[1.03] transition"
+                            className={cardCls + " hover:scale-[1.02]"}
                           >
                             {s.icon || activeRoot.icon || "🛍️"}
                           </Link>
                         )}
-                        <span className="text-[11px] md:text-xs text-center font-semibold leading-tight line-clamp-2 group-hover:text-primary w-full">
+                        <span className="text-[11px] md:text-xs text-center font-bold leading-tight line-clamp-2 text-foreground">
                           {catName(s)}
                         </span>
-                      </button>
+                      </div>
                     );
                   })}
                 </div>
@@ -227,12 +293,11 @@ export function HomeCategoryBrowser() {
             </div>
           )}
 
-          {/* SƏVIYYƏ 3: Leaf-cats (məhsul tipləri) — sub seçilibsə */}
+          {/* SƏVIYYƏ 3: Məhsul tipləri */}
           {activeSub && (
             <div>
-              <div className="flex items-end justify-between mb-3">
-                <h3 className="text-base md:text-lg font-extrabold flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-primary" />
+              <div className="flex items-end justify-between mb-3 px-1">
+                <h3 className="text-lg md:text-xl font-black text-foreground">
                   {typesTitle}
                 </h3>
                 <Link
@@ -248,24 +313,24 @@ export function HomeCategoryBrowser() {
                 <Link
                   to="/catalog"
                   search={{ cat: activeSub.slug, q: undefined } as never}
-                  className="block rounded-2xl bg-gradient-soft p-6 text-center font-bold hover:scale-[1.01] transition"
+                  className="block rounded-2xl bg-card border border-border p-6 text-center font-bold hover:shadow-elegant transition"
                 >
-                  <span className="text-3xl block mb-2">{activeSub.icon}</span>
+                  <span className="text-4xl block mb-2">{activeSub.icon}</span>
                   {catName(activeSub)} — {seeAll}
                 </Link>
               ) : (
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 md:gap-4">
-                  {leafCats.slice(0, 12).map((l) => (
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 md:gap-3">
+                  {leafCats.slice(0, 10).map((l) => (
                     <Link
                       key={l.id}
                       to="/catalog"
                       search={{ cat: l.slug, q: undefined } as never}
-                      className="group flex flex-col items-center gap-2"
+                      className="flex flex-col items-center gap-2"
                     >
-                      <div className="w-full aspect-square rounded-2xl bg-background border border-border group-hover:border-primary/40 group-hover:shadow-elegant flex items-center justify-center text-4xl md:text-5xl group-hover:scale-[1.03] transition">
+                      <div className="w-full aspect-square rounded-2xl bg-card border border-border hover:border-primary/50 hover:shadow-elegant flex items-center justify-center text-5xl md:text-6xl hover:scale-[1.02] transition">
                         {l.icon || activeSub.icon || "🛍️"}
                       </div>
-                      <span className="text-[11px] md:text-xs text-center font-semibold leading-tight line-clamp-2 group-hover:text-primary">
+                      <span className="text-[11px] md:text-xs text-center font-bold leading-tight line-clamp-2 text-foreground">
                         {catName(l)}
                       </span>
                     </Link>
@@ -275,40 +340,68 @@ export function HomeCategoryBrowser() {
             </div>
           )}
 
-          {/* Brands — həmişə cari kateqoriyaya uyğun */}
-          <div>
-            <div className="flex items-end justify-between mb-3">
-              <h3 className="text-base md:text-lg font-extrabold flex items-center gap-2">
-                <Tag className="h-4 w-4 text-primary" />
+          {/* MARKALAR — ağ kartlar Trendyol stil */}
+          {(loadingBrands || brands.length > 0) && (
+            <div>
+              <h3 className="text-lg md:text-xl font-black mb-3 px-1">
                 {brandsTitle}
               </h3>
+              {loadingBrands ? (
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2.5 md:gap-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="aspect-square rounded-2xl bg-secondary animate-pulse" />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex gap-2.5 md:gap-3 overflow-x-auto scrollbar-none pb-1">
+                  {brands.map((b) => (
+                    <Link
+                      key={b}
+                      to="/catalog"
+                      search={{ cat: current?.slug, brand: b, q: undefined } as never}
+                      className="shrink-0 w-28 md:w-32 aspect-square rounded-2xl bg-card border border-border hover:border-primary/50 hover:shadow-elegant flex items-center justify-center p-3 transition group"
+                    >
+                      <div className="flex flex-col items-center gap-1.5">
+                        <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl ${brandInitialColor(b)} text-white flex items-center justify-center font-black text-xl md:text-2xl shadow-sm`}>
+                          {b.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="font-black text-xs md:text-sm text-center line-clamp-1 group-hover:text-primary uppercase tracking-tight">
+                          {b}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
-            {loadingBrands ? (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 md:gap-4">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="aspect-[5/3] rounded-2xl bg-secondary animate-pulse" />
-                ))}
-              </div>
-            ) : brands.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-6">—</p>
-            ) : (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 md:gap-4">
-                {brands.map((b) => (
+          )}
+
+          {/* "Sizin ehtiyaclarınız" — alt kateqoriyaların böyük kart formatında təkrarı (Trendyol "Elektronik İhtiyaçlarınız" bölməsi kimi) */}
+          {!activeSub && subCats.length > 0 && (
+            <div>
+              <h3 className="text-lg md:text-xl font-black mb-3 px-1">
+                {catName(activeRoot)} — {needsTitle}
+              </h3>
+              <div className="flex gap-2.5 md:gap-3 overflow-x-auto scrollbar-none pb-1">
+                {subCats.slice(0, 8).map((s) => (
                   <Link
-                    key={b}
+                    key={s.id}
                     to="/catalog"
-                    search={{ cat: current?.slug, brand: b, q: undefined } as never}
-                    className="aspect-[5/3] rounded-2xl bg-background border border-border hover:border-primary/40 hover:shadow-elegant flex items-center justify-center px-3 transition group"
+                    search={{ cat: s.slug, q: undefined } as never}
+                    className="shrink-0 w-32 md:w-40 flex flex-col items-center gap-2"
                   >
-                    <span className="font-black text-sm md:text-lg text-center line-clamp-1 group-hover:text-primary tracking-tight uppercase">
-                      {b}
+                    <div className="w-full aspect-square rounded-2xl bg-secondary/40 border border-border hover:border-primary/50 hover:shadow-elegant flex items-center justify-center text-6xl md:text-7xl hover:scale-[1.02] transition">
+                      {s.icon || activeRoot.icon || "🛍️"}
+                    </div>
+                    <span className="text-xs md:text-sm font-bold text-center line-clamp-2">
+                      {catName(s)}
                     </span>
                   </Link>
                 ))}
               </div>
-            )}
-          </div>
-        </div>
+            </div>
+          )}
+        </>
       )}
     </section>
   );
