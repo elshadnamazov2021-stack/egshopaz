@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { catName } from "@/lib/catName";
-import { ChevronRight, Sparkles, Tag } from "lucide-react";
+import { ChevronRight, Sparkles, Tag, ArrowLeft } from "lucide-react";
 
 interface Category {
   id: string;
@@ -20,7 +20,8 @@ interface BrandRow { brand: string | null }
 export function HomeCategoryBrowser() {
   const { i18n } = useTranslation();
   const [cats, setCats] = useState<Category[]>([]);
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeRootId, setActiveRootId] = useState<string | null>(null);
+  const [activeSubId, setActiveSubId] = useState<string | null>(null);
   const [brands, setBrands] = useState<string[]>([]);
   const [loadingBrands, setLoadingBrands] = useState(false);
 
@@ -33,27 +34,45 @@ export function HomeCategoryBrowser() {
         const list = (data ?? []) as Category[];
         setCats(list);
         const firstRoot = list.find((c) => !c.parent_id);
-        if (firstRoot) setActiveId(firstRoot.id);
+        if (firstRoot) setActiveRootId(firstRoot.id);
       });
   }, []);
 
   const roots = useMemo(() => cats.filter((c) => !c.parent_id), [cats]);
-  const active = useMemo(() => cats.find((c) => c.id === activeId) || null, [cats, activeId]);
-  const subCats = useMemo(
-    () => (active ? cats.filter((c) => c.parent_id === active.id) : []),
-    [cats, active],
+  const activeRoot = useMemo(
+    () => cats.find((c) => c.id === activeRootId) || null,
+    [cats, activeRootId],
+  );
+  const activeSub = useMemo(
+    () => (activeSubId ? cats.find((c) => c.id === activeSubId) || null : null),
+    [cats, activeSubId],
   );
 
-  // Aktiv kateqoriyaya aid bütün alt slug-ları topla (brendləri çıxarmaq üçün)
+  // 2-ci səviyyə (root-un altları)
+  const subCats = useMemo(
+    () => (activeRoot ? cats.filter((c) => c.parent_id === activeRoot.id) : []),
+    [cats, activeRoot],
+  );
+
+  // 3-cü səviyyə (sub-un altları — məhsul tipləri)
+  const leafCats = useMemo(
+    () => (activeSub ? cats.filter((c) => c.parent_id === activeSub.id) : []),
+    [cats, activeSub],
+  );
+
+  // Hazırda aktiv olan kateqoriya: əgər sub seçilibsə — sub, yoxsa root
+  const current = activeSub || activeRoot;
+
+  // Brendləri çıxarmaq üçün cari kateqoriyanın bütün alt slug-larını topla
   const activeSlugs = useMemo(() => {
-    if (!active) return [];
-    const ids = new Set<string>([active.id]);
-    cats.filter((c) => c.parent_id === active.id).forEach((l2) => {
+    if (!current) return [];
+    const ids = new Set<string>([current.id]);
+    cats.filter((c) => c.parent_id === current.id).forEach((l2) => {
       ids.add(l2.id);
       cats.filter((c) => c.parent_id === l2.id).forEach((l3) => ids.add(l3.id));
     });
     return cats.filter((c) => ids.has(c.id)).map((c) => c.slug);
-  }, [cats, active]);
+  }, [cats, current]);
 
   useEffect(() => {
     if (activeSlugs.length === 0) {
@@ -78,6 +97,12 @@ export function HomeCategoryBrowser() {
       });
   }, [activeSlugs]);
 
+  // Root dəyişəndə sub seçimini sıfırla
+  const selectRoot = (id: string) => {
+    setActiveRootId(id);
+    setActiveSubId(null);
+  };
+
   if (roots.length === 0) return null;
 
   const lang = i18n.language || "az";
@@ -86,23 +111,29 @@ export function HomeCategoryBrowser() {
     : lang.startsWith("en")
       ? "Featured Categories"
       : "Öne Çıxan Kateqoriyalar";
+  const typesTitle = lang.startsWith("ru")
+    ? "Типы товаров"
+    : lang.startsWith("en")
+      ? "Product Types"
+      : "Məhsul tipləri";
   const brandsTitle = lang.startsWith("ru")
     ? "Популярные бренды"
     : lang.startsWith("en")
       ? "Featured Brands"
       : "Öne Çıxan Brendlər";
   const seeAll = lang.startsWith("ru") ? "Все" : lang.startsWith("en") ? "See all" : "Hamısına bax";
+  const backLabel = lang.startsWith("ru") ? "Назад" : lang.startsWith("en") ? "Back" : "Geri";
 
   return (
     <section className="rounded-3xl bg-card border border-border shadow-sm overflow-hidden">
       {/* Tab bar — root categories */}
       <div className="flex gap-2 overflow-x-auto px-4 pt-4 pb-3 scrollbar-none border-b border-border bg-secondary/30">
         {roots.map((c) => {
-          const isActive = c.id === activeId;
+          const isActive = c.id === activeRootId;
           return (
             <button
               key={c.id}
-              onClick={() => setActiveId(c.id)}
+              onClick={() => selectRoot(c.id)}
               className={`shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition border ${
                 isActive
                   ? "bg-gradient-brand text-primary-foreground border-transparent shadow-elegant scale-105"
@@ -116,55 +147,135 @@ export function HomeCategoryBrowser() {
         })}
       </div>
 
-      {active && (
+      {activeRoot && (
         <div className="p-4 md:p-6 space-y-6">
-          {/* Sub-categories */}
-          <div>
-            <div className="flex items-end justify-between mb-3">
-              <h3 className="text-base md:text-lg font-extrabold flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-primary" />
-                {featuredTitle}
-              </h3>
-              <Link
-                to="/catalog"
-                search={{ cat: active.slug, q: undefined } as never}
-                className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
+          {/* Breadcrumb / Back */}
+          {activeSub && (
+            <div className="flex items-center gap-2 text-sm">
+              <button
+                onClick={() => setActiveSubId(null)}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary hover:bg-secondary/70 font-bold transition"
               >
-                {seeAll} <ChevronRight className="h-3 w-3" />
-              </Link>
+                <ArrowLeft className="h-3.5 w-3.5" /> {backLabel}
+              </button>
+              <span className="text-muted-foreground">/</span>
+              <span className="font-bold">{catName(activeRoot)}</span>
+              <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="font-extrabold text-primary">{catName(activeSub)}</span>
             </div>
+          )}
 
-            {subCats.length === 0 ? (
-              <Link
-                to="/catalog"
-                search={{ cat: active.slug, q: undefined } as never}
-                className="block rounded-2xl bg-gradient-soft p-6 text-center font-bold hover:scale-[1.01] transition"
-              >
-                <span className="text-3xl block mb-2">{active.icon}</span>
-                {catName(active)} — {seeAll}
-              </Link>
-            ) : (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 md:gap-4">
-                {subCats.slice(0, 12).map((s) => (
-                  <Link
-                    key={s.id}
-                    to="/catalog"
-                    search={{ cat: s.slug, q: undefined } as never}
-                    className="group flex flex-col items-center gap-2"
-                  >
-                    <div className="w-full aspect-square rounded-2xl bg-background border border-border group-hover:border-primary/40 group-hover:shadow-elegant flex items-center justify-center text-4xl md:text-5xl group-hover:scale-[1.03] transition">
-                      {s.icon || active.icon || "🛍️"}
-                    </div>
-                    <span className="text-[11px] md:text-xs text-center font-semibold leading-tight line-clamp-2 group-hover:text-primary">
-                      {catName(s)}
-                    </span>
-                  </Link>
-                ))}
+          {/* SƏVIYYƏ 2: Sub-categories (yalnız sub seçilməyibsə) */}
+          {!activeSub && (
+            <div>
+              <div className="flex items-end justify-between mb-3">
+                <h3 className="text-base md:text-lg font-extrabold flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  {featuredTitle}
+                </h3>
+                <Link
+                  to="/catalog"
+                  search={{ cat: activeRoot.slug, q: undefined } as never}
+                  className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
+                >
+                  {seeAll} <ChevronRight className="h-3 w-3" />
+                </Link>
               </div>
-            )}
-          </div>
 
-          {/* Brands */}
+              {subCats.length === 0 ? (
+                <Link
+                  to="/catalog"
+                  search={{ cat: activeRoot.slug, q: undefined } as never}
+                  className="block rounded-2xl bg-gradient-soft p-6 text-center font-bold hover:scale-[1.01] transition"
+                >
+                  <span className="text-3xl block mb-2">{activeRoot.icon}</span>
+                  {catName(activeRoot)} — {seeAll}
+                </Link>
+              ) : (
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 md:gap-4">
+                  {subCats.slice(0, 12).map((s) => {
+                    const hasChildren = cats.some((c) => c.parent_id === s.id);
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => {
+                          if (hasChildren) setActiveSubId(s.id);
+                        }}
+                        className="group flex flex-col items-center gap-2 text-left"
+                      >
+                        {hasChildren ? (
+                          <div className="w-full aspect-square rounded-2xl bg-background border border-border group-hover:border-primary/40 group-hover:shadow-elegant flex items-center justify-center text-4xl md:text-5xl group-hover:scale-[1.03] transition">
+                            {s.icon || activeRoot.icon || "🛍️"}
+                          </div>
+                        ) : (
+                          <Link
+                            to="/catalog"
+                            search={{ cat: s.slug, q: undefined } as never}
+                            className="w-full aspect-square rounded-2xl bg-background border border-border group-hover:border-primary/40 group-hover:shadow-elegant flex items-center justify-center text-4xl md:text-5xl group-hover:scale-[1.03] transition"
+                          >
+                            {s.icon || activeRoot.icon || "🛍️"}
+                          </Link>
+                        )}
+                        <span className="text-[11px] md:text-xs text-center font-semibold leading-tight line-clamp-2 group-hover:text-primary w-full">
+                          {catName(s)}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* SƏVIYYƏ 3: Leaf-cats (məhsul tipləri) — sub seçilibsə */}
+          {activeSub && (
+            <div>
+              <div className="flex items-end justify-between mb-3">
+                <h3 className="text-base md:text-lg font-extrabold flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  {typesTitle}
+                </h3>
+                <Link
+                  to="/catalog"
+                  search={{ cat: activeSub.slug, q: undefined } as never}
+                  className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
+                >
+                  {seeAll} <ChevronRight className="h-3 w-3" />
+                </Link>
+              </div>
+
+              {leafCats.length === 0 ? (
+                <Link
+                  to="/catalog"
+                  search={{ cat: activeSub.slug, q: undefined } as never}
+                  className="block rounded-2xl bg-gradient-soft p-6 text-center font-bold hover:scale-[1.01] transition"
+                >
+                  <span className="text-3xl block mb-2">{activeSub.icon}</span>
+                  {catName(activeSub)} — {seeAll}
+                </Link>
+              ) : (
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 md:gap-4">
+                  {leafCats.slice(0, 12).map((l) => (
+                    <Link
+                      key={l.id}
+                      to="/catalog"
+                      search={{ cat: l.slug, q: undefined } as never}
+                      className="group flex flex-col items-center gap-2"
+                    >
+                      <div className="w-full aspect-square rounded-2xl bg-background border border-border group-hover:border-primary/40 group-hover:shadow-elegant flex items-center justify-center text-4xl md:text-5xl group-hover:scale-[1.03] transition">
+                        {l.icon || activeSub.icon || "🛍️"}
+                      </div>
+                      <span className="text-[11px] md:text-xs text-center font-semibold leading-tight line-clamp-2 group-hover:text-primary">
+                        {catName(l)}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Brands — həmişə cari kateqoriyaya uyğun */}
           <div>
             <div className="flex items-end justify-between mb-3">
               <h3 className="text-base md:text-lg font-extrabold flex items-center gap-2">
@@ -186,7 +297,7 @@ export function HomeCategoryBrowser() {
                   <Link
                     key={b}
                     to="/catalog"
-                    search={{ cat: active.slug, brand: b, q: undefined } as never}
+                    search={{ cat: current?.slug, brand: b, q: undefined } as never}
                     className="aspect-[5/3] rounded-2xl bg-background border border-border hover:border-primary/40 hover:shadow-elegant flex items-center justify-center px-3 transition group"
                   >
                     <span className="font-black text-sm md:text-lg text-center line-clamp-1 group-hover:text-primary tracking-tight uppercase">
