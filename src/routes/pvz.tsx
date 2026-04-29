@@ -418,84 +418,103 @@ function Returns() {
 }
 
 function Storage() {
+  const [list, setList] = useState<DBOrderItem[]>([]);
+  useEffect(() => {
+    supabase.from("order_items")
+      .select("id,title,price,quantity,pickup_code,status,accepted_at,delivered_at,pickup_point_id,orders(id,recipient_name,recipient_phone,pickup_point_id)")
+      .not("accepted_at", "is", null).is("delivered_at", null)
+      .order("accepted_at", { ascending: true }).limit(100)
+      .then(({ data }) => setList((data ?? []) as unknown as DBOrderItem[]));
+  }, []);
+  const now = Date.now();
+  const days = (a: string | null) => a ? Math.floor((now - new Date(a).getTime()) / 86400000) : 0;
+  const expiring = list.filter((s) => days(s.accepted_at) >= 5 && days(s.accepted_at) < 7).length;
+  const expired = list.filter((s) => days(s.accepted_at) >= 7).length;
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-extrabold flex items-center gap-2"><Archive className="h-6 w-6 text-primary" /> Saxlama</h1>
       <div className="grid grid-cols-3 gap-3">
-        <StatCard icon={Archive} label="Cəmi saxlamada" value="62" />
-        <StatCard icon={Clock} label="Müddəti azalan" value="7" accent="text-amber-500" />
-        <StatCard icon={AlertTriangle} label="Müddəti keçmiş" value="2" accent="text-rose-500" />
+        <StatCard icon={Archive} label="Cəmi saxlamada" value={String(list.length)} />
+        <StatCard icon={Clock} label="Müddəti azalan" value={String(expiring)} accent="text-amber-500" />
+        <StatCard icon={AlertTriangle} label="Müddəti keçmiş" value={String(expired)} accent="text-rose-500" />
       </div>
       <div className="bg-card border border-border rounded-2xl p-4">
-        <div className="font-bold mb-3">Saxlamadakı mallar</div>
-        <Table>
-          <TableHeader><TableRow><TableHead>Kod</TableHead><TableHead>Müştəri</TableHead><TableHead>Saxlanma</TableHead><TableHead>Vəziyyət</TableHead><TableHead className="text-right">Əməliyyat</TableHead></TableRow></TableHeader>
-          <TableBody>
-            {mockStorage.map((s) => (
-              <TableRow key={s.id}>
-                <TableCell className="font-mono">{s.id}</TableCell>
-                <TableCell>{s.buyer}</TableCell>
-                <TableCell>{s.days} gün</TableCell>
-                <TableCell><span className={s.expires.includes("keçib") ? "text-rose-600 font-semibold" : "text-amber-600"}>{s.expires}</span></TableCell>
-                <TableCell className="text-right">
-                  <Button size="sm" variant="outline" onClick={() => toast.success("Müştəriyə xəbərdarlıq göndərildi")}><PhoneCall className="h-4 w-4 mr-1" /> Bildiriş</Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="font-bold mb-3">Saxlamadakı mallar ({list.length})</div>
+        {list.length === 0 ? (
+          <div className="text-sm text-muted-foreground text-center py-6">Saxlamada məhsul yoxdur</div>
+        ) : (
+          <Table>
+            <TableHeader><TableRow><TableHead>Kod</TableHead><TableHead>Müştəri</TableHead><TableHead>Saxlanma</TableHead><TableHead>Vəziyyət</TableHead></TableRow></TableHeader>
+            <TableBody>
+              {list.map((s) => {
+                const d = days(s.accepted_at);
+                const lbl = d >= 7 ? "Vaxtı keçib" : d >= 5 ? `${7 - d} gün qalıb` : `${d} gün`;
+                return (
+                  <TableRow key={s.id}>
+                    <TableCell className="font-mono">{s.pickup_code}</TableCell>
+                    <TableCell>{s.orders?.recipient_name ?? "—"}</TableCell>
+                    <TableCell>{d} gün</TableCell>
+                    <TableCell><span className={d >= 7 ? "text-rose-600 font-semibold" : d >= 5 ? "text-amber-600" : "text-muted-foreground"}>{lbl}</span></TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
       </div>
     </div>
   );
 }
 
 function Reports() {
+  const [stats, setStats] = useState({ accepted: 0, delivered: 0, total: 0 });
+  useEffect(() => {
+    const start = new Date(); start.setHours(0, 0, 0, 0);
+    Promise.all([
+      supabase.from("order_items").select("*", { count: "exact", head: true }).gte("accepted_at", start.toISOString()),
+      supabase.from("order_items").select("*", { count: "exact", head: true }).gte("delivered_at", start.toISOString()),
+      supabase.from("order_items").select("*", { count: "exact", head: true }),
+    ]).then(([a, d, t]) => setStats({ accepted: a.count ?? 0, delivered: d.count ?? 0, total: t.count ?? 0 }));
+  }, []);
+  const conv = stats.accepted > 0 ? Math.round((stats.delivered / stats.accepted) * 100) : 0;
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-extrabold flex items-center gap-2"><BarChart3 className="h-6 w-6 text-primary" /> Hesabatlar</h1>
-      <div className="grid lg:grid-cols-2 gap-4">
-        <div className="bg-card border border-border rounded-2xl p-4">
-          <div className="font-bold mb-3">Günlük statistika</div>
-          <ul className="text-sm space-y-2">
-            <li className="flex justify-between"><span>Qəbul</span><b>21</b></li>
-            <li className="flex justify-between"><span>Təhvil</span><b>38</b></li>
-            <li className="flex justify-between"><span>Qaytarma</span><b>4</b></li>
-            <li className="flex justify-between"><span>Konversiya</span><b>92%</b></li>
-          </ul>
-        </div>
-        <div className="bg-card border border-border rounded-2xl p-4">
-          <div className="font-bold mb-3">İşçi performansı</div>
-          <ul className="text-sm space-y-2">
-            <li className="flex justify-between"><span>Orta təhvil müddəti</span><b>2 dəq</b></li>
-            <li className="flex justify-between"><span>Müştəri reytinqi</span><b>4.8 / 5</b></li>
-            <li className="flex justify-between"><span>Səhv əməliyyatlar</span><b>0</b></li>
-          </ul>
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <StatCard icon={PackageOpen} label="Bugün qəbul" value={String(stats.accepted)} accent="text-primary" />
+        <StatCard icon={CheckCircle2} label="Bugün təhvil" value={String(stats.delivered)} accent="text-emerald-500" />
+        <StatCard icon={TrendingUp} label="Konversiya" value={`${conv}%`} accent="text-emerald-500" />
+        <StatCard icon={Archive} label="Ümumi sifariş" value={String(stats.total)} />
       </div>
     </div>
   );
 }
 
 function Finance() {
+  const [today, setToday] = useState(0);
+  const [month, setMonth] = useState(0);
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    const startD = new Date(); startD.setHours(0, 0, 0, 0);
+    const startM = new Date(); startM.setDate(1); startM.setHours(0, 0, 0, 0);
+    Promise.all([
+      supabase.from("order_items").select("price,quantity").gte("delivered_at", startD.toISOString()),
+      supabase.from("order_items").select("price,quantity").gte("delivered_at", startM.toISOString()),
+    ]).then(([d, m]) => {
+      const sumD = (d.data ?? []).reduce((s: number, r: { price: number; quantity: number }) => s + Number(r.price) * r.quantity * 0.05, 0);
+      const sumM = (m.data ?? []).reduce((s: number, r: { price: number; quantity: number }) => s + Number(r.price) * r.quantity * 0.05, 0);
+      setToday(sumD); setMonth(sumM); setCount((d.data ?? []).length);
+    });
+  }, []);
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-extrabold flex items-center gap-2"><Wallet className="h-6 w-6 text-primary" /> Maliyyə</h1>
       <div className="grid grid-cols-3 gap-3">
-        <StatCard icon={TrendingUp} label="Bu gün qazanc" value={formatAZN(48.5)} accent="text-emerald-500" />
-        <StatCard icon={Wallet} label="Bu ay qazanc" value={formatAZN(1240)} />
-        <StatCard icon={ClipboardList} label="Əməliyyat (gün)" value="63" />
+        <StatCard icon={TrendingUp} label="Bu gün qazanc (5%)" value={formatAZN(today)} accent="text-emerald-500" />
+        <StatCard icon={Wallet} label="Bu ay qazanc" value={formatAZN(month)} />
+        <StatCard icon={ClipboardList} label="Bugün təhvil" value={String(count)} />
       </div>
-      <div className="bg-card border border-border rounded-2xl p-4">
-        <div className="font-bold mb-3">Ödəniş tarixçəsi</div>
-        <Table>
-          <TableHeader><TableRow><TableHead>Tarix</TableHead><TableHead>Növ</TableHead><TableHead className="text-right">Məbləğ</TableHead></TableRow></TableHeader>
-          <TableBody>
-            <TableRow><TableCell>25.04.2026</TableCell><TableCell>Həftəlik ödəniş</TableCell><TableCell className="text-right font-bold text-emerald-600">{formatAZN(312)}</TableCell></TableRow>
-            <TableRow><TableCell>18.04.2026</TableCell><TableCell>Həftəlik ödəniş</TableCell><TableCell className="text-right font-bold text-emerald-600">{formatAZN(298)}</TableCell></TableRow>
-            <TableRow><TableCell>11.04.2026</TableCell><TableCell>Həftəlik ödəniş</TableCell><TableCell className="text-right font-bold text-emerald-600">{formatAZN(341)}</TableCell></TableRow>
-          </TableBody>
-        </Table>
-      </div>
+      <p className="text-xs text-muted-foreground">PVZ payı: hər təhvil verilmiş məhsulun 5%-i</p>
     </div>
   );
 }
