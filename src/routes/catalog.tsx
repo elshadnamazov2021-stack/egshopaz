@@ -41,11 +41,28 @@ function Catalog() {
 
   useEffect(() => {
     setLoading(true);
+    // Seçilmiş kateqoriya + bütün alt törəmələri (3 səviyyə)
+    let catSlugs: string[] | null = null;
+    if (cat) {
+      const root = categories.find((c) => c.slug === cat);
+      if (root) {
+        const ids = new Set<string>([root.id]);
+        const lvl2 = categories.filter((c) => c.parent_id === root.id);
+        lvl2.forEach((l2) => {
+          ids.add(l2.id);
+          categories.filter((c) => c.parent_id === l2.id).forEach((l3) => ids.add(l3.id));
+        });
+        catSlugs = categories.filter((c) => ids.has(c.id)).map((c) => c.slug);
+      } else {
+        catSlugs = [cat];
+      }
+    }
+
     let query: any = supabase.from("products")
       .select("id,title,price,old_price,image_url,rating,reviews_count,brand,categories!inner(slug)")
       .eq("is_active", true);
     if (q) query = query.ilike("title", `%${q}%`);
-    if (cat) query = query.eq("categories.slug", cat);
+    if (catSlugs) query = query.in("categories.slug", catSlugs);
     if (filters.minPrice != null) query = query.gte("price", filters.minPrice);
     if (filters.maxPrice != null) query = query.lte("price", filters.maxPrice);
     if (filters.brand) query = query.eq("brand", filters.brand);
@@ -62,7 +79,7 @@ function Catalog() {
       setProducts((data ?? []) as ProductCardData[]);
       setLoading(false);
     });
-  }, [q, cat, filters]);
+  }, [q, cat, filters, categories]);
 
   const allBrandsList = useMemo(() => {
     const s = new Set<string>();
