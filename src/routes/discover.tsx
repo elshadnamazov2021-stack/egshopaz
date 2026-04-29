@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { Flame, Heart, Tag, Sparkles, TrendingUp } from "lucide-react";
@@ -7,8 +8,8 @@ import { Flame, Heart, Tag, Sparkles, TrendingUp } from "lucide-react";
 export const Route = createFileRoute("/discover")({
   head: () => ({
     meta: [
-      { title: "Kəşfet — Elzan Shop" },
-      { name: "description", content: "Trend məhsullar, ən çox sevilənlər, endirimlər və yeni gələnlər bir yerdə." },
+      { title: "Discover — Elzan Shop" },
+      { name: "description", content: "Trending products, most loved items, discounts and new arrivals all in one place." },
     ],
   }),
   component: Discover,
@@ -16,18 +17,19 @@ export const Route = createFileRoute("/discover")({
 
 type Tab = "trending" | "discounted" | "favorites" | "newest" | "topRated";
 
-const TABS: { id: Tab; label: string; icon: React.ComponentType<{ className?: string }>; color: string }[] = [
-  { id: "trending", label: "Trend", icon: Flame, color: "from-orange-500 to-red-500" },
-  { id: "discounted", label: "Endirimlər", icon: Tag, color: "from-rose-500 to-pink-500" },
-  { id: "favorites", label: "Ən sevilənlər", icon: Heart, color: "from-pink-500 to-fuchsia-500" },
-  { id: "topRated", label: "Yüksək reytinq", icon: TrendingUp, color: "from-amber-500 to-yellow-500" },
-  { id: "newest", label: "Yeniliklər", icon: Sparkles, color: "from-violet-500 to-indigo-500" },
-];
-
 function Discover() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>("trending");
   const [products, setProducts] = useState<ProductCardData[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const TABS: { id: Tab; label: string; icon: React.ComponentType<{ className?: string }>; color: string }[] = [
+    { id: "trending", label: t("discover.tabTrending"), icon: Flame, color: "from-orange-500 to-red-500" },
+    { id: "discounted", label: t("discover.tabDiscounted"), icon: Tag, color: "from-rose-500 to-pink-500" },
+    { id: "favorites", label: t("discover.tabFavorites"), icon: Heart, color: "from-pink-500 to-fuchsia-500" },
+    { id: "topRated", label: t("discover.tabTopRated"), icon: TrendingUp, color: "from-amber-500 to-yellow-500" },
+    { id: "newest", label: t("discover.tabNewest"), icon: Sparkles, color: "from-violet-500 to-indigo-500" },
+  ];
 
   useEffect(() => {
     setLoading(true);
@@ -40,7 +42,6 @@ function Discover() {
         const { data } = await base().not("old_price", "is", null).order("old_price", { ascending: false }).limit(40);
         setProducts((data ?? []) as ProductCardData[]); setLoading(false); return;
       } else if (tab === "favorites") {
-        // Most-favorited via aggregate
         const { data: favAgg } = await supabase
           .from("favorites")
           .select("product_id")
@@ -68,36 +69,36 @@ function Discover() {
     run();
   }, [tab]);
 
-  const active = TABS.find((t) => t.id === tab)!;
+  const active = TABS.find((x) => x.id === tab)!;
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
       <div className={`rounded-3xl p-6 md:p-10 text-white bg-gradient-to-br ${active.color} shadow-elegant relative overflow-hidden`}>
         <div className="relative z-10">
           <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-bold mb-3">
-            <active.icon className="h-3.5 w-3.5" /> KƏŞFET
+            <active.icon className="h-3.5 w-3.5" /> {t("discover.headerBadge")}
           </div>
           <h1 className="text-3xl md:text-5xl font-black leading-tight">{active.label}</h1>
-          <p className="opacity-90 mt-2 text-sm md:text-base">Sənin üçün ən maraqlı məhsullar bir yerdə</p>
+          <p className="opacity-90 mt-2 text-sm md:text-base">{t("discover.headerDesc")}</p>
         </div>
         <div className="absolute -right-10 -bottom-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
       </div>
 
       <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-none">
-        {TABS.map((t) => {
-          const isActive = tab === t.id;
+        {TABS.map((tt) => {
+          const isActive = tab === tt.id;
           return (
             <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
+              key={tt.id}
+              onClick={() => setTab(tt.id)}
               className={`shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-bold transition border-2 ${
                 isActive
-                  ? `bg-gradient-to-r ${t.color} text-white border-transparent shadow-card`
+                  ? `bg-gradient-to-r ${tt.color} text-white border-transparent shadow-card`
                   : "bg-card border-border hover:border-primary text-foreground"
               }`}
             >
-              <t.icon className="h-4 w-4" />
-              {t.label}
+              <tt.icon className="h-4 w-4" />
+              {tt.label}
             </button>
           );
         })}
@@ -111,9 +112,9 @@ function Discover() {
         </div>
       ) : products.length === 0 ? (
         <div className="text-center py-20 bg-secondary/40 rounded-2xl">
-          <p className="text-muted-foreground">Bu kateqoriyada hələ məhsul yoxdur</p>
+          <p className="text-muted-foreground">{t("discover.empty")}</p>
           <Link to="/catalog" search={{ q: undefined, cat: undefined } as never}
-                className="text-primary font-semibold hover:underline">Kataloqa keç →</Link>
+                className="text-primary font-semibold hover:underline">{t("discover.goToCatalog")}</Link>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
