@@ -41,11 +41,28 @@ function Catalog() {
 
   useEffect(() => {
     setLoading(true);
+    // Seçilmiş kateqoriya + bütün alt törəmələri (3 səviyyə)
+    let catSlugs: string[] | null = null;
+    if (cat) {
+      const root = categories.find((c) => c.slug === cat);
+      if (root) {
+        const ids = new Set<string>([root.id]);
+        const lvl2 = categories.filter((c) => c.parent_id === root.id);
+        lvl2.forEach((l2) => {
+          ids.add(l2.id);
+          categories.filter((c) => c.parent_id === l2.id).forEach((l3) => ids.add(l3.id));
+        });
+        catSlugs = categories.filter((c) => ids.has(c.id)).map((c) => c.slug);
+      } else {
+        catSlugs = [cat];
+      }
+    }
+
     let query: any = supabase.from("products")
       .select("id,title,price,old_price,image_url,rating,reviews_count,brand,categories!inner(slug)")
       .eq("is_active", true);
     if (q) query = query.ilike("title", `%${q}%`);
-    if (cat) query = query.eq("categories.slug", cat);
+    if (catSlugs) query = query.in("categories.slug", catSlugs);
     if (filters.minPrice != null) query = query.gte("price", filters.minPrice);
     if (filters.maxPrice != null) query = query.lte("price", filters.maxPrice);
     if (filters.brand) query = query.eq("brand", filters.brand);
@@ -62,7 +79,7 @@ function Catalog() {
       setProducts((data ?? []) as ProductCardData[]);
       setLoading(false);
     });
-  }, [q, cat, filters]);
+  }, [q, cat, filters, categories]);
 
   const allBrandsList = useMemo(() => {
     const s = new Set<string>();
@@ -102,7 +119,10 @@ function Catalog() {
             </li>
             {parents.map((c) => {
               const kids = childrenOf(c.id);
-              const isOpen = openParents[c.id] || activeCat?.parent_id === c.id || cat === c.slug;
+              const ancestorIds = new Set<string>();
+              let cur = activeCat;
+              while (cur?.parent_id) { ancestorIds.add(cur.parent_id); cur = categories.find((x) => x.id === cur!.parent_id); }
+              const isOpen = openParents[c.id] || ancestorIds.has(c.id) || cat === c.slug;
               return (
                 <li key={c.id}>
                   <button
@@ -119,14 +139,47 @@ function Catalog() {
                           {t("catalog.all")}
                         </Link>
                       </li>
-                      {kids.map((k) => (
-                        <li key={k.id}>
-                          <Link to="/catalog" search={{ q, cat: k.slug } as never}
-                                className={`block px-2 py-1 rounded text-xs hover:bg-secondary ${cat === k.slug ? "font-semibold text-primary" : ""}`}>
-                            {k.icon} {catName(k)}
-                          </Link>
-                        </li>
-                      ))}
+                      {kids.map((k) => {
+                        const grandKids = childrenOf(k.id);
+                        const kOpen = openParents[k.id] || ancestorIds.has(k.id) || cat === k.slug;
+                        return (
+                          <li key={k.id}>
+                            {grandKids.length > 0 ? (
+                              <>
+                                <button
+                                  onClick={() => setOpenParents((p) => ({ ...p, [k.id]: !kOpen }))}
+                                  className={`w-full flex items-center justify-between px-2 py-1 rounded text-xs hover:bg-secondary text-left ${cat === k.slug ? "font-semibold text-primary" : ""}`}>
+                                  <span>{k.icon} {catName(k)}</span>
+                                  <span className="text-[10px]">{kOpen ? "−" : "+"}</span>
+                                </button>
+                                {kOpen && (
+                                  <ul className="ml-3 mt-0.5 space-y-0.5 border-l border-border pl-2">
+                                    <li>
+                                      <Link to="/catalog" search={{ q, cat: k.slug } as never}
+                                            className={`block px-2 py-0.5 rounded text-[11px] hover:bg-secondary ${cat === k.slug ? "font-semibold text-primary" : "text-muted-foreground"}`}>
+                                        {t("catalog.all")}
+                                      </Link>
+                                    </li>
+                                    {grandKids.map((g) => (
+                                      <li key={g.id}>
+                                        <Link to="/catalog" search={{ q, cat: g.slug } as never}
+                                              className={`block px-2 py-0.5 rounded text-[11px] hover:bg-secondary ${cat === g.slug ? "font-semibold text-primary" : ""}`}>
+                                          {catName(g)}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </>
+                            ) : (
+                              <Link to="/catalog" search={{ q, cat: k.slug } as never}
+                                    className={`block px-2 py-1 rounded text-xs hover:bg-secondary ${cat === k.slug ? "font-semibold text-primary" : ""}`}>
+                                {k.icon} {catName(k)}
+                              </Link>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
                 </li>
