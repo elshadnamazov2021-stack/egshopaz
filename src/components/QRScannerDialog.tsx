@@ -129,15 +129,27 @@ export function QRScannerDialog({ open, onOpenChange, onScan, title = "QR / Ştr
 
         <div className="relative bg-black aspect-square">
           <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
+          {!started && !lastValue && !error && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-primary-foreground p-6 text-center bg-foreground/80">
+              <Camera className="h-12 w-12 mb-3" />
+              <p className="text-sm font-semibold mb-3">Kamera ilə skanlamağa başlamaq üçün düyməyə basın.</p>
+              <Button onClick={startScan} disabled={starting} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                {starting ? "Kamera açılır..." : "Kameranı aç"}
+              </Button>
+            </div>
+          )}
           {error && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6 text-center bg-black/70">
-              <X className="h-10 w-10 mb-2 text-rose-400" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-primary-foreground p-6 text-center bg-foreground/80">
+              <X className="h-10 w-10 mb-2 text-destructive" />
               <p className="text-sm">{error}</p>
-              <p className="text-xs text-white/60 mt-2">Telefonun parametrlərində kamera icazəsini açın.</p>
+              <p className="text-xs text-primary-foreground/70 mt-2">Telefonun parametrlərində kamera icazəsini açın.</p>
+              <Button onClick={startScan} disabled={starting} className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90">
+                Yenidən cəhd et
+              </Button>
             </div>
           )}
           {lastValue && (
-            <div className="absolute inset-0 flex items-center justify-center bg-emerald-500/20 backdrop-blur-sm">
+            <div className="absolute inset-0 flex items-center justify-center bg-success/20 backdrop-blur-sm">
               <div className="bg-card rounded-xl p-4 max-w-[85%] text-center shadow-2xl">
                 <div className="text-xs text-muted-foreground mb-1">Tapıldı</div>
                 <div className="font-mono text-sm break-all">{lastValue}</div>
@@ -149,6 +161,15 @@ export function QRScannerDialog({ open, onOpenChange, onScan, title = "QR / Ştr
         <div className="p-4 space-y-2">
           {!lastValue ? (
             <div className="flex gap-2">
+              {started ? (
+                <Button variant="outline" className="flex-1" onClick={rescan} disabled={starting}>
+                  <RefreshCw className="h-4 w-4 mr-1" /> Yenilə
+                </Button>
+              ) : (
+                <Button className="flex-1" onClick={startScan} disabled={starting}>
+                  <Camera className="h-4 w-4 mr-1" /> {starting ? "Açılır..." : "Skan et"}
+                </Button>
+              )}
               <Button variant="outline" className="flex-1" onClick={() => fileRef.current?.click()}>
                 <ImageIcon className="h-4 w-4 mr-1" /> Şəkildən
               </Button>
