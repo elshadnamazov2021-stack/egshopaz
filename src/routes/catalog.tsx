@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { SponsoredProducts } from "@/components/SponsoredProducts";
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/catalog")({
 interface Category { id: string; name: string; slug: string; icon: string | null; parent_id: string | null }
 
 function Catalog() {
+  const { t } = useTranslation();
   const { q, cat } = Route.useSearch();
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<ProductCardData[]>([]);
@@ -78,9 +80,9 @@ function Catalog() {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-        <Link to="/" className="hover:text-primary">Ana səhifə</Link>
+        <Link to="/" className="hover:text-primary">{t("home.breadcrumbHome")}</Link>
         <span>/</span>
-        <span className="text-foreground font-medium">{activeCat?.name ?? (q ? `"${q}" üzrə axtarış` : "Kataloq")}</span>
+        <span className="text-foreground font-medium">{activeCat?.name ?? (q ? t("catalog.searchBreadcrumb", { q }) : t("catalog.title"))}</span>
       </div>
 
       <div className="mb-6">
@@ -89,12 +91,12 @@ function Catalog() {
 
       <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6">
         <aside className="hidden md:block">
-          <h3 className="font-bold mb-3">Kateqoriyalar</h3>
+          <h3 className="font-bold mb-3">{t("catalog.categories")}</h3>
           <ul className="space-y-1">
             <li>
               <Link to="/catalog" search={{ q, cat: undefined } as never}
                     className={`block px-3 py-2 rounded-lg text-sm hover:bg-secondary ${!cat ? "bg-secondary font-semibold text-primary" : ""}`}>
-                Hamısı
+                {t("catalog.all")}
               </Link>
             </li>
             {parents.map((c) => {
@@ -113,7 +115,7 @@ function Catalog() {
                       <li>
                         <Link to="/catalog" search={{ q, cat: c.slug } as never}
                               className={`block px-2 py-1 rounded text-xs hover:bg-secondary ${cat === c.slug ? "font-semibold text-primary" : "text-muted-foreground"}`}>
-                          Hamısı
+                          {t("catalog.all")}
                         </Link>
                       </li>
                       {kids.map((k) => (
@@ -134,8 +136,8 @@ function Catalog() {
 
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold mb-4">
-            {activeCat?.name ?? (q ? `"${q}" üzrə nəticələr` : "Bütün məhsullar")}
-            <span className="ml-2 text-sm text-muted-foreground font-normal">{products.length} məhsul</span>
+            {activeCat?.name ?? (q ? t("catalog.searchResults", { q }) : t("catalog.allProducts"))}
+            <span className="ml-2 text-sm text-muted-foreground font-normal">{t("catalog.productCount", { count: products.length })}</span>
           </h1>
 
           <div className="mb-4">
@@ -150,7 +152,7 @@ function Catalog() {
             </div>
           ) : products.length === 0 ? (
             <div className="text-center py-20 bg-secondary/40 rounded-2xl">
-              <p className="text-muted-foreground">Heç bir məhsul tapılmadı</p>
+              <p className="text-muted-foreground">{t("catalog.noResults")}</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
