@@ -94,6 +94,9 @@ function Index() {
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-12">
+      {/* Trendyol-style: axtarış altında kateqoriya seç → alt kateqoriyalar + brendlər */}
+      <HomeCategoryBrowser />
+
       {/* HERO — bold gradient */}
       <section className="relative rounded-3xl overflow-hidden bg-gradient-brand text-primary-foreground p-8 md:p-16 shadow-elegant">
         <div className="max-w-2xl space-y-5 relative z-10">
@@ -121,9 +124,6 @@ function Index() {
         <div className="absolute right-32 top-10 w-56 h-56 bg-warning/30 rounded-full blur-2xl" />
         <div className="absolute right-10 top-1/2 w-32 h-32 bg-discount/30 rounded-full blur-xl" />
       </section>
-
-      {/* Trendyol-style: kateqoriya seç → alt kateqoriyalar + brendlər */}
-      <HomeCategoryBrowser />
 
       {/* Visual Search Banner — bold AI-powered */}
       <section className="rounded-3xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-500 p-6 md:p-8 text-white shadow-elegant relative overflow-hidden">
