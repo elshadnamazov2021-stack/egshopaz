@@ -173,23 +173,23 @@ export function HomeCategoryBrowser() {
               </h3>
             </div>
             {loadingBrands ? (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 md:gap-4">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-16 rounded-2xl bg-secondary animate-pulse" />
+                  <div key={i} className="aspect-[5/3] rounded-2xl bg-secondary animate-pulse" />
                 ))}
               </div>
             ) : brands.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-6">—</p>
             ) : (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 md:gap-4">
                 {brands.map((b) => (
                   <Link
                     key={b}
                     to="/catalog"
                     search={{ cat: active.slug, brand: b, q: undefined } as never}
-                    className="h-16 rounded-2xl bg-background border border-border hover:border-primary/40 hover:shadow-elegant flex items-center justify-center px-3 transition group"
+                    className="aspect-[5/3] rounded-2xl bg-background border border-border hover:border-primary/40 hover:shadow-elegant flex items-center justify-center px-3 transition group"
                   >
-                    <span className="font-extrabold text-sm md:text-base text-center line-clamp-1 group-hover:text-primary tracking-tight">
+                    <span className="font-black text-sm md:text-lg text-center line-clamp-1 group-hover:text-primary tracking-tight uppercase">
                       {b}
                     </span>
                   </Link>
