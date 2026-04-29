@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN } from "@/lib/format";
@@ -18,6 +19,7 @@ interface Order {
 }
 
 function Profile() {
+  const { t } = useTranslation();
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -56,68 +58,68 @@ function Profile() {
       shop_city: city.trim().slice(0, 100) || null,
     }, { onConflict: "id" });
     setSaving(false);
-    if (error) toast.error("Yadda saxlanılmadı");
-    else toast.success("Yadda saxlanıldı");
+    if (error) toast.error(t("common.saveError"));
+    else toast.success(t("common.saved"));
   };
 
   const statusLabel: Record<string, string> = {
-    pending: "Gözləyir", paid: "Ödənildi", shipped: "Göndərildi",
-    delivered: "Çatdırıldı", cancelled: "Ləğv edildi",
+    pending: t("orders.pending"), paid: t("orders.paid"), shipped: t("orders.shipped"),
+    delivered: t("orders.delivered"), cancelled: t("orders.cancelled"),
   };
 
   if (!user) return null;
 
   return (
-    <PanelLayout title="Müştərinin şəxsi kabineti" subtitle={user.email ?? undefined} items={items}>
+    <PanelLayout title={t("sidebar.buyerPanelTitle")} subtitle={user.email ?? undefined} items={items}>
       <div className="space-y-6">
         <section className="bg-card border border-border rounded-2xl p-6">
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><UserIcon className="h-5 w-5 text-primary" /> Şəxsi məlumatlar</h2>
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><UserIcon className="h-5 w-5 text-primary" /> {t("profile.personalInfo")}</h2>
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-sm font-semibold">Ad Soyad</label>
+              <label className="text-sm font-semibold">{t("profile.fullName")}</label>
               <input value={fullName} onChange={(e) => setFullName(e.target.value)} maxLength={100}
                      className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
             </div>
             <div>
-              <label className="text-sm font-semibold">Telefon</label>
+              <label className="text-sm font-semibold">{t("profile.phone")}</label>
               <input value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={30} placeholder="+994 ..."
                      className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
             </div>
             <div className="sm:col-span-2">
-              <label className="text-sm font-semibold flex items-center gap-1"><MapPin className="h-4 w-4" /> Çatdırılma ünvanı</label>
+              <label className="text-sm font-semibold flex items-center gap-1"><MapPin className="h-4 w-4" /> {t("profile.deliveryAddress")}</label>
               <input value={address} onChange={(e) => setAddress(e.target.value)} maxLength={300}
-                     placeholder="Məsələn: H. Əliyev pr. 12, mənzil 5"
+                     placeholder={t("profile.addressPlaceholder")}
                      className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
             </div>
             <div>
-              <label className="text-sm font-semibold">Şəhər</label>
-              <input value={city} onChange={(e) => setCity(e.target.value)} maxLength={100} placeholder="Bakı"
+              <label className="text-sm font-semibold">{t("profile.city")}</label>
+              <input value={city} onChange={(e) => setCity(e.target.value)} maxLength={100} placeholder={t("profile.cityPlaceholder")}
                      className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
             </div>
           </div>
           <div className="flex gap-2 mt-4">
             <button onClick={saveProfile} disabled={saving}
                     className="bg-primary text-primary-foreground px-5 h-11 rounded-lg font-bold hover:bg-primary/90 disabled:opacity-60">
-              {saving ? "..." : "Yadda saxla"}
+              {saving ? "..." : t("common.save")}
             </button>
             <button onClick={async () => { await signOut(); navigate({ to: "/" }); }}
                     className="border border-border px-5 h-11 rounded-lg font-bold hover:bg-secondary inline-flex items-center gap-2">
-              <LogOut className="h-4 w-4" /> Çıxış
+              <LogOut className="h-4 w-4" /> {t("profile.logout")}
             </button>
           </div>
         </section>
 
         <section>
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Package className="h-5 w-5 text-primary" /> Sifarişlərim</h2>
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Package className="h-5 w-5 text-primary" /> {t("profile.myOrders")}</h2>
           {orders.length === 0 ? (
-            <div className="bg-secondary/40 rounded-2xl p-10 text-center text-muted-foreground">Hələ sifariş yoxdur</div>
+            <div className="bg-secondary/40 rounded-2xl p-10 text-center text-muted-foreground">{t("profile.noOrders")}</div>
           ) : (
             <div className="space-y-3">
               {orders.map((o) => (
                 <div key={o.id} className="bg-card border border-border rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <div className="text-xs text-muted-foreground">№ {o.id.slice(0, 8).toUpperCase()}</div>
-                    <div className="text-sm">{new Date(o.created_at).toLocaleDateString("az-AZ")}</div>
+                    <div className="text-sm">{new Date(o.created_at).toLocaleDateString()}</div>
                     {o.shipping_address && <div className="text-xs text-muted-foreground mt-1 max-w-md truncate">{o.shipping_address}</div>}
                   </div>
                   <div className="flex items-center gap-4">
