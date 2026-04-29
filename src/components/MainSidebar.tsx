@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/sidebar";
 import {
   Home, LayoutGrid, Heart, ShoppingCart, MessageCircle, Package,
-  Bell, Tag, Gift, Store, User, HelpCircle, ChevronDown, ChevronRight, Shield, PackageOpen, Flame,
+  Bell, Tag, Gift, Store, User, HelpCircle, Shield, PackageOpen, Flame,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { catName } from "@/lib/catName";
