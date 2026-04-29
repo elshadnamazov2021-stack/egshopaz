@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { SponsoredProducts } from "@/components/SponsoredProducts";
 import { CatalogFilters, type Filters } from "@/components/CatalogFilters";
+import { catName } from "@/lib/catName";
 import { z } from "zod";
 
 const searchSchema = z.object({
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/catalog")({
   component: Catalog,
 });
 
-interface Category { id: string; name: string; slug: string; icon: string | null; parent_id: string | null }
+interface Category { id: string; name: string; name_ru?: string | null; name_en?: string | null; slug: string; icon: string | null; parent_id: string | null }
 
 function Catalog() {
   const { t } = useTranslation();
@@ -35,7 +36,7 @@ function Catalog() {
   const [filters, setFilters] = useState<Filters>({ sort: "newest" });
 
   useEffect(() => {
-    supabase.from("categories").select("*").order("sort_order").then(({ data }) => setCategories((data ?? []) as Category[]));
+    supabase.from("categories").select("id,name,name_ru,name_en,slug,icon,parent_id,sort_order").order("sort_order").then(({ data }) => setCategories((data ?? []) as Category[]));
   }, []);
 
   useEffect(() => {
@@ -82,7 +83,7 @@ function Catalog() {
       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
         <Link to="/" className="hover:text-primary">{t("home.breadcrumbHome")}</Link>
         <span>/</span>
-        <span className="text-foreground font-medium">{activeCat?.name ?? (q ? t("catalog.searchBreadcrumb", { q }) : t("catalog.title"))}</span>
+        <span className="text-foreground font-medium">{activeCat ? catName(activeCat) : (q ? t("catalog.searchBreadcrumb", { q }) : t("catalog.title"))}</span>
       </div>
 
       <div className="mb-6">
@@ -107,7 +108,7 @@ function Catalog() {
                   <button
                     onClick={() => setOpenParents((p) => ({ ...p, [c.id]: !isOpen }))}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm hover:bg-secondary text-left ${cat === c.slug ? "bg-secondary font-semibold text-primary" : ""}`}>
-                    <span>{c.icon} {c.name}</span>
+                    <span>{c.icon} {catName(c)}</span>
                     {kids.length > 0 && <span className="text-xs">{isOpen ? "−" : "+"}</span>}
                   </button>
                   {isOpen && kids.length > 0 && (
@@ -122,7 +123,7 @@ function Catalog() {
                         <li key={k.id}>
                           <Link to="/catalog" search={{ q, cat: k.slug } as never}
                                 className={`block px-2 py-1 rounded text-xs hover:bg-secondary ${cat === k.slug ? "font-semibold text-primary" : ""}`}>
-                            {k.icon} {k.name}
+                            {k.icon} {catName(k)}
                           </Link>
                         </li>
                       ))}
@@ -136,7 +137,7 @@ function Catalog() {
 
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold mb-4">
-            {activeCat?.name ?? (q ? t("catalog.searchResults", { q }) : t("catalog.allProducts"))}
+            {activeCat ? catName(activeCat) : (q ? t("catalog.searchResults", { q }) : t("catalog.allProducts"))}
             <span className="ml-2 text-sm text-muted-foreground font-normal">{t("catalog.productCount", { count: products.length })}</span>
           </h1>
 
