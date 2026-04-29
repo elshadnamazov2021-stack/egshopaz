@@ -102,7 +102,10 @@ function Catalog() {
             </li>
             {parents.map((c) => {
               const kids = childrenOf(c.id);
-              const isOpen = openParents[c.id] || activeCat?.parent_id === c.id || cat === c.slug;
+              const ancestorIds = new Set<string>();
+              let cur = activeCat;
+              while (cur?.parent_id) { ancestorIds.add(cur.parent_id); cur = categories.find((x) => x.id === cur!.parent_id); }
+              const isOpen = openParents[c.id] || ancestorIds.has(c.id) || cat === c.slug;
               return (
                 <li key={c.id}>
                   <button
@@ -119,14 +122,47 @@ function Catalog() {
                           {t("catalog.all")}
                         </Link>
                       </li>
-                      {kids.map((k) => (
-                        <li key={k.id}>
-                          <Link to="/catalog" search={{ q, cat: k.slug } as never}
-                                className={`block px-2 py-1 rounded text-xs hover:bg-secondary ${cat === k.slug ? "font-semibold text-primary" : ""}`}>
-                            {k.icon} {catName(k)}
-                          </Link>
-                        </li>
-                      ))}
+                      {kids.map((k) => {
+                        const grandKids = childrenOf(k.id);
+                        const kOpen = openParents[k.id] || ancestorIds.has(k.id) || cat === k.slug;
+                        return (
+                          <li key={k.id}>
+                            {grandKids.length > 0 ? (
+                              <>
+                                <button
+                                  onClick={() => setOpenParents((p) => ({ ...p, [k.id]: !kOpen }))}
+                                  className={`w-full flex items-center justify-between px-2 py-1 rounded text-xs hover:bg-secondary text-left ${cat === k.slug ? "font-semibold text-primary" : ""}`}>
+                                  <span>{k.icon} {catName(k)}</span>
+                                  <span className="text-[10px]">{kOpen ? "−" : "+"}</span>
+                                </button>
+                                {kOpen && (
+                                  <ul className="ml-3 mt-0.5 space-y-0.5 border-l border-border pl-2">
+                                    <li>
+                                      <Link to="/catalog" search={{ q, cat: k.slug } as never}
+                                            className={`block px-2 py-0.5 rounded text-[11px] hover:bg-secondary ${cat === k.slug ? "font-semibold text-primary" : "text-muted-foreground"}`}>
+                                        {t("catalog.all")}
+                                      </Link>
+                                    </li>
+                                    {grandKids.map((g) => (
+                                      <li key={g.id}>
+                                        <Link to="/catalog" search={{ q, cat: g.slug } as never}
+                                              className={`block px-2 py-0.5 rounded text-[11px] hover:bg-secondary ${cat === g.slug ? "font-semibold text-primary" : ""}`}>
+                                          {catName(g)}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </>
+                            ) : (
+                              <Link to="/catalog" search={{ q, cat: k.slug } as never}
+                                    className={`block px-2 py-1 rounded text-xs hover:bg-secondary ${cat === k.slug ? "font-semibold text-primary" : ""}`}>
+                                {k.icon} {catName(k)}
+                              </Link>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
                 </li>
