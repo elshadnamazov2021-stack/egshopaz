@@ -122,6 +122,8 @@ function Index() {
         <div className="absolute right-10 top-1/2 w-32 h-32 bg-discount/30 rounded-full blur-xl" />
       </section>
 
+      {/* Trendyol-style: kateqoriya seç → alt kateqoriyalar + brendlər */}
+      <HomeCategoryBrowser />
 
       {/* Visual Search Banner — bold AI-powered */}
       <section className="rounded-3xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-500 p-6 md:p-8 text-white shadow-elegant relative overflow-hidden">
