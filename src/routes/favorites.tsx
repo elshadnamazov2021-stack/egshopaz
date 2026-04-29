@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/favorites")({
 });
 
 function Favorites() {
+  const { t } = useTranslation();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [products, setProducts] = useState<ProductCardData[]>([]);
@@ -39,13 +41,13 @@ function Favorites() {
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="flex items-center gap-3 mb-6">
         <Heart className="h-7 w-7 text-discount" />
-        <h1 className="text-2xl md:text-3xl font-extrabold">Sevimlilərim</h1>
+        <h1 className="text-2xl md:text-3xl font-extrabold">{t("favorites.title")}</h1>
         <span className="text-muted-foreground text-sm">({products.length})</span>
       </div>
       {products.length === 0 ? (
         <div className="bg-secondary/40 rounded-2xl p-12 text-center text-muted-foreground">
           <Heart className="h-12 w-12 mx-auto mb-3 opacity-40" />
-          Hələ sevimli məhsul yoxdur
+          {t("favorites.empty")}
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
