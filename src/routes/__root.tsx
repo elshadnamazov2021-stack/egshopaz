@@ -3,6 +3,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { CategoryBar } from "@/components/CategoryBar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { MainSidebar } from "@/components/MainSidebar";
 import "@/i18n";
