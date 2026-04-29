@@ -22,67 +22,67 @@ export function QRScannerDialog({ open, onOpenChange, onScan, title = "QR / Ştr
   const scannerRef = useRef<QrScanner | null>(null);
   const [hasFlash, setHasFlash] = useState(false);
   const [flashOn, setFlashOn] = useState(false);
+  const [started, setStarted] = useState(false);
+  const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastValue, setLastValue] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!open || !videoRef.current) return;
-    setError(null);
-    setLastValue(null);
-
-    let cancelled = false;
-    let scanner: QrScanner | null = null;
-
-    (async () => {
-      try {
-        const hasCam = await QrScanner.hasCamera();
-        if (!hasCam) {
-          setError("Bu cihazda kamera tapılmadı. Şəkildən QR oxuya bilərsiniz.");
-          return;
-        }
-        if (!videoRef.current || cancelled) return;
-        scanner = new QrScanner(
-          videoRef.current,
-          (res) => {
-            if (!res?.data) return;
-            setLastValue(res.data);
-            scanner?.stop();
-          },
-          {
-            preferredCamera: "environment",
-            highlightScanRegion: true,
-            highlightCodeOutline: true,
-            maxScansPerSecond: 5,
-            returnDetailedScanResult: true,
-          }
-        );
-        scannerRef.current = scanner;
-        await scanner.start();
-        try { setHasFlash(await scanner.hasFlash()); } catch { /* ignore */ }
-      } catch (e: any) {
-        const msg = String(e?.name || e?.message || "");
-        if (msg.includes("NotAllowed") || msg.includes("Permission")) {
-          setError("Kamera icazəsi verilməyib. Brauzer parametrlərindən icazə verin və yenidən cəhd edin.");
-        } else if (msg.includes("NotFound") || msg.includes("DevicesNotFound")) {
-          setError("Kamera tapılmadı. Şəkildən QR seçə bilərsiniz.");
-        } else if (msg.includes("NotReadable") || msg.includes("TrackStart")) {
-          setError("Kamera başqa proqram tərəfindən istifadə olunur. Digər kamera proqramlarını bağlayın.");
-        } else if (location.protocol !== "https:" && location.hostname !== "localhost") {
-          setError("Kamera yalnız HTTPS-də işləyir. Saytı HTTPS ilə açın.");
-        } else {
-          setError(e?.message || "Kameraya giriş alınmadı.");
-        }
-      }
-    })();
-
+    if (open) { setError(null); setLastValue(null); setStarted(false); setStarting(false); }
     return () => {
-      cancelled = true;
-      try { scanner?.stop(); } catch { /* ignore */ }
-      try { scanner?.destroy(); } catch { /* ignore */ }
+      try { scannerRef.current?.stop(); } catch { /* ignore */ }
+      try { scannerRef.current?.destroy(); } catch { /* ignore */ }
       scannerRef.current = null;
       setFlashOn(false);
+      setHasFlash(false);
     };
   }, [open]);
+
+  const startScan = async () => {
+    if (!videoRef.current || starting) return;
+    setError(null);
+    setLastValue(null);
+    setStarting(true);
+    try {
+      try { scannerRef.current?.destroy(); } catch { /* ignore */ }
+      const scanner = new QrScanner(
+        videoRef.current,
+        (res) => {
+          if (!res?.data) return;
+          setLastValue(res.data);
+          setStarted(false);
+          scanner.stop();
+        },
+        {
+          preferredCamera: "environment",
+          highlightScanRegion: true,
+          highlightCodeOutline: true,
+          maxScansPerSecond: 5,
+          returnDetailedScanResult: true,
+        }
+      );
+      scannerRef.current = scanner;
+      await scanner.start();
+      setStarted(true);
+      try { setHasFlash(await scanner.hasFlash()); } catch { setHasFlash(false); }
+    } catch (e: any) {
+      const msg = String(e?.name || e?.message || "");
+      setStarted(false);
+      if (msg.includes("NotAllowed") || msg.includes("Permission")) {
+        setError("Kamera icazəsi verilməyib. Brauzer parametrlərindən icazə verin və yenidən cəhd edin.");
+      } else if (msg.includes("NotFound") || msg.includes("DevicesNotFound")) {
+        setError("Kamera tapılmadı. Şəkildən QR seçə bilərsiniz.");
+      } else if (msg.includes("NotReadable") || msg.includes("TrackStart")) {
+        setError("Kamera başqa proqram tərəfindən istifadə olunur. Digər kamera proqramlarını bağlayın.");
+      } else if (location.protocol !== "https:" && location.hostname !== "localhost") {
+        setError("Kamera yalnız HTTPS-də işləyir. Saytı HTTPS ilə açın.");
+      } else {
+        setError(e?.message || "Kameraya giriş alınmadı.");
+      }
+    } finally {
+      setStarting(false);
+    }
+  };
 
   const accept = () => {
     if (!lastValue) return;
@@ -92,7 +92,7 @@ export function QRScannerDialog({ open, onOpenChange, onScan, title = "QR / Ştr
 
   const rescan = () => {
     setLastValue(null);
-    scannerRef.current?.start().catch(() => {});
+    startScan();
   };
 
   const toggleFlash = async () => {
