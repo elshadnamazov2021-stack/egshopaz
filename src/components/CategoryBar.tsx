@@ -8,6 +8,7 @@ interface Category { id: string; name: string; name_ru?: string | null; name_en?
 
 export function CategoryBar() {
   const { t } = useTranslation();
+  const location = useLocation();
   const [cats, setCats] = useState<Category[]>([]);
 
   useEffect(() => {
@@ -19,6 +20,8 @@ export function CategoryBar() {
       .then(({ data }) => setCats((data ?? []) as Category[]));
   }, []);
 
+  // Ana səhifədə HomeCategoryBrowser göstərilir, bu bar yalnız digər səhifələrdə görünür
+  if (location.pathname === "/") return null;
   if (cats.length === 0) return null;
 
   return (
