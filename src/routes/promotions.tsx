@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { PanelLayout } from "@/components/PanelLayout";
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/promotions")({
 interface Promo { id: string; code: string; discount_percent: number | null; discount_amount: number | null; min_order: number; expires_at: string | null }
 
 function PromotionsPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { items } = useBuyerNav();
   const [promos, setPromos] = useState<Promo[]>([]);
@@ -33,9 +35,9 @@ function PromotionsPage() {
   };
 
   return (
-    <PanelLayout title="Müştərinin şəxsi kabineti" subtitle={user?.email ?? "Aksiyalar"} items={items}>
+    <PanelLayout title={t("sidebar.buyerPanelTitle")} subtitle={user?.email ?? t("promotions.title")} items={items}>
       <div>
-        <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2"><Gift className="h-6 w-6 text-primary" /> Aksiyalar və promokodlar</h1>
+        <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2"><Gift className="h-6 w-6 text-primary" /> {t("promotions.title")}</h1>
 
         <div className="grid sm:grid-cols-3 gap-3 mb-6">
           {[
@@ -51,10 +53,10 @@ function PromotionsPage() {
           ))}
         </div>
 
-        <h2 className="font-bold mb-3">Aktiv promokodlar</h2>
+        <h2 className="font-bold mb-3">{t("promotions.title")}</h2>
         {promos.length === 0 ? (
           <div className="bg-secondary/40 rounded-2xl p-12 text-center text-muted-foreground">
-            Hal-hazırda aktiv promokod yoxdur. Tezliklə yenilərini gözləyin!
+            {t("promotions.empty")}
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-3">
