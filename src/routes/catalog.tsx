@@ -36,7 +36,7 @@ function Catalog() {
   const [filters, setFilters] = useState<Filters>({ sort: "newest" });
 
   useEffect(() => {
-    supabase.from("categories").select("*").order("sort_order").then(({ data }) => setCategories((data ?? []) as Category[]));
+    supabase.from("categories").select("id,name,name_ru,name_en,slug,icon,parent_id,sort_order").order("sort_order").then(({ data }) => setCategories((data ?? []) as Category[]));
   }, []);
 
   useEffect(() => {
