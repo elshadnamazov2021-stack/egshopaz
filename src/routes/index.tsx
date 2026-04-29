@@ -121,23 +121,6 @@ function Index() {
         <div className="absolute right-10 top-1/2 w-32 h-32 bg-discount/30 rounded-full blur-xl" />
       </section>
 
-      {/* Categories — bigger, bolder */}
-      <section>
-        <div className="flex items-end justify-between mb-4">
-          <h2 className="text-2xl md:text-3xl font-black">{t("home.categoriesTitle")}</h2>
-        </div>
-        <div className="flex gap-3 md:gap-4 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-none">
-          {categories.map((c) => (
-            <Link key={c.id} to="/catalog" search={{ cat: c.slug, q: undefined } as never}
-                  className="shrink-0 w-28 md:w-32 flex flex-col items-center gap-2 group">
-              <div className="w-24 h-24 md:w-28 md:h-28 rounded-3xl bg-gradient-soft flex items-center justify-center text-4xl md:text-5xl group-hover:shadow-elegant group-hover:scale-105 transition border-2 border-transparent group-hover:border-primary/30">
-                {c.icon}
-              </div>
-              <span className="text-sm text-center font-bold leading-tight">{catName(c)}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
 
       {/* Visual Search Banner — bold AI-powered */}
       <section className="rounded-3xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-500 p-6 md:p-8 text-white shadow-elegant relative overflow-hidden">
