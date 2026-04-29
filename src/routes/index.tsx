@@ -93,37 +93,9 @@ function Index() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-8 md:space-y-10">
-      {/* 1) Öne Çıxan Kateqoriyalar + Markalar — axtarış bölməsinin altında sabit */}
+    <div className="container mx-auto px-3 md:px-4 py-4 space-y-6 md:space-y-8">
+      {/* 1) Tablar + Banner + Kateqoriyalar + Markalar (Trendyol-style hub) */}
       <HomeCategoryBrowser />
-
-      {/* 2) HERO — bold gradient banner (Trendyol-style top banner) */}
-      <section className="relative rounded-3xl overflow-hidden bg-gradient-brand text-primary-foreground p-8 md:p-16 shadow-elegant">
-        <div className="max-w-2xl space-y-5 relative z-10">
-          <span className="inline-flex items-center gap-2 bg-background/25 backdrop-blur px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
-            <Sparkles className="h-3.5 w-3.5" /> {t("home.newSeasonBadge")}
-          </span>
-          <h1 className="text-4xl md:text-7xl font-black leading-[0.95] tracking-tight">
-            {t("home.heroLine1")} <br /> {t("home.heroLine2")}
-          </h1>
-          <p className="text-lg md:text-2xl opacity-95 font-medium max-w-lg">
-            {t("home.heroDesc")}
-          </p>
-          <div className="flex flex-wrap gap-3 pt-2">
-            <Link to="/catalog" search={{ q: undefined, cat: undefined } as never}
-                  className="inline-flex items-center gap-2 bg-background text-primary px-7 py-4 rounded-xl font-extrabold hover:scale-105 transition shadow-elegant">
-              {t("home.startShopping")} <ArrowRight className="h-5 w-5" />
-            </Link>
-            <Link to="/discover"
-                  className="inline-flex items-center gap-2 bg-background/20 backdrop-blur text-primary-foreground border-2 border-background/40 px-7 py-4 rounded-xl font-extrabold hover:bg-background/30 transition">
-              <Flame className="h-5 w-5" /> {t("home.discover")}
-            </Link>
-          </div>
-        </div>
-        <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-background/15 rounded-full blur-3xl" />
-        <div className="absolute right-32 top-10 w-56 h-56 bg-warning/30 rounded-full blur-2xl" />
-        <div className="absolute right-10 top-1/2 w-32 h-32 bg-discount/30 rounded-full blur-xl" />
-      </section>
 
       {/* Visual Search Banner — bold AI-powered */}
       <section className="rounded-3xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-500 p-6 md:p-8 text-white shadow-elegant relative overflow-hidden">
