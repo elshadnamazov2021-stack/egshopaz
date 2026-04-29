@@ -22,7 +22,7 @@ export function SiteFooter() {
         </div>
         <div>
           <h4 className="font-bold mb-3">Elzan Shop</h4>
-          <p className="text-muted-foreground">Marketplace</p>
+          <p className="text-muted-foreground">{t("footer.shopBrand")}</p>
         </div>
         <div>
           <h4 className="font-bold mb-3">{t("header.language")}</h4>

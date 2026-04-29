@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, lazy, Suspense } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { SponsoredProducts } from "@/components/SponsoredProducts";
@@ -27,6 +28,7 @@ interface Category { id: string; name: string; slug: string; icon: string | null
 interface PromoCode { id: string; code: string; discount_percent: number | null; discount_amount: number | null; min_order: number; expires_at: string | null }
 
 function Index() {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<Category[]>([]);
   const [allProducts, setAllProducts] = useState<ProductCardData[]>([]);
   const [discounted, setDiscounted] = useState<ProductCardData[]>([]);
@@ -87,7 +89,7 @@ function Index() {
 
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
-    toast.success(`${code} kopyalandı`);
+    toast.success(t("home.codeCopied", { code }));
   };
 
   return (
@@ -96,22 +98,22 @@ function Index() {
       <section className="relative rounded-3xl overflow-hidden bg-gradient-brand text-primary-foreground p-8 md:p-16 shadow-elegant">
         <div className="max-w-2xl space-y-5 relative z-10">
           <span className="inline-flex items-center gap-2 bg-background/25 backdrop-blur px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
-            <Sparkles className="h-3.5 w-3.5" /> Yeni mövsüm endirimləri
+            <Sparkles className="h-3.5 w-3.5" /> {t("home.newSeasonBadge")}
           </span>
           <h1 className="text-4xl md:text-7xl font-black leading-[0.95] tracking-tight">
-            Hər şey <br /> bir yerdə.
+            {t("home.heroLine1")} <br /> {t("home.heroLine2")}
           </h1>
           <p className="text-lg md:text-2xl opacity-95 font-medium max-w-lg">
-            Milyonlarla məhsul. 70%-ə qədər endirim. Bütün ölkə üzrə pulsuz çatdırılma.
+            {t("home.heroDesc")}
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
             <Link to="/catalog" search={{ q: undefined, cat: undefined } as never}
                   className="inline-flex items-center gap-2 bg-background text-primary px-7 py-4 rounded-xl font-extrabold hover:scale-105 transition shadow-elegant">
-              Alış-verişə başla <ArrowRight className="h-5 w-5" />
+              {t("home.startShopping")} <ArrowRight className="h-5 w-5" />
             </Link>
             <Link to="/discover"
                   className="inline-flex items-center gap-2 bg-background/20 backdrop-blur text-primary-foreground border-2 border-background/40 px-7 py-4 rounded-xl font-extrabold hover:bg-background/30 transition">
-              <Flame className="h-5 w-5" /> Kəşfet
+              <Flame className="h-5 w-5" /> {t("home.discover")}
             </Link>
           </div>
         </div>
@@ -123,7 +125,7 @@ function Index() {
       {/* Categories — bigger, bolder */}
       <section>
         <div className="flex items-end justify-between mb-4">
-          <h2 className="text-2xl md:text-3xl font-black">Kateqoriyalar</h2>
+          <h2 className="text-2xl md:text-3xl font-black">{t("home.categoriesTitle")}</h2>
         </div>
         <div className="flex gap-3 md:gap-4 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-none">
           {categories.map((c) => (
@@ -145,20 +147,20 @@ function Index() {
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-bold">
-              <Sparkles className="h-3.5 w-3.5" /> AI POWERED · YENİ
+              <Sparkles className="h-3.5 w-3.5" /> {t("home.visualBadge")}
             </div>
             <h2 className="text-2xl md:text-4xl font-black leading-tight">
-              Şəkillə axtar 📸
+              {t("home.visualTitle")}
             </h2>
             <p className="text-sm md:text-base opacity-95 max-w-md">
-              Bəyəndiyin məhsulun şəklini çək — AI tanıyıb dərhal sənə oxşarını tapsın.
+              {t("home.visualDesc")}
             </p>
           </div>
           <button
             onClick={() => setVisualOpen(true)}
             className="inline-flex items-center gap-2 bg-white text-fuchsia-700 px-6 py-4 rounded-xl font-extrabold hover:scale-105 transition shadow-elegant whitespace-nowrap"
           >
-            <Camera className="h-5 w-5" /> İndi sına
+            <Camera className="h-5 w-5" /> {t("home.visualBtn")}
           </button>
         </div>
       </section>
@@ -167,11 +169,11 @@ function Index() {
           <div className="flex items-center justify-between mb-5">
             <div>
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-bold mb-2">
-                <Tag className="h-3.5 w-3.5" /> 70% ENDİRİM
+                <Tag className="h-3.5 w-3.5" /> {t("home.discountBadge")}
               </div>
-              <h2 className="text-2xl md:text-4xl font-black">Endirimli qiymətlər</h2>
+              <h2 className="text-2xl md:text-4xl font-black">{t("home.discountTitle")}</h2>
             </div>
-            <Link to="/discover" className="text-sm font-bold hover:underline whitespace-nowrap">Hamısına bax →</Link>
+            <Link to="/discover" className="text-sm font-bold hover:underline whitespace-nowrap">{t("home.viewAllArrow")}</Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 bg-white rounded-2xl p-3">
             {discounted.slice(0, 5).map((p) => <ProductCard key={p.id} p={p} />)}
@@ -185,9 +187,9 @@ function Index() {
           <div className="flex items-end justify-between mb-4">
             <div>
               <div className="inline-flex items-center gap-2 text-success font-bold text-xs uppercase mb-1">
-                <TicketPercent className="h-4 w-4" /> Aktiv kuponlar
+                <TicketPercent className="h-4 w-4" /> {t("home.promoBadge")}
               </div>
-              <h2 className="text-2xl md:text-3xl font-black">Kuponlu məhsullar</h2>
+              <h2 className="text-2xl md:text-3xl font-black">{t("home.promoTitle")}</h2>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -199,7 +201,7 @@ function Index() {
                     <div className="text-3xl font-black mb-1">
                       {p.discount_percent ? `-${p.discount_percent}%` : `-${p.discount_amount} ₼`}
                     </div>
-                    <div className="text-xs opacity-90">Min. sifariş: {p.min_order} ₼</div>
+                    <div className="text-xs opacity-90">{t("home.promoMinOrder")}: {p.min_order} ₼</div>
                   </div>
                   <button onClick={() => copyCode(p.code)}
                           className="bg-white text-success px-4 py-2.5 rounded-xl font-black text-sm flex items-center gap-2 hover:scale-105 transition">
@@ -224,11 +226,11 @@ function Index() {
                 <Flame className="h-6 w-6 text-white" />
               </div>
               <div>
-                <div className="text-xs text-muted-foreground font-bold uppercase">Hamı baxır</div>
-                <h2 className="text-2xl md:text-3xl font-black">Trend məhsullar</h2>
+                <div className="text-xs text-muted-foreground font-bold uppercase">{t("home.trendingSubtitle")}</div>
+                <h2 className="text-2xl md:text-3xl font-black">{t("home.trendingTitle")}</h2>
               </div>
             </div>
-            <Link to="/discover" className="text-sm text-primary font-bold hover:underline">Hamısı →</Link>
+            <Link to="/discover" className="text-sm text-primary font-bold hover:underline">{t("home.viewAllArrow")}</Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
             {trending.slice(0, 10).map((p) => <ProductCard key={p.id} p={p} />)}
@@ -248,8 +250,8 @@ function Index() {
                 <Heart className="h-6 w-6 text-white fill-white" />
               </div>
               <div>
-                <div className="text-xs text-muted-foreground font-bold uppercase">Müştəri seçimi</div>
-                <h2 className="text-2xl md:text-3xl font-black">Ən çox sevilənlər</h2>
+                <div className="text-xs text-muted-foreground font-bold uppercase">{t("home.favoritesSubtitle")}</div>
+                <h2 className="text-2xl md:text-3xl font-black">{t("home.favoritesTitle")}</h2>
               </div>
             </div>
           </div>
@@ -262,10 +264,10 @@ function Index() {
       {/* Benefits */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {[
-          { icon: Truck, t: "Pulsuz çatdırılma", s: "50 ₼-dən yuxarı", color: "from-violet-500 to-purple-500" },
-          { icon: ShieldCheck, t: "Zəmanət", s: "Bütün məhsullara", color: "from-emerald-500 to-teal-500" },
-          { icon: Tag, t: "Endirimlər", s: "Hər gün", color: "from-rose-500 to-pink-500" },
-          { icon: Clock, t: "24/7 dəstək", s: "Hər zaman", color: "from-amber-500 to-orange-500" },
+          { icon: Truck, t: t("home.benefitFreeShipping"), s: t("home.benefitFreeShippingDesc"), color: "from-violet-500 to-purple-500" },
+          { icon: ShieldCheck, t: t("home.benefitWarranty"), s: t("home.benefitWarrantyDesc"), color: "from-emerald-500 to-teal-500" },
+          { icon: Tag, t: t("home.benefitDiscounts"), s: t("home.benefitDiscountsDesc"), color: "from-rose-500 to-pink-500" },
+          { icon: Clock, t: t("home.benefitSupport"), s: t("home.benefitSupportDesc"), color: "from-amber-500 to-orange-500" },
         ].map((b, i) => (
           <div key={i} className="bg-card border-2 border-border rounded-2xl p-4 flex items-center gap-3 hover:border-primary/40 hover:shadow-card transition">
             <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${b.color} flex items-center justify-center text-white shrink-0`}>
@@ -286,16 +288,16 @@ function Index() {
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center shadow-card">
               <TrendingUp className="h-6 w-6 text-white" />
             </div>
-            <h2 className="text-2xl md:text-3xl font-black">Sizin üçün</h2>
+            <h2 className="text-2xl md:text-3xl font-black">{t("home.forYou")}</h2>
           </div>
           <Link to="/catalog" search={{ q: undefined, cat: undefined } as never} className="text-sm text-primary font-bold hover:underline">
-            Hamısına bax →
+            {t("home.viewAllArrow")}
           </Link>
         </div>
         {allProducts.length === 0 ? (
           <div className="text-center py-16 bg-secondary/40 rounded-2xl">
-            <p className="text-muted-foreground mb-2">Hələ məhsul əlavə olunmayıb</p>
-            <Link to="/become-seller" className="text-primary font-bold hover:underline">İlk satıcı olun →</Link>
+            <p className="text-muted-foreground mb-2">{t("home.noProducts")}</p>
+            <Link to="/become-seller" className="text-primary font-bold hover:underline">{t("home.becomeFirstSeller")}</Link>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">

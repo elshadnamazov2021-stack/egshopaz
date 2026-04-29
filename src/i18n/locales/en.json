@@ -38,7 +38,10 @@
     "saveError": "Could not save",
     "free": "Free",
     "apply": "Apply",
-    "retry": "Retry"
+    "retry": "Retry",
+    "loading_dots": "Loading...",
+    "notFound": "Not found",
+    "noImage": "No image"
   },
   "header": {
     "favorites": "Favorites",
@@ -83,7 +86,8 @@
     "contact": "Contact",
     "terms": "Terms",
     "privacy": "Privacy",
-    "rights": "All rights reserved"
+    "rights": "All rights reserved",
+    "shopBrand": "Marketplace"
   },
   "home": {
     "heroTitle": "Everything in one place",
@@ -93,7 +97,41 @@
     "newArrivals": "New arrivals",
     "categories": "Categories",
     "viewAll": "View all",
-    "breadcrumbHome": "Home"
+    "breadcrumbHome": "Home",
+    "newSeasonBadge": "New season discounts",
+    "heroLine1": "Everything",
+    "heroLine2": "in one place.",
+    "heroDesc": "Millions of products. Up to 70% off. Free delivery nationwide.",
+    "startShopping": "Start shopping",
+    "discover": "Discover",
+    "categoriesTitle": "Categories",
+    "visualBadge": "AI POWERED · NEW",
+    "visualTitle": "Search by photo 📸",
+    "visualDesc": "Snap a photo of any product — AI will find similar items instantly.",
+    "visualBtn": "Try now",
+    "discountBadge": "70% OFF",
+    "discountTitle": "Discounted prices",
+    "viewAllArrow": "View all →",
+    "promoBadge": "Active coupons",
+    "promoTitle": "Products with coupons",
+    "promoMinOrder": "Min. order",
+    "trendingSubtitle": "Everyone's watching",
+    "trendingTitle": "Trending products",
+    "favoritesSubtitle": "Customer favorites",
+    "favoritesTitle": "Most loved",
+    "benefitFreeShipping": "Free shipping",
+    "benefitFreeShippingDesc": "Over 50 ₼",
+    "benefitWarranty": "Warranty",
+    "benefitWarrantyDesc": "On all products",
+    "benefitDiscounts": "Discounts",
+    "benefitDiscountsDesc": "Every day",
+    "benefitSupport": "24/7 support",
+    "benefitSupportDesc": "Anytime",
+    "forYou": "For you",
+    "noProducts": "No products yet",
+    "becomeFirstSeller": "Become the first seller →",
+    "codeCopied": "{{code}} copied",
+    "visualSearchTitle": "Search by photo (AI)"
   },
   "catalog": {
     "title": "Catalog",
@@ -131,7 +169,22 @@
     "outOfStock": "Out of stock",
     "shipping": "Shipping",
     "seller": "Seller",
-    "rating": "Rating"
+    "rating": "Rating",
+    "noImage": "No image",
+    "notFound": "Product not found",
+    "home": "Home",
+    "reviewsShort": "{{count}} reviews",
+    "fastDelivery": "Fast delivery",
+    "originalProduct": "Original product",
+    "stockUnits": "{{count}} units",
+    "stockLabel": "In stock",
+    "writeShop": "Message shop",
+    "shopMsgPlaceholder": "Write a message to the shop...",
+    "msgSent": "Message sent",
+    "addedToCart": "Added to cart",
+    "addedToFavorites": "Added to favorites",
+    "favoriteAria": "Favorite",
+    "buyer": "Buyer"
   },
   "cart": {
     "title": "Cart",
@@ -272,7 +325,16 @@
     "empty": "No promotions"
   },
   "discover": {
-    "title": "Discover"
+    "title": "Discover",
+    "tabTrending": "Trending",
+    "tabDiscounted": "Discounts",
+    "tabFavorites": "Most loved",
+    "tabTopRated": "Top rated",
+    "tabNewest": "New",
+    "headerBadge": "DISCOVER",
+    "headerDesc": "The most interesting products for you",
+    "empty": "No products in this category yet",
+    "goToCatalog": "Go to catalog →"
   },
   "support": {
     "title": "Support",
@@ -380,5 +442,14 @@
   },
   "categoryBar": {
     "all": "All"
+  },
+  "shop": {
+    "title": "Shop",
+    "notFound": "Shop not found",
+    "productsCount": "{{count}} products",
+    "reviewsCount": "({{count}} reviews)",
+    "shopProducts": "Shop products",
+    "noProducts": "No products yet",
+    "defaultName": "Shop"
   }
 }

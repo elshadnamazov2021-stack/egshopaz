@@ -71,7 +71,7 @@ export function SiteHeader() {
             <button
               type="button"
               onClick={() => setVisualOpen(true)}
-              title="Şəkillə axtar (AI)"
+              title={t("home.visualSearchTitle")}
               className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-primary/10 text-primary transition"
             >
               <Camera className="h-5 w-5" />
@@ -83,7 +83,7 @@ export function SiteHeader() {
           <LanguageSwitcher />
           <Link to="/discover" className="hidden md:flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
             <span className="h-5 w-5 mb-0.5 text-base">🔥</span>
-            <span>Kəşfet</span>
+            <span>{t("sidebar.discover")}</span>
           </Link>
           <Link to="/favorites" className="relative flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
             <Heart className="h-5 w-5 mb-0.5" />
@@ -155,7 +155,7 @@ export function SiteHeader() {
           <button
             type="button"
             onClick={() => setVisualOpen(true)}
-            title="Şəkillə axtar"
+            title={t("home.visualSearchTitle")}
             className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-primary/10 text-primary transition"
           >
             <Camera className="h-4 w-4" />
