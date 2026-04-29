@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import {
   User as UserIcon, Package, MapPin, CreditCard, Star,
-  Gift, Bell, MessageCircle, Coins, Store,
+  Gift, Bell, MessageCircle, Coins, Store, AlertTriangle,
 } from "lucide-react";
 import type { PanelNavItem } from "@/components/PanelLayout";
 
@@ -46,6 +46,7 @@ export function useBuyerNav(): { items: PanelNavItem[]; bonusBalance: number } {
     { to: "/promotions", label: "Aksiyalar", icon: Gift },
     { to: "/bonus", label: "Bonus xallar", icon: Coins, badge: bonusBalance },
     { to: "/notifications", label: "Bildirişlər", icon: Bell },
+    { to: "/disputes", label: "Mübahisələr", icon: AlertTriangle },
     { to: "/support", label: "Dəstək", icon: MessageCircle, badge: openTickets },
     ...(!isSeller ? [{ to: "/become-seller", label: "Mağaza aç", icon: Store }] : []),
   ];

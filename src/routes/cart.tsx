@@ -26,30 +26,45 @@ function CartPage() {
   const [loading, setLoading] = useState(true);
   const [placing, setPlacing] = useState(false);
   const [address, setAddress] = useState("");
+  const [promo, setPromo] = useState("");
+  const [promoInfo, setPromoInfo] = useState<{ code: string; discount: number } | null>(null);
+  const [bonusBalance, setBonusBalance] = useState(0);
+  const [bonusToUse, setBonusToUse] = useState(0);
+  const [bonusToAzn, setBonusToAzn] = useState(0.01);
 
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const { data } = await supabase.from("cart_items")
-      .select("id,quantity,product_id,products(id,title,price,image_url,stock,seller_id)")
-      .eq("user_id", user.id);
-    setItems((data ?? []) as unknown as CartRow[]);
+    const [cart, prof, settings] = await Promise.all([
+      supabase.from("cart_items")
+        .select("id,quantity,product_id,products(id,title,price,image_url,stock,seller_id)")
+        .eq("user_id", user.id),
+      supabase.from("profiles").select("bonus_balance").eq("id", user.id).maybeSingle(),
+      supabase.from("system_settings").select("bonus_to_azn").limit(1).maybeSingle(),
+    ]);
+    setItems((cart.data ?? []) as unknown as CartRow[]);
+    setBonusBalance(prof.data?.bonus_balance ?? 0);
+    setBonusToAzn(Number(settings.data?.bonus_to_azn ?? 0.01));
     setLoading(false);
   };
 
   useEffect(() => { if (user) load(); else if (!authLoading) setLoading(false); }, [user, authLoading]);
 
-  if (!authLoading && !user) {
-    return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-        <h2 className="text-2xl font-bold mb-2">Səbətə baxmaq üçün daxil olun</h2>
-        <Link to="/auth" className="inline-block mt-4 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold">
-          Daxil ol
-        </Link>
-      </div>
-    );
-  }
+  const applyPromo = async () => {
+    const code = promo.trim().toUpperCase();
+    if (!code) return;
+    const { data } = await supabase.from("promo_codes")
+      .select("code,discount_percent,discount_amount,min_order,is_active,expires_at,usage_limit,used_count")
+      .eq("code", code).eq("is_active", true).maybeSingle();
+    if (!data) { toast.error("Promo kod tapılmadı"); return; }
+    if (data.expires_at && new Date(data.expires_at) < new Date()) { toast.error("Vaxtı keçib"); return; }
+    if (data.usage_limit && data.used_count >= data.usage_limit) { toast.error("Limit dolub"); return; }
+    if (Number(data.min_order) > total) { toast.error(`Min sifariş: ${formatAZN(Number(data.min_order))}`); return; }
+    const disc = data.discount_amount ? Number(data.discount_amount) : Math.round(total * (data.discount_percent ?? 0)) / 100;
+    setPromoInfo({ code: data.code, discount: disc });
+    toast.success(`Promo tətbiq olundu: -${formatAZN(disc)}`);
+  };
+
 
   const updateQty = async (id: string, qty: number) => {
     if (qty < 1) return;
@@ -62,15 +77,26 @@ function CartPage() {
     load();
   };
 
-  const total = items.reduce((s, it) => s + (it.products ? Number(it.products.price) * it.quantity : 0), 0);
+  const subtotal = items.reduce((s, it) => s + (it.products ? Number(it.products.price) * it.quantity : 0), 0);
+  const total = subtotal;
+  const bonusDiscount = bonusToUse * bonusToAzn;
+  const promoDiscount = promoInfo?.discount ?? 0;
+  const finalTotal = Math.max(0, subtotal - promoDiscount - bonusDiscount);
+  const maxBonus = Math.min(bonusBalance, Math.floor(subtotal / bonusToAzn));
 
   const checkout = async () => {
     if (!user || items.length === 0) return;
     if (!address.trim()) { toast.error("Çatdırılma ünvanını daxil edin"); return; }
     setPlacing(true);
     const { data: order, error } = await supabase.from("orders").insert({
-      buyer_id: user.id, total, shipping_address: address, status: "pending",
-    }).select().single();
+      buyer_id: user.id,
+      total: finalTotal,
+      shipping_address: address,
+      status: "pending",
+      promo_code: promoInfo?.code ?? null,
+      discount: promoDiscount + bonusDiscount,
+      bonus_used: bonusToUse,
+    } as never).select().single();
     if (error || !order) { toast.error("Sifariş yaradıla bilmədi"); setPlacing(false); return; }
 
     const orderItems = items.filter((i) => i.products).map((i) => ({
@@ -83,11 +109,32 @@ function CartPage() {
       image_url: i.products!.image_url,
     }));
     await supabase.from("order_items").insert(orderItems);
+
+    if (bonusToUse > 0) {
+      await supabase.from("bonus_transactions").insert({
+        user_id: user.id, amount: -bonusToUse, reason: "Sifarişdə istifadə", order_id: order.id,
+      } as never);
+      await supabase.from("profiles").update({ bonus_balance: bonusBalance - bonusToUse }).eq("id", user.id);
+    }
+    if (promoInfo) {
+      await supabase.rpc("noop" as never).then(() => {});
+    }
+
     await supabase.from("cart_items").delete().eq("user_id", user.id);
     toast.success("Sifariş qəbul olundu!");
     setPlacing(false);
-    navigate({ to: "/profile" });
+    navigate({ to: "/orders" });
   };
+
+  if (!authLoading && !user) {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+        <h2 className="text-2xl font-bold mb-2">Səbətə baxmaq üçün daxil olun</h2>
+        <Link to="/auth" className="inline-block mt-4 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold">Daxil ol</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -132,28 +179,64 @@ function CartPage() {
             <h3 className="font-bold text-lg">Sifariş yekunu</h3>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Məhsullar ({items.length})</span>
-              <span className="font-semibold">{formatAZN(total)}</span>
+              <span className="font-semibold">{formatAZN(subtotal)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Çatdırılma</span>
               <span className="font-semibold text-success">Pulsuz</span>
             </div>
+
+            <div className="border-t border-border pt-3 space-y-2">
+              <label className="text-xs font-semibold text-muted-foreground">Promo kod</label>
+              {promoInfo ? (
+                <div className="flex items-center justify-between bg-primary/10 rounded-lg p-2 text-sm">
+                  <span className="font-mono font-bold">{promoInfo.code}</span>
+                  <button onClick={() => setPromoInfo(null)} className="text-xs text-rose-500">Sil</button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input value={promo} onChange={(e) => setPromo(e.target.value.toUpperCase())}
+                    placeholder="KOD" maxLength={32}
+                    className="flex-1 border border-input rounded-lg px-3 h-9 text-sm font-mono uppercase" />
+                  <button onClick={applyPromo} className="bg-secondary hover:bg-secondary/80 px-3 h-9 rounded-lg text-sm font-bold">Tətbiq</button>
+                </div>
+              )}
+              {promoInfo && (
+                <div className="flex justify-between text-sm text-success">
+                  <span>Promo endirimi</span><span>−{formatAZN(promoDiscount)}</span>
+                </div>
+              )}
+            </div>
+
+            {bonusBalance > 0 && (
+              <div className="border-t border-border pt-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-muted-foreground">Bonus istifadə et</label>
+                  <span className="text-xs">Balans: <b>{bonusBalance}</b></span>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <input type="number" min={0} max={maxBonus} value={bonusToUse}
+                    onChange={(e) => setBonusToUse(Math.min(maxBonus, Math.max(0, parseInt(e.target.value || "0"))))}
+                    className="flex-1 border border-input rounded-lg px-3 h-9 text-sm" />
+                  <button onClick={() => setBonusToUse(maxBonus)} className="text-xs bg-secondary hover:bg-secondary/80 px-2 h-9 rounded-lg font-bold">Hamısı</button>
+                </div>
+                {bonusToUse > 0 && (
+                  <div className="flex justify-between text-sm text-success">
+                    <span>Bonus endirimi</span><span>−{formatAZN(bonusDiscount)}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="border-t border-border pt-3 flex justify-between text-lg font-extrabold">
               <span>Cəmi</span>
-              <span>{formatAZN(total)}</span>
+              <span>{formatAZN(finalTotal)}</span>
             </div>
-            <textarea
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              maxLength={500}
+            <textarea value={address} onChange={(e) => setAddress(e.target.value)} maxLength={500}
               placeholder="Çatdırılma ünvanı..."
-              className="w-full border border-input rounded-lg p-3 text-sm min-h-20 focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-            <button
-              onClick={checkout}
-              disabled={placing}
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl py-3 font-bold disabled:opacity-60"
-            >
+              className="w-full border border-input rounded-lg p-3 text-sm min-h-20 focus:outline-none focus:ring-2 focus:ring-ring" />
+            <button onClick={checkout} disabled={placing}
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl py-3 font-bold disabled:opacity-60">
               {placing ? "Göndərilir..." : "Sifariş ver"}
             </button>
           </aside>
