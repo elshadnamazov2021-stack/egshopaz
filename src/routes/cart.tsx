@@ -26,18 +26,44 @@ function CartPage() {
   const [loading, setLoading] = useState(true);
   const [placing, setPlacing] = useState(false);
   const [address, setAddress] = useState("");
+  const [promo, setPromo] = useState("");
+  const [promoInfo, setPromoInfo] = useState<{ code: string; discount: number } | null>(null);
+  const [bonusBalance, setBonusBalance] = useState(0);
+  const [bonusToUse, setBonusToUse] = useState(0);
+  const [bonusToAzn, setBonusToAzn] = useState(0.01);
 
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const { data } = await supabase.from("cart_items")
-      .select("id,quantity,product_id,products(id,title,price,image_url,stock,seller_id)")
-      .eq("user_id", user.id);
-    setItems((data ?? []) as unknown as CartRow[]);
+    const [cart, prof, settings] = await Promise.all([
+      supabase.from("cart_items")
+        .select("id,quantity,product_id,products(id,title,price,image_url,stock,seller_id)")
+        .eq("user_id", user.id),
+      supabase.from("profiles").select("bonus_balance").eq("id", user.id).maybeSingle(),
+      supabase.from("system_settings").select("bonus_to_azn").limit(1).maybeSingle(),
+    ]);
+    setItems((cart.data ?? []) as unknown as CartRow[]);
+    setBonusBalance(prof.data?.bonus_balance ?? 0);
+    setBonusToAzn(Number(settings.data?.bonus_to_azn ?? 0.01));
     setLoading(false);
   };
 
   useEffect(() => { if (user) load(); else if (!authLoading) setLoading(false); }, [user, authLoading]);
+
+  const applyPromo = async () => {
+    const code = promo.trim().toUpperCase();
+    if (!code) return;
+    const { data } = await supabase.from("promo_codes")
+      .select("code,discount_percent,discount_amount,min_order,is_active,expires_at,usage_limit,used_count")
+      .eq("code", code).eq("is_active", true).maybeSingle();
+    if (!data) { toast.error("Promo kod tapılmadı"); return; }
+    if (data.expires_at && new Date(data.expires_at) < new Date()) { toast.error("Vaxtı keçib"); return; }
+    if (data.usage_limit && data.used_count >= data.usage_limit) { toast.error("Limit dolub"); return; }
+    if (Number(data.min_order) > total) { toast.error(`Min sifariş: ${formatAZN(Number(data.min_order))}`); return; }
+    const disc = data.discount_amount ? Number(data.discount_amount) : Math.round(total * (data.discount_percent ?? 0)) / 100;
+    setPromoInfo({ code: data.code, discount: disc });
+    toast.success(`Promo tətbiq olundu: -${formatAZN(disc)}`);
+  };
 
   if (!authLoading && !user) {
     return (
