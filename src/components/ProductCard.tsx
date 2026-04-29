@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Heart, ShoppingCart, Star } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { formatAZN, calcDiscount } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -19,6 +20,7 @@ export interface ProductCardData {
 }
 
 export function ProductCard({ p }: { p: ProductCardData }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [adding, setAdding] = useState(false);
   const { isFav, toggle: toggleFav } = useFavorite(p.id);
@@ -26,7 +28,7 @@ export function ProductCard({ p }: { p: ProductCardData }) {
 
   const addToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
-    if (!user) { toast.error("Səbətə əlavə etmək üçün daxil olun"); return; }
+    if (!user) { toast.error(t("cart.loginRequired")); return; }
     setAdding(true);
     const { data: existing } = await supabase
       .from("cart_items").select("id, quantity")
@@ -36,7 +38,7 @@ export function ProductCard({ p }: { p: ProductCardData }) {
     } else {
       await supabase.from("cart_items").insert({ user_id: user.id, product_id: p.id, quantity: 1 });
     }
-    toast.success("Səbətə əlavə olundu");
+    toast.success(t("product.addToCart"));
     setAdding(false);
   };
 
@@ -51,7 +53,7 @@ export function ProductCard({ p }: { p: ProductCardData }) {
           <img src={p.image_url} alt={p.title} loading="lazy"
                className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">Şəkil yoxdur</div>
+          <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">—</div>
         )}
         {discount > 0 && (
           <span className="absolute top-2 left-2 bg-discount text-discount-foreground text-xs font-bold px-2 py-1 rounded">
@@ -61,7 +63,7 @@ export function ProductCard({ p }: { p: ProductCardData }) {
         <button
           onClick={toggleFav}
           className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center transition ${isFav ? "text-discount" : "hover:text-primary"}`}
-          aria-label="Sevimli"
+          aria-label={t("product.addToFavorites")}
         >
           <Heart className={`h-4 w-4 ${isFav ? "fill-discount" : ""}`} />
         </button>
@@ -78,7 +80,7 @@ export function ProductCard({ p }: { p: ProductCardData }) {
         <div className="flex items-center gap-1 text-xs text-muted-foreground mt-auto pt-1">
           <Star className="h-3 w-3 fill-warning text-warning" />
           <span className="font-semibold text-foreground">{Number(p.rating).toFixed(1)}</span>
-          <span>· {p.reviews_count} rəy</span>
+          <span>· {p.reviews_count}</span>
         </div>
         <button
           onClick={addToCart}
@@ -86,7 +88,7 @@ export function ProductCard({ p }: { p: ProductCardData }) {
           className="mt-2 w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 rounded-lg py-2 text-sm font-semibold flex items-center justify-center gap-1.5 transition"
         >
           <ShoppingCart className="h-4 w-4" />
-          Səbətə
+          {t("product.addToCart")}
         </button>
       </div>
     </Link>
