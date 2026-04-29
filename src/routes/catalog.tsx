@@ -83,7 +83,7 @@ function Catalog() {
       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
         <Link to="/" className="hover:text-primary">{t("home.breadcrumbHome")}</Link>
         <span>/</span>
-        <span className="text-foreground font-medium">{activeCat?.name ?? (q ? t("catalog.searchBreadcrumb", { q }) : t("catalog.title"))}</span>
+        <span className="text-foreground font-medium">{activeCat ? catName(activeCat) : (q ? t("catalog.searchBreadcrumb", { q }) : t("catalog.title"))}</span>
       </div>
 
       <div className="mb-6">
@@ -108,7 +108,7 @@ function Catalog() {
                   <button
                     onClick={() => setOpenParents((p) => ({ ...p, [c.id]: !isOpen }))}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm hover:bg-secondary text-left ${cat === c.slug ? "bg-secondary font-semibold text-primary" : ""}`}>
-                    <span>{c.icon} {c.name}</span>
+                    <span>{c.icon} {catName(c)}</span>
                     {kids.length > 0 && <span className="text-xs">{isOpen ? "−" : "+"}</span>}
                   </button>
                   {isOpen && kids.length > 0 && (
@@ -123,7 +123,7 @@ function Catalog() {
                         <li key={k.id}>
                           <Link to="/catalog" search={{ q, cat: k.slug } as never}
                                 className={`block px-2 py-1 rounded text-xs hover:bg-secondary ${cat === k.slug ? "font-semibold text-primary" : ""}`}>
-                            {k.icon} {k.name}
+                            {k.icon} {catName(k)}
                           </Link>
                         </li>
                       ))}
@@ -137,7 +137,7 @@ function Catalog() {
 
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold mb-4">
-            {activeCat?.name ?? (q ? t("catalog.searchResults", { q }) : t("catalog.allProducts"))}
+            {activeCat ? catName(activeCat) : (q ? t("catalog.searchResults", { q }) : t("catalog.allProducts"))}
             <span className="ml-2 text-sm text-muted-foreground font-normal">{t("catalog.productCount", { count: products.length })}</span>
           </h1>
 
