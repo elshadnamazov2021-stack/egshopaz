@@ -144,18 +144,18 @@ export function HomeCategoryBrowser() {
                 {catName(active)} — {seeAll}
               </Link>
             ) : (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 md:gap-4">
                 {subCats.slice(0, 12).map((s) => (
                   <Link
                     key={s.id}
                     to="/catalog"
                     search={{ cat: s.slug, q: undefined } as never}
-                    className="group flex flex-col items-center gap-2 p-3 rounded-2xl bg-secondary/50 hover:bg-primary/10 border border-transparent hover:border-primary/30 transition"
+                    className="group flex flex-col items-center gap-2"
                   >
-                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-background flex items-center justify-center text-2xl md:text-3xl group-hover:scale-110 transition shadow-sm">
+                    <div className="w-full aspect-square rounded-2xl bg-background border border-border group-hover:border-primary/40 group-hover:shadow-elegant flex items-center justify-center text-4xl md:text-5xl group-hover:scale-[1.03] transition">
                       {s.icon || active.icon || "🛍️"}
                     </div>
-                    <span className="text-[11px] md:text-xs text-center font-bold leading-tight line-clamp-2">
+                    <span className="text-[11px] md:text-xs text-center font-semibold leading-tight line-clamp-2 group-hover:text-primary">
                       {catName(s)}
                     </span>
                   </Link>
