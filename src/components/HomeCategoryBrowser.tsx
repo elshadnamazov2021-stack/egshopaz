@@ -81,21 +81,16 @@ export function HomeCategoryBrowser() {
   if (roots.length === 0) return null;
 
   const lang = i18n.language || "az";
-  const sectionTitle = lang.startsWith("ru")
-    ? "Категории"
-    : lang.startsWith("en")
-      ? "Categories"
-      : "Kateqoriyalar";
   const featuredTitle = lang.startsWith("ru")
-    ? "Популярные подкатегории"
+    ? "Популярные категории"
     : lang.startsWith("en")
-      ? "Featured sub-categories"
-      : "Öne çıxan alt-kateqoriyalar";
+      ? "Featured Categories"
+      : "Öne Çıxan Kateqoriyalar";
   const brandsTitle = lang.startsWith("ru")
     ? "Популярные бренды"
     : lang.startsWith("en")
-      ? "Featured brands"
-      : "Öne çıxan brendlər";
+      ? "Featured Brands"
+      : "Öne Çıxan Brendlər";
   const seeAll = lang.startsWith("ru") ? "Все" : lang.startsWith("en") ? "See all" : "Hamısına bax";
 
   return (
@@ -149,18 +144,18 @@ export function HomeCategoryBrowser() {
                 {catName(active)} — {seeAll}
               </Link>
             ) : (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 md:gap-4">
                 {subCats.slice(0, 12).map((s) => (
                   <Link
                     key={s.id}
                     to="/catalog"
                     search={{ cat: s.slug, q: undefined } as never}
-                    className="group flex flex-col items-center gap-2 p-3 rounded-2xl bg-secondary/50 hover:bg-primary/10 border border-transparent hover:border-primary/30 transition"
+                    className="group flex flex-col items-center gap-2"
                   >
-                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-background flex items-center justify-center text-2xl md:text-3xl group-hover:scale-110 transition shadow-sm">
+                    <div className="w-full aspect-square rounded-2xl bg-background border border-border group-hover:border-primary/40 group-hover:shadow-elegant flex items-center justify-center text-4xl md:text-5xl group-hover:scale-[1.03] transition">
                       {s.icon || active.icon || "🛍️"}
                     </div>
-                    <span className="text-[11px] md:text-xs text-center font-bold leading-tight line-clamp-2">
+                    <span className="text-[11px] md:text-xs text-center font-semibold leading-tight line-clamp-2 group-hover:text-primary">
                       {catName(s)}
                     </span>
                   </Link>
@@ -178,23 +173,23 @@ export function HomeCategoryBrowser() {
               </h3>
             </div>
             {loadingBrands ? (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 md:gap-4">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-16 rounded-2xl bg-secondary animate-pulse" />
+                  <div key={i} className="aspect-[5/3] rounded-2xl bg-secondary animate-pulse" />
                 ))}
               </div>
             ) : brands.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-6">—</p>
             ) : (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 md:gap-4">
                 {brands.map((b) => (
                   <Link
                     key={b}
                     to="/catalog"
                     search={{ cat: active.slug, brand: b, q: undefined } as never}
-                    className="h-16 rounded-2xl bg-background border border-border hover:border-primary/40 hover:shadow-elegant flex items-center justify-center px-3 transition group"
+                    className="aspect-[5/3] rounded-2xl bg-background border border-border hover:border-primary/40 hover:shadow-elegant flex items-center justify-center px-3 transition group"
                   >
-                    <span className="font-extrabold text-sm md:text-base text-center line-clamp-1 group-hover:text-primary tracking-tight">
+                    <span className="font-black text-sm md:text-lg text-center line-clamp-1 group-hover:text-primary tracking-tight uppercase">
                       {b}
                     </span>
                   </Link>
