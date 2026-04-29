@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/sidebar";
 import {
   Home, LayoutGrid, Heart, ShoppingCart, MessageCircle, Package,
-  Bell, Tag, Gift, Store, User, HelpCircle, ChevronDown, ChevronRight, Shield, PackageOpen, Flame,
+  Bell, Tag, Gift, Store, User, HelpCircle, Shield, PackageOpen, Flame,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { catName } from "@/lib/catName";
@@ -21,7 +21,6 @@ export function MainSidebar() {
   const { t } = useTranslation();
   const { setOpenMobile, isMobile } = useSidebar();
   const [cats, setCats] = useState<Category[]>([]);
-  const [openCat, setOpenCat] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.from("categories").select("*").order("sort_order").then(({ data }) => {
@@ -32,7 +31,6 @@ export function MainSidebar() {
   const close = () => { if (isMobile) setOpenMobile(false); };
 
   const parents = cats.filter((c) => !c.parent_id);
-  const childrenOf = (pid: string) => cats.filter((c) => c.parent_id === pid);
 
   const mainLinks = [
     { to: "/", label: t("sidebar.home"), icon: Home },
@@ -83,90 +81,20 @@ export function MainSidebar() {
           <SidebarGroupLabel>{t("sidebar.categories")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {parents.map((p) => {
-                const kids = childrenOf(p.id);
-                const open = openCat === p.id;
-                return (
-                  <SidebarMenuItem key={p.id}>
-                    {kids.length > 0 ? (
-                      <>
-                        <SidebarMenuButton onClick={() => setOpenCat(open ? null : p.id)}>
-                          <span className="text-base">{p.icon}</span>
-                          <span className="flex-1 text-left">{catName(p)}</span>
-                          {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                        </SidebarMenuButton>
-                        {open && (
-                          <ul className="ml-7 mt-1 space-y-1 border-l border-sidebar-border pl-2">
-                            <li>
-                              <Link
-                                to="/catalog"
-                                search={{ cat: p.slug, q: undefined } as never}
-                                onClick={close}
-                                className="block text-xs py-1.5 px-2 rounded hover:bg-sidebar-accent hover:text-sidebar-accent-foreground font-medium"
-                              >
-                                {t("common.all")}
-                              </Link>
-                            </li>
-                            {kids.map((k) => {
-                              const grandKids = childrenOf(k.id);
-                              const kOpen = openCat === k.id;
-                              return (
-                                <li key={k.id}>
-                                  {grandKids.length > 0 ? (
-                                    <>
-                                      <button
-                                        onClick={() => setOpenCat(kOpen ? p.id : k.id)}
-                                        className="w-full flex items-center justify-between text-xs py-1.5 px-2 rounded hover:bg-sidebar-accent text-left"
-                                      >
-                                        <span>{catName(k)}</span>
-                                        {kOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-                                      </button>
-                                      {kOpen && (
-                                        <ul className="ml-3 mt-0.5 space-y-0.5 border-l border-sidebar-border pl-2">
-                                          <li>
-                                            <Link to="/catalog" search={{ cat: k.slug, q: undefined } as never} onClick={close}
-                                                  className="block text-[11px] py-1 px-2 rounded hover:bg-sidebar-accent text-muted-foreground">
-                                              {t("common.all")}
-                                            </Link>
-                                          </li>
-                                          {grandKids.map((g) => (
-                                            <li key={g.id}>
-                                              <Link to="/catalog" search={{ cat: g.slug, q: undefined } as never} onClick={close}
-                                                    className="block text-[11px] py-1 px-2 rounded hover:bg-sidebar-accent">
-                                                {catName(g)}
-                                              </Link>
-                                            </li>
-                                          ))}
-                                        </ul>
-                                      )}
-                                    </>
-                                  ) : (
-                                    <Link
-                                      to="/catalog"
-                                      search={{ cat: k.slug, q: undefined } as never}
-                                      onClick={close}
-                                      className="block text-xs py-1.5 px-2 rounded hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                                    >
-                                      {catName(k)}
-                                    </Link>
-                                  )}
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        )}
-                      </>
-                    ) : (
-                      <SidebarMenuButton asChild>
-                        <Link to="/catalog" search={{ cat: p.slug, q: undefined } as never} onClick={close}>
-                          <span className="text-base">{p.icon}</span>
-                          <span>{catName(p)}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    )}
-                  </SidebarMenuItem>
-                );
-              })}
+              {parents.map((p) => (
+                <SidebarMenuItem key={p.id}>
+                  <SidebarMenuButton asChild>
+                    <Link
+                      to="/catalog"
+                      search={{ cat: p.slug, q: undefined } as never}
+                      onClick={close}
+                    >
+                      <span className="text-base">{p.icon}</span>
+                      <span>{catName(p)}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
