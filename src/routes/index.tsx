@@ -24,7 +24,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-interface Category { id: string; name: string; slug: string; icon: string | null }
+interface Category { id: string; name: string; name_ru?: string | null; name_en?: string | null; slug: string; icon: string | null }
 interface PromoCode { id: string; code: string; discount_percent: number | null; discount_amount: number | null; min_order: number; expires_at: string | null }
 
 function Index() {
@@ -39,7 +39,7 @@ function Index() {
 
   useEffect(() => {
     // Kritik: ana məhsullar + kateqoriyalar dərhal
-    supabase.from("categories").select("id,name,slug,icon").is("parent_id", null).order("sort_order").then(({ data }) => setCategories(data ?? []));
+    supabase.from("categories").select("id,name,name_ru,name_en,slug,icon").is("parent_id", null).order("sort_order").then(({ data }) => setCategories((data ?? []) as Category[]));
 
     supabase.from("products")
       .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
@@ -134,7 +134,7 @@ function Index() {
               <div className="w-24 h-24 md:w-28 md:h-28 rounded-3xl bg-gradient-soft flex items-center justify-center text-4xl md:text-5xl group-hover:shadow-elegant group-hover:scale-105 transition border-2 border-transparent group-hover:border-primary/30">
                 {c.icon}
               </div>
-              <span className="text-sm text-center font-bold leading-tight">{c.name}</span>
+              <span className="text-sm text-center font-bold leading-tight">{catName(c)}</span>
             </Link>
           ))}
         </div>
