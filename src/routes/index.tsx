@@ -7,6 +7,7 @@ import { SponsoredProducts } from "@/components/SponsoredProducts";
 import { SellerBanners } from "@/components/SellerBanners";
 import { Truck, ShieldCheck, Tag, Clock, Flame, Heart, TicketPercent, TrendingUp, Sparkles, ArrowRight, Copy, Camera } from "lucide-react";
 import { toast } from "sonner";
+import { catName } from "@/lib/catName";
 
 const VisualSearchDialog = lazy(() =>
   import("@/components/VisualSearchDialog").then((m) => ({ default: m.VisualSearchDialog }))
