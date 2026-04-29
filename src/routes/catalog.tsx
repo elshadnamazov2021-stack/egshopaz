@@ -29,12 +29,17 @@ interface Category { id: string; name: string; name_ru?: string | null; name_en?
 
 function Catalog() {
   const { t } = useTranslation();
-  const { q, cat } = Route.useSearch();
+  const { q, cat, brand } = Route.useSearch();
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<ProductCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [openParents, setOpenParents] = useState<Record<string, boolean>>({});
-  const [filters, setFilters] = useState<Filters>({ sort: "newest" });
+  const [filters, setFilters] = useState<Filters>({ sort: "newest", brand });
+
+  // URL-dəki brand dəyişəndə filtrləri yenilə
+  useEffect(() => {
+    setFilters((f) => ({ ...f, brand: brand || undefined }));
+  }, [brand]);
 
   useEffect(() => {
     supabase.from("categories").select("id,name,name_ru,name_en,slug,icon,parent_id,sort_order").order("sort_order").then(({ data }) => setCategories((data ?? []) as Category[]));
