@@ -81,21 +81,16 @@ export function HomeCategoryBrowser() {
   if (roots.length === 0) return null;
 
   const lang = i18n.language || "az";
-  const sectionTitle = lang.startsWith("ru")
-    ? "Категории"
-    : lang.startsWith("en")
-      ? "Categories"
-      : "Kateqoriyalar";
   const featuredTitle = lang.startsWith("ru")
-    ? "Популярные подкатегории"
+    ? "Популярные категории"
     : lang.startsWith("en")
-      ? "Featured sub-categories"
-      : "Öne çıxan alt-kateqoriyalar";
+      ? "Featured Categories"
+      : "Öne Çıxan Kateqoriyalar";
   const brandsTitle = lang.startsWith("ru")
     ? "Популярные бренды"
     : lang.startsWith("en")
-      ? "Featured brands"
-      : "Öne çıxan brendlər";
+      ? "Featured Brands"
+      : "Öne Çıxan Brendlər";
   const seeAll = lang.startsWith("ru") ? "Все" : lang.startsWith("en") ? "See all" : "Hamısına bax";
 
   return (
