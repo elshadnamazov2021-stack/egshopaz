@@ -92,7 +92,7 @@ export function MainSidebar() {
                       <>
                         <SidebarMenuButton onClick={() => setOpenCat(open ? null : p.id)}>
                           <span className="text-base">{p.icon}</span>
-                          <span className="flex-1 text-left">{p.name}</span>
+                          <span className="flex-1 text-left">{catName(p)}</span>
                           {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                         </SidebarMenuButton>
                         {open && (
@@ -107,18 +107,52 @@ export function MainSidebar() {
                                 {t("common.all")}
                               </Link>
                             </li>
-                            {kids.map((k) => (
-                              <li key={k.id}>
-                                <Link
-                                  to="/catalog"
-                                  search={{ cat: k.slug, q: undefined } as never}
-                                  onClick={close}
-                                  className="block text-xs py-1.5 px-2 rounded hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                                >
-                                  {k.name}
-                                </Link>
-                              </li>
-                            ))}
+                            {kids.map((k) => {
+                              const grandKids = childrenOf(k.id);
+                              const kOpen = openCat === k.id;
+                              return (
+                                <li key={k.id}>
+                                  {grandKids.length > 0 ? (
+                                    <>
+                                      <button
+                                        onClick={() => setOpenCat(kOpen ? p.id : k.id)}
+                                        className="w-full flex items-center justify-between text-xs py-1.5 px-2 rounded hover:bg-sidebar-accent text-left"
+                                      >
+                                        <span>{catName(k)}</span>
+                                        {kOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+                                      </button>
+                                      {kOpen && (
+                                        <ul className="ml-3 mt-0.5 space-y-0.5 border-l border-sidebar-border pl-2">
+                                          <li>
+                                            <Link to="/catalog" search={{ cat: k.slug, q: undefined } as never} onClick={close}
+                                                  className="block text-[11px] py-1 px-2 rounded hover:bg-sidebar-accent text-muted-foreground">
+                                              {t("common.all")}
+                                            </Link>
+                                          </li>
+                                          {grandKids.map((g) => (
+                                            <li key={g.id}>
+                                              <Link to="/catalog" search={{ cat: g.slug, q: undefined } as never} onClick={close}
+                                                    className="block text-[11px] py-1 px-2 rounded hover:bg-sidebar-accent">
+                                                {catName(g)}
+                                              </Link>
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <Link
+                                      to="/catalog"
+                                      search={{ cat: k.slug, q: undefined } as never}
+                                      onClick={close}
+                                      className="block text-xs py-1.5 px-2 rounded hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                                    >
+                                      {catName(k)}
+                                    </Link>
+                                  )}
+                                </li>
+                              );
+                            })}
                           </ul>
                         )}
                       </>
@@ -126,7 +160,7 @@ export function MainSidebar() {
                       <SidebarMenuButton asChild>
                         <Link to="/catalog" search={{ cat: p.slug, q: undefined } as never} onClick={close}>
                           <span className="text-base">{p.icon}</span>
-                          <span>{p.name}</span>
+                          <span>{catName(p)}</span>
                         </Link>
                       </SidebarMenuButton>
                     )}
