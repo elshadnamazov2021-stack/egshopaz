@@ -38,8 +38,7 @@ function Index() {
   const [visualOpen, setVisualOpen] = useState(false);
 
   useEffect(() => {
-    // Kritik: ana məhsullar + kateqoriyalar dərhal
-    supabase.from("categories").select("id,name,name_ru,name_en,slug,icon").is("parent_id", null).order("sort_order").then(({ data }) => setCategories((data ?? []) as Category[]));
+    // Kritik: ana məhsullar dərhal
 
     supabase.from("products")
       .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
