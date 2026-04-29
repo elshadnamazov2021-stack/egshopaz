@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
-interface Category { id: string; name: string; slug: string; icon: string | null; parent_id: string | null }
+interface Category { id: string; name: string; name_ru?: string | null; name_en?: string | null; slug: string; icon: string | null; parent_id: string | null }
 
 export function MainSidebar() {
   const { user, isSeller } = useAuth();
