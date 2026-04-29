@@ -65,17 +65,6 @@ function CartPage() {
     toast.success(`Promo tətbiq olundu: -${formatAZN(disc)}`);
   };
 
-  if (!authLoading && !user) {
-    return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-        <h2 className="text-2xl font-bold mb-2">Səbətə baxmaq üçün daxil olun</h2>
-        <Link to="/auth" className="inline-block mt-4 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold">
-          Daxil ol
-        </Link>
-      </div>
-    );
-  }
 
   const updateQty = async (id: string, qty: number) => {
     if (qty < 1) return;
