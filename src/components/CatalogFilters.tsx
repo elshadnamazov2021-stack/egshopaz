@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal, X, ArrowUpDown, ChevronDown, Tag, BadgePercent, Star } from "lucide-react";
 
 export type SortKey = "newest" | "price_asc" | "price_desc" | "rating" | "popular";
 
@@ -109,32 +109,123 @@ export function CatalogFilters({
     </div>
   );
 
+  // Chip styling helper — Trendyol-style: rounded pill, white bg, border, active = primary
+  const chipBase = "inline-flex items-center gap-1.5 h-9 px-3 rounded-full border whitespace-nowrap text-xs font-bold transition shrink-0";
+  const chipIdle = "border-border bg-card hover:border-primary text-foreground";
+  const chipActive = "border-primary bg-primary/10 text-primary";
+
+  const sortLabel = SORTS.find((s) => s.id === value.sort)?.label ?? t("catalog.sortBy");
+  const priceActive = value.minPrice != null || value.maxPrice != null;
+  const priceLabel = priceActive
+    ? `${value.minPrice ?? "0"}-${value.maxPrice ?? "∞"} ₼`
+    : t("common.price");
+
   return (
     <>
-      <div className="flex items-center gap-2 flex-wrap">
-        <button onClick={() => setOpen(true)}
-                className="inline-flex items-center gap-2 px-3 h-10 rounded-lg border border-border bg-card hover:border-primary text-sm font-semibold">
-          <SlidersHorizontal className="h-4 w-4" />
-          {t("catalog.filters")}
-          {activeCount > 0 && <span className="ml-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full h-5 min-w-5 px-1.5 flex items-center justify-center">{activeCount}</span>}
-        </button>
+      {/* Trendyol-style horizontal scrolling chip row */}
+      <div className="-mx-3 md:-mx-4 px-3 md:px-4 overflow-x-auto scrollbar-hide">
+        <div className="flex items-center gap-2 pb-1 min-w-max">
+          {/* Sırala */}
+          <div className="relative">
+            <select
+              value={value.sort}
+              onChange={(e) => onChange({ ...value, sort: e.target.value as SortKey })}
+              className={`${chipBase} ${chipIdle} appearance-none pr-7 cursor-pointer`}
+              style={{ paddingLeft: "0.75rem" }}
+            >
+              {SORTS.map((s) => <option key={s.id} value={s.id}>{t("catalog.sortBy")}: {s.label}</option>)}
+            </select>
+            <ArrowUpDown className="h-3.5 w-3.5 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-0" />
+            <ChevronDown className="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
 
-        <select value={value.sort} onChange={(e) => onChange({ ...value, sort: e.target.value as SortKey })}
-                className="h-10 px-3 rounded-lg border border-border bg-card text-sm font-semibold">
-          {SORTS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
-        </select>
+          {/* Filtrele (main) */}
+          <button onClick={() => setOpen(true)}
+                  className={`${chipBase} ${activeCount > 0 ? chipActive : chipIdle}`}>
+            <SlidersHorizontal className="h-3.5 w-3.5" />
+            {t("catalog.filters")}
+            {activeCount > 0 && <span className="bg-primary text-primary-foreground text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">{activeCount}</span>}
+          </button>
 
-        {value.onlyDiscount && (
-          <span className="inline-flex items-center gap-1 px-2.5 h-8 rounded-full bg-discount/10 text-discount text-xs font-bold">
-            {t("catalog.onlyDiscount")} <button onClick={() => onChange({ ...value, onlyDiscount: undefined })}><X className="h-3 w-3" /></button>
-          </span>
-        )}
-        {value.brand && (
-          <span className="inline-flex items-center gap-1 px-2.5 h-8 rounded-full bg-primary/10 text-primary text-xs font-bold">
-            {value.brand} <button onClick={() => onChange({ ...value, brand: undefined })}><X className="h-3 w-3" /></button>
-          </span>
-        )}
+          {/* Marka */}
+          {brands.length > 0 && (
+            <div className="relative">
+              <select
+                value={value.brand ?? ""}
+                onChange={(e) => onChange({ ...value, brand: e.target.value || undefined })}
+                className={`${chipBase} ${value.brand ? chipActive : chipIdle} appearance-none pr-7 pl-7 cursor-pointer`}
+              >
+                <option value="">{t("catalog.brand")}</option>
+                {brands.map((b) => <option key={b} value={b}>{b}</option>)}
+              </select>
+              <Tag className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          )}
+
+          {/* Qiymət */}
+          <button onClick={() => setOpen(true)}
+                  className={`${chipBase} ${priceActive ? chipActive : chipIdle}`}>
+            {priceLabel}
+            <ChevronDown className="h-3.5 w-3.5" />
+          </button>
+
+          {/* Reytinq */}
+          <div className="relative">
+            <select
+              value={value.minRating ?? ""}
+              onChange={(e) => onChange({ ...value, minRating: e.target.value ? Number(e.target.value) : undefined })}
+              className={`${chipBase} ${value.minRating ? chipActive : chipIdle} appearance-none pr-7 pl-7 cursor-pointer`}
+            >
+              <option value="">{t("catalog.minRating")}</option>
+              <option value="3">3+ ★</option>
+              <option value="4">4+ ★</option>
+              <option value="4.5">4.5+ ★</option>
+            </select>
+            <Star className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          {/* Sadəcə endirimli (toggle chip) */}
+          <button
+            onClick={() => onChange({ ...value, onlyDiscount: value.onlyDiscount ? undefined : true })}
+            className={`${chipBase} ${value.onlyDiscount ? "border-discount bg-discount/10 text-discount" : chipIdle}`}
+          >
+            <BadgePercent className="h-3.5 w-3.5" />
+            {t("catalog.onlyDiscount")}
+          </button>
+        </div>
       </div>
+
+      {/* Active filter pills — silmək üçün */}
+      {(value.brand || value.minRating || priceActive || value.onlyDiscount) && (
+        <div className="flex items-center gap-1.5 flex-wrap mt-2">
+          <span className="text-[11px] text-muted-foreground font-semibold">{sortLabel} ·</span>
+          {value.brand && (
+            <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+              {value.brand} <button onClick={() => onChange({ ...value, brand: undefined })}><X className="h-3 w-3" /></button>
+            </span>
+          )}
+          {priceActive && (
+            <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+              {priceLabel} <button onClick={() => onChange({ ...value, minPrice: undefined, maxPrice: undefined })}><X className="h-3 w-3" /></button>
+            </span>
+          )}
+          {value.minRating && (
+            <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+              {value.minRating}+ ★ <button onClick={() => onChange({ ...value, minRating: undefined })}><X className="h-3 w-3" /></button>
+            </span>
+          )}
+          {value.onlyDiscount && (
+            <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-discount/10 text-discount text-[11px] font-bold">
+              {t("catalog.onlyDiscount")} <button onClick={() => onChange({ ...value, onlyDiscount: undefined })}><X className="h-3 w-3" /></button>
+            </span>
+          )}
+          <button onClick={reset} className="text-[11px] font-bold text-muted-foreground hover:text-primary underline ml-1">
+            {t("catalog.reset")}
+          </button>
+        </div>
+      )}
 
       {open && (
         <div className="fixed inset-0 z-50 bg-foreground/40 backdrop-blur-sm flex items-end md:items-center justify-center p-4" onClick={() => setOpen(false)}>
