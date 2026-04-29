@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { PanelLayout } from "@/components/PanelLayout";
@@ -18,10 +19,6 @@ export const Route = createFileRoute("/orders")({
 interface OrderItem { id: string; title: string; price: number; quantity: number; image_url: string | null; status: string; seller_id: string; product_id: string; pickup_code: string | null; accepted_at: string | null; delivered_at: string | null; pickup_point_id: string | null }
 interface Order { id: string; total: number; status: string; created_at: string; shipping_address: string | null; payment_method: string; pickup_point_id: string | null; pickup_points: { name: string; address: string; city: string } | null; order_items: OrderItem[] }
 
-const statusLabel: Record<string, string> = {
-  pending: "Gözləyir", paid: "Ödənildi", shipped: "Göndərildi",
-  delivered: "Çatdırıldı", cancelled: "Ləğv edildi",
-};
 const statusColor: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
   paid: "bg-blue-100 text-blue-800",
@@ -31,6 +28,7 @@ const statusColor: Record<string, string> = {
 };
 
 function OrdersPage() {
+  const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { items } = useBuyerNav();
@@ -43,11 +41,16 @@ function OrdersPage() {
   const [qrItem, setQrItem] = useState<OrderItem | null>(null);
   const qrOrder = qrItem ? orders.find((o) => o.order_items?.some((i) => i.id === qrItem.id)) : null;
 
+  const statusLabel: Record<string, string> = {
+    pending: t("orders.pending"), paid: t("orders.paid"), shipped: t("orders.shipped"),
+    delivered: t("orders.delivered"), cancelled: t("orders.cancelled"),
+  };
+
   const sendMessage = async () => {
     if (!user || !msgItem) return;
     const body = msgBody.trim();
-    if (body.length < 2) { toast.error("Mesaj çox qısadır"); return; }
-    if (user.id === msgItem.seller_id) { toast.error("Öz mağazanıza mesaj göndərə bilməzsiniz"); return; }
+    if (body.length < 2) { toast.error(t("orders.messageShort")); return; }
+    if (user.id === msgItem.seller_id) { toast.error(t("orders.ownShopError")); return; }
     setMsgSending(true);
     const { error } = await supabase.from("shop_messages").insert({
       buyer_id: user.id,
@@ -59,7 +62,7 @@ function OrdersPage() {
     });
     setMsgSending(false);
     if (error) { toast.error(error.message); return; }
-    toast.success("Mesaj satıcıya göndərildi");
+    toast.success(t("orders.messageSent"));
     setMsgBody(""); setMsgItem(null); setMsgOrderId(null);
   };
 
@@ -76,20 +79,29 @@ function OrdersPage() {
   useEffect(load, [user]);
 
   const cancel = async (id: string) => {
-    if (!confirm("Sifarişi ləğv etmək istəyirsiniz?")) return;
+    if (!confirm(t("orders.cancelConfirm"))) return;
     const { error } = await supabase.from("orders").update({ status: "cancelled" }).eq("id", id);
-    if (error) toast.error("Ləğv edilmədi"); else { toast.success("Ləğv edildi"); load(); }
+    if (error) toast.error(t("orders.cancelError")); else { toast.success(t("orders.cancelled_msg")); load(); }
   };
 
   if (!user) return null;
   const filtered = filter === "all" ? orders : orders.filter((o) => o.status === filter);
 
+  const filterTabs: [string, string][] = [
+    ["all", t("orders.all")],
+    ["pending", t("orders.pending")],
+    ["paid", t("orders.paid")],
+    ["shipped", t("orders.shipped")],
+    ["delivered", t("orders.delivered")],
+    ["cancelled", t("orders.cancelShort")],
+  ];
+
   return (
-    <PanelLayout title="Müştərinin şəxsi kabineti" subtitle={user.email ?? undefined} items={items}>
+    <PanelLayout title={t("sidebar.buyerPanelTitle")} subtitle={user.email ?? undefined} items={items}>
       <div>
-        <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2"><Package className="h-6 w-6 text-primary" /> Sifarişlərim</h1>
+        <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2"><Package className="h-6 w-6 text-primary" /> {t("orders.title")}</h1>
         <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
-          {[["all", "Hamısı"], ["pending", "Gözləyir"], ["paid", "Ödənildi"], ["shipped", "Göndərildi"], ["delivered", "Çatdırıldı"], ["cancelled", "Ləğv"]].map(([k, l]) => (
+          {filterTabs.map(([k, l]) => (
             <button key={k} onClick={() => setFilter(k)}
                     className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap border ${filter === k ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-secondary"}`}>
               {l}
@@ -97,14 +109,14 @@ function OrdersPage() {
           ))}
         </div>
         {filtered.length === 0 ? (
-          <div className="bg-secondary/40 rounded-2xl p-12 text-center text-muted-foreground">Sifariş yoxdur</div>
+          <div className="bg-secondary/40 rounded-2xl p-12 text-center text-muted-foreground">{t("orders.empty")}</div>
         ) : (
           <div className="space-y-3">
             {filtered.map((o) => (
               <div key={o.id} className="bg-card border border-border rounded-2xl p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <div>
-                    <div className="text-xs text-muted-foreground">№ {o.id.slice(0, 8).toUpperCase()} · {new Date(o.created_at).toLocaleDateString("az-AZ")}</div>
+                    <div className="text-xs text-muted-foreground">№ {o.id.slice(0, 8).toUpperCase()} · {new Date(o.created_at).toLocaleDateString()}</div>
                     {o.shipping_address && <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1"><MapPin className="h-3 w-3" /> {o.shipping_address}</div>}
                   </div>
                   <div className="flex items-center gap-3">
@@ -123,9 +135,9 @@ function OrdersPage() {
                         <div className="truncate">{it.title}</div>
                         <div className="text-xs text-muted-foreground">{it.quantity} × {formatAZN(it.price)}</div>
                         {it.delivered_at ? (
-                          <div className="text-[10px] text-success font-semibold mt-0.5">✓ Təhvil alındı</div>
+                          <div className="text-[10px] text-success font-semibold mt-0.5">{t("orders.received")}</div>
                         ) : it.accepted_at ? (
-                          <div className="text-[10px] text-primary font-semibold mt-0.5">📦 PVZ-də gözləyir — götürmək üçün QR göstərin</div>
+                          <div className="text-[10px] text-primary font-semibold mt-0.5">{t("orders.atPvz")}</div>
                         ) : null}
                       </div>
                       <div className="flex flex-col gap-1 shrink-0">
@@ -134,7 +146,7 @@ function OrdersPage() {
                             onClick={() => setQrItem(it)}
                             className="text-xs px-2.5 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 transition inline-flex items-center gap-1"
                           >
-                            <QrCode className="h-3.5 w-3.5" /> QR
+                            <QrCode className="h-3.5 w-3.5" /> {t("orders.qr")}
                           </button>
                         )}
                         {user.id !== it.seller_id && (
@@ -142,7 +154,7 @@ function OrdersPage() {
                             onClick={() => { setMsgItem(it); setMsgOrderId(o.id); setMsgBody(""); }}
                             className="text-xs px-2.5 py-1.5 rounded-lg border border-border hover:border-primary hover:text-primary transition inline-flex items-center gap-1"
                           >
-                            <MessageCircle className="h-3.5 w-3.5" /> Yaz
+                            <MessageCircle className="h-3.5 w-3.5" /> {t("orders.write")}
                           </button>
                         )}
                       </div>
@@ -151,7 +163,7 @@ function OrdersPage() {
                 </div>
                 {(o.status === "pending" || o.status === "paid") && (
                   <button onClick={() => cancel(o.id)} className="mt-3 text-sm text-destructive hover:underline inline-flex items-center gap-1">
-                    <X className="h-3 w-3" /> Sifarişi ləğv et
+                    <X className="h-3 w-3" /> {t("orders.cancel")}
                   </button>
                 )}
               </div>
@@ -166,7 +178,7 @@ function OrdersPage() {
           onOpenChange={(v) => !v && setQrItem(null)}
           pickupCode={qrItem.pickup_code}
           title={qrItem.title}
-          subtitle={`Sifariş №${qrOrder?.id.slice(0, 8).toUpperCase()}`}
+          subtitle={`${t("orders.orderNumber")}${qrOrder?.id.slice(0, 8).toUpperCase()}`}
           pvzName={qrOrder?.pickup_points?.name ?? null}
           pvzAddress={qrOrder?.pickup_points ? `${qrOrder.pickup_points.city}, ${qrOrder.pickup_points.address}` : null}
           mode="buyer"
@@ -177,26 +189,26 @@ function OrdersPage() {
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setMsgItem(null)}>
           <div className="bg-card rounded-2xl p-5 w-full max-w-md space-y-3" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
-              <h3 className="font-bold flex items-center gap-2"><MessageCircle className="h-5 w-5 text-primary" /> Satıcıya mesaj</h3>
+              <h3 className="font-bold flex items-center gap-2"><MessageCircle className="h-5 w-5 text-primary" /> {t("orders.messageSeller")}</h3>
               <button onClick={() => setMsgItem(null)} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
             </div>
             <div className="text-sm text-muted-foreground line-clamp-2">{msgItem.title}</div>
             <textarea
               value={msgBody}
               onChange={(e) => setMsgBody(e.target.value)}
-              placeholder="Mesajınızı yazın..."
+              placeholder={t("orders.messagePlaceholder")}
               rows={4}
               maxLength={2000}
               className="w-full p-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring resize-none"
             />
             <div className="flex justify-end gap-2">
-              <button onClick={() => setMsgItem(null)} className="text-sm px-3 py-1.5 rounded-lg hover:bg-secondary">Ləğv</button>
+              <button onClick={() => setMsgItem(null)} className="text-sm px-3 py-1.5 rounded-lg hover:bg-secondary">{t("common.cancel")}</button>
               <button
                 onClick={sendMessage}
                 disabled={msgSending || msgBody.trim().length < 2}
                 className="text-sm px-4 py-1.5 rounded-lg bg-primary text-primary-foreground font-bold hover:bg-primary/90 disabled:opacity-50 inline-flex items-center gap-1.5"
               >
-                <Send className="h-3.5 w-3.5" /> {msgSending ? "..." : "Göndər"}
+                <Send className="h-3.5 w-3.5" /> {msgSending ? "..." : t("common.send")}
               </button>
             </div>
           </div>

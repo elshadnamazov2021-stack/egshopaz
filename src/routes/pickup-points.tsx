@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { PanelLayout } from "@/components/PanelLayout";
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/pickup-points")({
 interface PVZ { id: string; name: string; city: string; address: string; phone: string | null; working_hours: string }
 
 function PickupPointsPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { items } = useBuyerNav();
   const [list, setList] = useState<PVZ[]>([]);
@@ -29,17 +31,17 @@ function PickupPointsPage() {
   );
 
   return (
-    <PanelLayout title="Müştərinin şəxsi kabineti" subtitle={user?.email ?? "Çatdırış nöqtələri"} items={items}>
+    <PanelLayout title={t("sidebar.buyerPanelTitle")} subtitle={user?.email ?? t("pickupPoints.title")} items={items}>
       <div>
-        <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2"><MapPin className="h-6 w-6 text-primary" /> Çatdırış nöqtələri (PVZ)</h1>
+        <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2"><MapPin className="h-6 w-6 text-primary" /> {t("pickupPoints.title")}</h1>
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Şəhər və ya ünvan axtar..."
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("common.searchPlaceholder")}
                  className="w-full pl-10 pr-4 h-11 rounded-lg border border-input bg-background" />
         </div>
         {filtered.length === 0 ? (
           <div className="bg-secondary/40 rounded-2xl p-12 text-center text-muted-foreground">
-            Hələ çatdırış nöqtəsi əlavə edilməyib. Admin tərəfindən PVZ əlavə olunduqdan sonra burada görünəcək.
+            {t("pickupPoints.noPoints")}
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-3">

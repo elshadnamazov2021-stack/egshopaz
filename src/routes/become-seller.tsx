@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Store, TrendingUp, Package } from "lucide-react";
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/become-seller")({
 });
 
 function BecomeSeller() {
+  const { t } = useTranslation();
   const { user, isSeller, loading, refreshRoles } = useAuth();
   const navigate = useNavigate();
   const [shopName, setShopName] = useState("");
@@ -43,8 +45,8 @@ function BecomeSeller() {
     <div className="container mx-auto px-4 py-10 max-w-3xl">
       <div className="bg-gradient-brand text-primary-foreground rounded-3xl p-8 mb-6 shadow-elegant">
         <Store className="h-12 w-12 mb-3 opacity-90" />
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-2">Elzan Shop-də satıcı olun</h1>
-        <p className="opacity-90">Milyonlarla alıcıya çıxış əldə edin. Pulsuz qeydiyyat, sadə idarəetmə.</p>
+        <h1 className="text-3xl md:text-4xl font-extrabold mb-2">{t("becomeSeller.title")}</h1>
+        <p className="opacity-90">{t("becomeSeller.subtitle")}</p>
       </div>
 
       <div className="grid sm:grid-cols-3 gap-3 mb-8">
@@ -63,14 +65,14 @@ function BecomeSeller() {
 
       <form onSubmit={become} className="bg-card border border-border rounded-2xl p-6 space-y-4">
         <div>
-          <label className="text-sm font-semibold">Mağaza adı</label>
+          <label className="text-sm font-semibold">{t("becomeSeller.shopName")}</label>
           <input value={shopName} onChange={(e) => setShopName(e.target.value)} maxLength={100}
-                 placeholder="Məsələn: Bakı Moda Evi"
+                 placeholder={t("becomeSeller.shopName")}
                  className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
         </div>
         <button type="submit" disabled={busy}
                 className="w-full h-12 bg-primary text-primary-foreground rounded-xl font-bold hover:bg-primary/90 disabled:opacity-60">
-          {busy ? "..." : "Satıcı kimi qeydiyyatdan keç"}
+          {busy ? "..." : t("becomeSeller.submit")}
         </button>
       </form>
     </div>

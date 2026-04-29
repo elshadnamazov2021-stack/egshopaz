@@ -31,7 +31,14 @@
     "open": "Aç",
     "view": "Bax",
     "details": "Ətraflı",
-    "confirm": "Təsdiq et"
+    "confirm": "Təsdiq et",
+    "send": "Göndər",
+    "saving": "Saxlanılır...",
+    "saved": "Yadda saxlanıldı",
+    "saveError": "Yadda saxlanılmadı",
+    "free": "Pulsuz",
+    "apply": "Tətbiq et",
+    "retry": "Yenidən cəhd et"
   },
   "header": {
     "favorites": "Sevimli",
@@ -62,7 +69,14 @@
     "support": "Dəstək",
     "adminPanel": "Admin panel",
     "pvzPanel": "PVZ işçi paneli",
-    "sellerPanel": "Satıcı paneli"
+    "sellerPanel": "Satıcı paneli",
+    "buyerPanelTitle": "Müştərinin şəxsi kabineti",
+    "addresses": "Ünvanlarım",
+    "paymentMethods": "Ödəniş üsulları",
+    "myReviews": "Rəylərim",
+    "disputes": "Mübahisələr",
+    "pickupPoints": "PVZ məntəqələri",
+    "discover": "Kəşf et"
   },
   "footer": {
     "about": "Haqqımızda",
@@ -78,7 +92,8 @@
     "popular": "Populyar məhsullar",
     "newArrivals": "Yeniliklər",
     "categories": "Kateqoriyalar",
-    "viewAll": "Hamısına bax"
+    "viewAll": "Hamısına bax",
+    "breadcrumbHome": "Ana səhifə"
   },
   "catalog": {
     "title": "Kataloq",
@@ -87,10 +102,23 @@
     "priceAsc": "Ucuz əvvəl",
     "priceDesc": "Baha əvvəl",
     "newest": "Ən yenilər",
+    "popular": "Ən populyar",
     "rating": "Reytinq",
-    "noResults": "Nəticə tapılmadı",
+    "noResults": "Heç bir məhsul tapılmadı",
     "addToCart": "Səbətə at",
-    "outOfStock": "Stokda yoxdur"
+    "outOfStock": "Stokda yoxdur",
+    "categories": "Kateqoriyalar",
+    "all": "Hamısı",
+    "allProducts": "Bütün məhsullar",
+    "searchResults": "\"{{q}}\" üzrə nəticələr",
+    "searchBreadcrumb": "\"{{q}}\" üzrə axtarış",
+    "productCount": "{{count}} məhsul",
+    "minPrice": "Min qiymət",
+    "maxPrice": "Maks qiymət",
+    "brand": "Marka",
+    "minRating": "Min reytinq",
+    "onlyDiscount": "Yalnız endirimli",
+    "reset": "Sıfırla"
   },
   "product": {
     "addToCart": "Səbətə at",
@@ -107,7 +135,7 @@
   },
   "cart": {
     "title": "Səbət",
-    "empty": "Səbət boşdur",
+    "empty": "Səbətiniz boşdur",
     "subtotal": "Yekun",
     "discount": "Endirim",
     "delivery": "Çatdırılma",
@@ -115,8 +143,28 @@
     "checkout": "Sifariş ver",
     "remove": "Sil",
     "promoCode": "Promo kod",
-    "apply": "Tətbiq et",
-    "continueShopping": "Alış-verişə davam et"
+    "apply": "Tətbiq",
+    "continueShopping": "Alış-verişə başla",
+    "loginRequired": "Səbətə baxmaq üçün daxil olun",
+    "login": "Daxil ol",
+    "summary": "Sifariş yekunu",
+    "products": "Məhsullar",
+    "free": "Pulsuz",
+    "promoApplied": "Promo tətbiq olundu",
+    "promoDiscount": "Promo endirimi",
+    "useBonus": "Bonus istifadə et",
+    "balance": "Balans",
+    "all": "Hamısı",
+    "bonusDiscount": "Bonus endirimi",
+    "addressPlaceholder": "Çatdırılma ünvanı...",
+    "addressRequired": "Çatdırılma ünvanını daxil edin",
+    "placing": "Göndərilir...",
+    "orderPlaced": "Sifariş qəbul olundu!",
+    "orderError": "Sifariş yaradıla bilmədi",
+    "promoNotFound": "Promo kod tapılmadı",
+    "promoExpired": "Vaxtı keçib",
+    "promoLimit": "Limit dolub",
+    "minOrder": "Min sifariş"
   },
   "auth": {
     "login": "Giriş",
@@ -126,11 +174,19 @@
     "fullName": "Ad Soyad",
     "loginBtn": "Daxil ol",
     "registerBtn": "Qeydiyyatdan keç",
-    "noAccount": "Hesabın yoxdur?",
-    "hasAccount": "Hesabın var?",
+    "noAccount": "Hesabınız yoxdur? Qeydiyyatdan keçin",
+    "hasAccount": "Hesabınız var? Daxil olun",
     "forgot": "Şifrəni unutmusan?",
     "or": "və ya",
-    "googleLogin": "Google ilə daxil ol"
+    "googleLogin": "Google ilə daxil ol",
+    "loginSubtitle": "Hesabınıza daxil olun",
+    "registerSubtitle": "Yeni hesab yaradın",
+    "welcome": "Xoş gəldiniz!",
+    "registerSuccess": "Qeydiyyat tamamlandı!",
+    "wrongCredentials": "E-poçt və ya şifrə yanlışdır",
+    "invalidEmail": "Düzgün e-poçt daxil edin",
+    "minPassword": "Ən azı 6 simvol",
+    "minName": "Ən azı 2 simvol"
   },
   "profile": {
     "title": "Şəxsi kabinet",
@@ -139,20 +195,107 @@
     "paymentMethods": "Ödəniş üsulları",
     "myReviews": "Rəylərim",
     "settings": "Ayarlar",
-    "logout": "Çıxış"
+    "logout": "Çıxış",
+    "personalInfo": "Şəxsi məlumatlar",
+    "fullName": "Ad Soyad",
+    "phone": "Telefon",
+    "deliveryAddress": "Çatdırılma ünvanı",
+    "addressPlaceholder": "Məsələn: H. Əliyev pr. 12, mənzil 5",
+    "city": "Şəhər",
+    "cityPlaceholder": "Bakı",
+    "noOrders": "Hələ sifariş yoxdur"
   },
   "orders": {
     "title": "Sifarişlərim",
-    "empty": "Hələ sifarişin yoxdur",
+    "empty": "Sifariş yoxdur",
     "orderNumber": "Sifariş №",
     "date": "Tarix",
     "status": "Status",
     "items": "Məhsullar",
     "pending": "Gözləyir",
+    "paid": "Ödənildi",
     "processing": "Hazırlanır",
     "shipped": "Göndərildi",
     "delivered": "Çatdırıldı",
-    "cancelled": "Ləğv edildi"
+    "cancelled": "Ləğv edildi",
+    "all": "Hamısı",
+    "cancelShort": "Ləğv",
+    "cancel": "Sifarişi ləğv et",
+    "cancelConfirm": "Sifarişi ləğv etmək istəyirsiniz?",
+    "cancelled_msg": "Ləğv edildi",
+    "cancelError": "Ləğv edilmədi",
+    "received": "✓ Təhvil alındı",
+    "atPvz": "📦 PVZ-də gözləyir — götürmək üçün QR göstərin",
+    "qr": "QR",
+    "write": "Yaz",
+    "messageSeller": "Satıcıya mesaj",
+    "messagePlaceholder": "Mesajınızı yazın...",
+    "messageShort": "Mesaj çox qısadır",
+    "messageSent": "Mesaj satıcıya göndərildi",
+    "ownShopError": "Öz mağazanıza mesaj göndərə bilməzsiniz"
+  },
+  "favorites": {
+    "title": "Sevimlilər",
+    "empty": "Sevimliniz yoxdur"
+  },
+  "notifications": {
+    "title": "Bildirişlər",
+    "empty": "Bildiriş yoxdur",
+    "markAll": "Hamısını oxunmuş işarələ"
+  },
+  "messages": {
+    "title": "Mesajlar",
+    "empty": "Hələ mesaj yoxdur",
+    "writeMessage": "Mesaj yazın..."
+  },
+  "addresses": {
+    "title": "Ünvanlarım",
+    "addNew": "Yeni ünvan",
+    "noAddresses": "Hələ ünvan yoxdur"
+  },
+  "payment": {
+    "title": "Ödəniş üsulları",
+    "addCard": "Kart əlavə et",
+    "noCards": "Hələ kart yoxdur"
+  },
+  "myReviews": {
+    "title": "Rəylərim",
+    "empty": "Rəyiniz yoxdur"
+  },
+  "bonus": {
+    "title": "Bonuslar",
+    "balance": "Balans",
+    "history": "Tarixçə"
+  },
+  "promotions": {
+    "title": "Aksiyalar",
+    "empty": "Aksiya yoxdur"
+  },
+  "discover": {
+    "title": "Kəşf et"
+  },
+  "support": {
+    "title": "Dəstək",
+    "newTicket": "Yeni müraciət",
+    "subject": "Mövzu",
+    "message": "Mesaj",
+    "submit": "Göndər"
+  },
+  "becomeSeller": {
+    "title": "Satıcı olun",
+    "subtitle": "Mağazanızı açın və satışa başlayın",
+    "shopName": "Mağaza adı",
+    "submit": "Müraciət et"
+  },
+  "pickupPoints": {
+    "title": "PVZ məntəqələri",
+    "noPoints": "Məntəqə tapılmadı"
+  },
+  "disputes": {
+    "title": "Mübahisələr",
+    "empty": "Mübahisə yoxdur",
+    "open": "Açıq",
+    "resolved": "Həll edildi"
   },
   "seller": {
     "title": "Satıcı paneli",
@@ -234,5 +377,8 @@
     "support": "Dəstək",
     "settings": "Sistem ayarları",
     "security": "Təhlükəsizlik"
+  },
+  "categoryBar": {
+    "all": "Hamısı"
   }
 }

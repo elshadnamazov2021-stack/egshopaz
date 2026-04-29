@@ -31,7 +31,14 @@
     "open": "Открыть",
     "view": "Посмотреть",
     "details": "Подробнее",
-    "confirm": "Подтвердить"
+    "confirm": "Подтвердить",
+    "send": "Отправить",
+    "saving": "Сохранение...",
+    "saved": "Сохранено",
+    "saveError": "Не удалось сохранить",
+    "free": "Бесплатно",
+    "apply": "Применить",
+    "retry": "Повторить"
   },
   "header": {
     "favorites": "Избранное",
@@ -62,7 +69,14 @@
     "support": "Поддержка",
     "adminPanel": "Админ-панель",
     "pvzPanel": "Панель ПВЗ",
-    "sellerPanel": "Панель продавца"
+    "sellerPanel": "Панель продавца",
+    "buyerPanelTitle": "Личный кабинет покупателя",
+    "addresses": "Мои адреса",
+    "paymentMethods": "Способы оплаты",
+    "myReviews": "Мои отзывы",
+    "disputes": "Споры",
+    "pickupPoints": "Пункты выдачи",
+    "discover": "Открыть"
   },
   "footer": {
     "about": "О нас",
@@ -78,7 +92,8 @@
     "popular": "Популярные товары",
     "newArrivals": "Новинки",
     "categories": "Категории",
-    "viewAll": "Смотреть все"
+    "viewAll": "Смотреть все",
+    "breadcrumbHome": "Главная"
   },
   "catalog": {
     "title": "Каталог",
@@ -87,10 +102,23 @@
     "priceAsc": "Сначала дешевле",
     "priceDesc": "Сначала дороже",
     "newest": "Сначала новые",
+    "popular": "Самые популярные",
     "rating": "Рейтинг",
     "noResults": "Ничего не найдено",
     "addToCart": "В корзину",
-    "outOfStock": "Нет в наличии"
+    "outOfStock": "Нет в наличии",
+    "categories": "Категории",
+    "all": "Все",
+    "allProducts": "Все товары",
+    "searchResults": "Результаты по \"{{q}}\"",
+    "searchBreadcrumb": "Поиск \"{{q}}\"",
+    "productCount": "{{count}} товаров",
+    "minPrice": "Мин. цена",
+    "maxPrice": "Макс. цена",
+    "brand": "Бренд",
+    "minRating": "Мин. рейтинг",
+    "onlyDiscount": "Только со скидкой",
+    "reset": "Сбросить"
   },
   "product": {
     "addToCart": "В корзину",
@@ -116,7 +144,27 @@
     "remove": "Удалить",
     "promoCode": "Промокод",
     "apply": "Применить",
-    "continueShopping": "Продолжить покупки"
+    "continueShopping": "Начать покупки",
+    "loginRequired": "Войдите, чтобы посмотреть корзину",
+    "login": "Войти",
+    "summary": "Итог заказа",
+    "products": "Товары",
+    "free": "Бесплатно",
+    "promoApplied": "Промокод применён",
+    "promoDiscount": "Скидка по промо",
+    "useBonus": "Использовать бонусы",
+    "balance": "Баланс",
+    "all": "Все",
+    "bonusDiscount": "Скидка бонусами",
+    "addressPlaceholder": "Адрес доставки...",
+    "addressRequired": "Введите адрес доставки",
+    "placing": "Отправка...",
+    "orderPlaced": "Заказ принят!",
+    "orderError": "Не удалось создать заказ",
+    "promoNotFound": "Промокод не найден",
+    "promoExpired": "Истёк срок",
+    "promoLimit": "Лимит исчерпан",
+    "minOrder": "Мин. заказ"
   },
   "auth": {
     "login": "Вход",
@@ -126,11 +174,19 @@
     "fullName": "Имя и Фамилия",
     "loginBtn": "Войти",
     "registerBtn": "Зарегистрироваться",
-    "noAccount": "Нет аккаунта?",
-    "hasAccount": "Уже есть аккаунт?",
+    "noAccount": "Нет аккаунта? Зарегистрируйтесь",
+    "hasAccount": "Уже есть аккаунт? Войдите",
     "forgot": "Забыли пароль?",
     "or": "или",
-    "googleLogin": "Войти через Google"
+    "googleLogin": "Войти через Google",
+    "loginSubtitle": "Войдите в свой аккаунт",
+    "registerSubtitle": "Создайте новый аккаунт",
+    "welcome": "Добро пожаловать!",
+    "registerSuccess": "Регистрация завершена!",
+    "wrongCredentials": "Неверный e-mail или пароль",
+    "invalidEmail": "Введите корректный e-mail",
+    "minPassword": "Минимум 6 символов",
+    "minName": "Минимум 2 символа"
   },
   "profile": {
     "title": "Личный кабинет",
@@ -139,20 +195,107 @@
     "paymentMethods": "Способы оплаты",
     "myReviews": "Мои отзывы",
     "settings": "Настройки",
-    "logout": "Выход"
+    "logout": "Выход",
+    "personalInfo": "Личные данные",
+    "fullName": "Имя и Фамилия",
+    "phone": "Телефон",
+    "deliveryAddress": "Адрес доставки",
+    "addressPlaceholder": "Например: пр. Г. Алиева 12, кв. 5",
+    "city": "Город",
+    "cityPlaceholder": "Баку",
+    "noOrders": "Заказов пока нет"
   },
   "orders": {
     "title": "Мои заказы",
-    "empty": "У вас пока нет заказов",
+    "empty": "Заказов нет",
     "orderNumber": "Заказ №",
     "date": "Дата",
     "status": "Статус",
     "items": "Товары",
     "pending": "Ожидает",
+    "paid": "Оплачен",
     "processing": "Обрабатывается",
     "shipped": "Отправлен",
     "delivered": "Доставлен",
-    "cancelled": "Отменён"
+    "cancelled": "Отменён",
+    "all": "Все",
+    "cancelShort": "Отмена",
+    "cancel": "Отменить заказ",
+    "cancelConfirm": "Хотите отменить заказ?",
+    "cancelled_msg": "Отменено",
+    "cancelError": "Не удалось отменить",
+    "received": "✓ Получено",
+    "atPvz": "📦 Ожидает в ПВЗ — покажите QR для получения",
+    "qr": "QR",
+    "write": "Написать",
+    "messageSeller": "Сообщение продавцу",
+    "messagePlaceholder": "Напишите сообщение...",
+    "messageShort": "Сообщение слишком короткое",
+    "messageSent": "Сообщение отправлено продавцу",
+    "ownShopError": "Нельзя писать в свой магазин"
+  },
+  "favorites": {
+    "title": "Избранное",
+    "empty": "Избранного нет"
+  },
+  "notifications": {
+    "title": "Уведомления",
+    "empty": "Уведомлений нет",
+    "markAll": "Отметить все прочитанными"
+  },
+  "messages": {
+    "title": "Сообщения",
+    "empty": "Сообщений пока нет",
+    "writeMessage": "Напишите сообщение..."
+  },
+  "addresses": {
+    "title": "Мои адреса",
+    "addNew": "Новый адрес",
+    "noAddresses": "Адресов пока нет"
+  },
+  "payment": {
+    "title": "Способы оплаты",
+    "addCard": "Добавить карту",
+    "noCards": "Карт пока нет"
+  },
+  "myReviews": {
+    "title": "Мои отзывы",
+    "empty": "Отзывов нет"
+  },
+  "bonus": {
+    "title": "Бонусы",
+    "balance": "Баланс",
+    "history": "История"
+  },
+  "promotions": {
+    "title": "Акции",
+    "empty": "Акций нет"
+  },
+  "discover": {
+    "title": "Открыть"
+  },
+  "support": {
+    "title": "Поддержка",
+    "newTicket": "Новое обращение",
+    "subject": "Тема",
+    "message": "Сообщение",
+    "submit": "Отправить"
+  },
+  "becomeSeller": {
+    "title": "Стать продавцом",
+    "subtitle": "Откройте магазин и начните продавать",
+    "shopName": "Название магазина",
+    "submit": "Подать заявку"
+  },
+  "pickupPoints": {
+    "title": "Пункты выдачи",
+    "noPoints": "Пункт не найден"
+  },
+  "disputes": {
+    "title": "Споры",
+    "empty": "Споров нет",
+    "open": "Открыт",
+    "resolved": "Решён"
   },
   "seller": {
     "title": "Панель продавца",
@@ -234,5 +377,8 @@
     "support": "Поддержка",
     "settings": "Системные настройки",
     "security": "Безопасность"
+  },
+  "categoryBar": {
+    "all": "Все"
   }
 }

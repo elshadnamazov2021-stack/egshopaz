@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { PanelLayout } from "@/components/PanelLayout";
@@ -26,6 +27,7 @@ interface Msg {
 interface SellerProfile { id: string; shop_name: string | null; full_name: string | null; shop_logo_url: string | null; avatar_url: string | null }
 
 function MessagesPage() {
+  const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { items } = useBuyerNav();
@@ -140,16 +142,16 @@ function MessagesPage() {
   const sellerImg = (id: string) => sellers[id]?.shop_logo_url ?? sellers[id]?.avatar_url ?? null;
 
   return (
-    <PanelLayout title="Müştərinin şəxsi kabineti" subtitle={user.email ?? undefined} items={items}>
+    <PanelLayout title={t("sidebar.buyerPanelTitle")} subtitle={user.email ?? undefined} items={items}>
       <div>
         <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2">
-          <MessageCircle className="h-6 w-6 text-primary" /> Mesajlarım
+          <MessageCircle className="h-6 w-6 text-primary" /> {t("messages.title")}
         </h1>
 
         {threads.length === 0 ? (
           <div className="bg-secondary/40 rounded-2xl p-12 text-center text-muted-foreground">
             <MessageCircle className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            Hələ mesajınız yoxdur. Sifarişlərim bölməsindən satıcıya yaza bilərsiniz.
+            {t("messages.empty")}
           </div>
         ) : (
           <div className="bg-card border border-border rounded-2xl overflow-hidden grid md:grid-cols-[280px_1fr] h-[70vh]">
@@ -236,7 +238,7 @@ function MessagesPage() {
                       value={reply}
                       onChange={(e) => setReply(e.target.value)}
                       onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-                      placeholder="Mesajınızı yazın..."
+                      placeholder={t("messages.writeMessage")}
                       maxLength={2000}
                       rows={1}
                       className="flex-1 px-3 py-2 rounded-lg border border-input bg-background resize-none max-h-32 text-sm"

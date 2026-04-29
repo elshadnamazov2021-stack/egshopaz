@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatAZN } from "@/lib/format";
@@ -20,6 +21,7 @@ interface CartRow {
 }
 
 function CartPage() {
+  const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [items, setItems] = useState<CartRow[]>([]);
@@ -56,13 +58,13 @@ function CartPage() {
     const { data } = await supabase.from("promo_codes")
       .select("code,discount_percent,discount_amount,min_order,is_active,expires_at,usage_limit,used_count")
       .eq("code", code).eq("is_active", true).maybeSingle();
-    if (!data) { toast.error("Promo kod tapılmadı"); return; }
-    if (data.expires_at && new Date(data.expires_at) < new Date()) { toast.error("Vaxtı keçib"); return; }
-    if (data.usage_limit && data.used_count >= data.usage_limit) { toast.error("Limit dolub"); return; }
-    if (Number(data.min_order) > total) { toast.error(`Min sifariş: ${formatAZN(Number(data.min_order))}`); return; }
+    if (!data) { toast.error(t("cart.promoNotFound")); return; }
+    if (data.expires_at && new Date(data.expires_at) < new Date()) { toast.error(t("cart.promoExpired")); return; }
+    if (data.usage_limit && data.used_count >= data.usage_limit) { toast.error(t("cart.promoLimit")); return; }
+    if (Number(data.min_order) > total) { toast.error(`${t("cart.minOrder")}: ${formatAZN(Number(data.min_order))}`); return; }
     const disc = data.discount_amount ? Number(data.discount_amount) : Math.round(total * (data.discount_percent ?? 0)) / 100;
     setPromoInfo({ code: data.code, discount: disc });
-    toast.success(`Promo tətbiq olundu: -${formatAZN(disc)}`);
+    toast.success(`${t("cart.promoApplied")}: -${formatAZN(disc)}`);
   };
 
 
@@ -86,7 +88,7 @@ function CartPage() {
 
   const checkout = async () => {
     if (!user || items.length === 0) return;
-    if (!address.trim()) { toast.error("Çatdırılma ünvanını daxil edin"); return; }
+    if (!address.trim()) { toast.error(t("cart.addressRequired")); return; }
     setPlacing(true);
     const { data: order, error } = await supabase.from("orders").insert({
       buyer_id: user.id,
@@ -97,7 +99,7 @@ function CartPage() {
       discount: promoDiscount + bonusDiscount,
       bonus_used: bonusToUse,
     } as never).select().single();
-    if (error || !order) { toast.error("Sifariş yaradıla bilmədi"); setPlacing(false); return; }
+    if (error || !order) { toast.error(t("cart.orderError")); setPlacing(false); return; }
 
     const orderItems = items.filter((i) => i.products).map((i) => ({
       order_id: order.id,
@@ -112,7 +114,7 @@ function CartPage() {
 
     if (bonusToUse > 0) {
       await supabase.from("bonus_transactions").insert({
-        user_id: user.id, amount: -bonusToUse, reason: "Sifarişdə istifadə", order_id: order.id,
+        user_id: user.id, amount: -bonusToUse, reason: t("cart.useBonus"), order_id: order.id,
       } as never);
       await supabase.from("profiles").update({ bonus_balance: bonusBalance - bonusToUse }).eq("id", user.id);
     }
@@ -121,7 +123,7 @@ function CartPage() {
     }
 
     await supabase.from("cart_items").delete().eq("user_id", user.id);
-    toast.success("Sifariş qəbul olundu!");
+    toast.success(t("cart.orderPlaced"));
     setPlacing(false);
     navigate({ to: "/orders" });
   };
@@ -130,23 +132,23 @@ function CartPage() {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-        <h2 className="text-2xl font-bold mb-2">Səbətə baxmaq üçün daxil olun</h2>
-        <Link to="/auth" className="inline-block mt-4 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold">Daxil ol</Link>
+        <h2 className="text-2xl font-bold mb-2">{t("cart.loginRequired")}</h2>
+        <Link to="/auth" className="inline-block mt-4 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold">{t("cart.login")}</Link>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl md:text-3xl font-extrabold mb-6">Səbət</h1>
+      <h1 className="text-2xl md:text-3xl font-extrabold mb-6">{t("cart.title")}</h1>
       {loading ? (
-        <div className="text-muted-foreground">Yüklənir...</div>
+        <div className="text-muted-foreground">{t("common.loading")}</div>
       ) : items.length === 0 ? (
         <div className="text-center py-16 bg-secondary/40 rounded-2xl">
           <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-          <p className="text-muted-foreground mb-4">Səbətiniz boşdur</p>
+          <p className="text-muted-foreground mb-4">{t("cart.empty")}</p>
           <Link to="/catalog" search={{ q: undefined, cat: undefined } as never} className="inline-block bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold">
-            Alış-verişə başla
+            {t("cart.continueShopping")}
           </Link>
         </div>
       ) : (
@@ -176,34 +178,34 @@ function CartPage() {
           </div>
 
           <aside className="bg-card border border-border rounded-2xl p-5 h-fit sticky top-24 space-y-4">
-            <h3 className="font-bold text-lg">Sifariş yekunu</h3>
+            <h3 className="font-bold text-lg">{t("cart.summary")}</h3>
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Məhsullar ({items.length})</span>
+              <span className="text-muted-foreground">{t("cart.products")} ({items.length})</span>
               <span className="font-semibold">{formatAZN(subtotal)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Çatdırılma</span>
-              <span className="font-semibold text-success">Pulsuz</span>
+              <span className="text-muted-foreground">{t("cart.delivery")}</span>
+              <span className="font-semibold text-success">{t("cart.free")}</span>
             </div>
 
             <div className="border-t border-border pt-3 space-y-2">
-              <label className="text-xs font-semibold text-muted-foreground">Promo kod</label>
+              <label className="text-xs font-semibold text-muted-foreground">{t("cart.promoCode")}</label>
               {promoInfo ? (
                 <div className="flex items-center justify-between bg-primary/10 rounded-lg p-2 text-sm">
                   <span className="font-mono font-bold">{promoInfo.code}</span>
-                  <button onClick={() => setPromoInfo(null)} className="text-xs text-rose-500">Sil</button>
+                  <button onClick={() => setPromoInfo(null)} className="text-xs text-rose-500">{t("common.delete")}</button>
                 </div>
               ) : (
                 <div className="flex gap-2">
                   <input value={promo} onChange={(e) => setPromo(e.target.value.toUpperCase())}
                     placeholder="KOD" maxLength={32}
                     className="flex-1 border border-input rounded-lg px-3 h-9 text-sm font-mono uppercase" />
-                  <button onClick={applyPromo} className="bg-secondary hover:bg-secondary/80 px-3 h-9 rounded-lg text-sm font-bold">Tətbiq</button>
+                  <button onClick={applyPromo} className="bg-secondary hover:bg-secondary/80 px-3 h-9 rounded-lg text-sm font-bold">{t("cart.apply")}</button>
                 </div>
               )}
               {promoInfo && (
                 <div className="flex justify-between text-sm text-success">
-                  <span>Promo endirimi</span><span>−{formatAZN(promoDiscount)}</span>
+                  <span>{t("cart.promoDiscount")}</span><span>−{formatAZN(promoDiscount)}</span>
                 </div>
               )}
             </div>
@@ -211,33 +213,33 @@ function CartPage() {
             {bonusBalance > 0 && (
               <div className="border-t border-border pt-3 space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-muted-foreground">Bonus istifadə et</label>
-                  <span className="text-xs">Balans: <b>{bonusBalance}</b></span>
+                  <label className="text-xs font-semibold text-muted-foreground">{t("cart.useBonus")}</label>
+                  <span className="text-xs">{t("cart.balance")}: <b>{bonusBalance}</b></span>
                 </div>
                 <div className="flex gap-2 items-center">
                   <input type="number" min={0} max={maxBonus} value={bonusToUse}
                     onChange={(e) => setBonusToUse(Math.min(maxBonus, Math.max(0, parseInt(e.target.value || "0"))))}
                     className="flex-1 border border-input rounded-lg px-3 h-9 text-sm" />
-                  <button onClick={() => setBonusToUse(maxBonus)} className="text-xs bg-secondary hover:bg-secondary/80 px-2 h-9 rounded-lg font-bold">Hamısı</button>
+                  <button onClick={() => setBonusToUse(maxBonus)} className="text-xs bg-secondary hover:bg-secondary/80 px-2 h-9 rounded-lg font-bold">{t("cart.all")}</button>
                 </div>
                 {bonusToUse > 0 && (
                   <div className="flex justify-between text-sm text-success">
-                    <span>Bonus endirimi</span><span>−{formatAZN(bonusDiscount)}</span>
+                    <span>{t("cart.bonusDiscount")}</span><span>−{formatAZN(bonusDiscount)}</span>
                   </div>
                 )}
               </div>
             )}
 
             <div className="border-t border-border pt-3 flex justify-between text-lg font-extrabold">
-              <span>Cəmi</span>
+              <span>{t("cart.total")}</span>
               <span>{formatAZN(finalTotal)}</span>
             </div>
             <textarea value={address} onChange={(e) => setAddress(e.target.value)} maxLength={500}
-              placeholder="Çatdırılma ünvanı..."
+              placeholder={t("cart.addressPlaceholder")}
               className="w-full border border-input rounded-lg p-3 text-sm min-h-20 focus:outline-none focus:ring-2 focus:ring-ring" />
             <button onClick={checkout} disabled={placing}
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl py-3 font-bold disabled:opacity-60">
-              {placing ? "Göndərilir..." : "Sifariş ver"}
+              {placing ? t("cart.placing") : t("cart.checkout")}
             </button>
           </aside>
         </div>

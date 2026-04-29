@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -9,6 +10,7 @@ import type { PanelNavItem } from "@/components/PanelLayout";
 
 export function useBuyerNav(): { items: PanelNavItem[]; bonusBalance: number } {
   const { user, isSeller } = useAuth();
+  const { t } = useTranslation();
   const [orderCount, setOrderCount] = useState(0);
   const [bonusBalance, setBonusBalance] = useState(0);
   const [openTickets, setOpenTickets] = useState(0);
@@ -35,20 +37,20 @@ export function useBuyerNav(): { items: PanelNavItem[]; bonusBalance: number } {
   }, [user]);
 
   const items: PanelNavItem[] = [
-    { to: "/profile", label: "Profil", icon: UserIcon },
-    { to: "/orders", label: "Sifarişlərim", icon: Package, badge: orderCount },
-    { to: "/messages", label: "Mesajlarım", icon: MessageCircle, badge: unreadMsgs },
-    { to: "/messages-pvz", label: "PVZ ilə əlaqə", icon: MessageCircle },
-    { to: "/addresses", label: "Ünvanlarım", icon: MapPin },
-    { to: "/pickup-points", label: "Çatdırış nöqtələri", icon: MapPin },
-    { to: "/payment-methods", label: "Ödəniş üsulları", icon: CreditCard },
-    { to: "/my-reviews", label: "Rəylərim", icon: Star },
-    { to: "/promotions", label: "Aksiyalar", icon: Gift },
-    { to: "/bonus", label: "Bonus xallar", icon: Coins, badge: bonusBalance },
-    { to: "/notifications", label: "Bildirişlər", icon: Bell },
-    { to: "/disputes", label: "Mübahisələr", icon: AlertTriangle },
-    { to: "/support", label: "Dəstək", icon: MessageCircle, badge: openTickets },
-    ...(!isSeller ? [{ to: "/become-seller", label: "Mağaza aç", icon: Store }] : []),
+    { to: "/profile", label: t("sidebar.profile"), icon: UserIcon },
+    { to: "/orders", label: t("sidebar.orders"), icon: Package, badge: orderCount },
+    { to: "/messages", label: t("sidebar.messages"), icon: MessageCircle, badge: unreadMsgs },
+    { to: "/messages-pvz", label: t("sidebar.pvzPanel"), icon: MessageCircle },
+    { to: "/addresses", label: t("sidebar.addresses"), icon: MapPin },
+    { to: "/pickup-points", label: t("sidebar.pickupPoints"), icon: MapPin },
+    { to: "/payment-methods", label: t("sidebar.paymentMethods"), icon: CreditCard },
+    { to: "/my-reviews", label: t("sidebar.myReviews"), icon: Star },
+    { to: "/promotions", label: t("sidebar.promotions"), icon: Gift },
+    { to: "/bonus", label: t("sidebar.bonuses"), icon: Coins, badge: bonusBalance },
+    { to: "/notifications", label: t("sidebar.notifications"), icon: Bell },
+    { to: "/disputes", label: t("sidebar.disputes"), icon: AlertTriangle },
+    { to: "/support", label: t("sidebar.support"), icon: MessageCircle, badge: openTickets },
+    ...(!isSeller ? [{ to: "/become-seller", label: t("sidebar.openShop"), icon: Store }] : []),
   ];
 
   return { items, bonusBalance };

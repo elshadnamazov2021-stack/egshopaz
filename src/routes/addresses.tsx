@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { PanelLayout } from "@/components/PanelLayout";
@@ -18,6 +19,7 @@ interface Address {
 }
 
 function AddressesPage() {
+  const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { items } = useBuyerNav();
@@ -74,18 +76,18 @@ function AddressesPage() {
   if (!user) return null;
 
   return (
-    <PanelLayout title="Müştərinin şəxsi kabineti" subtitle={user.email ?? undefined} items={items}>
+    <PanelLayout title={t("sidebar.buyerPanelTitle")} subtitle={user.email ?? undefined} items={items}>
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-extrabold flex items-center gap-2"><MapPin className="h-6 w-6 text-primary" /> Ünvanlarım</h1>
+          <h1 className="text-2xl font-extrabold flex items-center gap-2"><MapPin className="h-6 w-6 text-primary" /> {t("addresses.title")}</h1>
           <button onClick={() => setEditing({ title: "Ev", is_default: list.length === 0 })}
                   className="bg-primary text-primary-foreground px-4 h-10 rounded-lg font-bold hover:bg-primary/90 inline-flex items-center gap-2">
-            <Plus className="h-4 w-4" /> Yeni
+            <Plus className="h-4 w-4" /> {t("addresses.addNew")}
           </button>
         </div>
 
         {list.length === 0 && !editing ? (
-          <div className="bg-secondary/40 rounded-2xl p-12 text-center text-muted-foreground">Hələ ünvan əlavə etməmisiniz</div>
+          <div className="bg-secondary/40 rounded-2xl p-12 text-center text-muted-foreground">{t("addresses.noAddresses")}</div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-3">
             {list.map((a) => (
