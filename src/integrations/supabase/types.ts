@@ -297,6 +297,33 @@ export type Database = {
         }
         Relationships: []
       }
+      dispute_messages: {
+        Row: {
+          body: string
+          created_at: string
+          dispute_id: string
+          id: string
+          sender_id: string
+          sender_role: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          dispute_id: string
+          id?: string
+          sender_id: string
+          sender_role: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          dispute_id?: string
+          id?: string
+          sender_id?: string
+          sender_role?: string
+        }
+        Relationships: []
+      }
       disputes: {
         Row: {
           buyer_id: string
@@ -306,6 +333,7 @@ export type Database = {
           description: string | null
           id: string
           order_id: string | null
+          order_item_id: string | null
           reason: string
           resolution: string | null
           seller_id: string | null
@@ -320,6 +348,7 @@ export type Database = {
           description?: string | null
           id?: string
           order_id?: string | null
+          order_item_id?: string | null
           reason: string
           resolution?: string | null
           seller_id?: string | null
@@ -334,6 +363,7 @@ export type Database = {
           description?: string | null
           id?: string
           order_id?: string | null
+          order_item_id?: string | null
           reason?: string
           resolution?: string | null
           seller_id?: string | null
@@ -470,6 +500,8 @@ export type Database = {
       }
       orders: {
         Row: {
+          bonus_earned: number
+          bonus_used: number
           buyer_id: string
           created_at: string
           discount: number
@@ -484,6 +516,8 @@ export type Database = {
           total: number
         }
         Insert: {
+          bonus_earned?: number
+          bonus_used?: number
           buyer_id: string
           created_at?: string
           discount?: number
@@ -498,6 +532,8 @@ export type Database = {
           total: number
         }
         Update: {
+          bonus_earned?: number
+          bonus_used?: number
           buyer_id?: string
           created_at?: string
           discount?: number
@@ -1098,6 +1134,8 @@ export type Database = {
       }
       system_settings: {
         Row: {
+          bonus_earn_percent: number
+          bonus_to_azn: number
           commission_percent: number
           delivery_base_fee: number
           id: string
@@ -1107,6 +1145,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          bonus_earn_percent?: number
+          bonus_to_azn?: number
           commission_percent?: number
           delivery_base_fee?: number
           id?: string
@@ -1116,6 +1156,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          bonus_earn_percent?: number
+          bonus_to_azn?: number
           commission_percent?: number
           delivery_base_fee?: number
           id?: string
