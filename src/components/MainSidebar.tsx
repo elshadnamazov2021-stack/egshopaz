@@ -21,7 +21,6 @@ export function MainSidebar() {
   const { t } = useTranslation();
   const { setOpenMobile, isMobile } = useSidebar();
   const [cats, setCats] = useState<Category[]>([]);
-  const [openCat, setOpenCat] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.from("categories").select("*").order("sort_order").then(({ data }) => {
@@ -32,7 +31,6 @@ export function MainSidebar() {
   const close = () => { if (isMobile) setOpenMobile(false); };
 
   const parents = cats.filter((c) => !c.parent_id);
-  const childrenOf = (pid: string) => cats.filter((c) => c.parent_id === pid);
 
   const mainLinks = [
     { to: "/", label: t("sidebar.home"), icon: Home },
