@@ -18,7 +18,7 @@ interface Category {
 interface BrandRow { brand: string | null }
 
 export function HomeCategoryBrowser() {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const [cats, setCats] = useState<Category[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [brands, setBrands] = useState<string[]>([]);
