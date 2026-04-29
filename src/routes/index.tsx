@@ -30,7 +30,6 @@ interface PromoCode { id: string; code: string; discount_percent: number | null;
 
 function Index() {
   const { t } = useTranslation();
-  const [categories, setCategories] = useState<Category[]>([]);
   const [allProducts, setAllProducts] = useState<ProductCardData[]>([]);
   const [discounted, setDiscounted] = useState<ProductCardData[]>([]);
   const [trending, setTrending] = useState<ProductCardData[]>([]);
