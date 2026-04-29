@@ -217,6 +217,8 @@ export type Database = {
           icon: string | null
           id: string
           name: string
+          name_en: string | null
+          name_ru: string | null
           parent_id: string | null
           slug: string
           sort_order: number
@@ -226,6 +228,8 @@ export type Database = {
           icon?: string | null
           id?: string
           name: string
+          name_en?: string | null
+          name_ru?: string | null
           parent_id?: string | null
           slug: string
           sort_order?: number
@@ -235,6 +239,8 @@ export type Database = {
           icon?: string | null
           id?: string
           name?: string
+          name_en?: string | null
+          name_ru?: string | null
           parent_id?: string | null
           slug?: string
           sort_order?: number
