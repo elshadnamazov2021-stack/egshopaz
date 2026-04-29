@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Category { id: string; name: string; slug: string; icon: string | null }
 
 export function CategoryBar() {
+  const { t } = useTranslation();
   const [cats, setCats] = useState<Category[]>([]);
 
   useEffect(() => {
@@ -28,7 +30,7 @@ export function CategoryBar() {
             className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-brand text-primary-foreground font-bold text-sm hover:scale-105 transition shadow-sm"
           >
             <span className="text-lg">🛍️</span>
-            <span>Hamısı</span>
+            <span>{t("categoryBar.all")}</span>
           </Link>
           {cats.map((c) => (
             <Link
