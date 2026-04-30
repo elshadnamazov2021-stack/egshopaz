@@ -1432,6 +1432,10 @@ export type Database = {
     }
     Functions: {
       become_seller: { Args: { _shop_name: string }; Returns: undefined }
+      call_ai_auto_reply: {
+        Args: { _channel: string; _message_id: string }
+        Returns: undefined
+      }
       get_owner_admin_id: { Args: never; Returns: string }
       has_role: {
         Args: {
