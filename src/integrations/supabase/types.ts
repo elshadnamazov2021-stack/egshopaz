@@ -934,6 +934,7 @@ export type Database = {
           shop_logo_url: string | null
           shop_name: string | null
           updated_at: string
+          voen: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -952,6 +953,7 @@ export type Database = {
           shop_logo_url?: string | null
           shop_name?: string | null
           updated_at?: string
+          voen?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -970,6 +972,7 @@ export type Database = {
           shop_logo_url?: string | null
           shop_name?: string | null
           updated_at?: string
+          voen?: string | null
         }
         Relationships: []
       }
@@ -1448,9 +1451,27 @@ export type Database = {
         }
         Returns: boolean
       }
+      register_pvz_staff: {
+        Args: {
+          _full_name: string
+          _phone: string
+          _pickup_point_id: string
+          _position?: string
+        }
+        Returns: undefined
+      }
+      register_seller: {
+        Args: {
+          _phone: string
+          _shop_city: string
+          _shop_name: string
+          _voen?: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
-      app_role: "admin" | "seller" | "buyer"
+      app_role: "admin" | "seller" | "buyer" | "pvz"
       order_status:
         | "pending"
         | "paid"
@@ -1585,7 +1606,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "seller", "buyer"],
+      app_role: ["admin", "seller", "buyer", "pvz"],
       order_status: [
         "pending",
         "paid",
