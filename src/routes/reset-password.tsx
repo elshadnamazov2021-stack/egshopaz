@@ -1,0 +1,63 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { z } from "zod";
+
+export const Route = createFileRoute("/reset-password")({
+  head: () => ({ meta: [{ title: "Şifrəni yenilə — Elzan Shop" }] }),
+  component: ResetPasswordPage,
+});
+
+function ResetPasswordPage() {
+  const navigate = useNavigate();
+  const [ready, setReady] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    // Supabase recovery link sets a session via URL hash; listener fires on PASSWORD_RECOVERY
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") setReady(true);
+    });
+    supabase.auth.getSession().then(({ data }) => { if (data.session) setReady(true); });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const v = z.string().min(6, "Şifrə minimum 6 simvol").max(72).safeParse(password);
+    if (!v.success) { toast.error(v.error.issues[0].message); return; }
+    if (password !== confirm) { toast.error("Şifrələr uyğun gəlmir"); return; }
+    setBusy(true);
+    const { error } = await supabase.auth.updateUser({ password });
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Şifrəniz uğurla yeniləndi");
+    navigate({ to: "/" });
+  };
+
+  const inputCls = "w-full h-11 px-3 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring";
+
+  return (
+    <div className="container mx-auto px-4 py-10 max-w-md">
+      <div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-card">
+        <h1 className="text-2xl font-extrabold mb-1">Yeni şifrə təyin edin</h1>
+        <p className="text-sm text-muted-foreground mb-5">
+          {ready ? "Yeni şifrənizi daxil edin." : "Bərpa linkini yoxlayırıq..."}
+        </p>
+        <form onSubmit={submit} className="space-y-3">
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+            placeholder="Yeni şifrə (min 6 simvol)" maxLength={72} autoComplete="new-password" className={inputCls} />
+          <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)}
+            placeholder="Yeni şifrəni təkrar daxil edin" maxLength={72} autoComplete="new-password" className={inputCls} />
+          <button type="submit" disabled={busy || !ready}
+            className="w-full h-11 bg-primary text-primary-foreground rounded-lg font-bold hover:bg-primary/90 disabled:opacity-60">
+            {busy ? "..." : "Şifrəni yenilə"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
