@@ -89,8 +89,14 @@ function AuthPage() {
   const [forgotOpen, setForgotOpen] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotBusy, setForgotBusy] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
+  useEffect(() => { setMounted(true); }, []);
   useEffect(() => { if (user) navigate({ to: "/" }); }, [user, navigate]);
+
+  if (!mounted) {
+    return <div className="container mx-auto px-4 py-10 max-w-lg"><div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-card h-96 animate-pulse" /></div>;
+  }
 
   const sendReset = async () => {
     const v = z.string().trim().email("Yanlış e-poçt").safeParse(forgotEmail);
