@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ShoppingBag, Store, Package } from "lucide-react";
+import { ShoppingBag, Store, Package, Eye, EyeOff } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
@@ -85,6 +85,7 @@ function AuthPage() {
   const [position, setPosition] = useState("operator");
 
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotBusy, setForgotBusy] = useState(false);
@@ -239,10 +240,16 @@ function AuthPage() {
 
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
             placeholder="E-poçt" maxLength={255} autoComplete="email" className={inputCls} />
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-            placeholder="Şifrə (minimum 6 simvol)" maxLength={72}
-            autoComplete={mode === "login" ? "current-password" : "new-password"} className={inputCls} />
-
+          <div className="relative">
+            <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
+              placeholder="Şifrə (minimum 6 simvol)" maxLength={72}
+              autoComplete={mode === "login" ? "current-password" : "new-password"} className={`${inputCls} pr-11`} />
+            <button type="button" onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Şifrəni gizlə" : "Şifrəni göstər"}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-muted-foreground hover:text-primary transition">
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
           {mode === "signup" && role === "seller" && (
             <>
               <input value={shopName} onChange={(e) => setShopName(e.target.value)}

@@ -115,16 +115,6 @@ export function MainSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
-                {isSeller && (
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <Link to="/seller" onClick={close}>
-                        <Store className="h-4 w-4" />
-                        <span>{t("sidebar.sellerPanel")}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
