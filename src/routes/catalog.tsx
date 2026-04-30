@@ -74,6 +74,11 @@ function Catalog() {
     if (filters.brand) query = query.eq("brand", filters.brand);
     if (filters.minRating) query = query.gte("rating", filters.minRating);
     if (filters.onlyDiscount) query = query.not("old_price", "is", null);
+    if (filters.inStockOnly) query = query.gt("stock", 0);
+    if (filters.newArrivals) {
+      const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      query = query.gte("created_at", since);
+    }
 
     if (filters.sort === "price_asc") query = query.order("price", { ascending: true });
     else if (filters.sort === "price_desc") query = query.order("price", { ascending: false });
