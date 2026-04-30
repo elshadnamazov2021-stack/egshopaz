@@ -21,7 +21,7 @@ export const Route = createFileRoute("/admin")({
 type TabKey =
   | "dashboard" | "customers" | "sellers" | "couriers" | "pvz_staff"
   | "categories" | "products" | "shops" | "warehouses" | "pickup_points"
-  | "orders" | "finance" | "marketing" | "banners" | "promo" | "analytics"
+  | "orders" | "finance" | "marketing" | "banners" | "packages" | "promo" | "analytics"
   | "security" | "disputes" | "content" | "settings" | "support";
 
 interface Stat { users: number; products: number; orders: number; revenue: number; sellers: number }
