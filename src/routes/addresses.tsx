@@ -7,6 +7,8 @@ import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { MapPin, Plus, Trash2, Star, Edit3 } from "lucide-react";
 import { toast } from "sonner";
+import { CitySelect } from "@/components/CitySelect";
+import { findCity } from "@/lib/azCities";
 
 export const Route = createFileRoute("/addresses")({
   head: () => ({ meta: [{ title: "Ünvanlarım — Elzan Shop" }] }),
