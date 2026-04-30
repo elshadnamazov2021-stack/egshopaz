@@ -286,22 +286,23 @@ function AdminPanel() {
   // ── Ad packages mutations ────────────────────────────────────
   const savePackage = async (id: string | null, patch: Partial<AdPackageRow>) => {
     if (id) {
-      const { error } = await supabase.from("ad_packages").update(patch).eq("id", id);
+      const { error } = await supabase.from("ad_packages").update(patch as never).eq("id", id);
       if (error) { toast.error(error.message); return; }
       toast.success("Paket yeniləndi");
     } else {
-      const { error } = await supabase.from("ad_packages").insert({
+      const row = {
         name: patch.name ?? "Yeni paket",
         tier: patch.tier ?? "silver",
         price: patch.price ?? 0,
         duration_days: patch.duration_days ?? 30,
         banner_slots: patch.banner_slots ?? 0,
         sponsored_product_slots: patch.sponsored_product_slots ?? 0,
-        features: patch.features ?? [],
+        features: (patch.features ?? []) as never,
         color: patch.color ?? "#3b82f6",
         is_active: patch.is_active ?? true,
         sort_order: patch.sort_order ?? packages.length,
-      });
+      };
+      const { error } = await supabase.from("ad_packages").insert(row as never);
       if (error) { toast.error(error.message); return; }
       toast.success("Paket yaradıldı");
     }
