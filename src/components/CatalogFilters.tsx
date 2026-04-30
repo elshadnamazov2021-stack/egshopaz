@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { SlidersHorizontal, X, ArrowUpDown, ChevronDown, Tag, BadgePercent, Star } from "lucide-react";
+import { SlidersHorizontal, X, ChevronDown, Tag, BadgePercent, Star, Package, Truck, Zap, Sparkles } from "lucide-react";
 
 export type SortKey = "newest" | "price_asc" | "price_desc" | "rating" | "popular";
 
@@ -10,6 +10,11 @@ export interface Filters {
   brand?: string;
   minRating?: number;
   onlyDiscount?: boolean;
+  inStockOnly?: boolean;
+  freeShipping?: boolean;
+  fastDelivery?: boolean;
+  newArrivals?: boolean;
+  minDiscount?: number; // % e.g. 20, 30, 50
   sort: SortKey;
 }
 
@@ -58,13 +63,18 @@ export function CatalogFilters({
     if (value.brand) n++;
     if (value.minRating) n++;
     if (value.onlyDiscount) n++;
+    if (value.inStockOnly) n++;
+    if (value.freeShipping) n++;
+    if (value.fastDelivery) n++;
+    if (value.newArrivals) n++;
+    if (value.minDiscount) n++;
     return n;
   }, [value]);
 
   const Body = (
-    <div className="space-y-5">
+    <div className="space-y-5 max-h-[70vh] overflow-y-auto pr-1">
       <div>
-        <label className="text-xs font-bold uppercase text-muted-foreground">{t("common.price")} (₼)</label>
+        <label className="text-xs font-bold uppercase text-muted-foreground">{t("catalog.priceRange")} (₼)</label>
         <div className="flex gap-2 mt-2">
           <input type="number" inputMode="numeric" value={minP} onChange={(e) => setMinP(e.target.value)}
                  placeholder={t("catalog.minPrice")} className="w-1/2 h-10 px-3 rounded-lg border border-input bg-background text-sm" />
@@ -96,20 +106,48 @@ export function CatalogFilters({
         </div>
       </div>
 
-      <label className="flex items-center gap-2 cursor-pointer select-none">
-        <input type="checkbox" checked={!!value.onlyDiscount} onChange={(e) => onChange({ ...value, onlyDiscount: e.target.checked || undefined })}
-               className="w-4 h-4 accent-primary" />
-        <span className="text-sm font-medium">{t("catalog.onlyDiscount")}</span>
-      </label>
+      <div>
+        <label className="text-xs font-bold uppercase text-muted-foreground">{t("catalog.minDiscount")}</label>
+        <div className="flex gap-1 mt-2">
+          {[0, 10, 25, 50].map((d) => (
+            <button key={d} onClick={() => onChange({ ...value, minDiscount: d || undefined })}
+                    className={`flex-1 h-9 rounded-lg text-xs font-semibold border ${value.minDiscount === d || (!value.minDiscount && d === 0) ? "bg-discount text-white border-discount" : "border-border hover:border-discount"}`}>
+              {d === 0 ? t("catalog.all") : `${d}%+`}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      <div className="flex gap-2 pt-2">
+      <div className="space-y-2">
+        <label className="flex items-center gap-2 cursor-pointer select-none">
+          <input type="checkbox" checked={!!value.onlyDiscount} onChange={(e) => onChange({ ...value, onlyDiscount: e.target.checked || undefined })} className="w-4 h-4 accent-primary" />
+          <span className="text-sm font-medium">{t("catalog.onlyDiscount")}</span>
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer select-none">
+          <input type="checkbox" checked={!!value.inStockOnly} onChange={(e) => onChange({ ...value, inStockOnly: e.target.checked || undefined })} className="w-4 h-4 accent-primary" />
+          <span className="text-sm font-medium">{t("catalog.inStockOnly")}</span>
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer select-none">
+          <input type="checkbox" checked={!!value.freeShipping} onChange={(e) => onChange({ ...value, freeShipping: e.target.checked || undefined })} className="w-4 h-4 accent-primary" />
+          <span className="text-sm font-medium">{t("catalog.freeShipping")}</span>
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer select-none">
+          <input type="checkbox" checked={!!value.fastDelivery} onChange={(e) => onChange({ ...value, fastDelivery: e.target.checked || undefined })} className="w-4 h-4 accent-primary" />
+          <span className="text-sm font-medium">{t("catalog.fastDelivery")}</span>
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer select-none">
+          <input type="checkbox" checked={!!value.newArrivals} onChange={(e) => onChange({ ...value, newArrivals: e.target.checked || undefined })} className="w-4 h-4 accent-primary" />
+          <span className="text-sm font-medium">{t("catalog.newArrivals")}</span>
+        </label>
+      </div>
+
+      <div className="flex gap-2 pt-2 sticky bottom-0 bg-card">
         <button onClick={reset} className="flex-1 h-10 rounded-lg border border-border text-sm font-semibold hover:bg-secondary">{t("catalog.reset")}</button>
         <button onClick={apply} className="flex-1 h-10 rounded-lg bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90">{t("common.apply")}</button>
       </div>
     </div>
   );
 
-  // Chip styling helper — Trendyol-style: rounded pill, white bg, border, active = primary
   const chipBase = "inline-flex items-center gap-1.5 h-9 px-3 rounded-full border whitespace-nowrap text-xs font-bold transition shrink-0";
   const chipIdle = "border-border bg-card hover:border-primary text-foreground";
   const chipActive = "border-primary bg-primary/10 text-primary";
@@ -122,24 +160,21 @@ export function CatalogFilters({
 
   return (
     <>
-      {/* Trendyol-style horizontal scrolling chip row */}
       <div className="-mx-3 md:-mx-4 px-3 md:px-4 overflow-x-auto scrollbar-hide">
         <div className="flex items-center gap-2 pb-1 min-w-max">
-          {/* Sırala */}
+          {/* Sort */}
           <div className="relative">
             <select
               value={value.sort}
               onChange={(e) => onChange({ ...value, sort: e.target.value as SortKey })}
               className={`${chipBase} ${chipIdle} appearance-none pr-7 cursor-pointer`}
-              style={{ paddingLeft: "0.75rem" }}
             >
               {SORTS.map((s) => <option key={s.id} value={s.id}>{t("catalog.sortBy")}: {s.label}</option>)}
             </select>
-            <ArrowUpDown className="h-3.5 w-3.5 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-0" />
             <ChevronDown className="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
 
-          {/* Filtrele (main) */}
+          {/* Filters main */}
           <button onClick={() => setOpen(true)}
                   className={`${chipBase} ${activeCount > 0 ? chipActive : chipIdle}`}>
             <SlidersHorizontal className="h-3.5 w-3.5" />
@@ -147,7 +182,7 @@ export function CatalogFilters({
             {activeCount > 0 && <span className="bg-primary text-primary-foreground text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">{activeCount}</span>}
           </button>
 
-          {/* Marka */}
+          {/* Brand */}
           {brands.length > 0 && (
             <div className="relative">
               <select
@@ -163,14 +198,14 @@ export function CatalogFilters({
             </div>
           )}
 
-          {/* Qiymət */}
+          {/* Price */}
           <button onClick={() => setOpen(true)}
                   className={`${chipBase} ${priceActive ? chipActive : chipIdle}`}>
             {priceLabel}
             <ChevronDown className="h-3.5 w-3.5" />
           </button>
 
-          {/* Reytinq */}
+          {/* Rating */}
           <div className="relative">
             <select
               value={value.minRating ?? ""}
@@ -186,7 +221,23 @@ export function CatalogFilters({
             <ChevronDown className="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
 
-          {/* Sadəcə endirimli (toggle chip) */}
+          {/* Discount % */}
+          <div className="relative">
+            <select
+              value={value.minDiscount ?? ""}
+              onChange={(e) => onChange({ ...value, minDiscount: e.target.value ? Number(e.target.value) : undefined })}
+              className={`${chipBase} ${value.minDiscount ? "border-discount bg-discount/10 text-discount" : chipIdle} appearance-none pr-7 pl-7 cursor-pointer`}
+            >
+              <option value="">{t("catalog.minDiscount")}</option>
+              <option value="10">10%+</option>
+              <option value="25">25%+</option>
+              <option value="50">50%+</option>
+            </select>
+            <BadgePercent className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          {/* Discount toggle */}
           <button
             onClick={() => onChange({ ...value, onlyDiscount: value.onlyDiscount ? undefined : true })}
             className={`${chipBase} ${value.onlyDiscount ? "border-discount bg-discount/10 text-discount" : chipIdle}`}
@@ -194,11 +245,47 @@ export function CatalogFilters({
             <BadgePercent className="h-3.5 w-3.5" />
             {t("catalog.onlyDiscount")}
           </button>
+
+          {/* In stock */}
+          <button
+            onClick={() => onChange({ ...value, inStockOnly: value.inStockOnly ? undefined : true })}
+            className={`${chipBase} ${value.inStockOnly ? chipActive : chipIdle}`}
+          >
+            <Package className="h-3.5 w-3.5" />
+            {t("catalog.inStockOnly")}
+          </button>
+
+          {/* Free shipping */}
+          <button
+            onClick={() => onChange({ ...value, freeShipping: value.freeShipping ? undefined : true })}
+            className={`${chipBase} ${value.freeShipping ? chipActive : chipIdle}`}
+          >
+            <Truck className="h-3.5 w-3.5" />
+            {t("catalog.freeShipping")}
+          </button>
+
+          {/* Fast delivery */}
+          <button
+            onClick={() => onChange({ ...value, fastDelivery: value.fastDelivery ? undefined : true })}
+            className={`${chipBase} ${value.fastDelivery ? chipActive : chipIdle}`}
+          >
+            <Zap className="h-3.5 w-3.5" />
+            {t("catalog.fastDelivery")}
+          </button>
+
+          {/* New arrivals */}
+          <button
+            onClick={() => onChange({ ...value, newArrivals: value.newArrivals ? undefined : true })}
+            className={`${chipBase} ${value.newArrivals ? chipActive : chipIdle}`}
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            {t("catalog.newArrivals")}
+          </button>
         </div>
       </div>
 
-      {/* Active filter pills — silmək üçün */}
-      {(value.brand || value.minRating || priceActive || value.onlyDiscount) && (
+      {/* Active pills */}
+      {(value.brand || value.minRating || priceActive || value.onlyDiscount || value.inStockOnly || value.freeShipping || value.fastDelivery || value.newArrivals || value.minDiscount) && (
         <div className="flex items-center gap-1.5 flex-wrap mt-2">
           <span className="text-[11px] text-muted-foreground font-semibold">{sortLabel} ·</span>
           {value.brand && (
@@ -216,9 +303,34 @@ export function CatalogFilters({
               {value.minRating}+ ★ <button onClick={() => onChange({ ...value, minRating: undefined })}><X className="h-3 w-3" /></button>
             </span>
           )}
+          {value.minDiscount && (
+            <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-discount/10 text-discount text-[11px] font-bold">
+              {value.minDiscount}%+ <button onClick={() => onChange({ ...value, minDiscount: undefined })}><X className="h-3 w-3" /></button>
+            </span>
+          )}
           {value.onlyDiscount && (
             <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-discount/10 text-discount text-[11px] font-bold">
               {t("catalog.onlyDiscount")} <button onClick={() => onChange({ ...value, onlyDiscount: undefined })}><X className="h-3 w-3" /></button>
+            </span>
+          )}
+          {value.inStockOnly && (
+            <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+              {t("catalog.inStockOnly")} <button onClick={() => onChange({ ...value, inStockOnly: undefined })}><X className="h-3 w-3" /></button>
+            </span>
+          )}
+          {value.freeShipping && (
+            <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+              {t("catalog.freeShipping")} <button onClick={() => onChange({ ...value, freeShipping: undefined })}><X className="h-3 w-3" /></button>
+            </span>
+          )}
+          {value.fastDelivery && (
+            <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+              {t("catalog.fastDelivery")} <button onClick={() => onChange({ ...value, fastDelivery: undefined })}><X className="h-3 w-3" /></button>
+            </span>
+          )}
+          {value.newArrivals && (
+            <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+              {t("catalog.newArrivals")} <button onClick={() => onChange({ ...value, newArrivals: undefined })}><X className="h-3 w-3" /></button>
             </span>
           )}
           <button onClick={reset} className="text-[11px] font-bold text-muted-foreground hover:text-primary underline ml-1">

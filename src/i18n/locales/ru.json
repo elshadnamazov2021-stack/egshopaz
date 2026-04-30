@@ -156,6 +156,12 @@
     "brand": "Бренд",
     "minRating": "Мин. рейтинг",
     "onlyDiscount": "Только со скидкой",
+    "inStockOnly": "В наличии",
+    "freeShipping": "Бесплатная доставка",
+    "fastDelivery": "Быстрая доставка",
+    "newArrivals": "Новинки",
+    "minDiscount": "Мин скидка %",
+    "priceRange": "Диапазон цен",
     "reset": "Сбросить"
   },
   "product": {

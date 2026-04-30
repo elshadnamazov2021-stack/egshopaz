@@ -74,6 +74,11 @@ function Catalog() {
     if (filters.brand) query = query.eq("brand", filters.brand);
     if (filters.minRating) query = query.gte("rating", filters.minRating);
     if (filters.onlyDiscount) query = query.not("old_price", "is", null);
+    if (filters.inStockOnly) query = query.gt("stock", 0);
+    if (filters.newArrivals) {
+      const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      query = query.gte("created_at", since);
+    }
 
     if (filters.sort === "price_asc") query = query.order("price", { ascending: true });
     else if (filters.sort === "price_desc") query = query.order("price", { ascending: false });
@@ -82,7 +87,16 @@ function Catalog() {
     else query = query.order("created_at", { ascending: false });
 
     query.limit(80).then(({ data }: { data: ProductCardData[] | null }) => {
-      setProducts((data ?? []) as ProductCardData[]);
+      let list = (data ?? []) as ProductCardData[];
+      if (filters.minDiscount) {
+        const min = filters.minDiscount;
+        list = list.filter((p: any) => {
+          if (!p.old_price || p.old_price <= p.price) return false;
+          const pct = ((p.old_price - p.price) / p.old_price) * 100;
+          return pct >= min;
+        });
+      }
+      setProducts(list);
       setLoading(false);
     });
   }, [q, cat, filters, categories]);
