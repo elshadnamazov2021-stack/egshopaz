@@ -21,6 +21,9 @@ interface Product {
   image_url: string | null; images: string[]; is_active: boolean; category_id: string | null;
   brand: string | null; description: string | null; sku: string | null; weight: number | null;
   rating: number; reviews_count: number;
+  delivery_days_min?: number | null; delivery_days_max?: number | null;
+  delivery_city?: string | null; free_shipping?: boolean | null; fast_delivery?: boolean | null;
+  condition?: string | null; color?: string | null; size?: string | null;
 }
 interface Category { id: string; name: string }
 interface OrderItem {
