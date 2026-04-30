@@ -129,6 +129,45 @@ export function CatalogFilters({
         </div>
       </div>
 
+      <div>
+        <label className="text-xs font-bold uppercase text-muted-foreground">{t("catalog.maxDeliveryDays")}</label>
+        <div className="flex gap-1 mt-2">
+          {[0, ...DELIVERY_DAYS].map((d) => (
+            <button key={d} onClick={() => onChange({ ...value, maxDeliveryDays: d || undefined })}
+                    className={`flex-1 h-9 rounded-lg text-xs font-semibold border ${value.maxDeliveryDays === d || (!value.maxDeliveryDays && d === 0) ? "bg-primary text-primary-foreground border-primary" : "border-border hover:border-primary"}`}>
+              {d === 0 ? t("catalog.all") : `≤${d}${t("catalog.daysShort")}`}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-bold uppercase text-muted-foreground">{t("catalog.deliveryCity")}</label>
+        <select value={value.city ?? ""} onChange={(e) => onChange({ ...value, city: e.target.value || undefined })}
+                className="mt-2 w-full h-10 px-3 rounded-lg border border-input bg-background text-sm">
+          <option value="">{t("catalog.all")}</option>
+          {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+        </select>
+      </div>
+
+      <div>
+        <label className="text-xs font-bold uppercase text-muted-foreground">{t("catalog.condition")}</label>
+        <div className="flex gap-1 mt-2">
+          <button onClick={() => onChange({ ...value, condition: undefined })}
+                  className={`flex-1 h-9 rounded-lg text-xs font-semibold border ${!value.condition ? "bg-primary text-primary-foreground border-primary" : "border-border hover:border-primary"}`}>
+            {t("catalog.all")}
+          </button>
+          <button onClick={() => onChange({ ...value, condition: "new" })}
+                  className={`flex-1 h-9 rounded-lg text-xs font-semibold border ${value.condition === "new" ? "bg-primary text-primary-foreground border-primary" : "border-border hover:border-primary"}`}>
+            {t("catalog.conditionNew")}
+          </button>
+          <button onClick={() => onChange({ ...value, condition: "used" })}
+                  className={`flex-1 h-9 rounded-lg text-xs font-semibold border ${value.condition === "used" ? "bg-primary text-primary-foreground border-primary" : "border-border hover:border-primary"}`}>
+            {t("catalog.conditionUsed")}
+          </button>
+        </div>
+      </div>
+
       <div className="space-y-2">
         <label className="flex items-center gap-2 cursor-pointer select-none">
           <input type="checkbox" checked={!!value.onlyDiscount} onChange={(e) => onChange({ ...value, onlyDiscount: e.target.checked || undefined })} className="w-4 h-4 accent-primary" />
