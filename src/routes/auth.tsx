@@ -332,5 +332,3 @@ function AuthPage() {
     </div>
   );
 }
-  );
-}
