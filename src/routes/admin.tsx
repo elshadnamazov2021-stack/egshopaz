@@ -7,7 +7,7 @@ import {
   Users, Package, ShoppingBag, DollarSign, Shield, LayoutDashboard,
   Truck, Warehouse, Store, Megaphone, BarChart3, Lock, Scale,
   FileText, Settings, LifeBuoy, AlertTriangle, TrendingUp, Plus, Trash2,
-  CheckCircle2, XCircle, Power, Ban, Edit3, Bell, Tag, Crown, Gem, Star, Award,
+  CheckCircle2, XCircle, Power, Ban, Edit3, Bell, Tag, Crown, Gem, Star, Award, Bot, Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
@@ -340,6 +340,7 @@ function AdminPanel() {
     { key: "content", label: "Kontent", icon: FileText, active: tab === "content", onClick: () => setTab("content") },
     { key: "settings", label: "Sistem ayarları", icon: Settings, active: tab === "settings", onClick: () => setTab("settings") },
     { key: "support", label: "Dəstək", icon: LifeBuoy, badge: tickets.filter((t) => t.status === "open").length, active: tab === "support", onClick: () => setTab("support") },
+    { key: "ai_bot", label: "AI Bot", icon: Bot, active: tab === "ai_bot", onClick: () => setTab("ai_bot") },
   ];
 
   const tabTitle = navItems.find((n) => n.key === tab)?.label ?? "Admin";
@@ -373,6 +374,7 @@ function AdminPanel() {
       {tab === "content" && <ContentSection />}
       {tab === "settings" && <SettingsSection settings={settings} updateSettings={updateSettings} />}
       {tab === "support" && <SupportSection tickets={tickets} replyTicket={replyTicket} />}
+      {tab === "ai_bot" && <AIBotSection />}
     </PanelLayout>
   );
 }
