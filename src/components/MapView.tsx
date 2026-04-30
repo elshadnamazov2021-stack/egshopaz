@@ -57,10 +57,7 @@ export function MapView({ markers, height = 480, center, zoom = 8, className = "
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [{ default: L }] = await Promise.all([
-        import("leaflet"),
-        import("leaflet/dist/leaflet.css"),
-      ]);
+      const { default: L } = await import("leaflet");
       if (cancelled || !containerRef.current || mapRef.current) return;
       LRef.current = L;
       const map = L.map(containerRef.current, { scrollWheelZoom: true }).setView(initialCenter, zoom);
