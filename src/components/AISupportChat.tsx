@@ -10,7 +10,7 @@ interface AIMsg {
   created_at: string;
 }
 
-export function AISupportChat({ userId }: { userId: string }) {
+export function AISupportChat({ userId, audience = "buyer" }: { userId: string; audience?: "buyer" | "seller" | "pvz" | "all" }) {
   const [messages, setMessages] = useState<AIMsg[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
