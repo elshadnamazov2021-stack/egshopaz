@@ -162,7 +162,16 @@
     "newArrivals": "Yeni gələnlər",
     "minDiscount": "Min endirim %",
     "priceRange": "Qiymət aralığı",
-    "reset": "Sıfırla"
+    "reset": "Sıfırla",
+    "maxDeliveryDays": "Çatdırılma müddəti",
+    "deliveryCity": "Çatdırılma şəhəri",
+    "deliveryFast": "Ən tez çatdırılma",
+    "discountHigh": "Ən yüksək endirim",
+    "condition": "Vəziyyəti",
+    "conditionNew": "Yeni",
+    "conditionUsed": "İşlənmiş",
+    "daysShort": "g",
+    "freeShippingShort": "Pulsuz"
   },
   "product": {
     "addToCart": "Səbətə at",

@@ -663,8 +663,15 @@ export type Database = {
         Row: {
           brand: string | null
           category_id: string | null
+          color: string | null
+          condition: string | null
           created_at: string
+          delivery_city: string | null
+          delivery_days_max: number | null
+          delivery_days_min: number | null
           description: string | null
+          fast_delivery: boolean
+          free_shipping: boolean
           id: string
           image_url: string | null
           images: string[]
@@ -674,6 +681,7 @@ export type Database = {
           rating: number
           reviews_count: number
           seller_id: string
+          size: string | null
           sku: string | null
           stock: number
           title: string
@@ -683,8 +691,15 @@ export type Database = {
         Insert: {
           brand?: string | null
           category_id?: string | null
+          color?: string | null
+          condition?: string | null
           created_at?: string
+          delivery_city?: string | null
+          delivery_days_max?: number | null
+          delivery_days_min?: number | null
           description?: string | null
+          fast_delivery?: boolean
+          free_shipping?: boolean
           id?: string
           image_url?: string | null
           images?: string[]
@@ -694,6 +709,7 @@ export type Database = {
           rating?: number
           reviews_count?: number
           seller_id: string
+          size?: string | null
           sku?: string | null
           stock?: number
           title: string
@@ -703,8 +719,15 @@ export type Database = {
         Update: {
           brand?: string | null
           category_id?: string | null
+          color?: string | null
+          condition?: string | null
           created_at?: string
+          delivery_city?: string | null
+          delivery_days_max?: number | null
+          delivery_days_min?: number | null
           description?: string | null
+          fast_delivery?: boolean
+          free_shipping?: boolean
           id?: string
           image_url?: string | null
           images?: string[]
@@ -714,6 +737,7 @@ export type Database = {
           rating?: number
           reviews_count?: number
           seller_id?: string
+          size?: string | null
           sku?: string | null
           stock?: number
           title?: string

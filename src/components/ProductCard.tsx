@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, ShoppingCart, Star } from "lucide-react";
+import { Heart, ShoppingCart, Star, Truck, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { formatAZN, calcDiscount } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +17,12 @@ export interface ProductCardData {
   rating: number;
   reviews_count: number;
   brand: string | null;
+  delivery_days_min?: number | null;
+  delivery_days_max?: number | null;
+  delivery_city?: string | null;
+  free_shipping?: boolean | null;
+  fast_delivery?: boolean | null;
+  stock?: number | null;
 }
 
 export function ProductCard({ p }: { p: ProductCardData }) {
@@ -77,6 +83,28 @@ export function ProductCard({ p }: { p: ProductCardData }) {
         </div>
         {p.brand && <span className="text-xs text-muted-foreground font-semibold uppercase">{p.brand}</span>}
         <p className="text-sm line-clamp-2 text-foreground/80">{p.title}</p>
+        {(p.fast_delivery || p.free_shipping || p.delivery_days_max) && (
+          <div className="flex items-center gap-1 flex-wrap">
+            {p.fast_delivery && (
+              <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-warning/15 text-warning px-1.5 py-0.5 rounded">
+                <Zap className="h-2.5 w-2.5" /> 24s
+              </span>
+            )}
+            {p.free_shipping && (
+              <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-success/15 text-success px-1.5 py-0.5 rounded">
+                <Truck className="h-2.5 w-2.5" /> {t("catalog.freeShippingShort")}
+              </span>
+            )}
+            {!p.fast_delivery && p.delivery_days_max ? (
+              <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-muted-foreground">
+                <Truck className="h-2.5 w-2.5" />
+                {p.delivery_days_min && p.delivery_days_min !== p.delivery_days_max
+                  ? `${p.delivery_days_min}-${p.delivery_days_max}`
+                  : p.delivery_days_max} {t("catalog.daysShort")}
+              </span>
+            ) : null}
+          </div>
+        )}
         <div className="flex items-center gap-1 text-xs text-muted-foreground mt-auto pt-1">
           <Star className="h-3 w-3 fill-warning text-warning" />
           <span className="font-semibold text-foreground">{Number(p.rating).toFixed(1)}</span>

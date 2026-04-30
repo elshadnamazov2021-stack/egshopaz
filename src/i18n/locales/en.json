@@ -162,7 +162,16 @@
     "newArrivals": "New arrivals",
     "minDiscount": "Min discount %",
     "priceRange": "Price range",
-    "reset": "Reset"
+    "reset": "Reset",
+    "maxDeliveryDays": "Delivery time",
+    "deliveryCity": "Delivery city",
+    "deliveryFast": "Fastest delivery",
+    "discountHigh": "Highest discount",
+    "condition": "Condition",
+    "conditionNew": "New",
+    "conditionUsed": "Used",
+    "daysShort": "d",
+    "freeShippingShort": "Free"
   },
   "product": {
     "addToCart": "Add to cart",

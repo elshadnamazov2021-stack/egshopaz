@@ -162,7 +162,16 @@
     "newArrivals": "Новинки",
     "minDiscount": "Мин скидка %",
     "priceRange": "Диапазон цен",
-    "reset": "Сбросить"
+    "reset": "Сбросить",
+    "maxDeliveryDays": "Срок доставки",
+    "deliveryCity": "Город доставки",
+    "deliveryFast": "Самая быстрая доставка",
+    "discountHigh": "Наибольшая скидка",
+    "condition": "Состояние",
+    "conditionNew": "Новый",
+    "conditionUsed": "Б/у",
+    "daysShort": "дн",
+    "freeShippingShort": "Бесплатно"
   },
   "product": {
     "addToCart": "В корзину",

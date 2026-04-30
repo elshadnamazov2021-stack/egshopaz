@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { SlidersHorizontal, X, ChevronDown, Tag, BadgePercent, Star, Package, Truck, Zap, Sparkles } from "lucide-react";
+import { SlidersHorizontal, X, ChevronDown, Tag, BadgePercent, Star, Package, Truck, Zap, Sparkles, MapPin, Clock } from "lucide-react";
 
-export type SortKey = "newest" | "price_asc" | "price_desc" | "rating" | "popular";
+export type SortKey = "newest" | "price_asc" | "price_desc" | "rating" | "popular" | "delivery_fast" | "discount_high";
 
 export interface Filters {
   minPrice?: number;
@@ -15,8 +15,14 @@ export interface Filters {
   fastDelivery?: boolean;
   newArrivals?: boolean;
   minDiscount?: number; // % e.g. 20, 30, 50
+  maxDeliveryDays?: number; // 1, 3, 7, 14
+  city?: string; // delivery city
+  condition?: "new" | "used"; // product condition
   sort: SortKey;
 }
+
+const CITIES = ["Bakı", "Sumqayıt", "Gəncə", "Mingəçevir", "Lənkəran", "Şirvan", "Naxçıvan", "Şəki", "Quba"];
+const DELIVERY_DAYS = [1, 3, 7, 14];
 
 export function CatalogFilters({
   brands,
@@ -40,6 +46,8 @@ export function CatalogFilters({
     { id: "price_asc", label: t("catalog.priceAsc") },
     { id: "price_desc", label: t("catalog.priceDesc") },
     { id: "rating", label: t("catalog.rating") },
+    { id: "delivery_fast", label: t("catalog.deliveryFast") },
+    { id: "discount_high", label: t("catalog.discountHigh") },
   ];
 
   const apply = () => {
@@ -68,6 +76,9 @@ export function CatalogFilters({
     if (value.fastDelivery) n++;
     if (value.newArrivals) n++;
     if (value.minDiscount) n++;
+    if (value.maxDeliveryDays) n++;
+    if (value.city) n++;
+    if (value.condition) n++;
     return n;
   }, [value]);
 
@@ -115,6 +126,45 @@ export function CatalogFilters({
               {d === 0 ? t("catalog.all") : `${d}%+`}
             </button>
           ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-bold uppercase text-muted-foreground">{t("catalog.maxDeliveryDays")}</label>
+        <div className="flex gap-1 mt-2">
+          {[0, ...DELIVERY_DAYS].map((d) => (
+            <button key={d} onClick={() => onChange({ ...value, maxDeliveryDays: d || undefined })}
+                    className={`flex-1 h-9 rounded-lg text-xs font-semibold border ${value.maxDeliveryDays === d || (!value.maxDeliveryDays && d === 0) ? "bg-primary text-primary-foreground border-primary" : "border-border hover:border-primary"}`}>
+              {d === 0 ? t("catalog.all") : `≤${d}${t("catalog.daysShort")}`}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-bold uppercase text-muted-foreground">{t("catalog.deliveryCity")}</label>
+        <select value={value.city ?? ""} onChange={(e) => onChange({ ...value, city: e.target.value || undefined })}
+                className="mt-2 w-full h-10 px-3 rounded-lg border border-input bg-background text-sm">
+          <option value="">{t("catalog.all")}</option>
+          {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+        </select>
+      </div>
+
+      <div>
+        <label className="text-xs font-bold uppercase text-muted-foreground">{t("catalog.condition")}</label>
+        <div className="flex gap-1 mt-2">
+          <button onClick={() => onChange({ ...value, condition: undefined })}
+                  className={`flex-1 h-9 rounded-lg text-xs font-semibold border ${!value.condition ? "bg-primary text-primary-foreground border-primary" : "border-border hover:border-primary"}`}>
+            {t("catalog.all")}
+          </button>
+          <button onClick={() => onChange({ ...value, condition: "new" })}
+                  className={`flex-1 h-9 rounded-lg text-xs font-semibold border ${value.condition === "new" ? "bg-primary text-primary-foreground border-primary" : "border-border hover:border-primary"}`}>
+            {t("catalog.conditionNew")}
+          </button>
+          <button onClick={() => onChange({ ...value, condition: "used" })}
+                  className={`flex-1 h-9 rounded-lg text-xs font-semibold border ${value.condition === "used" ? "bg-primary text-primary-foreground border-primary" : "border-border hover:border-primary"}`}>
+            {t("catalog.conditionUsed")}
+          </button>
         </div>
       </div>
 
@@ -281,11 +331,53 @@ export function CatalogFilters({
             <Sparkles className="h-3.5 w-3.5" />
             {t("catalog.newArrivals")}
           </button>
+
+          {/* Max delivery days */}
+          <div className="relative">
+            <select
+              value={value.maxDeliveryDays ?? ""}
+              onChange={(e) => onChange({ ...value, maxDeliveryDays: e.target.value ? Number(e.target.value) : undefined })}
+              className={`${chipBase} ${value.maxDeliveryDays ? chipActive : chipIdle} appearance-none pr-7 pl-7 cursor-pointer`}
+            >
+              <option value="">{t("catalog.maxDeliveryDays")}</option>
+              {DELIVERY_DAYS.map((d) => <option key={d} value={d}>≤{d}{t("catalog.daysShort")}</option>)}
+            </select>
+            <Clock className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          {/* City */}
+          <div className="relative">
+            <select
+              value={value.city ?? ""}
+              onChange={(e) => onChange({ ...value, city: e.target.value || undefined })}
+              className={`${chipBase} ${value.city ? chipActive : chipIdle} appearance-none pr-7 pl-7 cursor-pointer`}
+            >
+              <option value="">{t("catalog.deliveryCity")}</option>
+              {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <MapPin className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          {/* Condition */}
+          <div className="relative">
+            <select
+              value={value.condition ?? ""}
+              onChange={(e) => onChange({ ...value, condition: (e.target.value as "new" | "used") || undefined })}
+              className={`${chipBase} ${value.condition ? chipActive : chipIdle} appearance-none pr-7 cursor-pointer`}
+            >
+              <option value="">{t("catalog.condition")}</option>
+              <option value="new">{t("catalog.conditionNew")}</option>
+              <option value="used">{t("catalog.conditionUsed")}</option>
+            </select>
+            <ChevronDown className="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
         </div>
       </div>
 
       {/* Active pills */}
-      {(value.brand || value.minRating || priceActive || value.onlyDiscount || value.inStockOnly || value.freeShipping || value.fastDelivery || value.newArrivals || value.minDiscount) && (
+      {(value.brand || value.minRating || priceActive || value.onlyDiscount || value.inStockOnly || value.freeShipping || value.fastDelivery || value.newArrivals || value.minDiscount || value.maxDeliveryDays || value.city || value.condition) && (
         <div className="flex items-center gap-1.5 flex-wrap mt-2">
           <span className="text-[11px] text-muted-foreground font-semibold">{sortLabel} ·</span>
           {value.brand && (
@@ -331,6 +423,21 @@ export function CatalogFilters({
           {value.newArrivals && (
             <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
               {t("catalog.newArrivals")} <button onClick={() => onChange({ ...value, newArrivals: undefined })}><X className="h-3 w-3" /></button>
+            </span>
+          )}
+          {value.maxDeliveryDays && (
+            <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+              ≤{value.maxDeliveryDays}{t("catalog.daysShort")} <button onClick={() => onChange({ ...value, maxDeliveryDays: undefined })}><X className="h-3 w-3" /></button>
+            </span>
+          )}
+          {value.city && (
+            <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+              {value.city} <button onClick={() => onChange({ ...value, city: undefined })}><X className="h-3 w-3" /></button>
+            </span>
+          )}
+          {value.condition && (
+            <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+              {t(value.condition === "new" ? "catalog.conditionNew" : "catalog.conditionUsed")} <button onClick={() => onChange({ ...value, condition: undefined })}><X className="h-3 w-3" /></button>
             </span>
           )}
           <button onClick={reset} className="text-[11px] font-bold text-muted-foreground hover:text-primary underline ml-1">
