@@ -50,10 +50,22 @@ function ResetPasswordPage() {
           {ready ? "Yeni şifrənizi daxil edin." : "Bərpa linkini yoxlayırıq..."}
         </p>
         <form onSubmit={submit} className="space-y-3">
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-            placeholder="Yeni şifrə (min 6 simvol)" maxLength={72} autoComplete="new-password" className={inputCls} />
-          <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)}
-            placeholder="Yeni şifrəni təkrar daxil edin" maxLength={72} autoComplete="new-password" className={inputCls} />
+          <div className="relative">
+            <input type={show1 ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
+              placeholder="Yeni şifrə (min 6 simvol)" maxLength={72} autoComplete="new-password" className={`${inputCls} pr-11`} />
+            <button type="button" onClick={() => setShow1((v) => !v)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-muted-foreground hover:text-primary transition">
+              {show1 ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+          <div className="relative">
+            <input type={show2 ? "text" : "password"} value={confirm} onChange={(e) => setConfirm(e.target.value)}
+              placeholder="Yeni şifrəni təkrar daxil edin" maxLength={72} autoComplete="new-password" className={`${inputCls} pr-11`} />
+            <button type="button" onClick={() => setShow2((v) => !v)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-muted-foreground hover:text-primary transition">
+              {show2 ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
           <button type="submit" disabled={busy || !ready}
             className="w-full h-11 bg-primary text-primary-foreground rounded-lg font-bold hover:bg-primary/90 disabled:opacity-60">
             {busy ? "..." : "Şifrəni yenilə"}
