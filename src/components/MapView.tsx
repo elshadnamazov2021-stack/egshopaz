@@ -1,6 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export type MapMarker = {
   id: string;
@@ -31,18 +29,6 @@ const ICONS: Record<MapMarker["kind"], string> = {
   order: "🛍️",
 };
 
-function makeIcon(kind: MapMarker["kind"]) {
-  const color = COLORS[kind];
-  const emoji = ICONS[kind];
-  return L.divIcon({
-    className: "lvbl-marker",
-    html: `<div style="background:${color};width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.3)"><span style="transform:rotate(45deg);font-size:16px">${emoji}</span></div>`,
-    iconSize: [34, 34],
-    iconAnchor: [17, 34],
-    popupAnchor: [0, -32],
-  });
-}
-
 interface Props {
   markers: MapMarker[];
   height?: number | string;
@@ -53,8 +39,13 @@ interface Props {
 
 export function MapView({ markers, height = 480, center, zoom = 8, className = "" }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<L.Map | null>(null);
-  const layerRef = useRef<L.LayerGroup | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const layerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const LRef = useRef<any>(null);
+  const [ready, setReady] = useState(false);
 
   const initialCenter = useMemo<[number, number]>(() => {
     if (center) return center;
@@ -62,28 +53,59 @@ export function MapView({ markers, height = 480, center, zoom = 8, className = "
     return [40.3, 47.7]; // Az center
   }, [center, markers]);
 
+  // Client-only Leaflet load (avoids SSR `window is not defined` crash)
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) return;
-    const map = L.map(containerRef.current, { scrollWheelZoom: true }).setView(initialCenter, zoom);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; OpenStreetMap',
-      maxZoom: 19,
-    }).addTo(map);
-    layerRef.current = L.layerGroup().addTo(map);
-    mapRef.current = map;
-    return () => { map.remove(); mapRef.current = null; };
+    let cancelled = false;
+    (async () => {
+      const [{ default: L }] = await Promise.all([
+        import("leaflet"),
+        import("leaflet/dist/leaflet.css"),
+      ]);
+      if (cancelled || !containerRef.current || mapRef.current) return;
+      LRef.current = L;
+      const map = L.map(containerRef.current, { scrollWheelZoom: true }).setView(initialCenter, zoom);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap",
+        maxZoom: 19,
+      }).addTo(map);
+      layerRef.current = L.layerGroup().addTo(map);
+      mapRef.current = map;
+      // Force size after mount (parent containers can be 0 height initially)
+      setTimeout(() => map.invalidateSize(), 50);
+      setReady(true);
+    })().catch((e) => console.error("[MapView] load failed", e));
+    return () => {
+      cancelled = true;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    const map = mapRef.current; const layer = layerRef.current;
-    if (!map || !layer) return;
+    const L = LRef.current;
+    const map = mapRef.current;
+    const layer = layerRef.current;
+    if (!ready || !L || !map || !layer) return;
     layer.clearLayers();
     const valid = markers.filter((m) => Number.isFinite(m.lat) && Number.isFinite(m.lng));
     valid.forEach((m) => {
-      const marker = L.marker([m.lat, m.lng], { icon: makeIcon(m.kind), title: m.title });
+      const color = COLORS[m.kind];
+      const emoji = ICONS[m.kind];
+      const icon = L.divIcon({
+        className: "lvbl-marker",
+        html: `<div style="background:${color};width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.3)"><span style="transform:rotate(45deg);font-size:16px">${emoji}</span></div>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 34],
+        popupAnchor: [0, -32],
+      });
+      const marker = L.marker([m.lat, m.lng], { icon, title: m.title });
       const link = m.link ? `<br/><a href="${m.link}" style="color:#3b82f6;font-weight:600">Aç →</a>` : "";
-      marker.bindPopup(`<div style="font-family:system-ui;min-width:160px"><b>${m.title}</b>${m.description ? `<br/><small>${m.description}</small>` : ""}${link}</div>`);
+      marker.bindPopup(
+        `<div style="font-family:system-ui;min-width:160px"><b>${m.title}</b>${m.description ? `<br/><small>${m.description}</small>` : ""}${link}</div>`
+      );
       marker.addTo(layer);
     });
     if (valid.length > 1) {
@@ -92,10 +114,13 @@ export function MapView({ markers, height = 480, center, zoom = 8, className = "
     } else if (valid.length === 1) {
       map.setView([valid[0].lat, valid[0].lng], Math.max(map.getZoom(), 12));
     }
-  }, [markers]);
+  }, [markers, ready]);
 
   return (
-    <div ref={containerRef} className={`rounded-2xl overflow-hidden border border-border ${className}`}
-         style={{ height, width: "100%", zIndex: 0 }} />
+    <div
+      ref={containerRef}
+      className={`rounded-2xl overflow-hidden border border-border bg-secondary/30 ${className}`}
+      style={{ height, width: "100%", zIndex: 0 }}
+    />
   );
 }
