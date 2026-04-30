@@ -22,7 +22,7 @@ type TabKey =
   | "dashboard" | "customers" | "sellers" | "couriers" | "pvz_staff"
   | "categories" | "products" | "shops" | "warehouses" | "pickup_points"
   | "orders" | "finance" | "marketing" | "banners" | "packages" | "promo" | "analytics"
-  | "security" | "disputes" | "content" | "settings" | "support";
+  | "security" | "disputes" | "content" | "settings" | "support" | "ai_bot";
 
 interface Stat { users: number; products: number; orders: number; revenue: number; sellers: number }
 interface ProfileRow { id: string; full_name: string | null; shop_name: string | null; created_at: string; phone: string | null }
