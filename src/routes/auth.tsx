@@ -10,6 +10,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import elzanLogo from "@/assets/elzan-logo.png";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Giriş / Qeydiyyat — Elzan Shop" }] }),
@@ -223,8 +224,11 @@ function AuthPage() {
   return (
     <div className="container mx-auto px-4 py-10 max-w-lg">
       <div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-card">
-        <h1 className="text-2xl font-extrabold mb-1">{mode === "login" ? "Giriş" : "Qeydiyyat"}</h1>
-        <p className="text-sm text-muted-foreground mb-5">
+        <div className="flex justify-center mb-4">
+          <img src={elzanLogo} alt="Elzan Shop logo" className="h-24 w-auto object-contain drop-shadow-md" />
+        </div>
+        <h1 className="text-2xl font-extrabold mb-1 text-center">{mode === "login" ? "Giriş" : "Qeydiyyat"}</h1>
+        <p className="text-sm text-muted-foreground mb-5 text-center">
           {mode === "login" ? "Hesabınıza daxil olun" : "Hesab tipinizi seçin"}
         </p>
 
