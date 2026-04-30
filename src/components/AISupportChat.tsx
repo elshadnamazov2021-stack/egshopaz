@@ -44,7 +44,7 @@ export function AISupportChat({ userId, audience = "buyer" }: { userId: string; 
     setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "user", content: msg, created_at: new Date().toISOString() }]);
     try {
       const { data, error } = await supabase.functions.invoke("ai-auto-reply", {
-        body: { channel: "support", user_id: userId, message: msg },
+        body: { channel: "support", user_id: userId, message: msg, audience },
       });
       if (error) throw error;
       if (data?.reply) {
