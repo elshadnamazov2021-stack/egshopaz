@@ -16,7 +16,8 @@ function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
-
+  const [show1, setShow1] = useState(false);
+  const [show2, setShow2] = useState(false);
   useEffect(() => {
     // Supabase recovery link sets a session via URL hash; listener fires on PASSWORD_RECOVERY
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
