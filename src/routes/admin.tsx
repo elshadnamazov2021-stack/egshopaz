@@ -332,6 +332,7 @@ function AdminPanel() {
     { key: "finance", label: "Maliyyə", icon: DollarSign, active: tab === "finance", onClick: () => setTab("finance") },
     { key: "marketing", label: "Marketinq", icon: Megaphone, active: tab === "marketing", onClick: () => setTab("marketing") },
     { key: "banners", label: "Bannerlər", icon: Megaphone, active: tab === "banners", onClick: () => setTab("banners") },
+    { key: "packages", label: "Reklam paketləri", icon: Crown, active: tab === "packages", onClick: () => setTab("packages") },
     { key: "promo", label: "Promokodlar", icon: Tag, active: tab === "promo", onClick: () => setTab("promo") },
     { key: "analytics", label: "Analitika", icon: BarChart3, active: tab === "analytics", onClick: () => setTab("analytics") },
     { key: "security", label: "Təhlükəsizlik", icon: Lock, active: tab === "security", onClick: () => setTab("security") },
