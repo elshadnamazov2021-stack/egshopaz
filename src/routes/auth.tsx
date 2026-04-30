@@ -228,7 +228,7 @@ function AuthPage() {
           <img src={elzanLogo} alt="Elzan Shop logo" className="h-24 w-auto object-contain drop-shadow-md" />
         </div>
         <h1 className="text-2xl font-extrabold mb-1 text-center">{mode === "login" ? "Giriş" : "Qeydiyyat"}</h1>
-        <p className="text-sm text-muted-foreground mb-5">
+        <p className="text-sm text-muted-foreground mb-5 text-center">
           {mode === "login" ? "Hesabınıza daxil olun" : "Hesab tipinizi seçin"}
         </p>
 
