@@ -222,6 +222,14 @@ function OrdersPage() {
           </div>
         </div>
       )}
-    </PanelLayout>
+
+      {trackOrder && (
+        <OrderTrackDialog
+          open={!!trackOrder}
+          onClose={() => setTrackOrder(null)}
+          orderId={trackOrder.id}
+          pickupPointId={trackOrder.pickup_point_id}
+        />
+      )}
   );
 }
