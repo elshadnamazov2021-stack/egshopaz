@@ -156,6 +156,12 @@
     "brand": "Brand",
     "minRating": "Min rating",
     "onlyDiscount": "Discounted only",
+    "inStockOnly": "In stock",
+    "freeShipping": "Free shipping",
+    "fastDelivery": "Fast delivery",
+    "newArrivals": "New arrivals",
+    "minDiscount": "Min discount %",
+    "priceRange": "Price range",
     "reset": "Reset"
   },
   "product": {
