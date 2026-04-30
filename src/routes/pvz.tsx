@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { QRScannerDialog } from "@/components/QRScannerDialog";
 import { PvzOrderChat } from "@/components/PvzOrderChat";
+import { AISupportChat } from "@/components/AISupportChat";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
