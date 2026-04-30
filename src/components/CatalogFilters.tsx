@@ -331,11 +331,53 @@ export function CatalogFilters({
             <Sparkles className="h-3.5 w-3.5" />
             {t("catalog.newArrivals")}
           </button>
+
+          {/* Max delivery days */}
+          <div className="relative">
+            <select
+              value={value.maxDeliveryDays ?? ""}
+              onChange={(e) => onChange({ ...value, maxDeliveryDays: e.target.value ? Number(e.target.value) : undefined })}
+              className={`${chipBase} ${value.maxDeliveryDays ? chipActive : chipIdle} appearance-none pr-7 pl-7 cursor-pointer`}
+            >
+              <option value="">{t("catalog.maxDeliveryDays")}</option>
+              {DELIVERY_DAYS.map((d) => <option key={d} value={d}>≤{d}{t("catalog.daysShort")}</option>)}
+            </select>
+            <Clock className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          {/* City */}
+          <div className="relative">
+            <select
+              value={value.city ?? ""}
+              onChange={(e) => onChange({ ...value, city: e.target.value || undefined })}
+              className={`${chipBase} ${value.city ? chipActive : chipIdle} appearance-none pr-7 pl-7 cursor-pointer`}
+            >
+              <option value="">{t("catalog.deliveryCity")}</option>
+              {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <MapPin className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          {/* Condition */}
+          <div className="relative">
+            <select
+              value={value.condition ?? ""}
+              onChange={(e) => onChange({ ...value, condition: (e.target.value as "new" | "used") || undefined })}
+              className={`${chipBase} ${value.condition ? chipActive : chipIdle} appearance-none pr-7 cursor-pointer`}
+            >
+              <option value="">{t("catalog.condition")}</option>
+              <option value="new">{t("catalog.conditionNew")}</option>
+              <option value="used">{t("catalog.conditionUsed")}</option>
+            </select>
+            <ChevronDown className="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
         </div>
       </div>
 
       {/* Active pills */}
-      {(value.brand || value.minRating || priceActive || value.onlyDiscount || value.inStockOnly || value.freeShipping || value.fastDelivery || value.newArrivals || value.minDiscount) && (
+      {(value.brand || value.minRating || priceActive || value.onlyDiscount || value.inStockOnly || value.freeShipping || value.fastDelivery || value.newArrivals || value.minDiscount || value.maxDeliveryDays || value.city || value.condition) && (
         <div className="flex items-center gap-1.5 flex-wrap mt-2">
           <span className="text-[11px] text-muted-foreground font-semibold">{sortLabel} ·</span>
           {value.brand && (
@@ -381,6 +423,21 @@ export function CatalogFilters({
           {value.newArrivals && (
             <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
               {t("catalog.newArrivals")} <button onClick={() => onChange({ ...value, newArrivals: undefined })}><X className="h-3 w-3" /></button>
+            </span>
+          )}
+          {value.maxDeliveryDays && (
+            <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+              ≤{value.maxDeliveryDays}{t("catalog.daysShort")} <button onClick={() => onChange({ ...value, maxDeliveryDays: undefined })}><X className="h-3 w-3" /></button>
+            </span>
+          )}
+          {value.city && (
+            <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+              {value.city} <button onClick={() => onChange({ ...value, city: undefined })}><X className="h-3 w-3" /></button>
+            </span>
+          )}
+          {value.condition && (
+            <span className="inline-flex items-center gap-1 px-2 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+              {t(value.condition === "new" ? "catalog.conditionNew" : "catalog.conditionUsed")} <button onClick={() => onChange({ ...value, condition: undefined })}><X className="h-3 w-3" /></button>
             </span>
           )}
           <button onClick={reset} className="text-[11px] font-bold text-muted-foreground hover:text-primary underline ml-1">
