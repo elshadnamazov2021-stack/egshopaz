@@ -7,7 +7,7 @@ import {
   Users, Package, ShoppingBag, DollarSign, Shield, LayoutDashboard,
   Truck, Warehouse, Store, Megaphone, BarChart3, Lock, Scale,
   FileText, Settings, LifeBuoy, AlertTriangle, TrendingUp, Plus, Trash2,
-  CheckCircle2, XCircle, Power, Ban, Edit3, Bell, Tag,
+  CheckCircle2, XCircle, Power, Ban, Edit3, Bell, Tag, Crown, Gem, Star, Award,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/admin")({
 type TabKey =
   | "dashboard" | "customers" | "sellers" | "couriers" | "pvz_staff"
   | "categories" | "products" | "shops" | "warehouses" | "pickup_points"
-  | "orders" | "finance" | "marketing" | "banners" | "promo" | "analytics"
+  | "orders" | "finance" | "marketing" | "banners" | "packages" | "promo" | "analytics"
   | "security" | "disputes" | "content" | "settings" | "support";
 
 interface Stat { users: number; products: number; orders: number; revenue: number; sellers: number }
@@ -38,6 +38,11 @@ interface DisputeRow { id: string; order_id: string | null; buyer_id: string; se
 interface PromoRow { id: string; code: string; discount_percent: number | null; discount_amount: number | null; is_active: boolean; used_count: number; usage_limit: number | null; min_order: number }
 interface SettingsRow { id: string; commission_percent: number; delivery_base_fee: number; storage_fee_per_day: number; maintenance_mode: boolean; min_payout: number }
 interface TicketRow { id: string; subject: string; category: string; status: string; user_id: string; created_at: string; admin_reply: string | null }
+interface AdPackageRow {
+  id: string; name: string; tier: string; price: number; duration_days: number;
+  banner_slots: number; sponsored_product_slots: number; features: string[] | unknown;
+  color: string; is_active: boolean; sort_order: number;
+}
 
 function AdminPanel() {
   const { user, isAdmin, loading } = useAuth();
@@ -57,6 +62,7 @@ function AdminPanel() {
   const [promos, setPromos] = useState<PromoRow[]>([]);
   const [settings, setSettings] = useState<SettingsRow | null>(null);
   const [tickets, setTickets] = useState<TicketRow[]>([]);
+  const [packages, setPackages] = useState<AdPackageRow[]>([]);
   const [unlocked, setUnlocked] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return sessionStorage.getItem("admin_panel_unlocked") === "1";
@@ -94,7 +100,7 @@ function AdminPanel() {
     const [
       { count: u }, { count: p }, { data: os }, { data: pr }, { data: rs },
       { data: prod }, { data: cats }, { data: cour }, { data: wh },
-      { data: pp }, { data: bn }, { data: dsp }, { data: prm }, { data: stg }, { data: tkt },
+      { data: pp }, { data: bn }, { data: dsp }, { data: prm }, { data: stg }, { data: tkt }, { data: pkg },
     ] = await Promise.all([
       supabase.from("profiles").select("*", { count: "exact", head: true }),
       supabase.from("products").select("*", { count: "exact", head: true }),
@@ -111,6 +117,7 @@ function AdminPanel() {
       supabase.from("promo_codes").select("*").order("created_at", { ascending: false }),
       supabase.from("system_settings").select("*").limit(1).maybeSingle(),
       supabase.from("support_tickets").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("ad_packages").select("*").order("sort_order", { ascending: true }),
     ]);
     const orderRows = (os ?? []) as OrderRow[];
     const roleRows = (rs ?? []) as RoleRow[];
@@ -127,6 +134,7 @@ function AdminPanel() {
     setPromos((prm ?? []) as PromoRow[]);
     setSettings((stg ?? null) as SettingsRow | null);
     setTickets((tkt ?? []) as TicketRow[]);
+    setPackages((pkg ?? []) as AdPackageRow[]);
     setStats({
       users: u ?? 0, products: p ?? 0, orders: orderRows.length,
       revenue: orderRows.reduce((s, o) => s + Number(o.total), 0),
@@ -275,7 +283,40 @@ function AdminPanel() {
     toast.success("Cavab göndərildi"); reload();
   };
 
-  // ── Navigation items ─────────────────────────────────────────
+  // ── Ad packages mutations ────────────────────────────────────
+  const savePackage = async (id: string | null, patch: Partial<AdPackageRow>) => {
+    if (id) {
+      const { error } = await supabase.from("ad_packages").update(patch as never).eq("id", id);
+      if (error) { toast.error(error.message); return; }
+      toast.success("Paket yeniləndi");
+    } else {
+      const row = {
+        name: patch.name ?? "Yeni paket",
+        tier: patch.tier ?? "silver",
+        price: patch.price ?? 0,
+        duration_days: patch.duration_days ?? 30,
+        banner_slots: patch.banner_slots ?? 0,
+        sponsored_product_slots: patch.sponsored_product_slots ?? 0,
+        features: (patch.features ?? []) as never,
+        color: patch.color ?? "#3b82f6",
+        is_active: patch.is_active ?? true,
+        sort_order: patch.sort_order ?? packages.length,
+      };
+      const { error } = await supabase.from("ad_packages").insert(row as never);
+      if (error) { toast.error(error.message); return; }
+      toast.success("Paket yaradıldı");
+    }
+    reload();
+  };
+  const deletePackage = async (id: string) => {
+    if (!confirm("Bu paketi silmək?")) return;
+    const { error } = await supabase.from("ad_packages").delete().eq("id", id);
+    if (error) toast.error(error.message); else { toast.success("Silindi"); reload(); }
+  };
+  const togglePackage = async (id: string, active: boolean) => {
+    await supabase.from("ad_packages").update({ is_active: !active }).eq("id", id); reload();
+  };
+
   const navItems: PanelNavItem[] = [
     { key: "dashboard", label: "Ana səhifə", icon: LayoutDashboard, active: tab === "dashboard", onClick: () => setTab("dashboard") },
     { key: "customers", label: "Müştərilər", icon: Users, active: tab === "customers", onClick: () => setTab("customers") },
@@ -291,6 +332,7 @@ function AdminPanel() {
     { key: "finance", label: "Maliyyə", icon: DollarSign, active: tab === "finance", onClick: () => setTab("finance") },
     { key: "marketing", label: "Marketinq", icon: Megaphone, active: tab === "marketing", onClick: () => setTab("marketing") },
     { key: "banners", label: "Bannerlər", icon: Megaphone, active: tab === "banners", onClick: () => setTab("banners") },
+    { key: "packages", label: "Reklam paketləri", icon: Crown, active: tab === "packages", onClick: () => setTab("packages") },
     { key: "promo", label: "Promokodlar", icon: Tag, active: tab === "promo", onClick: () => setTab("promo") },
     { key: "analytics", label: "Analitika", icon: BarChart3, active: tab === "analytics", onClick: () => setTab("analytics") },
     { key: "security", label: "Təhlükəsizlik", icon: Lock, active: tab === "security", onClick: () => setTab("security") },
@@ -323,6 +365,7 @@ function AdminPanel() {
       {tab === "finance" && <FinanceSection stats={stats} orders={orders} settings={settings} />}
       {tab === "marketing" && <MarketingSection />}
       {tab === "banners" && <BannersSection banners={banners} addBanner={addBanner} toggleBanner={toggleBanner} deleteBanner={deleteBanner} />}
+      {tab === "packages" && <PackagesSection packages={packages} savePackage={savePackage} deletePackage={deletePackage} togglePackage={togglePackage} />}
       {tab === "promo" && <PromoSection promos={promos} addPromo={addPromo} togglePromo={togglePromo} />}
       {tab === "analytics" && <AnalyticsSection products={products} orders={orders} categories={categories} />}
       {tab === "security" && <SecuritySection />}
@@ -946,5 +989,261 @@ function SupportSection({ tickets, replyTicket }: { tickets: TicketRow[]; replyT
         ))}
       </Table>
     </div>
+  );
+}
+
+const TIER_PRESETS = [
+  { tier: "silver", label: "Silver", icon: Award, color: "#9ca3af" },
+  { tier: "gold", label: "Gold", icon: Star, color: "#f59e0b" },
+  { tier: "premium", label: "Premium", icon: Gem, color: "#8b5cf6" },
+  { tier: "vip", label: "VIP", icon: Crown, color: "#ef4444" },
+];
+
+function PackagesSection({ packages, savePackage, deletePackage, togglePackage }: {
+  packages: AdPackageRow[];
+  savePackage: (id: string | null, patch: Partial<AdPackageRow>) => Promise<void>;
+  deletePackage: (id: string) => Promise<void>;
+  togglePackage: (id: string, active: boolean) => Promise<void>;
+}) {
+  const [editing, setEditing] = useState<AdPackageRow | null>(null);
+  const [creating, setCreating] = useState(false);
+
+  const blank: Partial<AdPackageRow> = {
+    name: "", tier: "silver", price: 0, duration_days: 30,
+    banner_slots: 1, sponsored_product_slots: 5, features: [],
+    color: "#9ca3af", is_active: true, sort_order: packages.length,
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-sm text-muted-foreground">
+            Satıcılara təklif edilən reklam paketlərini özünüz yaradın və qiymət/şərtləri istənilən vaxt dəyişin.
+          </p>
+        </div>
+        <button onClick={() => { setEditing(blank as AdPackageRow); setCreating(true); }}
+          className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold inline-flex items-center gap-2 hover:bg-primary/90">
+          <Plus className="h-4 w-4" /> Yeni paket
+        </button>
+      </div>
+
+      {/* Quick presets */}
+      {packages.length === 0 && (
+        <div className="bg-muted/30 border border-dashed border-border rounded-2xl p-5">
+          <div className="font-bold mb-3">Sürətli başlanğıc — hazır şablonlar:</div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {TIER_PRESETS.map((t) => (
+              <button key={t.tier} onClick={() => { setEditing({
+                ...(blank as AdPackageRow),
+                name: t.label, tier: t.tier, color: t.color,
+                price: t.tier === "silver" ? 19 : t.tier === "gold" ? 49 : t.tier === "premium" ? 99 : 199,
+                banner_slots: t.tier === "silver" ? 1 : t.tier === "gold" ? 2 : t.tier === "premium" ? 4 : 8,
+                sponsored_product_slots: t.tier === "silver" ? 3 : t.tier === "gold" ? 10 : t.tier === "premium" ? 25 : 60,
+                features: t.tier === "silver"
+                  ? ["1 banner", "3 sponsorlu məhsul", "Əsas analitika"]
+                  : t.tier === "gold"
+                    ? ["2 banner", "10 sponsorlu məhsul", "Genişlənmiş analitika", "Email dəstək"]
+                    : t.tier === "premium"
+                      ? ["4 banner", "25 sponsorlu məhsul", "Top yerləşdirmə", "Prioritet dəstək"]
+                      : ["8 banner", "60 sponsorlu məhsul", "Ana səhifə top", "Şəxsi menecer", "API girişi"],
+              } as AdPackageRow); setCreating(true); }}
+                className="text-left p-4 rounded-xl border-2 border-border hover:border-primary hover:shadow-card transition group">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white" style={{ background: t.color }}>
+                    <t.icon className="h-5 w-5" />
+                  </div>
+                  <div className="font-black">{t.label}</div>
+                </div>
+                <div className="text-xs text-muted-foreground">Şablon ilə başla</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Cards */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {packages.map((p) => {
+          const features = Array.isArray(p.features) ? (p.features as string[]) : [];
+          const preset = TIER_PRESETS.find((t) => t.tier === p.tier);
+          const Icon = preset?.icon ?? Award;
+          return (
+            <div key={p.id} className="rounded-2xl border-2 border-border bg-card overflow-hidden hover:shadow-elegant transition flex flex-col">
+              <div className="p-4 text-white relative" style={{ background: `linear-gradient(135deg, ${p.color}, ${p.color}dd)` }}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-6 w-6" />
+                    <div className="font-black text-lg">{p.name}</div>
+                  </div>
+                  <span className="text-[10px] uppercase font-bold bg-white/20 px-2 py-0.5 rounded-full">{p.tier}</span>
+                </div>
+                <div className="mt-3 flex items-baseline gap-1">
+                  <span className="text-3xl font-black">{p.price}</span>
+                  <span className="text-sm opacity-90">₼ / {p.duration_days} gün</span>
+                </div>
+              </div>
+              <div className="p-4 space-y-2 flex-1">
+                <div className="text-xs text-muted-foreground">
+                  <span className="font-bold text-foreground">{p.banner_slots}</span> banner ·{" "}
+                  <span className="font-bold text-foreground">{p.sponsored_product_slots}</span> sponsorlu məhsul
+                </div>
+                {features.slice(0, 5).map((f, i) => (
+                  <div key={i} className="flex items-start gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-success shrink-0 mt-0.5" />
+                    <span>{f}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="p-3 border-t border-border flex items-center gap-2">
+                <button onClick={() => { setEditing(p); setCreating(false); }}
+                  className="flex-1 text-xs px-2 py-2 rounded-lg border border-border hover:bg-secondary font-semibold inline-flex items-center justify-center gap-1">
+                  <Edit3 className="h-3.5 w-3.5" /> Redaktə
+                </button>
+                <button onClick={() => togglePackage(p.id, p.is_active)}
+                  className={`text-xs px-2 py-2 rounded-lg font-semibold ${p.is_active ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>
+                  {p.is_active ? "Aktiv" : "Deaktiv"}
+                </button>
+                <button onClick={() => deletePackage(p.id)}
+                  className="text-xs p-2 rounded-lg border border-destructive/30 text-destructive hover:bg-destructive/10">
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {editing && (
+        <PackageEditor
+          pkg={editing}
+          isNew={creating}
+          onClose={() => setEditing(null)}
+          onSave={async (patch) => {
+            await savePackage(creating ? null : editing.id, patch);
+            setEditing(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function PackageEditor({ pkg, isNew, onClose, onSave }: {
+  pkg: AdPackageRow;
+  isNew: boolean;
+  onClose: () => void;
+  onSave: (patch: Partial<AdPackageRow>) => Promise<void>;
+}) {
+  const [form, setForm] = useState<AdPackageRow>(pkg);
+  const features = Array.isArray(form.features) ? (form.features as string[]) : [];
+  const setFeature = (i: number, v: string) => {
+    const next = [...features]; next[i] = v;
+    setForm({ ...form, features: next });
+  };
+  const addFeature = () => setForm({ ...form, features: [...features, ""] });
+  const removeFeature = (i: number) => setForm({ ...form, features: features.filter((_, idx) => idx !== i) });
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
+      <div className="bg-card border border-border rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
+        <div className="p-5 border-b border-border flex items-center justify-between sticky top-0 bg-card z-10">
+          <h3 className="text-xl font-black">{isNew ? "Yeni reklam paketi" : "Paketi redaktə et"}</h3>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-secondary"><XCircle className="h-5 w-5" /></button>
+        </div>
+        <div className="p-5 space-y-4">
+          <div className="grid sm:grid-cols-2 gap-3">
+            <Field label="Paket adı">
+              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="w-full h-10 px-3 rounded-lg border border-input bg-background" placeholder="Silver / Gold / VIP..." />
+            </Field>
+            <Field label="Tier (səviyyə)">
+              <select value={form.tier} onChange={(e) => {
+                const preset = TIER_PRESETS.find((t) => t.tier === e.target.value);
+                setForm({ ...form, tier: e.target.value, color: preset?.color ?? form.color });
+              }} className="w-full h-10 px-3 rounded-lg border border-input bg-background">
+                {TIER_PRESETS.map((t) => <option key={t.tier} value={t.tier}>{t.label}</option>)}
+                <option value="custom">Xüsusi</option>
+              </select>
+            </Field>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-3">
+            <Field label="Qiymət (₼)">
+              <input type="number" min={0} value={form.price}
+                onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+                className="w-full h-10 px-3 rounded-lg border border-input bg-background" />
+            </Field>
+            <Field label="Müddət (gün)">
+              <input type="number" min={1} value={form.duration_days}
+                onChange={(e) => setForm({ ...form, duration_days: Number(e.target.value) })}
+                className="w-full h-10 px-3 rounded-lg border border-input bg-background" />
+            </Field>
+            <Field label="Rəng">
+              <input type="color" value={form.color}
+                onChange={(e) => setForm({ ...form, color: e.target.value })}
+                className="w-full h-10 px-1 rounded-lg border border-input bg-background" />
+            </Field>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <Field label="Banner sayı">
+              <input type="number" min={0} value={form.banner_slots}
+                onChange={(e) => setForm({ ...form, banner_slots: Number(e.target.value) })}
+                className="w-full h-10 px-3 rounded-lg border border-input bg-background" />
+            </Field>
+            <Field label="Sponsorlu məhsul sayı">
+              <input type="number" min={0} value={form.sponsored_product_slots}
+                onChange={(e) => setForm({ ...form, sponsored_product_slots: Number(e.target.value) })}
+                className="w-full h-10 px-3 rounded-lg border border-input bg-background" />
+            </Field>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-bold">Şərtlər və üstünlüklər</label>
+              <button type="button" onClick={addFeature} className="text-xs px-3 py-1 rounded-lg bg-secondary hover:bg-secondary/70 font-bold inline-flex items-center gap-1">
+                <Plus className="h-3 w-3" /> Əlavə et
+              </button>
+            </div>
+            <div className="space-y-2">
+              {features.length === 0 && <div className="text-xs text-muted-foreground">Hələ şərt əlavə edilməyib.</div>}
+              {features.map((f, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
+                  <input value={f} onChange={(e) => setFeature(i, e.target.value)}
+                    className="flex-1 h-9 px-3 rounded-lg border border-input bg-background text-sm"
+                    placeholder="Məsələn: 24/7 dəstək" />
+                  <button onClick={() => removeFeature(i)} className="p-2 rounded-lg text-destructive hover:bg-destructive/10">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={form.is_active}
+              onChange={(e) => setForm({ ...form, is_active: e.target.checked })} className="h-4 w-4" />
+            Aktiv (satıcılar görə bilər)
+          </label>
+        </div>
+
+        <div className="p-5 border-t border-border flex items-center justify-end gap-2 sticky bottom-0 bg-card">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-border hover:bg-secondary font-bold">Ləğv et</button>
+          <button onClick={() => onSave(form)}
+            className="px-5 py-2 rounded-lg bg-primary text-primary-foreground font-bold hover:bg-primary/90 inline-flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4" /> Yadda saxla
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="block text-xs font-bold text-muted-foreground mb-1">{label}</span>
+      {children}
+    </label>
   );
 }
