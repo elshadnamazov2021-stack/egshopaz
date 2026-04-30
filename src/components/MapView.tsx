@@ -37,7 +37,24 @@ interface Props {
   className?: string;
 }
 
-export function MapView({ markers, height = 480, center, zoom = 8, className = "" }: Props) {
+export function MapView(props: Props) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  if (!mounted) {
+    return (
+      <div
+        className={`rounded-2xl overflow-hidden border border-border bg-secondary/30 flex items-center justify-center text-sm text-muted-foreground ${props.className ?? ""}`}
+        style={{ height: props.height ?? 480, width: "100%" }}
+      >
+        Xəritə yüklənir...
+      </div>
+    );
+  }
+  return <MapInner {...props} />;
+}
+
+function MapInner({ markers, height = 480, center, zoom = 8, className = "" }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapRef = useRef<any>(null);
@@ -46,35 +63,41 @@ export function MapView({ markers, height = 480, center, zoom = 8, className = "
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const LRef = useRef<any>(null);
   const [ready, setReady] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const initialCenter = useMemo<[number, number]>(() => {
     if (center) return center;
     if (markers.length === 1) return [markers[0].lat, markers[0].lng];
-    return [40.3, 47.7]; // Az center
+    return [40.3, 47.7];
   }, [center, markers]);
 
-  // Client-only Leaflet load (avoids SSR `window is not defined` crash)
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { default: L } = await import("leaflet");
-      if (cancelled || !containerRef.current || mapRef.current) return;
-      LRef.current = L;
-      const map = L.map(containerRef.current, { scrollWheelZoom: true }).setView(initialCenter, zoom);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "&copy; OpenStreetMap",
-        maxZoom: 19,
-      }).addTo(map);
-      layerRef.current = L.layerGroup().addTo(map);
-      mapRef.current = map;
-      // Force size after mount (parent containers can be 0 height initially)
-      setTimeout(() => map.invalidateSize(), 50);
-      setReady(true);
-    })().catch((e) => console.error("[MapView] load failed", e));
+      try {
+        const mod = await import("leaflet");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const L: any = (mod as any).default ?? mod;
+        if (cancelled || !containerRef.current || mapRef.current) return;
+        LRef.current = L;
+        const map = L.map(containerRef.current, { scrollWheelZoom: true }).setView(initialCenter, zoom);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "&copy; OpenStreetMap",
+          maxZoom: 19,
+        }).addTo(map);
+        layerRef.current = L.layerGroup().addTo(map);
+        mapRef.current = map;
+        setTimeout(() => { try { map.invalidateSize(); } catch { /* noop */ } }, 100);
+        setReady(true);
+      } catch (e) {
+        console.error("[MapView] leaflet load failed", e);
+        setError(String((e as Error)?.message ?? e));
+      }
+    })();
     return () => {
       cancelled = true;
       if (mapRef.current) {
-        mapRef.current.remove();
+        try { mapRef.current.remove(); } catch { /* noop */ }
         mapRef.current = null;
       }
     };
@@ -114,10 +137,17 @@ export function MapView({ markers, height = 480, center, zoom = 8, className = "
   }, [markers, ready]);
 
   return (
-    <div
-      ref={containerRef}
-      className={`rounded-2xl overflow-hidden border border-border bg-secondary/30 ${className}`}
-      style={{ height, width: "100%", zIndex: 0 }}
-    />
+    <div className="relative">
+      <div
+        ref={containerRef}
+        className={`rounded-2xl overflow-hidden border border-border bg-secondary/30 ${className}`}
+        style={{ height, width: "100%", zIndex: 0 }}
+      />
+      {error && (
+        <div className="absolute inset-0 flex items-center justify-center text-destructive text-sm bg-background/80 rounded-2xl p-4 text-center">
+          Xəritə yüklənmədi: {error}
+        </div>
+      )}
+    </div>
   );
 }
