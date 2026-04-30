@@ -7,7 +7,7 @@ import {
   Users, Package, ShoppingBag, DollarSign, Shield, LayoutDashboard,
   Truck, Warehouse, Store, Megaphone, BarChart3, Lock, Scale,
   FileText, Settings, LifeBuoy, AlertTriangle, TrendingUp, Plus, Trash2,
-  CheckCircle2, XCircle, Power, Ban, Edit3, Bell, Tag, Crown, Gem, Star, Award,
+  CheckCircle2, XCircle, Power, Ban, Edit3, Bell, Tag, Crown, Gem, Star, Award, Bot, Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
@@ -22,7 +22,7 @@ type TabKey =
   | "dashboard" | "customers" | "sellers" | "couriers" | "pvz_staff"
   | "categories" | "products" | "shops" | "warehouses" | "pickup_points"
   | "orders" | "finance" | "marketing" | "banners" | "packages" | "promo" | "analytics"
-  | "security" | "disputes" | "content" | "settings" | "support";
+  | "security" | "disputes" | "content" | "settings" | "support" | "ai_bot";
 
 interface Stat { users: number; products: number; orders: number; revenue: number; sellers: number }
 interface ProfileRow { id: string; full_name: string | null; shop_name: string | null; created_at: string; phone: string | null }
@@ -340,6 +340,7 @@ function AdminPanel() {
     { key: "content", label: "Kontent", icon: FileText, active: tab === "content", onClick: () => setTab("content") },
     { key: "settings", label: "Sistem ayarları", icon: Settings, active: tab === "settings", onClick: () => setTab("settings") },
     { key: "support", label: "Dəstək", icon: LifeBuoy, badge: tickets.filter((t) => t.status === "open").length, active: tab === "support", onClick: () => setTab("support") },
+    { key: "ai_bot", label: "AI Bot", icon: Bot, active: tab === "ai_bot", onClick: () => setTab("ai_bot") },
   ];
 
   const tabTitle = navItems.find((n) => n.key === tab)?.label ?? "Admin";
@@ -373,6 +374,7 @@ function AdminPanel() {
       {tab === "content" && <ContentSection />}
       {tab === "settings" && <SettingsSection settings={settings} updateSettings={updateSettings} />}
       {tab === "support" && <SupportSection tickets={tickets} replyTicket={replyTicket} />}
+      {tab === "ai_bot" && <AIBotSection />}
     </PanelLayout>
   );
 }
@@ -1245,5 +1247,186 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <span className="block text-xs font-bold text-muted-foreground mb-1">{label}</span>
       {children}
     </label>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+// AI Bot Section
+// ─────────────────────────────────────────────────────────────────
+interface AISettingsRow {
+  id: string;
+  enabled: boolean;
+  enabled_shop: boolean;
+  enabled_pvz: boolean;
+  enabled_dispute: boolean;
+  enabled_support: boolean;
+  model: string;
+  system_prompt_shop: string;
+  system_prompt_pvz: string;
+  system_prompt_dispute: string;
+  system_prompt_support: string;
+}
+interface FaqRow {
+  id: string; category: string; question: string; answer: string;
+  audience: string; is_active: boolean; sort_order: number;
+}
+
+function AIBotSection() {
+  const [settings, setSettings] = useState<AISettingsRow | null>(null);
+  const [faqs, setFaqs] = useState<FaqRow[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [newFaq, setNewFaq] = useState({ category: "general", question: "", answer: "", audience: "buyer" });
+
+  const load = async () => {
+    const [{ data: s }, { data: f }] = await Promise.all([
+      supabase.from("ai_settings").select("*").limit(1).maybeSingle(),
+      supabase.from("faq_items").select("*").order("sort_order", { ascending: true }),
+    ]);
+    setSettings(s as AISettingsRow);
+    setFaqs((f ?? []) as FaqRow[]);
+  };
+  useEffect(() => { load(); }, []);
+
+  const saveSettings = async () => {
+    if (!settings) return;
+    setSaving(true);
+    const { error } = await supabase.from("ai_settings").update({
+      enabled: settings.enabled, enabled_shop: settings.enabled_shop,
+      enabled_pvz: settings.enabled_pvz, enabled_dispute: settings.enabled_dispute,
+      enabled_support: settings.enabled_support, model: settings.model,
+      system_prompt_shop: settings.system_prompt_shop,
+      system_prompt_pvz: settings.system_prompt_pvz,
+      system_prompt_dispute: settings.system_prompt_dispute,
+      system_prompt_support: settings.system_prompt_support,
+    }).eq("id", settings.id);
+    setSaving(false);
+    if (error) toast.error(error.message); else toast.success("AI ayarları yeniləndi");
+  };
+
+  const addFaq = async () => {
+    if (newFaq.question.trim().length < 3 || newFaq.answer.trim().length < 3) {
+      toast.error("Sual və cavab daxil edin"); return;
+    }
+    const { error } = await supabase.from("faq_items").insert({ ...newFaq, sort_order: faqs.length });
+    if (error) toast.error(error.message);
+    else { toast.success("FAQ əlavə olundu"); setNewFaq({ category: "general", question: "", answer: "", audience: "buyer" }); load(); }
+  };
+  const deleteFaq = async (id: string) => {
+    if (!confirm("Silinsin?")) return;
+    await supabase.from("faq_items").delete().eq("id", id); load();
+  };
+  const toggleFaq = async (id: string, val: boolean) => {
+    await supabase.from("faq_items").update({ is_active: !val }).eq("id", id); load();
+  };
+
+  if (!settings) return <div>Yüklənir…</div>;
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-card border border-border rounded-2xl p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <Sparkles className="h-5 w-5 text-amber-500" />
+          <h2 className="text-lg font-bold">AI Asistent ayarları</h2>
+        </div>
+        <div className="grid md:grid-cols-2 gap-3 mb-4">
+          {([
+            ["enabled", "AI Aktiv (ümumi)"],
+            ["enabled_shop", "Müştəri → Satıcı chat"],
+            ["enabled_pvz", "Müştəri → PVZ chat"],
+            ["enabled_dispute", "Mübahisə chat"],
+            ["enabled_support", "Ümumi dəstək (support)"],
+          ] as const).map(([k, label]) => (
+            <label key={k} className="flex items-center justify-between p-3 bg-secondary/30 rounded-lg cursor-pointer">
+              <span className="font-semibold text-sm">{label}</span>
+              <input type="checkbox" checked={(settings as any)[k]}
+                onChange={(e) => setSettings({ ...settings, [k]: e.target.checked } as AISettingsRow)}
+                className="w-5 h-5" />
+            </label>
+          ))}
+          <label className="flex items-center gap-2 p-3 bg-secondary/30 rounded-lg">
+            <span className="font-semibold whitespace-nowrap text-sm">Model:</span>
+            <select value={settings.model} onChange={(e) => setSettings({ ...settings, model: e.target.value })}
+                    className="flex-1 h-9 px-2 rounded border border-input bg-background text-sm">
+              <option value="google/gemini-2.5-flash">Gemini 2.5 Flash</option>
+              <option value="google/gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
+              <option value="google/gemini-2.5-pro">Gemini 2.5 Pro</option>
+              <option value="openai/gpt-5-mini">GPT-5 Mini</option>
+              <option value="openai/gpt-5">GPT-5</option>
+            </select>
+          </label>
+        </div>
+
+        <details className="bg-secondary/20 rounded-lg p-3 mb-3">
+          <summary className="font-semibold cursor-pointer text-sm">Sistem promptları (genişlət)</summary>
+          <div className="space-y-3 mt-3">
+            {(["shop", "pvz", "dispute", "support"] as const).map((k) => (
+              <div key={k}>
+                <div className="text-xs font-bold text-muted-foreground mb-1">{k.toUpperCase()} prompt</div>
+                <textarea value={(settings as any)[`system_prompt_${k}`]}
+                  onChange={(e) => setSettings({ ...settings, [`system_prompt_${k}`]: e.target.value } as AISettingsRow)}
+                  rows={3} className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm resize-y" />
+              </div>
+            ))}
+          </div>
+        </details>
+
+        <button onClick={saveSettings} disabled={saving}
+          className="bg-primary text-primary-foreground px-5 h-10 rounded-lg font-bold hover:bg-primary/90 disabled:opacity-60">
+          {saving ? "Saxlanır..." : "Ayarları saxla"}
+        </button>
+      </div>
+
+      <div className="bg-card border border-border rounded-2xl p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <FileText className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-bold">FAQ — AI bilik bazası ({faqs.length})</h2>
+        </div>
+        <div className="grid md:grid-cols-4 gap-2 mb-3">
+          <select value={newFaq.category} onChange={(e) => setNewFaq({ ...newFaq, category: e.target.value })}
+                  className="h-10 px-3 rounded-lg border border-input bg-background text-sm">
+            <option value="general">Ümumi</option><option value="order">Sifariş</option>
+            <option value="payment">Ödəniş</option><option value="delivery">Çatdırılma</option>
+            <option value="return">Qaytarma</option><option value="seller">Satıcı</option>
+            <option value="pvz">PVZ</option><option value="bonus">Bonus</option>
+          </select>
+          <select value={newFaq.audience} onChange={(e) => setNewFaq({ ...newFaq, audience: e.target.value })}
+                  className="h-10 px-3 rounded-lg border border-input bg-background text-sm">
+            <option value="all">Hamı</option><option value="buyer">Müştəri</option>
+            <option value="seller">Satıcı</option><option value="pvz">PVZ</option>
+          </select>
+          <input placeholder="Sual" value={newFaq.question} onChange={(e) => setNewFaq({ ...newFaq, question: e.target.value })}
+                 className="md:col-span-2 h-10 px-3 rounded-lg border border-input bg-background text-sm" />
+          <textarea placeholder="Cavab" value={newFaq.answer} onChange={(e) => setNewFaq({ ...newFaq, answer: e.target.value })}
+                    rows={2} className="md:col-span-3 px-3 py-2 rounded-lg border border-input bg-background text-sm resize-none" />
+          <button onClick={addFaq} className="bg-primary text-primary-foreground rounded-lg font-bold hover:bg-primary/90 inline-flex items-center justify-center gap-1">
+            <Plus className="h-4 w-4" /> Əlavə et
+          </button>
+        </div>
+        <div className="space-y-2 max-h-[500px] overflow-y-auto">
+          {faqs.map((f) => (
+            <div key={f.id} className="bg-secondary/30 border border-border rounded-lg p-3">
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <div className="flex gap-2 items-center flex-wrap">
+                  <span className="text-[10px] px-2 py-0.5 bg-primary/10 text-primary rounded-full font-bold">{f.category}</span>
+                  <span className="text-[10px] px-2 py-0.5 bg-secondary rounded-full">{f.audience}</span>
+                  {!f.is_active && <span className="text-[10px] px-2 py-0.5 bg-rose-100 text-rose-700 rounded-full">deaktiv</span>}
+                </div>
+                <div className="flex gap-1">
+                  <button onClick={() => toggleFaq(f.id, f.is_active)} className="p-1.5 hover:bg-secondary rounded">
+                    <Power className={`h-4 w-4 ${f.is_active ? "text-emerald-600" : "text-muted-foreground"}`} />
+                  </button>
+                  <button onClick={() => deleteFaq(f.id)} className="p-1.5 hover:bg-rose-50 rounded">
+                    <Trash2 className="h-4 w-4 text-rose-500" />
+                  </button>
+                </div>
+              </div>
+              <div className="font-semibold text-sm">{f.question}</div>
+              <div className="text-sm text-muted-foreground mt-1">{f.answer}</div>
+            </div>
+          ))}
+          {faqs.length === 0 && <div className="text-center py-8 text-muted-foreground text-sm">FAQ əlavə edin</div>}
+        </div>
+      </div>
+    </div>
   );
 }

@@ -107,6 +107,111 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_replies_log: {
+        Row: {
+          channel: string
+          completion_tokens: number | null
+          created_at: string
+          error: string | null
+          id: string
+          prompt_tokens: number | null
+          reply_id: string | null
+          source_message_id: string | null
+          status: string
+        }
+        Insert: {
+          channel: string
+          completion_tokens?: number | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          prompt_tokens?: number | null
+          reply_id?: string | null
+          source_message_id?: string | null
+          status?: string
+        }
+        Update: {
+          channel?: string
+          completion_tokens?: number | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          prompt_tokens?: number | null
+          reply_id?: string | null
+          source_message_id?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      ai_settings: {
+        Row: {
+          enabled: boolean
+          enabled_dispute: boolean
+          enabled_pvz: boolean
+          enabled_shop: boolean
+          enabled_support: boolean
+          id: string
+          model: string
+          system_prompt_dispute: string
+          system_prompt_pvz: string
+          system_prompt_shop: string
+          system_prompt_support: string
+          updated_at: string
+        }
+        Insert: {
+          enabled?: boolean
+          enabled_dispute?: boolean
+          enabled_pvz?: boolean
+          enabled_shop?: boolean
+          enabled_support?: boolean
+          id?: string
+          model?: string
+          system_prompt_dispute?: string
+          system_prompt_pvz?: string
+          system_prompt_shop?: string
+          system_prompt_support?: string
+          updated_at?: string
+        }
+        Update: {
+          enabled?: boolean
+          enabled_dispute?: boolean
+          enabled_pvz?: boolean
+          enabled_shop?: boolean
+          enabled_support?: boolean
+          id?: string
+          model?: string
+          system_prompt_dispute?: string
+          system_prompt_pvz?: string
+          system_prompt_shop?: string
+          system_prompt_support?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       banners: {
         Row: {
           clicks: number
@@ -390,6 +495,42 @@ export type Database = {
           seller_id?: string | null
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      faq_items: {
+        Row: {
+          answer: string
+          audience: string
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean
+          keywords: string | null
+          question: string
+          sort_order: number
+        }
+        Insert: {
+          answer: string
+          audience?: string
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          keywords?: string | null
+          question: string
+          sort_order?: number
+        }
+        Update: {
+          answer?: string
+          audience?: string
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          keywords?: string | null
+          question?: string
+          sort_order?: number
         }
         Relationships: []
       }
@@ -1291,6 +1432,10 @@ export type Database = {
     }
     Functions: {
       become_seller: { Args: { _shop_name: string }; Returns: undefined }
+      call_ai_auto_reply: {
+        Args: { _channel: string; _message_id: string }
+        Returns: undefined
+      }
       get_owner_admin_id: { Args: never; Returns: string }
       has_role: {
         Args: {
