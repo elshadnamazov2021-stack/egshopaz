@@ -184,6 +184,12 @@ function SellerPanel() {
       description: payload.description || null,
       seller_id: user.id,
       is_active: editing.is_active ?? true,
+      delivery_days_min: editing.delivery_days_min != null ? Number(editing.delivery_days_min) : 1,
+      delivery_days_max: editing.delivery_days_max != null ? Number(editing.delivery_days_max) : 3,
+      delivery_city: editing.delivery_city || "Bakı",
+      free_shipping: !!editing.free_shipping,
+      fast_delivery: !!editing.fast_delivery,
+      condition: editing.condition || "new",
     };
 
     if (editing.id) {
