@@ -506,6 +506,20 @@ function SellerPanel() {
 
       {tab === "advertising" && <SellerAdvertising />}
 
+      {tab === "support" && (
+        <div className="space-y-4">
+          <div>
+            <h1 className="text-2xl font-extrabold flex items-center gap-2">
+              <LifeBuoy className="h-6 w-6 text-primary" /> AI Dəstək
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Satıcı suallarınıza 24/7 avtomatik cavab — məhsul, sifariş, reklam, ödəniş, mübahisələr.
+            </p>
+          </div>
+          <AISupportChat userId={user.id} audience="seller" />
+        </div>
+      )}
+
       {tab === "shop" && profile && (
         <div className="space-y-6 max-w-3xl">
           {/* Banner & Logo */}
