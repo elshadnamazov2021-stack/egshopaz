@@ -66,6 +66,8 @@ export type Database = {
           created_at: string
           id: string
           is_default: boolean
+          lat: number | null
+          lng: number | null
           notes: string | null
           phone: string
           recipient_name: string
@@ -79,6 +81,8 @@ export type Database = {
           created_at?: string
           id?: string
           is_default?: boolean
+          lat?: number | null
+          lng?: number | null
           notes?: string | null
           phone: string
           recipient_name: string
@@ -92,6 +96,8 @@ export type Database = {
           created_at?: string
           id?: string
           is_default?: boolean
+          lat?: number | null
+          lng?: number | null
           notes?: string | null
           phone?: string
           recipient_name?: string
@@ -264,6 +270,9 @@ export type Database = {
           full_name: string
           id: string
           is_active: boolean
+          last_seen_at: string | null
+          lat: number | null
+          lng: number | null
           phone: string
           rating: number
           total_deliveries: number
@@ -279,6 +288,9 @@ export type Database = {
           full_name: string
           id?: string
           is_active?: boolean
+          last_seen_at?: string | null
+          lat?: number | null
+          lng?: number | null
           phone: string
           rating?: number
           total_deliveries?: number
@@ -294,6 +306,9 @@ export type Database = {
           full_name?: string
           id?: string
           is_active?: boolean
+          last_seen_at?: string | null
+          lat?: number | null
+          lng?: number | null
           phone?: string
           rating?: number
           total_deliveries?: number
@@ -444,6 +459,7 @@ export type Database = {
       order_items: {
         Row: {
           accepted_at: string | null
+          courier_id: string | null
           delivered_at: string | null
           id: string
           image_url: string | null
@@ -459,6 +475,7 @@ export type Database = {
         }
         Insert: {
           accepted_at?: string | null
+          courier_id?: string | null
           delivered_at?: string | null
           id?: string
           image_url?: string | null
@@ -474,6 +491,7 @@ export type Database = {
         }
         Update: {
           accepted_at?: string | null
+          courier_id?: string | null
           delivered_at?: string | null
           id?: string
           image_url?: string | null
@@ -767,6 +785,8 @@ export type Database = {
           shop_city: string | null
           shop_description: string | null
           shop_email: string | null
+          shop_lat: number | null
+          shop_lng: number | null
           shop_logo_url: string | null
           shop_name: string | null
           updated_at: string
@@ -783,6 +803,8 @@ export type Database = {
           shop_city?: string | null
           shop_description?: string | null
           shop_email?: string | null
+          shop_lat?: number | null
+          shop_lng?: number | null
           shop_logo_url?: string | null
           shop_name?: string | null
           updated_at?: string
@@ -799,6 +821,8 @@ export type Database = {
           shop_city?: string | null
           shop_description?: string | null
           shop_email?: string | null
+          shop_lat?: number | null
+          shop_lng?: number | null
           shop_logo_url?: string | null
           shop_name?: string | null
           updated_at?: string
