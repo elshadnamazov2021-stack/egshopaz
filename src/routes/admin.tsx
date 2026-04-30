@@ -1034,7 +1034,7 @@ function PackagesSection({ packages, savePackage, deletePackage, togglePackage }
           <div className="font-bold mb-3">Sürətli başlanğıc — hazır şablonlar:</div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {TIER_PRESETS.map((t) => (
-              <button key={t.tier} onClick={() => setEditing({
+              <button key={t.tier} onClick={() => { setEditing({
                 ...(blank as AdPackageRow),
                 name: t.label, tier: t.tier, color: t.color,
                 price: t.tier === "silver" ? 19 : t.tier === "gold" ? 49 : t.tier === "premium" ? 99 : 199,
@@ -1047,7 +1047,7 @@ function PackagesSection({ packages, savePackage, deletePackage, togglePackage }
                     : t.tier === "premium"
                       ? ["4 banner", "25 sponsorlu məhsul", "Top yerləşdirmə", "Prioritet dəstək"]
                       : ["8 banner", "60 sponsorlu məhsul", "Ana səhifə top", "Şəxsi menecer", "API girişi"],
-              }); setCreating(true); }}
+              } as AdPackageRow); setCreating(true); }}
                 className="text-left p-4 rounded-xl border-2 border-border hover:border-primary hover:shadow-card transition group">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white" style={{ background: t.color }}>
