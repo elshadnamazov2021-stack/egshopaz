@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { SlidersHorizontal, X, ChevronDown, Tag, BadgePercent, Star, Package, Truck, Zap, Sparkles } from "lucide-react";
+import { SlidersHorizontal, X, ChevronDown, Tag, BadgePercent, Star, Package, Truck, Zap, Sparkles, MapPin, Clock } from "lucide-react";
 
-export type SortKey = "newest" | "price_asc" | "price_desc" | "rating" | "popular";
+export type SortKey = "newest" | "price_asc" | "price_desc" | "rating" | "popular" | "delivery_fast" | "discount_high";
 
 export interface Filters {
   minPrice?: number;
@@ -15,8 +15,14 @@ export interface Filters {
   fastDelivery?: boolean;
   newArrivals?: boolean;
   minDiscount?: number; // % e.g. 20, 30, 50
+  maxDeliveryDays?: number; // 1, 3, 7, 14
+  city?: string; // delivery city
+  condition?: "new" | "used"; // product condition
   sort: SortKey;
 }
+
+const CITIES = ["Bakı", "Sumqayıt", "Gəncə", "Mingəçevir", "Lənkəran", "Şirvan", "Naxçıvan", "Şəki", "Quba"];
+const DELIVERY_DAYS = [1, 3, 7, 14];
 
 export function CatalogFilters({
   brands,
@@ -40,6 +46,8 @@ export function CatalogFilters({
     { id: "price_asc", label: t("catalog.priceAsc") },
     { id: "price_desc", label: t("catalog.priceDesc") },
     { id: "rating", label: t("catalog.rating") },
+    { id: "delivery_fast", label: t("catalog.deliveryFast") },
+    { id: "discount_high", label: t("catalog.discountHigh") },
   ];
 
   const apply = () => {
@@ -68,6 +76,9 @@ export function CatalogFilters({
     if (value.fastDelivery) n++;
     if (value.newArrivals) n++;
     if (value.minDiscount) n++;
+    if (value.maxDeliveryDays) n++;
+    if (value.city) n++;
+    if (value.condition) n++;
     return n;
   }, [value]);
 
