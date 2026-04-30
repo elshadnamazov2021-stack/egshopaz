@@ -94,6 +94,12 @@ function AuthPage() {
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { if (user) navigate({ to: "/" }); }, [user, navigate]);
 
+  useEffect(() => {
+    if (role !== "pvz") return;
+    supabase.from("pickup_points").select("id,name,city").eq("is_active", true).order("city")
+      .then(({ data }) => setPvzList(data ?? []));
+  }, [role]);
+
   if (!mounted) {
     return <div className="container mx-auto px-4 py-10 max-w-lg"><div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-card h-96 animate-pulse" /></div>;
   }
@@ -111,12 +117,6 @@ function AuthPage() {
     setForgotOpen(false);
     setForgotEmail("");
   };
-
-  useEffect(() => {
-    if (role !== "pvz") return;
-    supabase.from("pickup_points").select("id,name,city").eq("is_active", true).order("city")
-      .then(({ data }) => setPvzList(data ?? []));
-  }, [role]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
