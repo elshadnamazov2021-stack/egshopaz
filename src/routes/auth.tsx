@@ -85,8 +85,25 @@ function AuthPage() {
   const [position, setPosition] = useState("operator");
 
   const [busy, setBusy] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotBusy, setForgotBusy] = useState(false);
 
   useEffect(() => { if (user) navigate({ to: "/" }); }, [user, navigate]);
+
+  const sendReset = async () => {
+    const v = z.string().trim().email("Yanlış e-poçt").safeParse(forgotEmail);
+    if (!v.success) { toast.error(v.error.issues[0].message); return; }
+    setForgotBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setForgotBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Bərpa linki e-poçtunuza göndərildi");
+    setForgotOpen(false);
+    setForgotEmail("");
+  };
 
   useEffect(() => {
     if (role !== "pvz") return;
@@ -284,11 +301,34 @@ function AuthPage() {
           </button>
         </form>
 
+        {mode === "login" && (
+          <button type="button" onClick={() => { setForgotEmail(email); setForgotOpen(true); }}
+            className="mt-3 w-full text-sm text-primary hover:underline">
+            Şifrəmi unutdum
+          </button>
+        )}
+
         <button onClick={() => setMode(mode === "login" ? "signup" : "login")}
           className="mt-4 w-full text-sm text-muted-foreground hover:text-primary">
           {mode === "login" ? "Hesabınız yoxdur? Qeydiyyat" : "Artıq hesabınız var? Daxil olun"}
         </button>
       </div>
+
+      <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Şifrəni bərpa et</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            E-poçtunuzu daxil edin — bərpa linki göndəriləcək. Müştəri, satıcı və PVZ işçiləri üçün eyni qaydada işləyir.
+          </p>
+          <input type="email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)}
+            placeholder="E-poçt" maxLength={255}
+            className="w-full h-11 px-3 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
+          <button onClick={sendReset} disabled={forgotBusy}
+            className="w-full h-11 bg-primary text-primary-foreground rounded-lg font-bold hover:bg-primary/90 disabled:opacity-60">
+            {forgotBusy ? "..." : "Bərpa linkini göndər"}
+          </button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

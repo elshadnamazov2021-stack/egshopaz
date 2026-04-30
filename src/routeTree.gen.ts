@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as SellerRouteImport } from './routes/seller'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PvzRouteImport } from './routes/pvz'
 import { Route as PromotionsRouteImport } from './routes/promotions'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -44,6 +45,11 @@ const SupportRoute = SupportRouteImport.update({
 const SellerRoute = SellerRouteImport.update({
   id: '/seller',
   path: '/seller',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PvzRoute = PvzRouteImport.update({
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
   '/pvz': typeof PvzRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/seller': typeof SellerRoute
   '/support': typeof SupportRoute
   '/product/$id': typeof ProductIdRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
   '/pvz': typeof PvzRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/seller': typeof SellerRoute
   '/support': typeof SupportRoute
   '/product/$id': typeof ProductIdRoute
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
   '/pvz': typeof PvzRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/seller': typeof SellerRoute
   '/support': typeof SupportRoute
   '/product/$id': typeof ProductIdRoute
@@ -277,6 +286,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/promotions'
     | '/pvz'
+    | '/reset-password'
     | '/seller'
     | '/support'
     | '/product/$id'
@@ -305,6 +315,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/promotions'
     | '/pvz'
+    | '/reset-password'
     | '/seller'
     | '/support'
     | '/product/$id'
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/promotions'
     | '/pvz'
+    | '/reset-password'
     | '/seller'
     | '/support'
     | '/product/$id'
@@ -362,6 +374,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   PromotionsRoute: typeof PromotionsRoute
   PvzRoute: typeof PvzRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SellerRoute: typeof SellerRoute
   SupportRoute: typeof SupportRoute
   ProductIdRoute: typeof ProductIdRoute
@@ -382,6 +395,13 @@ declare module '@tanstack/react-router' {
       path: '/seller'
       fullPath: '/seller'
       preLoaderRoute: typeof SellerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pvz': {
@@ -578,6 +598,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   PromotionsRoute: PromotionsRoute,
   PvzRoute: PvzRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SellerRoute: SellerRoute,
   SupportRoute: SupportRoute,
   ProductIdRoute: ProductIdRoute,
