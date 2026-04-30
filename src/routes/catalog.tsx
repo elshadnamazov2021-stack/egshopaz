@@ -65,7 +65,7 @@ function Catalog() {
     }
 
     let query: any = supabase.from("products")
-      .select("id,title,price,old_price,image_url,rating,reviews_count,brand,categories!inner(slug)")
+      .select("id,title,price,old_price,image_url,rating,reviews_count,brand,stock,delivery_days_min,delivery_days_max,delivery_city,free_shipping,fast_delivery,condition,categories!inner(slug)")
       .eq("is_active", true);
     if (q) query = query.ilike("title", `%${q}%`);
     if (catSlugs) query = query.in("categories.slug", catSlugs);
@@ -75,6 +75,11 @@ function Catalog() {
     if (filters.minRating) query = query.gte("rating", filters.minRating);
     if (filters.onlyDiscount) query = query.not("old_price", "is", null);
     if (filters.inStockOnly) query = query.gt("stock", 0);
+    if (filters.freeShipping) query = query.eq("free_shipping", true);
+    if (filters.fastDelivery) query = query.eq("fast_delivery", true);
+    if (filters.maxDeliveryDays) query = query.lte("delivery_days_max", filters.maxDeliveryDays);
+    if (filters.city) query = query.eq("delivery_city", filters.city);
+    if (filters.condition) query = query.eq("condition", filters.condition);
     if (filters.newArrivals) {
       const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
       query = query.gte("created_at", since);
@@ -84,6 +89,8 @@ function Catalog() {
     else if (filters.sort === "price_desc") query = query.order("price", { ascending: false });
     else if (filters.sort === "rating") query = query.order("rating", { ascending: false });
     else if (filters.sort === "popular") query = query.order("reviews_count", { ascending: false });
+    else if (filters.sort === "delivery_fast") query = query.order("delivery_days_max", { ascending: true, nullsFirst: false });
+    else if (filters.sort === "discount_high") query = query.order("old_price", { ascending: false, nullsFirst: false });
     else query = query.order("created_at", { ascending: false });
 
     query.limit(80).then(({ data }: { data: ProductCardData[] | null }) => {
