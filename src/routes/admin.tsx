@@ -100,7 +100,7 @@ function AdminPanel() {
     const [
       { count: u }, { count: p }, { data: os }, { data: pr }, { data: rs },
       { data: prod }, { data: cats }, { data: cour }, { data: wh },
-      { data: pp }, { data: bn }, { data: dsp }, { data: prm }, { data: stg }, { data: tkt },
+      { data: pp }, { data: bn }, { data: dsp }, { data: prm }, { data: stg }, { data: tkt }, { data: pkg },
     ] = await Promise.all([
       supabase.from("profiles").select("*", { count: "exact", head: true }),
       supabase.from("products").select("*", { count: "exact", head: true }),
@@ -117,6 +117,7 @@ function AdminPanel() {
       supabase.from("promo_codes").select("*").order("created_at", { ascending: false }),
       supabase.from("system_settings").select("*").limit(1).maybeSingle(),
       supabase.from("support_tickets").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("ad_packages").select("*").order("sort_order", { ascending: true }),
     ]);
     const orderRows = (os ?? []) as OrderRow[];
     const roleRows = (rs ?? []) as RoleRow[];
