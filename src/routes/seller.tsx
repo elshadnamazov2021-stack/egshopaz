@@ -335,6 +335,7 @@ function SellerPanel() {
     { key: "messages", label: "Mesajlar", icon: MessageCircle, badge: unreadMsgs, active: tab === "messages", onClick: () => setTab("messages") },
     { key: "advertising", label: "Reklam & Paketlər", icon: Megaphone, active: tab === "advertising", onClick: () => setTab("advertising") },
     { key: "shop", label: "Mağaza ayarları", icon: Settings, active: tab === "shop", onClick: () => setTab("shop") },
+    { key: "support", label: "AI Dəstək", icon: LifeBuoy, active: tab === "support", onClick: () => setTab("support") },
   ];
 
   return (
