@@ -38,6 +38,11 @@ interface DisputeRow { id: string; order_id: string | null; buyer_id: string; se
 interface PromoRow { id: string; code: string; discount_percent: number | null; discount_amount: number | null; is_active: boolean; used_count: number; usage_limit: number | null; min_order: number }
 interface SettingsRow { id: string; commission_percent: number; delivery_base_fee: number; storage_fee_per_day: number; maintenance_mode: boolean; min_payout: number }
 interface TicketRow { id: string; subject: string; category: string; status: string; user_id: string; created_at: string; admin_reply: string | null }
+interface AdPackageRow {
+  id: string; name: string; tier: string; price: number; duration_days: number;
+  banner_slots: number; sponsored_product_slots: number; features: string[] | unknown;
+  color: string; is_active: boolean; sort_order: number;
+}
 
 function AdminPanel() {
   const { user, isAdmin, loading } = useAuth();
