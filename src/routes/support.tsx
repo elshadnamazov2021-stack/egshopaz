@@ -5,8 +5,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
-import { MessageCircle, Plus, Send } from "lucide-react";
+import { MessageCircle, Plus, Send, Bot } from "lucide-react";
 import { toast } from "sonner";
+import { AISupportChat } from "@/components/AISupportChat";
 
 export const Route = createFileRoute("/support")({
   head: () => ({ meta: [{ title: "Dəstək — Elzan Shop" }] }),
@@ -33,6 +34,7 @@ function SupportPage() {
   const { items } = useBuyerNav();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [creating, setCreating] = useState(false);
+  const [tab, setTab] = useState<"ai" | "tickets">("ai");
   const [form, setForm] = useState({ subject: "", category: "general", message: "" });
 
   useEffect(() => { if (!authLoading && !user) navigate({ to: "/auth" }); }, [user, authLoading, navigate]);
@@ -64,12 +66,29 @@ function SupportPage() {
   return (
     <PanelLayout title="Müştərinin şəxsi kabineti" subtitle={user.email ?? undefined} items={items}>
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <h1 className="text-2xl font-extrabold flex items-center gap-2"><MessageCircle className="h-6 w-6 text-primary" /> Dəstək xidməti</h1>
-          <button onClick={() => setCreating(!creating)} className="bg-primary text-primary-foreground px-4 h-10 rounded-lg font-bold hover:bg-primary/90 inline-flex items-center gap-2">
-            <Plus className="h-4 w-4" /> Yeni müraciət
+          {tab === "tickets" && (
+            <button onClick={() => setCreating(!creating)} className="bg-primary text-primary-foreground px-4 h-10 rounded-lg font-bold hover:bg-primary/90 inline-flex items-center gap-2">
+              <Plus className="h-4 w-4" /> Yeni müraciət
+            </button>
+          )}
+        </div>
+
+        <div className="flex gap-2 mb-4 border-b border-border">
+          <button onClick={() => setTab("ai")}
+            className={`px-4 h-10 font-semibold inline-flex items-center gap-2 border-b-2 -mb-px ${tab === "ai" ? "border-primary text-primary" : "border-transparent text-muted-foreground"}`}>
+            <Bot className="h-4 w-4" /> AI Asistent
+          </button>
+          <button onClick={() => setTab("tickets")}
+            className={`px-4 h-10 font-semibold inline-flex items-center gap-2 border-b-2 -mb-px ${tab === "tickets" ? "border-primary text-primary" : "border-transparent text-muted-foreground"}`}>
+            <MessageCircle className="h-4 w-4" /> Müraciətlərim
           </button>
         </div>
+
+        {tab === "ai" && <AISupportChat userId={user.id} />}
+
+        {tab === "tickets" && <></>}
 
         {creating && (
           <div className="bg-card border border-border rounded-2xl p-4 mb-4 space-y-3">
