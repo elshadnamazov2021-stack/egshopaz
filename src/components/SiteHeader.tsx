@@ -56,8 +56,8 @@ export function SiteHeader() {
         <SidebarTrigger className="shrink-0" />
 
         <Link to="/" className="flex items-center gap-3 shrink-0 hover:scale-105 transition-transform" aria-label="Elzan Shop">
-          <img src={elzanLogo} alt="Elzan Shop logo" width={1024} height={1024} className="h-16 sm:h-20 md:h-24 w-auto object-contain drop-shadow-md" />
-          <span className="hidden sm:inline text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
+          <img src={elzanLogo} alt="Elzan Shop logo" width={1024} height={1024} className="h-14 sm:h-16 md:h-20 w-14 sm:w-16 md:w-20 rounded-full object-cover ring-2 ring-primary/30 shadow-lg" />
+          <span className="text-2xl md:text-3xl font-black tracking-tight text-primary">
             Elzan Shop
           </span>
         </Link>
