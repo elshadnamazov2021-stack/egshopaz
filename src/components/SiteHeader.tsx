@@ -117,11 +117,6 @@ export function SiteHeader() {
                 <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
                   <User className="h-4 w-4 mr-2" /> {t("header.personalCabinet")}
                 </DropdownMenuItem>
-                {!isSeller && (
-                  <DropdownMenuItem onClick={() => navigate({ to: "/become-seller" })}>
-                    <Store className="h-4 w-4 mr-2" /> {t("header.openShop")}
-                  </DropdownMenuItem>
-                )}
                 {isSeller && (
                   <DropdownMenuItem onClick={() => navigate({ to: "/seller" })}>
                     <Store className="h-4 w-4 mr-2" /> {t("header.sellerPanel")}

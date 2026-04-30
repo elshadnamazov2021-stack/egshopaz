@@ -123,16 +123,6 @@ export function MainSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {!isSeller && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <Link to="/become-seller" onClick={close}>
-                      <Store className="h-4 w-4" />
-                      <span>{t("sidebar.openShop")}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link to="/support" onClick={close}>
