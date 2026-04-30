@@ -39,6 +39,7 @@ function AddressesPage() {
 
   const save = async () => {
     if (!user || !editing) return;
+    const cityCoord = findCity(editing.city);
     const payload = {
       user_id: user.id,
       title: (editing.title || "Ev").slice(0, 50),
@@ -49,6 +50,8 @@ function AddressesPage() {
       apartment: editing.apartment?.slice(0, 50) || null,
       notes: editing.notes?.slice(0, 300) || null,
       is_default: editing.is_default ?? false,
+      lat: cityCoord?.lat ?? null,
+      lng: cityCoord?.lng ?? null,
     };
     if (!payload.recipient_name || !payload.phone || !payload.city || !payload.street) {
       toast.error("Bütün məcburi sahələri doldurun"); return;
