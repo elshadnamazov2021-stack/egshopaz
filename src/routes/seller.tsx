@@ -3,13 +3,14 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN } from "@/lib/format";
-import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon, LayoutDashboard, Settings, MessageCircle, QrCode, Download, Megaphone } from "lucide-react";
+import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon, LayoutDashboard, Settings, MessageCircle, QrCode, Download, Megaphone, LifeBuoy } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import QRCode from "qrcode";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { SellerMessages } from "@/components/SellerMessages";
 import { SellerAdvertising } from "@/components/SellerAdvertising";
+import { AISupportChat } from "@/components/AISupportChat";
 import { CitySelect } from "@/components/CitySelect";
 import { findCity } from "@/lib/azCities";
 
@@ -63,7 +64,7 @@ const ORDER_STATUSES = [
 function SellerPanel() {
   const { user, isSeller, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"dashboard" | "products" | "orders" | "messages" | "advertising" | "shop">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "products" | "orders" | "messages" | "advertising" | "shop" | "support">("dashboard");
   const [unreadMsgs, setUnreadMsgs] = useState(0);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -334,6 +335,7 @@ function SellerPanel() {
     { key: "messages", label: "Mesajlar", icon: MessageCircle, badge: unreadMsgs, active: tab === "messages", onClick: () => setTab("messages") },
     { key: "advertising", label: "Reklam & Paketlər", icon: Megaphone, active: tab === "advertising", onClick: () => setTab("advertising") },
     { key: "shop", label: "Mağaza ayarları", icon: Settings, active: tab === "shop", onClick: () => setTab("shop") },
+    { key: "support", label: "AI Dəstək", icon: LifeBuoy, active: tab === "support", onClick: () => setTab("support") },
   ];
 
   return (
@@ -503,6 +505,20 @@ function SellerPanel() {
       {tab === "messages" && <SellerMessages sellerId={user.id} />}
 
       {tab === "advertising" && <SellerAdvertising />}
+
+      {tab === "support" && (
+        <div className="space-y-4">
+          <div>
+            <h1 className="text-2xl font-extrabold flex items-center gap-2">
+              <LifeBuoy className="h-6 w-6 text-primary" /> AI Dəstək
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Satıcı suallarınıza 24/7 avtomatik cavab — məhsul, sifariş, reklam, ödəniş, mübahisələr.
+            </p>
+          </div>
+          <AISupportChat userId={user.id} audience="seller" />
+        </div>
+      )}
 
       {tab === "shop" && profile && (
         <div className="space-y-6 max-w-3xl">

@@ -129,6 +129,7 @@ Deno.serve(async (req) => {
       if (!settings.enabled_support) return json({ skipped: "channel_off" });
       const userId: string = body.user_id;
       const userMsg: string = body.message;
+      const audience: string = body.audience || "buyer";
       if (!userId || !userMsg) return json({ error: "missing user_id or message" }, 400);
 
       const { data: hist } = await admin.from("ai_chat_messages")
@@ -136,8 +137,14 @@ Deno.serve(async (req) => {
         .order("created_at", { ascending: true }).limit(20);
       const history = (hist ?? []).map((m) => ({ role: m.role, content: m.content }));
 
-      const faq = await loadFAQ("buyer");
-      const sys = `${settings.system_prompt_support}\n\n=== FAQ ===\n${faq}`;
+      const faq = await loadFAQ(audience);
+      let basePrompt = settings.system_prompt_support;
+      if (audience === "seller") {
+        basePrompt = `Sən Elzan Shop satıcı dəstək asistentisən. Satıcılara məhsul yükləmə, sifariş idarəetməsi, reklam paketləri, ödəniş, çatdırılma şərtləri, mağaza ayarları, mübahisələr və komissiya barədə kömək et. Mehriban, qısa və dəqiq cavab ver. Azərbaycan dilində danış.`;
+      } else if (audience === "pvz") {
+        basePrompt = `Sən Elzan Shop PVZ (çatdırılma nöqtəsi) işçi dəstək asistentisən. PVZ operatorlarına paket qəbulu, QR skan, götürmə kodu, anbar, qaytarma, növbə açma/bağlama, hesabat və müştəri ilə əlaqə barədə kömək et. Qısa, peşəkar və əməliyyat-yönümlü cavab ver. Azərbaycan dilində danış.`;
+      }
+      const sys = `${basePrompt}\n\n=== FAQ ===\n${faq}`;
       const reply = await callAI(model, sys, userMsg, history);
 
       await admin.from("ai_chat_messages").insert([

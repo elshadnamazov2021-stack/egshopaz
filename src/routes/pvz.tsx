@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { QRScannerDialog } from "@/components/QRScannerDialog";
 import { PvzOrderChat } from "@/components/PvzOrderChat";
+import { AISupportChat } from "@/components/AISupportChat";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
@@ -586,6 +587,7 @@ function SettingsSec() {
 }
 
 function Support() {
+  const { user } = useAuth();
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-extrabold flex items-center gap-2"><LifeBuoy className="h-6 w-6 text-primary" /> Dəstək</h1>
@@ -606,6 +608,15 @@ function Support() {
           <div className="text-xs text-muted-foreground">Foto ilə birlikdə</div>
         </button>
       </div>
+      {user && (
+        <div className="space-y-2">
+          <h2 className="text-lg font-bold flex items-center gap-2 mt-6">
+            🤖 AI Asistent — PVZ işçiləri üçün
+          </h2>
+          <p className="text-sm text-muted-foreground">QR skan, götürmə kodu, qaytarma, anbar, hesabat və s. üzrə dərhal cavab.</p>
+          <AISupportChat userId={user.id} audience="pvz" />
+        </div>
+      )}
     </div>
   );
 }

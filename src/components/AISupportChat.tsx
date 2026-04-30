@@ -10,7 +10,7 @@ interface AIMsg {
   created_at: string;
 }
 
-export function AISupportChat({ userId }: { userId: string }) {
+export function AISupportChat({ userId, audience = "buyer" }: { userId: string; audience?: "buyer" | "seller" | "pvz" | "all" }) {
   const [messages, setMessages] = useState<AIMsg[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -44,7 +44,7 @@ export function AISupportChat({ userId }: { userId: string }) {
     setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "user", content: msg, created_at: new Date().toISOString() }]);
     try {
       const { data, error } = await supabase.functions.invoke("ai-auto-reply", {
-        body: { channel: "support", user_id: userId, message: msg },
+        body: { channel: "support", user_id: userId, message: msg, audience },
       });
       if (error) throw error;
       if (data?.reply) {
