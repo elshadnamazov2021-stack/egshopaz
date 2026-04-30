@@ -365,6 +365,7 @@ function AdminPanel() {
       {tab === "finance" && <FinanceSection stats={stats} orders={orders} settings={settings} />}
       {tab === "marketing" && <MarketingSection />}
       {tab === "banners" && <BannersSection banners={banners} addBanner={addBanner} toggleBanner={toggleBanner} deleteBanner={deleteBanner} />}
+      {tab === "packages" && <PackagesSection packages={packages} savePackage={savePackage} deletePackage={deletePackage} togglePackage={togglePackage} />}
       {tab === "promo" && <PromoSection promos={promos} addPromo={addPromo} togglePromo={togglePromo} />}
       {tab === "analytics" && <AnalyticsSection products={products} orders={orders} categories={categories} />}
       {tab === "security" && <SecuritySection />}
