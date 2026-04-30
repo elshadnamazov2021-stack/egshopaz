@@ -295,6 +295,7 @@ function SellerPanel() {
   const saveShop = async () => {
     if (!user || !profile) return;
     setSavingShop(true);
+    const c = findCity(profile.shop_city);
     const { error } = await supabase.from("profiles").upsert({
       id: user.id,
       shop_name: profile.shop_name?.slice(0, 100) ?? null,
@@ -307,6 +308,8 @@ function SellerPanel() {
       shop_address: profile.shop_address?.slice(0, 300) ?? null,
       shop_city: profile.shop_city?.slice(0, 100) ?? null,
       shop_email: profile.shop_email?.slice(0, 200) ?? null,
+      shop_lat: c?.lat ?? null,
+      shop_lng: c?.lng ?? null,
     }, { onConflict: "id" });
     if (error) toast.error(error.message); else toast.success("Mağaza məlumatları yadda saxlanıldı");
     setSavingShop(false);
