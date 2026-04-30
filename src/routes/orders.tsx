@@ -231,5 +231,6 @@ function OrdersPage() {
           pickupPointId={trackOrder.pickup_point_id}
         />
       )}
+    </PanelLayout>
   );
 }
