@@ -283,7 +283,39 @@ function AdminPanel() {
     toast.success("Cavab göndərildi"); reload();
   };
 
-  // ── Navigation items ─────────────────────────────────────────
+  // ── Ad packages mutations ────────────────────────────────────
+  const savePackage = async (id: string | null, patch: Partial<AdPackageRow>) => {
+    if (id) {
+      const { error } = await supabase.from("ad_packages").update(patch).eq("id", id);
+      if (error) { toast.error(error.message); return; }
+      toast.success("Paket yeniləndi");
+    } else {
+      const { error } = await supabase.from("ad_packages").insert({
+        name: patch.name ?? "Yeni paket",
+        tier: patch.tier ?? "silver",
+        price: patch.price ?? 0,
+        duration_days: patch.duration_days ?? 30,
+        banner_slots: patch.banner_slots ?? 0,
+        sponsored_product_slots: patch.sponsored_product_slots ?? 0,
+        features: patch.features ?? [],
+        color: patch.color ?? "#3b82f6",
+        is_active: patch.is_active ?? true,
+        sort_order: patch.sort_order ?? packages.length,
+      });
+      if (error) { toast.error(error.message); return; }
+      toast.success("Paket yaradıldı");
+    }
+    reload();
+  };
+  const deletePackage = async (id: string) => {
+    if (!confirm("Bu paketi silmək?")) return;
+    const { error } = await supabase.from("ad_packages").delete().eq("id", id);
+    if (error) toast.error(error.message); else { toast.success("Silindi"); reload(); }
+  };
+  const togglePackage = async (id: string, active: boolean) => {
+    await supabase.from("ad_packages").update({ is_active: !active }).eq("id", id); reload();
+  };
+
   const navItems: PanelNavItem[] = [
     { key: "dashboard", label: "Ana səhifə", icon: LayoutDashboard, active: tab === "dashboard", onClick: () => setTab("dashboard") },
     { key: "customers", label: "Müştərilər", icon: Users, active: tab === "customers", onClick: () => setTab("customers") },
