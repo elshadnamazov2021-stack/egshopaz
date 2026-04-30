@@ -85,8 +85,25 @@ function AuthPage() {
   const [position, setPosition] = useState("operator");
 
   const [busy, setBusy] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotBusy, setForgotBusy] = useState(false);
 
   useEffect(() => { if (user) navigate({ to: "/" }); }, [user, navigate]);
+
+  const sendReset = async () => {
+    const v = z.string().trim().email("Yanlış e-poçt").safeParse(forgotEmail);
+    if (!v.success) { toast.error(v.error.issues[0].message); return; }
+    setForgotBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setForgotBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Bərpa linki e-poçtunuza göndərildi");
+    setForgotOpen(false);
+    setForgotEmail("");
+  };
 
   useEffect(() => {
     if (role !== "pvz") return;
