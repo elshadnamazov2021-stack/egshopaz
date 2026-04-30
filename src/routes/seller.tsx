@@ -666,6 +666,55 @@ function SellerPanel() {
                 </select>
               </div>
 
+              <div className="border-t border-border pt-4">
+                <h4 className="text-sm font-bold mb-3 flex items-center gap-2">🚚 Çatdırılma şərtləri</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground">Min gün</label>
+                    <input type="number" min={0} value={editing.delivery_days_min ?? 1}
+                           onChange={(e) => setEditing({ ...editing, delivery_days_min: parseInt(e.target.value) || 0 })}
+                           className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground">Max gün</label>
+                    <input type="number" min={0} value={editing.delivery_days_max ?? 3}
+                           onChange={(e) => setEditing({ ...editing, delivery_days_max: parseInt(e.target.value) || 0 })}
+                           className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <label className="text-xs font-semibold text-muted-foreground">Çatdırılma şəhəri</label>
+                  <select value={editing.delivery_city ?? "Bakı"}
+                          onChange={(e) => setEditing({ ...editing, delivery_city: e.target.value })}
+                          className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background">
+                    {["Bakı","Sumqayıt","Gəncə","Mingəçevir","Lənkəran","Şirvan","Naxçıvan","Şəki","Quba"].map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-lg border border-border hover:border-primary">
+                    <input type="checkbox" checked={!!editing.free_shipping}
+                           onChange={(e) => setEditing({ ...editing, free_shipping: e.target.checked })}
+                           className="w-4 h-4 accent-primary" />
+                    <span className="text-xs font-semibold">🆓 Pulsuz çatdırılma</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-lg border border-border hover:border-primary">
+                    <input type="checkbox" checked={!!editing.fast_delivery}
+                           onChange={(e) => setEditing({ ...editing, fast_delivery: e.target.checked })}
+                           className="w-4 h-4 accent-primary" />
+                    <span className="text-xs font-semibold">⚡ 24 saat ərzində</span>
+                  </label>
+                </div>
+                <div className="mt-3">
+                  <label className="text-xs font-semibold text-muted-foreground">Vəziyyəti</label>
+                  <select value={editing.condition ?? "new"}
+                          onChange={(e) => setEditing({ ...editing, condition: e.target.value })}
+                          className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background">
+                    <option value="new">Yeni</option>
+                    <option value="used">İşlənmiş</option>
+                  </select>
+                </div>
+              </div>
+
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={editing.is_active ?? true}
                        onChange={(e) => setEditing({ ...editing, is_active: e.target.checked })}
