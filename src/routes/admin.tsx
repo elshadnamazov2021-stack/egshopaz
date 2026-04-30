@@ -134,6 +134,7 @@ function AdminPanel() {
     setPromos((prm ?? []) as PromoRow[]);
     setSettings((stg ?? null) as SettingsRow | null);
     setTickets((tkt ?? []) as TicketRow[]);
+    setPackages((pkg ?? []) as AdPackageRow[]);
     setStats({
       users: u ?? 0, products: p ?? 0, orders: orderRows.length,
       revenue: orderRows.reduce((s, o) => s + Number(o.total), 0),
