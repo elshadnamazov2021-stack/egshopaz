@@ -156,6 +156,12 @@
     "brand": "Marka",
     "minRating": "Min reytinq",
     "onlyDiscount": "Yalnız endirimli",
+    "inStockOnly": "Stokda var",
+    "freeShipping": "Pulsuz çatdırılma",
+    "fastDelivery": "Sürətli çatdırılma",
+    "newArrivals": "Yeni gələnlər",
+    "minDiscount": "Min endirim %",
+    "priceRange": "Qiymət aralığı",
     "reset": "Sıfırla"
   },
   "product": {
