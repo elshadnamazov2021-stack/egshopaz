@@ -62,6 +62,7 @@ function AdminPanel() {
   const [promos, setPromos] = useState<PromoRow[]>([]);
   const [settings, setSettings] = useState<SettingsRow | null>(null);
   const [tickets, setTickets] = useState<TicketRow[]>([]);
+  const [packages, setPackages] = useState<AdPackageRow[]>([]);
   const [unlocked, setUnlocked] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return sessionStorage.getItem("admin_panel_unlocked") === "1";
