@@ -109,6 +109,7 @@ export type Database = {
       }
       ai_chat_messages: {
         Row: {
+          audience: string
           content: string
           created_at: string
           id: string
@@ -116,6 +117,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          audience?: string
           content: string
           created_at?: string
           id?: string
@@ -123,6 +125,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          audience?: string
           content?: string
           created_at?: string
           id?: string
@@ -1436,6 +1439,7 @@ export type Database = {
         Args: { _channel: string; _message_id: string }
         Returns: undefined
       }
+      cleanup_ai_chat_messages: { Args: never; Returns: undefined }
       get_owner_admin_id: { Args: never; Returns: string }
       has_role: {
         Args: {
