@@ -7,6 +7,8 @@ import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { MapPin, Plus, Trash2, Star, Edit3 } from "lucide-react";
 import { toast } from "sonner";
+import { CitySelect } from "@/components/CitySelect";
+import { findCity } from "@/lib/azCities";
 
 export const Route = createFileRoute("/addresses")({
   head: () => ({ meta: [{ title: "Ünvanlarım — Elzan Shop" }] }),
@@ -37,6 +39,7 @@ function AddressesPage() {
 
   const save = async () => {
     if (!user || !editing) return;
+    const cityCoord = findCity(editing.city);
     const payload = {
       user_id: user.id,
       title: (editing.title || "Ev").slice(0, 50),
@@ -47,6 +50,8 @@ function AddressesPage() {
       apartment: editing.apartment?.slice(0, 50) || null,
       notes: editing.notes?.slice(0, 300) || null,
       is_default: editing.is_default ?? false,
+      lat: cityCoord?.lat ?? null,
+      lng: cityCoord?.lng ?? null,
     };
     if (!payload.recipient_name || !payload.phone || !payload.city || !payload.street) {
       toast.error("Bütün məcburi sahələri doldurun"); return;
@@ -118,7 +123,7 @@ function AddressesPage() {
                 <input placeholder="Başlıq (Ev, İş)" value={editing.title ?? ""} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className="col-span-2 h-10 px-3 rounded-lg border border-input bg-background" />
                 <input placeholder="Alıcı ad soyad *" value={editing.recipient_name ?? ""} onChange={(e) => setEditing({ ...editing, recipient_name: e.target.value })} className="h-10 px-3 rounded-lg border border-input bg-background" />
                 <input placeholder="Telefon *" value={editing.phone ?? ""} onChange={(e) => setEditing({ ...editing, phone: e.target.value })} className="h-10 px-3 rounded-lg border border-input bg-background" />
-                <input placeholder="Şəhər *" value={editing.city ?? ""} onChange={(e) => setEditing({ ...editing, city: e.target.value })} className="h-10 px-3 rounded-lg border border-input bg-background" />
+                <CitySelect value={editing.city ?? ""} onChange={(v) => setEditing({ ...editing, city: v })} includeEmpty placeholder="Şəhər *" className="w-full" />
                 <input placeholder="Mənzil/ofis" value={editing.apartment ?? ""} onChange={(e) => setEditing({ ...editing, apartment: e.target.value })} className="h-10 px-3 rounded-lg border border-input bg-background" />
                 <input placeholder="Küçə, ev *" value={editing.street ?? ""} onChange={(e) => setEditing({ ...editing, street: e.target.value })} className="col-span-2 h-10 px-3 rounded-lg border border-input bg-background" />
                 <textarea placeholder="Qeyd (giriş kodu, mərtəbə və s.)" value={editing.notes ?? ""} onChange={(e) => setEditing({ ...editing, notes: e.target.value })} className="col-span-2 h-20 px-3 py-2 rounded-lg border border-input bg-background resize-none" />

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
+import { AZ_CITY_NAMES, findCity } from "@/lib/azCities";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin paneli — Elzan Shop" }] }),
@@ -219,9 +220,13 @@ function AdminPanel() {
 
   const addPickup = async () => {
     const name = prompt("PVZ adı:"); if (!name) return;
-    const city = prompt("Şəhər:") ?? "Bakı";
+    const cityList = AZ_CITY_NAMES.join(", ");
+    const city = prompt(`Şəhər (mümkün: ${cityList.slice(0, 200)}...):`) ?? "Bakı";
     const address = prompt("Ünvan:") ?? "";
-    const { error } = await supabase.from("pickup_points").insert({ name, city, address });
+    const c = findCity(city);
+    const { error } = await supabase.from("pickup_points").insert({
+      name, city, address, lat: c?.lat ?? null, lng: c?.lng ?? null,
+    });
     if (error) toast.error(error.message); else { toast.success("Əlavə edildi"); reload(); }
   };
   const togglePickup = async (id: string, active: boolean) => {

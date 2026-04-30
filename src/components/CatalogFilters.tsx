@@ -21,7 +21,8 @@ export interface Filters {
   sort: SortKey;
 }
 
-const CITIES = ["Bakı", "Sumqayıt", "Gəncə", "Mingəçevir", "Lənkəran", "Şirvan", "Naxçıvan", "Şəki", "Quba"];
+import { AZ_CITY_NAMES } from "@/lib/azCities";
+const CITIES = AZ_CITY_NAMES;
 const DELIVERY_DAYS = [1, 3, 7, 14];
 
 export function CatalogFilters({

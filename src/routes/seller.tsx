@@ -10,6 +10,8 @@ import QRCode from "qrcode";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { SellerMessages } from "@/components/SellerMessages";
 import { SellerAdvertising } from "@/components/SellerAdvertising";
+import { CitySelect } from "@/components/CitySelect";
+import { findCity } from "@/lib/azCities";
 
 export const Route = createFileRoute("/seller")({
   head: () => ({ meta: [{ title: "Satıcı paneli — Elzan Shop" }] }),
@@ -293,6 +295,7 @@ function SellerPanel() {
   const saveShop = async () => {
     if (!user || !profile) return;
     setSavingShop(true);
+    const c = findCity(profile.shop_city);
     const { error } = await supabase.from("profiles").upsert({
       id: user.id,
       shop_name: profile.shop_name?.slice(0, 100) ?? null,
@@ -305,6 +308,8 @@ function SellerPanel() {
       shop_address: profile.shop_address?.slice(0, 300) ?? null,
       shop_city: profile.shop_city?.slice(0, 100) ?? null,
       shop_email: profile.shop_email?.slice(0, 200) ?? null,
+      shop_lat: c?.lat ?? null,
+      shop_lng: c?.lng ?? null,
     }, { onConflict: "id" });
     if (error) toast.error(error.message); else toast.success("Mağaza məlumatları yadda saxlanıldı");
     setSavingShop(false);
@@ -555,8 +560,9 @@ function SellerPanel() {
               </div>
               <div>
                 <label className="text-sm font-semibold">Şəhər</label>
-                <input value={profile.shop_city ?? ""} onChange={(e) => setProfile({ ...profile, shop_city: e.target.value })}
-                       maxLength={100} placeholder="Bakı" className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+                <CitySelect value={profile.shop_city ?? ""}
+                       onChange={(v) => setProfile({ ...profile, shop_city: v })}
+                       includeEmpty placeholder="Şəhər seçin" className="mt-1 w-full h-11" />
               </div>
               <div className="sm:col-span-2">
                 <label className="text-sm font-semibold">Ünvan</label>
@@ -693,11 +699,9 @@ function SellerPanel() {
                 </div>
                 <div className="mt-3">
                   <label className="text-xs font-semibold text-muted-foreground">Çatdırılma şəhəri</label>
-                  <select value={editing.delivery_city ?? "Bakı"}
-                          onChange={(e) => setEditing({ ...editing, delivery_city: e.target.value })}
-                          className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background">
-                    {["Bakı","Sumqayıt","Gəncə","Mingəçevir","Lənkəran","Şirvan","Naxçıvan","Şəki","Quba"].map((c) => <option key={c} value={c}>{c}</option>)}
-                  </select>
+                  <CitySelect value={editing.delivery_city ?? "Bakı"}
+                          onChange={(v) => setEditing({ ...editing, delivery_city: v })}
+                          className="mt-1 w-full" />
                 </div>
                 <div className="grid grid-cols-2 gap-3 mt-3">
                   <label className="flex items-center gap-2 cursor-pointer p-2 rounded-lg border border-border hover:border-primary">
