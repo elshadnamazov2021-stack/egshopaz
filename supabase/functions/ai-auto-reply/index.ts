@@ -133,7 +133,7 @@ Deno.serve(async (req) => {
       if (!userId || !userMsg) return json({ error: "missing user_id or message" }, 400);
 
       const { data: hist } = await admin.from("ai_chat_messages")
-        .select("role,content").eq("user_id", userId)
+        .select("role,content").eq("user_id", userId).eq("audience", audience)
         .order("created_at", { ascending: true }).limit(20);
       const history = (hist ?? []).map((m) => ({ role: m.role, content: m.content }));
 
@@ -148,8 +148,8 @@ Deno.serve(async (req) => {
       const reply = await callAI(model, sys, userMsg, history);
 
       await admin.from("ai_chat_messages").insert([
-        { user_id: userId, role: "user", content: userMsg },
-        { user_id: userId, role: "assistant", content: reply },
+        { user_id: userId, role: "user", content: userMsg, audience },
+        { user_id: userId, role: "assistant", content: reply, audience },
       ]);
       await admin.from("ai_replies_log").insert({ channel, status: "ok" });
       return json({ reply });

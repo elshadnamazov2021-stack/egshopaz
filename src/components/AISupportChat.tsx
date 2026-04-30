@@ -21,6 +21,7 @@ export function AISupportChat({ userId, audience = "buyer" }: { userId: string; 
       .from("ai_chat_messages")
       .select("*")
       .eq("user_id", userId)
+      .eq("audience", audience)
       .order("created_at", { ascending: true })
       .limit(50);
     setMessages((data ?? []) as AIMsg[]);
