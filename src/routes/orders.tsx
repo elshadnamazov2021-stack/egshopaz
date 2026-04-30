@@ -40,6 +40,7 @@ function OrdersPage() {
   const [msgBody, setMsgBody] = useState("");
   const [msgSending, setMsgSending] = useState(false);
   const [qrItem, setQrItem] = useState<OrderItem | null>(null);
+  const [trackOrder, setTrackOrder] = useState<Order | null>(null);
   const qrOrder = qrItem ? orders.find((o) => o.order_items?.some((i) => i.id === qrItem.id)) : null;
 
   const statusLabel: Record<string, string> = {
@@ -162,11 +163,17 @@ function OrdersPage() {
                     </div>
                   ))}
                 </div>
-                {(o.status === "pending" || o.status === "paid") && (
-                  <button onClick={() => cancel(o.id)} className="mt-3 text-sm text-destructive hover:underline inline-flex items-center gap-1">
-                    <X className="h-3 w-3" /> {t("orders.cancel")}
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <button onClick={() => setTrackOrder(o)}
+                          className="text-sm px-3 py-1.5 rounded-lg border border-primary/40 text-primary hover:bg-primary/10 inline-flex items-center gap-1.5">
+                    <MapIcon className="h-4 w-4" /> Xəritədə izlə
                   </button>
-                )}
+                  {(o.status === "pending" || o.status === "paid") && (
+                    <button onClick={() => cancel(o.id)} className="text-sm text-destructive hover:underline inline-flex items-center gap-1">
+                      <X className="h-3 w-3" /> {t("orders.cancel")}
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
