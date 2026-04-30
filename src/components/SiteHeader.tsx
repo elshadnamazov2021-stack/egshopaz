@@ -55,8 +55,11 @@ export function SiteHeader() {
       <div className="container mx-auto px-4 h-32 sm:h-36 flex items-center gap-4">
         <SidebarTrigger className="shrink-0" />
 
-        <Link to="/" className="flex items-center shrink-0 drop-shadow-md hover:scale-105 transition-transform" aria-label="Elzan Shop">
-          <img src={elzanLogo} alt="Elzan Shop logo" width={1024} height={512} className="h-28 sm:h-32 md:h-36 w-auto object-contain" />
+        <Link to="/" className="flex items-center gap-3 shrink-0 hover:scale-105 transition-transform" aria-label="Elzan Shop">
+          <img src={elzanLogo} alt="Elzan Shop logo" width={1024} height={1024} className="h-16 sm:h-20 md:h-24 w-auto object-contain drop-shadow-md" />
+          <span className="hidden sm:inline text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
+            Elzan Shop
+          </span>
         </Link>
 
         <form onSubmit={onSearch} className="flex-1 max-w-2xl hidden md:flex">
