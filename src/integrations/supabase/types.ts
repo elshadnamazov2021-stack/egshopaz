@@ -369,6 +369,27 @@ export type Database = {
           },
         ]
       }
+      compare_items: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       couriers: {
         Row: {
           city: string
@@ -924,6 +945,11 @@ export type Database = {
           full_name: string | null
           id: string
           phone: string | null
+          referral_code: string | null
+          referred_by: string | null
+          seller_tier: string
+          seller_total_orders: number
+          seller_total_sales: number
           shop_address: string | null
           shop_banner_url: string | null
           shop_city: string | null
@@ -943,6 +969,11 @@ export type Database = {
           full_name?: string | null
           id: string
           phone?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
+          seller_tier?: string
+          seller_total_orders?: number
+          seller_total_sales?: number
           shop_address?: string | null
           shop_banner_url?: string | null
           shop_city?: string | null
@@ -962,6 +993,11 @@ export type Database = {
           full_name?: string | null
           id?: string
           phone?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
+          seller_tier?: string
+          seller_total_orders?: number
+          seller_total_sales?: number
           shop_address?: string | null
           shop_banner_url?: string | null
           shop_city?: string | null
@@ -1130,6 +1166,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      referrals: {
+        Row: {
+          bonus_awarded: number
+          created_at: string
+          id: string
+          referred_id: string
+          referrer_id: string
+        }
+        Insert: {
+          bonus_awarded?: number
+          created_at?: string
+          id?: string
+          referred_id: string
+          referrer_id: string
+        }
+        Update: {
+          bonus_awarded?: number
+          created_at?: string
+          id?: string
+          referred_id?: string
+          referrer_id?: string
+        }
+        Relationships: []
       }
       reviews: {
         Row: {
