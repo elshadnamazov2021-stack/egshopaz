@@ -207,8 +207,12 @@ function ProductPage() {
         </div>
       </div>
 
-      <div className="mt-10">
+      <div className="mt-10 space-y-10">
+        <ProductRecommendations productId={p.id} />
         <ProductReviews productId={p.id} />
+      </div>
+      <div className="fixed bottom-20 right-4 z-40 md:bottom-8">
+        <CompareButton productId={p.id} />
       </div>
     </div>
   );
