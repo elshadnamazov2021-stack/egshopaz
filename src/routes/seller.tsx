@@ -508,6 +508,10 @@ function SellerPanel() {
 
       {tab === "messages" && <SellerMessages sellerId={user.id} />}
 
+      {tab === "analytics" && <SellerAnalytics sellerId={user.id} />}
+
+      {tab === "bulk" && <BulkProductUpload sellerId={user.id} onComplete={load} />}
+
       {tab === "advertising" && <SellerAdvertising />}
 
       {tab === "support" && (
