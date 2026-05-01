@@ -67,13 +67,12 @@ export function OrderTrackingMap({ orderItemId }: Props) {
 
   const currentStep = info.delivered_at ? 3 : info.accepted_at ? 2 : info.status === "shipped" ? 1 : 0;
 
-  // Build markers for map
-  const markers: { lat: number; lng: number; label: string; color?: string }[] = [];
+  const markers: import("@/components/MapView").MapMarker[] = [];
   if (info.pickup_point?.lat && info.pickup_point?.lng) {
-    markers.push({ lat: Number(info.pickup_point.lat), lng: Number(info.pickup_point.lng), label: `📦 ${info.pickup_point.name}`, color: "#3b82f6" });
+    markers.push({ id: "pvz", lat: Number(info.pickup_point.lat), lng: Number(info.pickup_point.lng), title: info.pickup_point.name, description: info.pickup_point.address, kind: "pvz" });
   }
   if (info.courier?.lat && info.courier?.lng) {
-    markers.push({ lat: Number(info.courier.lat), lng: Number(info.courier.lng), label: `🚚 ${info.courier.full_name}`, color: "#10b981" });
+    markers.push({ id: "courier", lat: Number(info.courier.lat), lng: Number(info.courier.lng), title: info.courier.full_name, description: info.courier.phone, kind: "courier" });
   }
 
   return (
