@@ -7,6 +7,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Star, ShoppingCart, Heart, Truck, ShieldCheck, MessageCircle, Send, Store } from "lucide-react";
 import { toast } from "sonner";
 import { ProductReviews } from "@/components/ProductReviews";
+import { CompareButton } from "@/components/CompareButton";
+import { ProductRecommendations } from "@/components/ProductRecommendations";
 
 export const Route = createFileRoute("/product/$id")({
   component: ProductPage,
