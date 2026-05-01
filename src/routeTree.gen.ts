@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as SellerRouteImport } from './routes/seller'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ReferralRouteImport } from './routes/referral'
 import { Route as PvzRouteImport } from './routes/pvz'
 import { Route as PromotionsRouteImport } from './routes/promotions'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -26,6 +27,7 @@ import { Route as MapRouteImport } from './routes/map'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as DisputesRouteImport } from './routes/disputes'
 import { Route as DiscoverRouteImport } from './routes/discover'
+import { Route as CompareRouteImport } from './routes/compare'
 import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as BonusRouteImport } from './routes/bonus'
@@ -50,6 +52,11 @@ const SellerRoute = SellerRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReferralRoute = ReferralRouteImport.update({
+  id: '/referral',
+  path: '/referral',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PvzRoute = PvzRouteImport.update({
@@ -122,6 +129,11 @@ const DiscoverRoute = DiscoverRouteImport.update({
   path: '/discover',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CatalogRoute = CatalogRouteImport.update({
   id: '/catalog',
   path: '/catalog',
@@ -182,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/bonus': typeof BonusRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
+  '/compare': typeof CompareRoute
   '/discover': typeof DiscoverRoute
   '/disputes': typeof DisputesRoute
   '/favorites': typeof FavoritesRoute
@@ -196,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
   '/pvz': typeof PvzRoute
+  '/referral': typeof ReferralRoute
   '/reset-password': typeof ResetPasswordRoute
   '/seller': typeof SellerRoute
   '/support': typeof SupportRoute
@@ -211,6 +225,7 @@ export interface FileRoutesByTo {
   '/bonus': typeof BonusRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
+  '/compare': typeof CompareRoute
   '/discover': typeof DiscoverRoute
   '/disputes': typeof DisputesRoute
   '/favorites': typeof FavoritesRoute
@@ -225,6 +240,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
   '/pvz': typeof PvzRoute
+  '/referral': typeof ReferralRoute
   '/reset-password': typeof ResetPasswordRoute
   '/seller': typeof SellerRoute
   '/support': typeof SupportRoute
@@ -241,6 +257,7 @@ export interface FileRoutesById {
   '/bonus': typeof BonusRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
+  '/compare': typeof CompareRoute
   '/discover': typeof DiscoverRoute
   '/disputes': typeof DisputesRoute
   '/favorites': typeof FavoritesRoute
@@ -255,6 +272,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
   '/pvz': typeof PvzRoute
+  '/referral': typeof ReferralRoute
   '/reset-password': typeof ResetPasswordRoute
   '/seller': typeof SellerRoute
   '/support': typeof SupportRoute
@@ -272,6 +290,7 @@ export interface FileRouteTypes {
     | '/bonus'
     | '/cart'
     | '/catalog'
+    | '/compare'
     | '/discover'
     | '/disputes'
     | '/favorites'
@@ -286,6 +305,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/promotions'
     | '/pvz'
+    | '/referral'
     | '/reset-password'
     | '/seller'
     | '/support'
@@ -301,6 +321,7 @@ export interface FileRouteTypes {
     | '/bonus'
     | '/cart'
     | '/catalog'
+    | '/compare'
     | '/discover'
     | '/disputes'
     | '/favorites'
@@ -315,6 +336,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/promotions'
     | '/pvz'
+    | '/referral'
     | '/reset-password'
     | '/seller'
     | '/support'
@@ -330,6 +352,7 @@ export interface FileRouteTypes {
     | '/bonus'
     | '/cart'
     | '/catalog'
+    | '/compare'
     | '/discover'
     | '/disputes'
     | '/favorites'
@@ -344,6 +367,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/promotions'
     | '/pvz'
+    | '/referral'
     | '/reset-password'
     | '/seller'
     | '/support'
@@ -360,6 +384,7 @@ export interface RootRouteChildren {
   BonusRoute: typeof BonusRoute
   CartRoute: typeof CartRoute
   CatalogRoute: typeof CatalogRoute
+  CompareRoute: typeof CompareRoute
   DiscoverRoute: typeof DiscoverRoute
   DisputesRoute: typeof DisputesRoute
   FavoritesRoute: typeof FavoritesRoute
@@ -374,6 +399,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   PromotionsRoute: typeof PromotionsRoute
   PvzRoute: typeof PvzRoute
+  ReferralRoute: typeof ReferralRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SellerRoute: typeof SellerRoute
   SupportRoute: typeof SupportRoute
@@ -402,6 +428,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/referral': {
+      id: '/referral'
+      path: '/referral'
+      fullPath: '/referral'
+      preLoaderRoute: typeof ReferralRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pvz': {
@@ -502,6 +535,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DiscoverRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/catalog': {
       id: '/catalog'
       path: '/catalog'
@@ -584,6 +624,7 @@ const rootRouteChildren: RootRouteChildren = {
   BonusRoute: BonusRoute,
   CartRoute: CartRoute,
   CatalogRoute: CatalogRoute,
+  CompareRoute: CompareRoute,
   DiscoverRoute: DiscoverRoute,
   DisputesRoute: DisputesRoute,
   FavoritesRoute: FavoritesRoute,
@@ -598,6 +639,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   PromotionsRoute: PromotionsRoute,
   PvzRoute: PvzRoute,
+  ReferralRoute: ReferralRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SellerRoute: SellerRoute,
   SupportRoute: SupportRoute,
