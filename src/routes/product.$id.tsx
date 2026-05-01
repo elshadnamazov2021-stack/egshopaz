@@ -208,7 +208,8 @@ function ProductPage() {
       </div>
 
       <div className="mt-10 space-y-10">
-        <ProductRecommendations productId={p.id} />
+        <ProductRecommendations mode="together" productId={p.id} />
+        <ProductRecommendations mode="for_you" />
         <ProductReviews productId={p.id} />
       </div>
       <div className="fixed bottom-20 right-4 z-40 md:bottom-8">
