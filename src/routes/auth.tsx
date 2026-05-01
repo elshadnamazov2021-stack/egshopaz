@@ -86,6 +86,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [referralCode, setReferralCode] = useState(() => typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("ref") ?? "" : "");
   const [agree, setAgree] = useState(false);
 
   // seller
@@ -168,7 +169,7 @@ function AuthPage() {
       email, password,
       options: {
         emailRedirectTo: `${window.location.origin}/`,
-        data: { full_name: name, phone },
+        data: { full_name: name, phone, referral_code: referralCode.trim().toUpperCase() || undefined },
       },
     });
     if (error) { setBusy(false); toast.error(error.message); return; }
