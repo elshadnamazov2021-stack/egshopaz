@@ -50,6 +50,7 @@ export function MainSidebar() {
     { to: "/cart", label: t("sidebar.cart"), icon: ShoppingCart },
     { to: "/messages", label: t("sidebar.messages"), icon: MessageCircle },
     { to: "/notifications", label: t("sidebar.notifications"), icon: Bell },
+    { to: "/referral", label: "Referral proqramı", icon: Users },
   ] : [];
 
   return (
