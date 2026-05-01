@@ -37,6 +37,7 @@ export function MainSidebar() {
     { to: "/", label: t("sidebar.home"), icon: Home },
     { to: "/catalog", label: t("sidebar.catalog"), icon: LayoutGrid, search: { q: undefined, cat: undefined } as never },
     { to: "/discover", label: t("sidebar.discover"), icon: Flame },
+    { to: "/compare", label: "Müqayisə", icon: GitCompare },
     { to: "/map", label: "Xəritə", icon: MapIcon },
     { to: "/promotions", label: t("sidebar.promotions"), icon: Tag },
     { to: "/bonus", label: t("sidebar.bonuses"), icon: Gift },
