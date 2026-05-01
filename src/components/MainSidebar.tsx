@@ -10,6 +10,7 @@ import {
 import {
   Home, LayoutGrid, Heart, ShoppingCart, MessageCircle, Package,
   Bell, Tag, Gift, Store, User, HelpCircle, Shield, PackageOpen, Flame, Map as MapIcon,
+  GitCompare, Users,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { catName } from "@/lib/catName";
@@ -36,6 +37,7 @@ export function MainSidebar() {
     { to: "/", label: t("sidebar.home"), icon: Home },
     { to: "/catalog", label: t("sidebar.catalog"), icon: LayoutGrid, search: { q: undefined, cat: undefined } as never },
     { to: "/discover", label: t("sidebar.discover"), icon: Flame },
+    { to: "/compare", label: "Müqayisə", icon: GitCompare },
     { to: "/map", label: "Xəritə", icon: MapIcon },
     { to: "/promotions", label: t("sidebar.promotions"), icon: Tag },
     { to: "/bonus", label: t("sidebar.bonuses"), icon: Gift },
@@ -48,6 +50,7 @@ export function MainSidebar() {
     { to: "/cart", label: t("sidebar.cart"), icon: ShoppingCart },
     { to: "/messages", label: t("sidebar.messages"), icon: MessageCircle },
     { to: "/notifications", label: t("sidebar.notifications"), icon: Bell },
+    { to: "/referral", label: "Referral proqramı", icon: Users },
   ] : [];
 
   return (
