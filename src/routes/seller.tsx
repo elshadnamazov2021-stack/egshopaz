@@ -3,13 +3,15 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN } from "@/lib/format";
-import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon, LayoutDashboard, Settings, MessageCircle, QrCode, Download, Megaphone, LifeBuoy } from "lucide-react";
+import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon, LayoutDashboard, Settings, MessageCircle, QrCode, Download, Megaphone, LifeBuoy, BarChart3, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import QRCode from "qrcode";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { SellerMessages } from "@/components/SellerMessages";
 import { SellerAdvertising } from "@/components/SellerAdvertising";
+import { SellerAnalytics } from "@/components/SellerAnalytics";
+import { BulkProductUpload } from "@/components/BulkProductUpload";
 import { AISupportChat } from "@/components/AISupportChat";
 import { CitySelect } from "@/components/CitySelect";
 import { findCity } from "@/lib/azCities";
@@ -64,7 +66,7 @@ const ORDER_STATUSES = [
 function SellerPanel() {
   const { user, isSeller, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"dashboard" | "products" | "orders" | "messages" | "advertising" | "shop" | "support">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "products" | "orders" | "messages" | "advertising" | "analytics" | "bulk" | "shop" | "support">("dashboard");
   const [unreadMsgs, setUnreadMsgs] = useState(0);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -331,7 +333,9 @@ function SellerPanel() {
   const navItems: PanelNavItem[] = [
     { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, active: tab === "dashboard", onClick: () => setTab("dashboard") },
     { key: "products", label: "Məhsullar", icon: Package, badge: products.length, active: tab === "products", onClick: () => setTab("products") },
+    { key: "bulk", label: "Toplu yükləmə", icon: FileSpreadsheet, active: tab === "bulk", onClick: () => setTab("bulk") },
     { key: "orders", label: "Sifarişlər", icon: ShoppingBag, badge: pendingOrders, active: tab === "orders", onClick: () => setTab("orders") },
+    { key: "analytics", label: "Analitika", icon: BarChart3, active: tab === "analytics", onClick: () => setTab("analytics") },
     { key: "messages", label: "Mesajlar", icon: MessageCircle, badge: unreadMsgs, active: tab === "messages", onClick: () => setTab("messages") },
     { key: "advertising", label: "Reklam & Paketlər", icon: Megaphone, active: tab === "advertising", onClick: () => setTab("advertising") },
     { key: "shop", label: "Mağaza ayarları", icon: Settings, active: tab === "shop", onClick: () => setTab("shop") },
@@ -503,6 +507,10 @@ function SellerPanel() {
       )}
 
       {tab === "messages" && <SellerMessages sellerId={user.id} />}
+
+      {tab === "analytics" && <SellerAnalytics sellerId={user.id} />}
+
+      {tab === "bulk" && <BulkProductUpload sellerId={user.id} onDone={load} />}
 
       {tab === "advertising" && <SellerAdvertising />}
 
