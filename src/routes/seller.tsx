@@ -64,7 +64,7 @@ const ORDER_STATUSES = [
 function SellerPanel() {
   const { user, isSeller, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"dashboard" | "products" | "orders" | "messages" | "advertising" | "shop" | "support">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "products" | "orders" | "messages" | "advertising" | "analytics" | "bulk" | "shop" | "support">("dashboard");
   const [unreadMsgs, setUnreadMsgs] = useState(0);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
