@@ -333,7 +333,9 @@ function SellerPanel() {
   const navItems: PanelNavItem[] = [
     { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, active: tab === "dashboard", onClick: () => setTab("dashboard") },
     { key: "products", label: "Məhsullar", icon: Package, badge: products.length, active: tab === "products", onClick: () => setTab("products") },
+    { key: "bulk", label: "Toplu yükləmə", icon: FileSpreadsheet, active: tab === "bulk", onClick: () => setTab("bulk") },
     { key: "orders", label: "Sifarişlər", icon: ShoppingBag, badge: pendingOrders, active: tab === "orders", onClick: () => setTab("orders") },
+    { key: "analytics", label: "Analitika", icon: BarChart3, active: tab === "analytics", onClick: () => setTab("analytics") },
     { key: "messages", label: "Mesajlar", icon: MessageCircle, badge: unreadMsgs, active: tab === "messages", onClick: () => setTab("messages") },
     { key: "advertising", label: "Reklam & Paketlər", icon: Megaphone, active: tab === "advertising", onClick: () => setTab("advertising") },
     { key: "shop", label: "Mağaza ayarları", icon: Settings, active: tab === "shop", onClick: () => setTab("shop") },
