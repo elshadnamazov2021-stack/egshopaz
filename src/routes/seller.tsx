@@ -510,7 +510,7 @@ function SellerPanel() {
 
       {tab === "analytics" && <SellerAnalytics sellerId={user.id} />}
 
-      {tab === "bulk" && <BulkProductUpload sellerId={user.id} onComplete={load} />}
+      {tab === "bulk" && <BulkProductUpload sellerId={user.id} onDone={load} />}
 
       {tab === "advertising" && <SellerAdvertising />}
 
