@@ -85,7 +85,7 @@ function PvzPanel() {
   ];
 
   return (
-    <PanelLayout title={t("pvz.title")} subtitle="Bakı — N-12 nöqtə" items={items}>
+    <PanelLayout title={t("pvz.title")} subtitle="PVZ PUNKT işçi paneli" items={items}>
       {!shiftOpen && tab !== "shift" && (
         <div className="mb-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-3 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm">
@@ -582,13 +582,9 @@ function AccountSec() {
       setFullName(prof?.full_name ?? "");
       setPhone(prof?.phone ?? "");
 
-      // Reliable lookup by user_id; fallback to phone for legacy rows
+      // Reliable lookup only by user_id so another phone-matched PVZ address never appears
       let staff = (await supabase.from("pvz_staff")
         .select("position,pickup_point_id").eq("user_id", user.id).maybeSingle()).data;
-      if (!staff && prof?.phone) {
-        staff = (await supabase.from("pvz_staff")
-          .select("position,pickup_point_id").eq("phone", prof.phone).maybeSingle()).data;
-      }
       if (staff?.position) setPosition(staff.position);
       if (staff?.pickup_point_id) {
         const { data: pp } = await supabase.from("pickup_points")
