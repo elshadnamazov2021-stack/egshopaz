@@ -235,7 +235,7 @@ function AuthPage() {
   const tabs: { key: RoleTab; label: string; Icon: typeof Store }[] = [
     { key: "buyer", label: "Müştəri", Icon: ShoppingBag },
     { key: "seller", label: "Satıcı", Icon: Store },
-    { key: "pvz", label: "PVZ işçisi", Icon: Package },
+    { key: "pvz", label: "PVZ PUNKT", Icon: Package },
   ];
 
   return (
