@@ -625,10 +625,14 @@ export type Database = {
         Row: {
           accepted_at: string | null
           courier_id: string | null
+          customer_name: string | null
+          customer_phone: string | null
           delivered_at: string | null
           id: string
           image_url: string | null
           order_id: string
+          payout_at: string | null
+          payout_status: string
           pickup_code: string | null
           pickup_point_id: string | null
           price: number
@@ -641,10 +645,14 @@ export type Database = {
         Insert: {
           accepted_at?: string | null
           courier_id?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
           delivered_at?: string | null
           id?: string
           image_url?: string | null
           order_id: string
+          payout_at?: string | null
+          payout_status?: string
           pickup_code?: string | null
           pickup_point_id?: string | null
           price: number
@@ -657,10 +665,14 @@ export type Database = {
         Update: {
           accepted_at?: string | null
           courier_id?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
           delivered_at?: string | null
           id?: string
           image_url?: string | null
           order_id?: string
+          payout_at?: string | null
+          payout_status?: string
           pickup_code?: string | null
           pickup_point_id?: string | null
           price?: number
@@ -778,6 +790,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payouts: {
+        Row: {
+          amount: number
+          commission: number
+          created_at: string
+          id: string
+          net_amount: number
+          order_item_id: string
+          seller_id: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          commission?: number
+          created_at?: string
+          id?: string
+          net_amount: number
+          order_item_id: string
+          seller_id: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          commission?: number
+          created_at?: string
+          id?: string
+          net_amount?: number
+          order_item_id?: string
+          seller_id?: string
+          status?: string
+        }
+        Relationships: []
       }
       pickup_points: {
         Row: {
@@ -1191,6 +1236,48 @@ export type Database = {
         }
         Relationships: []
       }
+      returns: {
+        Row: {
+          buyer_id: string
+          created_at: string
+          description: string | null
+          id: string
+          order_id: string
+          order_item_id: string
+          reason: string
+          resolved_at: string | null
+          seller_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_id: string
+          order_item_id: string
+          reason: string
+          resolved_at?: string | null
+          seller_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_id?: string
+          order_item_id?: string
+          reason?: string
+          resolved_at?: string | null
+          seller_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           comment: string | null
@@ -1218,6 +1305,30 @@ export type Database = {
           product_id?: string
           rating?: number
           user_id?: string
+        }
+        Relationships: []
+      }
+      seller_balances: {
+        Row: {
+          available: number
+          pending: number
+          seller_id: string
+          total_earned: number
+          updated_at: string
+        }
+        Insert: {
+          available?: number
+          pending?: number
+          seller_id: string
+          total_earned?: number
+          updated_at?: string
+        }
+        Update: {
+          available?: number
+          pending?: number
+          seller_id?: string
+          total_earned?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1497,6 +1608,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      auto_payout_after_3_days: { Args: never; Returns: number }
       become_seller: { Args: { _shop_name: string }; Returns: undefined }
       call_ai_auto_reply: {
         Args: { _channel: string; _message_id: string }
@@ -1511,15 +1623,28 @@ export type Database = {
         }
         Returns: boolean
       }
-      register_pvz_staff: {
-        Args: {
-          _full_name: string
-          _phone: string
-          _pickup_point_id: string
-          _position?: string
-        }
-        Returns: undefined
-      }
+      register_pvz_staff:
+        | {
+            Args: {
+              _full_name: string
+              _phone: string
+              _pickup_point_id: string
+              _position?: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              _full_name: string
+              _new_pvz_address?: string
+              _new_pvz_city?: string
+              _new_pvz_name?: string
+              _phone: string
+              _pickup_point_id: string
+              _position?: string
+            }
+            Returns: string
+          }
       register_seller: {
         Args: {
           _phone: string

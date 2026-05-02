@@ -12,10 +12,12 @@ interface Props {
   subtitle?: string;
   pvzName?: string | null;
   pvzAddress?: string | null;
+  customerName?: string | null;
+  customerPhone?: string | null;
   mode?: "buyer" | "seller";
 }
 
-export function OrderQRDialog({ open, onOpenChange, pickupCode, title, subtitle, pvzName, pvzAddress, mode = "buyer" }: Props) {
+export function OrderQRDialog({ open, onOpenChange, pickupCode, title, subtitle, pvzName, pvzAddress, customerName, customerPhone, mode = "buyer" }: Props) {
   const [qr, setQr] = useState("");
 
   useEffect(() => {
@@ -37,12 +39,16 @@ export function OrderQRDialog({ open, onOpenChange, pickupCode, title, subtitle,
     w.document.write(`<!doctype html><html><head><title>${pickupCode}</title>
       <style>@page{size:80mm 100mm;margin:4mm}body{font-family:system-ui;text-align:center;padding:8px}
       h2{margin:4px 0;font-size:14px}.code{font-family:monospace;font-size:22px;font-weight:800;letter-spacing:2px;margin:6px 0}
-      img{width:280px;height:280px}.sub{font-size:11px;color:#555;margin:4px 0}.pvz{margin-top:8px;padding-top:6px;border-top:1px dashed #999;font-size:11px}</style>
+      img{width:280px;height:280px}.sub{font-size:11px;color:#555;margin:4px 0}
+      .pvz{margin-top:8px;padding-top:6px;border-top:1px dashed #999;font-size:11px}
+      .cust{margin-top:6px;padding:6px;border:1px solid #000;border-radius:4px;font-size:12px;text-align:left}
+      .cust b{display:block;font-size:13px;margin-bottom:2px}</style>
       </head><body>
       <h2>${title}</h2>
       ${subtitle ? `<div class="sub">${subtitle}</div>` : ""}
       <img src="${qr}"/>
       <div class="code">${pickupCode}</div>
+      ${(customerName || customerPhone) ? `<div class="cust"><b>👤 Müştəri</b>${customerName ? customerName : ""}${customerPhone ? `<br/>📞 ${customerPhone}` : ""}</div>` : ""}
       ${pvzName ? `<div class="pvz"><b>PVZ:</b> ${pvzName}<br/>${pvzAddress ?? ""}</div>` : ""}
       </body></html>`);
     w.document.close(); w.focus(); setTimeout(() => w.print(), 300);
@@ -63,6 +69,12 @@ export function OrderQRDialog({ open, onOpenChange, pickupCode, title, subtitle,
             {qr ? <img src={qr} alt="QR" className="w-56 h-56" /> : <div className="w-56 h-56 bg-muted animate-pulse rounded" />}
           </div>
           <div className="font-mono text-xl font-extrabold tracking-widest text-primary">{pickupCode}</div>
+          {(customerName || customerPhone) && mode === "seller" && (
+            <div className="text-xs bg-primary/5 border border-primary/30 rounded-lg p-2 text-left">
+              <div className="font-bold text-foreground mb-0.5">👤 {customerName ?? "—"}</div>
+              {customerPhone && <div className="text-muted-foreground">📞 {customerPhone}</div>}
+            </div>
+          )}
           {pvzName && (
             <div className="text-xs bg-secondary/60 rounded-lg p-2 text-left">
               <div className="font-bold text-foreground mb-0.5">📍 {pvzName}</div>

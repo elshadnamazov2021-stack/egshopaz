@@ -98,6 +98,9 @@ function AuthPage() {
   const [pvzList, setPvzList] = useState<{ id: string; name: string; city: string }[]>([]);
   const [pickupPointId, setPickupPointId] = useState<string>("");
   const [position, setPosition] = useState("operator");
+  const [newPvzName, setNewPvzName] = useState("");
+  const [newPvzCity, setNewPvzCity] = useState("");
+  const [newPvzAddress, setNewPvzAddress] = useState("");
 
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -161,7 +164,12 @@ function AuthPage() {
       if (shopCity.trim().length < 2) { toast.error("Şəhər daxil edin"); return; }
     }
     if (role === "pvz") {
-      if (!pickupPointId) { toast.error("PVZ nöqtəsini seçin"); return; }
+      if (!pickupPointId) {
+        // creating a new PVZ PUNKT — require all fields
+        if (newPvzName.trim().length < 2) { toast.error("PVZ PUNKT adını daxil edin"); return; }
+        if (newPvzCity.trim().length < 2) { toast.error("Şəhəri daxil edin"); return; }
+        if (newPvzAddress.trim().length < 5) { toast.error("PVZ PUNKT-un tam ünvanını daxil edin"); return; }
+      }
     }
 
     setBusy(true);
@@ -195,14 +203,22 @@ function AuthPage() {
     }
 
     if (role === "pvz") {
-      const { error: e3 } = await supabase.rpc("register_pvz_staff", {
+      const rpcArgs: Record<string, string> = {
         _full_name: name.trim(),
         _phone: phone.trim(),
-        _pickup_point_id: pickupPointId,
         _position: position,
-      });
+      };
+      if (pickupPointId) {
+        rpcArgs._pickup_point_id = pickupPointId;
+      } else {
+        rpcArgs._new_pvz_name = newPvzName.trim();
+        rpcArgs._new_pvz_city = newPvzCity.trim();
+        rpcArgs._new_pvz_address = newPvzAddress.trim();
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: e3 } = await supabase.rpc("register_pvz_staff", rpcArgs as any);
       if (e3) { setBusy(false); toast.error(e3.message); return; }
-      toast.success("PVZ işçi qeydiyyatı tamamlandı");
+      toast.success("PVZ PUNKT qeydiyyatı tamamlandı");
       setBusy(false);
       navigate({ to: "/pvz" });
       return;
@@ -219,7 +235,7 @@ function AuthPage() {
   const tabs: { key: RoleTab; label: string; Icon: typeof Store }[] = [
     { key: "buyer", label: "Müştəri", Icon: ShoppingBag },
     { key: "seller", label: "Satıcı", Icon: Store },
-    { key: "pvz", label: "PVZ işçisi", Icon: Package },
+    { key: "pvz", label: "PVZ PUNKT", Icon: Package },
   ];
 
   return (
@@ -288,11 +304,24 @@ function AuthPage() {
           {mode === "signup" && role === "pvz" && (
             <>
               <select value={pickupPointId} onChange={(e) => setPickupPointId(e.target.value)} className={inputCls}>
-                <option value="">— PVZ nöqtəsini seçin —</option>
+                <option value="">+ Yeni PVZ PUNKT yarat</option>
                 {pvzList.map((p) => (
                   <option key={p.id} value={p.id}>{p.city} — {p.name}</option>
                 ))}
               </select>
+
+              {!pickupPointId && (
+                <div className="space-y-2 p-3 rounded-lg border border-dashed border-primary/40 bg-primary/5">
+                  <div className="text-xs font-semibold text-primary">Yeni PVZ PUNKT məlumatları</div>
+                  <input value={newPvzName} onChange={(e) => setNewPvzName(e.target.value)}
+                    placeholder="PVZ PUNKT adı (məs. Mərkəz-1)" maxLength={80} className={inputCls} />
+                  <input value={newPvzCity} onChange={(e) => setNewPvzCity(e.target.value)}
+                    placeholder="Şəhər (məs. Bakı)" maxLength={50} className={inputCls} />
+                  <input value={newPvzAddress} onChange={(e) => setNewPvzAddress(e.target.value)}
+                    placeholder="Tam ünvan (küçə, bina, mənzil)" maxLength={200} className={inputCls} />
+                </div>
+              )}
+
               <select value={position} onChange={(e) => setPosition(e.target.value)} className={inputCls}>
                 <option value="operator">Operator</option>
                 <option value="manager">Menecer</option>
@@ -327,7 +356,7 @@ function AuthPage() {
           <button type="submit" disabled={busy}
             className="w-full h-11 bg-primary text-primary-foreground rounded-lg font-bold hover:bg-primary/90 disabled:opacity-60">
             {busy ? "..." : mode === "login" ? "Daxil ol" : (
-              role === "seller" ? "Satıcı kimi qeydiyyat" : role === "pvz" ? "PVZ işçisi kimi qeydiyyat" : "Qeydiyyat"
+              role === "seller" ? "Satıcı kimi qeydiyyat" : role === "pvz" ? "PVZ PUNKT qeydiyyatı" : "Qeydiyyat"
             )}
           </button>
         </form>

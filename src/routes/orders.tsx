@@ -6,11 +6,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { formatAZN } from "@/lib/format";
-import { Package, MapPin, X, MessageCircle, Send, QrCode, Map as MapIcon } from "lucide-react";
+import { Package, MapPin, X, MessageCircle, Send, QrCode, Map as MapIcon, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { OrderTimeline } from "@/components/OrderTimeline";
 import { OrderQRDialog } from "@/components/OrderQRDialog";
 import { OrderTrackDialog } from "@/components/OrderTrackDialog";
+import { ReturnRequestDialog } from "@/components/ReturnRequestDialog";
 
 export const Route = createFileRoute("/orders")({
   head: () => ({ meta: [{ title: "Sifarişlərim — Elzan Shop" }] }),
@@ -41,6 +42,7 @@ function OrdersPage() {
   const [msgSending, setMsgSending] = useState(false);
   const [qrItem, setQrItem] = useState<OrderItem | null>(null);
   const [trackOrder, setTrackOrder] = useState<Order | null>(null);
+  const [returnItem, setReturnItem] = useState<{ item: OrderItem; orderId: string } | null>(null);
   const qrOrder = qrItem ? orders.find((o) => o.order_items?.some((i) => i.id === qrItem.id)) : null;
 
   const statusLabel: Record<string, string> = {
@@ -151,6 +153,18 @@ function OrdersPage() {
                             <QrCode className="h-3.5 w-3.5" /> {t("orders.qr")}
                           </button>
                         )}
+                        {it.delivered_at && (() => {
+                          const ms = Date.now() - new Date(it.delivered_at).getTime();
+                          const inWindow = ms <= 3 * 24 * 60 * 60 * 1000;
+                          return inWindow ? (
+                            <button
+                              onClick={() => setReturnItem({ item: it, orderId: o.id })}
+                              className="text-xs px-2.5 py-1.5 rounded-lg bg-warning/10 text-warning-foreground border border-warning/40 hover:bg-warning/20 transition inline-flex items-center gap-1"
+                            >
+                              <Undo2 className="h-3.5 w-3.5" /> Qaytar
+                            </button>
+                          ) : null;
+                        })()}
                         {user.id !== it.seller_id && (
                           <button
                             onClick={() => { setMsgItem(it); setMsgOrderId(o.id); setMsgBody(""); }}
@@ -229,6 +243,20 @@ function OrdersPage() {
           onClose={() => setTrackOrder(null)}
           orderId={trackOrder.id}
           pickupPointId={trackOrder.pickup_point_id}
+        />
+      )}
+
+      {returnItem && (
+        <ReturnRequestDialog
+          open={!!returnItem}
+          onOpenChange={(v) => !v && setReturnItem(null)}
+          orderItemId={returnItem.item.id}
+          orderId={returnItem.orderId}
+          buyerId={user.id}
+          sellerId={returnItem.item.seller_id}
+          productTitle={returnItem.item.title}
+          deliveredAt={returnItem.item.delivered_at}
+          onDone={load}
         />
       )}
     </PanelLayout>
