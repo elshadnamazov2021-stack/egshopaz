@@ -546,12 +546,62 @@ function CouriersSection({ couriers, addCourier, toggleCourier }: { couriers: Co
   );
 }
 
+interface PvzStaffRow {
+  id: string; full_name: string; phone: string; position: string; is_active: boolean;
+  created_at: string; user_id: string | null;
+  pickup_point: { id: string; name: string; city: string; address: string; point_number: number | null } | null;
+  profile: { full_name: string | null; phone: string | null; voen: string | null } | null;
+}
+
 function PvzStaffSection() {
+  const [rows, setRows] = useState<PvzStaffRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.from("pvz_staff")
+        .select("id,full_name,phone,position,is_active,created_at,user_id,pickup_point:pickup_points(id,name,city,address,point_number)")
+        .order("created_at", { ascending: false });
+      const staff = (data ?? []) as unknown as PvzStaffRow[];
+      const userIds = staff.map((s) => s.user_id).filter(Boolean) as string[];
+      if (userIds.length) {
+        const { data: profs } = await supabase.from("profiles").select("id,full_name,phone,voen").in("id", userIds);
+        const map = new Map((profs ?? []).map((p) => [p.id, p]));
+        staff.forEach((s) => { s.profile = s.user_id ? (map.get(s.user_id) as never) ?? null : null; });
+      }
+      setRows(staff);
+      setLoading(false);
+    })();
+  }, []);
+
+  if (loading) return <div className="text-muted-foreground">Yüklənir...</div>;
+
   return (
-    <div className="bg-card border border-border rounded-2xl p-8 text-center">
-      <Users className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-      <div className="font-bold mb-1">PVZ işçiləri</div>
-      <div className="text-sm text-muted-foreground">Hər PVZ nöqtəsinə işçi təyin etmək üçün "PVZ nöqtələri" bölməsindən nöqtəyə daxil olun.</div>
+    <div className="space-y-4">
+      <div className="text-sm text-muted-foreground">PVZ qeydiyyatından keçmiş bütün işçilər və onların məlumatları.</div>
+      <Table headers={["Ad", "Telefon", "Vəzifə", "PVZ Punkt", "VÖEN", "Status", "Tarix"]}>
+        {rows.length === 0 ? <EmptyRow cols={7} /> : rows.map((s) => (
+          <tr key={s.id} className="border-t border-border">
+            <td className="p-3 font-semibold">{s.full_name}</td>
+            <td className="p-3 text-muted-foreground">{s.phone}</td>
+            <td className="p-3 text-xs">{s.position}</td>
+            <td className="p-3 text-xs">
+              {s.pickup_point ? (
+                <div>
+                  <div className="font-bold text-primary">#{s.pickup_point.point_number ?? "-"} {s.pickup_point.name}</div>
+                  <div className="text-muted-foreground">{s.pickup_point.city} — {s.pickup_point.address}</div>
+                </div>
+              ) : <span className="text-muted-foreground">—</span>}
+            </td>
+            <td className="p-3 text-xs text-muted-foreground">{s.profile?.voen ?? "—"}</td>
+            <td className="p-3">
+              <span className={`text-xs px-2 py-1 rounded-full font-semibold ${s.is_active ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>
+                {s.is_active ? "Aktiv" : "Deaktiv"}
+              </span>
+            </td>
+            <td className="p-3 text-xs text-muted-foreground">{new Date(s.created_at).toLocaleDateString("az-AZ")}</td>
+          </tr>
+        ))}
+      </Table>
     </div>
   );
 }
