@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatAZN } from "@/lib/format";
-import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag, MapPin, Search } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/cart")({
@@ -27,7 +27,9 @@ function CartPage() {
   const [items, setItems] = useState<CartRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [placing, setPlacing] = useState(false);
-  const [address, setAddress] = useState("");
+  const [pvzList, setPvzList] = useState<{ id: string; name: string; city: string; address: string; point_number: number | null; phone: string | null; working_hours: string }[]>([]);
+  const [pvzId, setPvzId] = useState<string>("");
+  const [pvzSearch, setPvzSearch] = useState("");
   const [promo, setPromo] = useState("");
   const [promoInfo, setPromoInfo] = useState<{ code: string; discount: number } | null>(null);
   const [bonusBalance, setBonusBalance] = useState(0);
@@ -37,16 +39,18 @@ function CartPage() {
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const [cart, prof, settings] = await Promise.all([
+    const [cart, prof, settings, pps] = await Promise.all([
       supabase.from("cart_items")
         .select("id,quantity,product_id,products(id,title,price,image_url,stock,seller_id)")
         .eq("user_id", user.id),
       supabase.from("profiles").select("bonus_balance").eq("id", user.id).maybeSingle(),
       supabase.from("system_settings").select("bonus_to_azn").limit(1).maybeSingle(),
+      supabase.from("pickup_points").select("id,name,city,address,point_number,phone,working_hours").eq("is_active", true).order("point_number", { ascending: true }),
     ]);
     setItems((cart.data ?? []) as unknown as CartRow[]);
     setBonusBalance(prof.data?.bonus_balance ?? 0);
     setBonusToAzn(Number(settings.data?.bonus_to_azn ?? 0.01));
+    setPvzList((pps.data ?? []) as never);
     setLoading(false);
   };
 
@@ -95,12 +99,16 @@ function CartPage() {
   const checkout = async () => {
     if (!user || items.length === 0) return;
     if (isSeller || isPvz) { toast.error("Satıcı və PVZ PUNKT hesabları sifariş verə bilməz."); return; }
-    if (!address.trim()) { toast.error(t("cart.addressRequired")); return; }
+    if (!pvzId) { toast.error("Zəhmət olmasa PVZ punkt seçin"); return; }
+    const selected = pvzList.find((p) => p.id === pvzId);
+    if (!selected) { toast.error("PVZ punkt tapılmadı"); return; }
     setPlacing(true);
+    const shippingAddress = `PVZ #${selected.point_number ?? "-"} — ${selected.name}, ${selected.city}, ${selected.address}`;
     const { data: order, error } = await supabase.from("orders").insert({
       buyer_id: user.id,
       total: finalTotal,
-      shipping_address: address,
+      shipping_address: shippingAddress,
+      pickup_point_id: pvzId,
       status: "pending",
       promo_code: promoInfo?.code ?? null,
       discount: promoDiscount + bonusDiscount,
@@ -116,6 +124,7 @@ function CartPage() {
       price: i.products!.price,
       quantity: i.quantity,
       image_url: i.products!.image_url,
+      pickup_point_id: pvzId,
     }));
     await supabase.from("order_items").insert(orderItems);
 
@@ -243,9 +252,39 @@ function CartPage() {
               <span>{t("cart.total")}</span>
               <span>{formatAZN(finalTotal)}</span>
             </div>
-            <textarea value={address} onChange={(e) => setAddress(e.target.value)} maxLength={500}
-              placeholder={t("cart.addressPlaceholder")}
-              className="w-full border border-input rounded-lg p-3 text-sm min-h-20 focus:outline-none focus:ring-2 focus:ring-ring" />
+            <div className="border-t border-border pt-3 space-y-2">
+              <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" /> PVZ punkt seçin
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input value={pvzSearch} onChange={(e) => setPvzSearch(e.target.value)}
+                  placeholder="Şəhər, ünvan və ya nömrə..."
+                  className="w-full pl-9 pr-3 h-9 rounded-lg border border-input bg-background text-sm" />
+              </div>
+              <div className="max-h-56 overflow-y-auto space-y-1 border border-border rounded-lg p-1">
+                {pvzList
+                  .filter((p) => {
+                    const q = pvzSearch.toLowerCase().trim();
+                    if (!q) return true;
+                    return p.city.toLowerCase().includes(q)
+                      || p.address.toLowerCase().includes(q)
+                      || p.name.toLowerCase().includes(q)
+                      || String(p.point_number ?? "").includes(q);
+                  })
+                  .map((p) => (
+                    <button key={p.id} type="button" onClick={() => setPvzId(p.id)}
+                      className={`w-full text-left p-2 rounded-md text-xs hover:bg-secondary transition ${pvzId === p.id ? "bg-primary/10 ring-2 ring-primary" : ""}`}>
+                      <div className="font-bold">#{p.point_number ?? "-"} · {p.name}</div>
+                      <div className="text-muted-foreground">{p.city} — {p.address}</div>
+                      <div className="text-muted-foreground">{p.working_hours}{p.phone ? ` · ${p.phone}` : ""}</div>
+                    </button>
+                  ))}
+                {pvzList.length === 0 && (
+                  <div className="text-xs text-muted-foreground p-3 text-center">PVZ punkt mövcud deyil</div>
+                )}
+              </div>
+            </div>
             <button onClick={checkout} disabled={placing}
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl py-3 font-bold disabled:opacity-60">
               {placing ? t("cart.placing") : t("cart.checkout")}

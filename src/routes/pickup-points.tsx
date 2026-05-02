@@ -12,7 +12,7 @@ export const Route = createFileRoute("/pickup-points")({
   component: PickupPointsPage,
 });
 
-interface PVZ { id: string; name: string; city: string; address: string; phone: string | null; working_hours: string }
+interface PVZ { id: string; name: string; city: string; address: string; phone: string | null; working_hours: string; point_number: number | null }
 
 function PickupPointsPage() {
   const { t } = useTranslation();
@@ -22,12 +22,12 @@ function PickupPointsPage() {
   const [q, setQ] = useState("");
 
   useEffect(() => {
-    supabase.from("pickup_points").select("*").eq("is_active", true).order("city")
+    supabase.from("pickup_points").select("*").eq("is_active", true).order("point_number", { ascending: true })
       .then(({ data }) => setList((data ?? []) as PVZ[]));
   }, []);
 
   const filtered = list.filter((p) =>
-    !q || p.city.toLowerCase().includes(q.toLowerCase()) || p.address.toLowerCase().includes(q.toLowerCase()) || p.name.toLowerCase().includes(q.toLowerCase())
+    !q || p.city.toLowerCase().includes(q.toLowerCase()) || p.address.toLowerCase().includes(q.toLowerCase()) || p.name.toLowerCase().includes(q.toLowerCase()) || String(p.point_number ?? "").includes(q)
   );
 
   return (
@@ -47,7 +47,7 @@ function PickupPointsPage() {
           <div className="grid sm:grid-cols-2 gap-3">
             {filtered.map((p) => (
               <div key={p.id} className="bg-card border border-border rounded-2xl p-4">
-                <div className="font-bold mb-1">{p.name}</div>
+                <div className="font-bold mb-1">#{p.point_number ?? "-"} · {p.name}</div>
                 <div className="text-xs text-primary font-semibold mb-2">{p.city}</div>
                 <div className="text-sm space-y-1 text-muted-foreground">
                   <div className="flex items-start gap-2"><MapPin className="h-4 w-4 mt-0.5 shrink-0" /> {p.address}</div>

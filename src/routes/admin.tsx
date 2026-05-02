@@ -32,7 +32,7 @@ interface ProductRow { id: string; title: string; price: number; stock: number; 
 interface CategoryRow { id: string; name: string; slug: string; icon: string | null; sort_order: number; parent_id: string | null }
 interface CourierRow { id: string; full_name: string; phone: string; vehicle_type: string; city: string; is_active: boolean; rating: number; total_deliveries: number; earnings: number }
 interface WarehouseRow { id: string; name: string; city: string; address: string; capacity: number; occupied: number; manager_name: string | null; is_active: boolean }
-interface PickupRow { id: string; name: string; city: string; address: string; phone: string | null; is_active: boolean; working_hours: string }
+interface PickupRow { id: string; name: string; city: string; address: string; phone: string | null; is_active: boolean; working_hours: string; point_number: number | null }
 interface BannerRow { id: string; title: string; image_url: string | null; link_url: string | null; position: string; is_active: boolean; clicks: number; impressions: number }
 interface DisputeRow { id: string; order_id: string | null; buyer_id: string; seller_id: string | null; reason: string; status: string; compensation: number | null; created_at: string }
 interface PromoRow { id: string; code: string; discount_percent: number | null; discount_amount: number | null; is_active: boolean; used_count: number; usage_limit: number | null; min_order: number }
@@ -231,14 +231,35 @@ function AdminPanel() {
     const cityList = AZ_CITY_NAMES.join(", ");
     const city = prompt(`Şəhər (mümkün: ${cityList.slice(0, 200)}...):`) ?? "Bakı";
     const address = prompt("Ünvan:") ?? "";
+    const phone = prompt("Telefon (opsional):") || null;
+    const working_hours = prompt("İş saatları:", "09:00 - 21:00") || "09:00 - 21:00";
     const c = findCity(city);
     const { error } = await supabase.from("pickup_points").insert({
-      name, city, address, lat: c?.lat ?? null, lng: c?.lng ?? null,
+      name, city, address, phone, working_hours, lat: c?.lat ?? null, lng: c?.lng ?? null,
     });
     if (error) toast.error(error.message); else { toast.success("Əlavə edildi"); reload(); }
   };
   const togglePickup = async (id: string, active: boolean) => {
     await supabase.from("pickup_points").update({ is_active: !active }).eq("id", id); reload();
+  };
+  const editPickup = async (p: PickupRow) => {
+    const name = prompt("PVZ adı:", p.name); if (!name) return;
+    const city = prompt("Şəhər:", p.city) ?? p.city;
+    const address = prompt("Ünvan:", p.address) ?? p.address;
+    const phone = prompt("Telefon:", p.phone ?? "") || null;
+    const working_hours = prompt("İş saatları:", p.working_hours) || p.working_hours;
+    const numStr = prompt("Punkt nömrəsi (boş qoy avtomatik):", String(p.point_number ?? ""));
+    const point_number = numStr && /^\d+$/.test(numStr) ? parseInt(numStr) : p.point_number;
+    const c = findCity(city);
+    const { error } = await supabase.from("pickup_points")
+      .update({ name, city, address, phone, working_hours, point_number, lat: c?.lat ?? null, lng: c?.lng ?? null })
+      .eq("id", p.id);
+    if (error) toast.error(error.message); else { toast.success("Yeniləndi"); reload(); }
+  };
+  const deletePickup = async (id: string) => {
+    if (!confirm("PVZ punkt silinsin?")) return;
+    const { error } = await supabase.from("pickup_points").delete().eq("id", id);
+    if (error) toast.error(error.message); else { toast.success("Silindi"); reload(); }
   };
 
   const addBanner = async () => {
@@ -361,7 +382,7 @@ function AdminPanel() {
       {tab === "products" && <ProductsSection products={products} toggleProductActive={toggleProductActive} />}
       {tab === "shops" && <ShopsSection profiles={profiles} userRoles={userRoles} />}
       {tab === "warehouses" && <WarehousesSection warehouses={warehouses} addWarehouse={addWarehouse} />}
-      {tab === "pickup_points" && <PickupSection pickups={pickups} addPickup={addPickup} togglePickup={togglePickup} />}
+      {tab === "pickup_points" && <PickupSection pickups={pickups} addPickup={addPickup} togglePickup={togglePickup} editPickup={editPickup} deletePickup={deletePickup} />}
       {tab === "orders" && <OrdersSection orders={orders} updateOrderStatus={updateOrderStatus} />}
       {tab === "finance" && <FinanceSection stats={stats} orders={orders} settings={settings} />}
       {tab === "marketing" && <MarketingSection />}
@@ -525,12 +546,62 @@ function CouriersSection({ couriers, addCourier, toggleCourier }: { couriers: Co
   );
 }
 
+interface PvzStaffRow {
+  id: string; full_name: string; phone: string; position: string; is_active: boolean;
+  created_at: string; user_id: string | null;
+  pickup_point: { id: string; name: string; city: string; address: string; point_number: number | null } | null;
+  profile: { full_name: string | null; phone: string | null; voen: string | null } | null;
+}
+
 function PvzStaffSection() {
+  const [rows, setRows] = useState<PvzStaffRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.from("pvz_staff")
+        .select("id,full_name,phone,position,is_active,created_at,user_id,pickup_point:pickup_points(id,name,city,address,point_number)")
+        .order("created_at", { ascending: false });
+      const staff = (data ?? []) as unknown as PvzStaffRow[];
+      const userIds = staff.map((s) => s.user_id).filter(Boolean) as string[];
+      if (userIds.length) {
+        const { data: profs } = await supabase.from("profiles").select("id,full_name,phone,voen").in("id", userIds);
+        const map = new Map((profs ?? []).map((p) => [p.id, p]));
+        staff.forEach((s) => { s.profile = s.user_id ? (map.get(s.user_id) as never) ?? null : null; });
+      }
+      setRows(staff);
+      setLoading(false);
+    })();
+  }, []);
+
+  if (loading) return <div className="text-muted-foreground">Yüklənir...</div>;
+
   return (
-    <div className="bg-card border border-border rounded-2xl p-8 text-center">
-      <Users className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-      <div className="font-bold mb-1">PVZ işçiləri</div>
-      <div className="text-sm text-muted-foreground">Hər PVZ nöqtəsinə işçi təyin etmək üçün "PVZ nöqtələri" bölməsindən nöqtəyə daxil olun.</div>
+    <div className="space-y-4">
+      <div className="text-sm text-muted-foreground">PVZ qeydiyyatından keçmiş bütün işçilər və onların məlumatları.</div>
+      <Table headers={["Ad", "Telefon", "Vəzifə", "PVZ Punkt", "VÖEN", "Status", "Tarix"]}>
+        {rows.length === 0 ? <EmptyRow cols={7} /> : rows.map((s) => (
+          <tr key={s.id} className="border-t border-border">
+            <td className="p-3 font-semibold">{s.full_name}</td>
+            <td className="p-3 text-muted-foreground">{s.phone}</td>
+            <td className="p-3 text-xs">{s.position}</td>
+            <td className="p-3 text-xs">
+              {s.pickup_point ? (
+                <div>
+                  <div className="font-bold text-primary">#{s.pickup_point.point_number ?? "-"} {s.pickup_point.name}</div>
+                  <div className="text-muted-foreground">{s.pickup_point.city} — {s.pickup_point.address}</div>
+                </div>
+              ) : <span className="text-muted-foreground">—</span>}
+            </td>
+            <td className="p-3 text-xs text-muted-foreground">{s.profile?.voen ?? "—"}</td>
+            <td className="p-3">
+              <span className={`text-xs px-2 py-1 rounded-full font-semibold ${s.is_active ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>
+                {s.is_active ? "Aktiv" : "Deaktiv"}
+              </span>
+            </td>
+            <td className="p-3 text-xs text-muted-foreground">{new Date(s.created_at).toLocaleDateString("az-AZ")}</td>
+          </tr>
+        ))}
+      </Table>
     </div>
   );
 }
@@ -638,15 +709,16 @@ function WarehousesSection({ warehouses, addWarehouse }: { warehouses: Warehouse
   );
 }
 
-function PickupSection({ pickups, addPickup, togglePickup }: { pickups: PickupRow[]; addPickup: () => void; togglePickup: (id: string, active: boolean) => void }) {
+function PickupSection({ pickups, addPickup, togglePickup, editPickup, deletePickup }: { pickups: PickupRow[]; addPickup: () => void; togglePickup: (id: string, active: boolean) => void; editPickup: (p: PickupRow) => void; deletePickup: (id: string) => void }) {
   return (
     <div className="space-y-4">
       <button onClick={addPickup} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold inline-flex items-center gap-2 hover:bg-primary/90">
         <Plus className="h-4 w-4" /> Yeni PVZ
       </button>
-      <Table headers={["Ad", "Şəhər", "Ünvan", "İş saatları", "Telefon", "Status"]}>
-        {pickups.length === 0 ? <EmptyRow cols={6} /> : pickups.map((p) => (
+      <Table headers={["#", "Ad", "Şəhər", "Ünvan", "İş saatları", "Telefon", "Status", "Əməliyyat"]}>
+        {pickups.length === 0 ? <EmptyRow cols={8} /> : pickups.map((p) => (
           <tr key={p.id} className="border-t border-border">
+            <td className="p-3 font-mono font-bold text-primary">#{p.point_number ?? "-"}</td>
             <td className="p-3 font-semibold">{p.name}</td>
             <td className="p-3">{p.city}</td>
             <td className="p-3 text-muted-foreground text-xs">{p.address}</td>
@@ -656,6 +728,12 @@ function PickupSection({ pickups, addPickup, togglePickup }: { pickups: PickupRo
               <button onClick={() => togglePickup(p.id, p.is_active)} className={`text-xs px-2 py-1 rounded-full font-semibold ${p.is_active ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>
                 {p.is_active ? "Aktiv" : "Deaktiv"}
               </button>
+            </td>
+            <td className="p-3">
+              <div className="flex gap-1">
+                <button onClick={() => editPickup(p)} className="text-xs px-2 py-1 rounded bg-primary/10 text-primary hover:bg-primary/20 font-semibold">Düzəliş</button>
+                <button onClick={() => deletePickup(p.id)} className="text-xs px-2 py-1 rounded bg-destructive/10 text-destructive hover:bg-destructive/20 font-semibold">Sil</button>
+              </div>
             </td>
           </tr>
         ))}

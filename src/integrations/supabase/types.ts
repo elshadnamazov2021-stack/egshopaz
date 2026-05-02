@@ -835,6 +835,7 @@ export type Database = {
           lng: number | null
           name: string
           phone: string | null
+          point_number: number | null
           working_hours: string
         }
         Insert: {
@@ -847,6 +848,7 @@ export type Database = {
           lng?: number | null
           name: string
           phone?: string | null
+          point_number?: number | null
           working_hours?: string
         }
         Update: {
@@ -859,6 +861,7 @@ export type Database = {
           lng?: number | null
           name?: string
           phone?: string | null
+          point_number?: number | null
           working_hours?: string
         }
         Relationships: []

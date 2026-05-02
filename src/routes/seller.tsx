@@ -35,6 +35,8 @@ interface OrderItem {
   id: string; title: string; price: number; quantity: number;
   image_url: string | null; order_id: string; status: string; product_id: string;
   pickup_code: string | null;
+  pickup_point_id: string | null;
+  pickup_point: { id: string; name: string; city: string; address: string; point_number: number | null; phone: string | null; working_hours: string } | null;
 }
 interface Profile {
   full_name: string | null; shop_name: string | null; phone: string | null; avatar_url: string | null;
@@ -89,7 +91,7 @@ function SellerPanel() {
     const [{ data: ps }, { data: cs }, { data: ois }, { data: pr }] = await Promise.all([
       supabase.from("products").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("categories").select("id,name").order("sort_order"),
-      supabase.from("order_items").select("*").eq("seller_id", user.id).order("id", { ascending: false }).limit(100),
+      supabase.from("order_items").select("*,pickup_point:pickup_points(id,name,city,address,point_number,phone,working_hours)").eq("seller_id", user.id).order("id", { ascending: false }).limit(100),
       supabase.from("profiles").select("full_name,shop_name,phone,avatar_url,shop_description,shop_logo_url,shop_banner_url,shop_address,shop_city,shop_email").eq("id", user.id).maybeSingle(),
     ]);
     setProducts((ps ?? []) as unknown as Product[]);
@@ -473,33 +475,45 @@ function SellerPanel() {
             const st = ORDER_STATUSES.find((s) => s.v === i.status) ?? ORDER_STATUSES[0];
             const canPack = i.status === "pending" || i.status === "processing";
             return (
-              <div key={i.id} className="bg-card border border-border rounded-xl p-4 flex flex-wrap items-center gap-3">
-                <div className="w-14 h-14 bg-secondary rounded-lg overflow-hidden shrink-0">
-                  {i.image_url && <img src={i.image_url} alt="" className="w-full h-full object-cover" />}
-                </div>
-                <div className="flex-1 min-w-[180px]">
-                  <div className="font-semibold line-clamp-1">{i.title}</div>
-                  <div className="text-xs text-muted-foreground">№ {i.order_id.slice(0, 8).toUpperCase()} · {i.quantity} ədəd</div>
-                </div>
-                <div className="font-extrabold whitespace-nowrap">{formatAZN(Number(i.price) * i.quantity)}</div>
-                <select value={i.status} onChange={(e) => updateOrderStatus(i.id, e.target.value)}
-                        className={`text-xs px-3 py-2 rounded-lg font-semibold border-0 ${st.c} cursor-pointer`}>
-                  {ORDER_STATUSES.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}
-                </select>
-                <div className="flex gap-1">
-                  {canPack && (
-                    <button onClick={() => updateOrderStatus(i.id, "packed")}
-                            className="px-3 py-2 rounded-lg bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white text-xs font-bold inline-flex items-center gap-1"
-                            title="Paketləndi olaraq qeyd et">
-                      <Package className="h-3.5 w-3.5" /> Paketlə
+              <div key={i.id} className="bg-card border border-border rounded-xl p-4 space-y-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="w-14 h-14 bg-secondary rounded-lg overflow-hidden shrink-0">
+                    {i.image_url && <img src={i.image_url} alt="" className="w-full h-full object-cover" />}
+                  </div>
+                  <div className="flex-1 min-w-[180px]">
+                    <div className="font-semibold line-clamp-1">{i.title}</div>
+                    <div className="text-xs text-muted-foreground">№ {i.order_id.slice(0, 8).toUpperCase()} · {i.quantity} ədəd · Kod: <b className="font-mono">{i.pickup_code ?? "—"}</b></div>
+                  </div>
+                  <div className="font-extrabold whitespace-nowrap">{formatAZN(Number(i.price) * i.quantity)}</div>
+                  <select value={i.status} onChange={(e) => updateOrderStatus(i.id, e.target.value)}
+                          className={`text-xs px-3 py-2 rounded-lg font-semibold border-0 ${st.c} cursor-pointer`}>
+                    {ORDER_STATUSES.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}
+                  </select>
+                  <div className="flex gap-1">
+                    {canPack && (
+                      <button onClick={() => updateOrderStatus(i.id, "packed")}
+                              className="px-3 py-2 rounded-lg bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white text-xs font-bold inline-flex items-center gap-1"
+                              title="Paketləndi olaraq qeyd et">
+                        <Package className="h-3.5 w-3.5" /> Paketlə
+                      </button>
+                    )}
+                    <button onClick={() => printShippingLabel(i)}
+                            className="px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground text-xs font-bold inline-flex items-center gap-1"
+                            title="Qablaşdırma etiketi (QR + sifariş kodu)">
+                      <QrCode className="h-3.5 w-3.5" /> Etiket çap et
                     </button>
-                  )}
-                  <button onClick={() => printShippingLabel(i)}
-                          className="px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground text-xs font-bold inline-flex items-center gap-1"
-                          title="Qablaşdırma etiketi (QR + sifariş kodu)">
-                    <QrCode className="h-3.5 w-3.5" /> Etiket çap et
-                  </button>
+                  </div>
                 </div>
+                {i.pickup_point ? (
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-xs">
+                    <div className="font-bold text-primary mb-1">📍 Çatdırılma PVZ #{i.pickup_point.point_number ?? "-"}</div>
+                    <div><b>{i.pickup_point.name}</b> — {i.pickup_point.city}</div>
+                    <div className="text-muted-foreground">{i.pickup_point.address}</div>
+                    <div className="text-muted-foreground">{i.pickup_point.working_hours}{i.pickup_point.phone ? ` · ${i.pickup_point.phone}` : ""}</div>
+                  </div>
+                ) : (
+                  <div className="text-xs text-muted-foreground italic">PVZ punkt təyin olunmayıb</div>
+                )}
               </div>
             );
           })}
