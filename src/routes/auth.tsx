@@ -149,15 +149,27 @@ function AuthPage() {
       const { data: signInData, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error || !signInData.user) { setBusy(false); toast.error("E-poçt və ya şifrə yanlışdır"); return; }
 
-      // Müştəri girişində satıcı/PVZ hesabını buraxmırıq
+      // Rol uyğunluğunu yoxla — hər rol yalnız öz panelinə daxil ola bilər
       const { data: rolesData } = await supabase
         .from("user_roles").select("role").eq("user_id", signInData.user.id);
       const roles = (rolesData ?? []).map((r) => r.role as string);
 
-      if (roles.includes("seller") || roles.includes("pvz")) {
+      if (role === "buyer" && (roles.includes("seller") || roles.includes("pvz"))) {
         await supabase.auth.signOut();
         setBusy(false);
-        toast.error("Bu səhifə yalnız müştərilər üçündür. Satıcı üçün Satıcı panelindən, PVZ PUNKT üçün PVZ panelindən daxil olun.");
+        toast.error("Bu hesab müştəri deyil. Satıcı və ya PVZ PUNKT seçimini istifadə edin.");
+        return;
+      }
+      if (role === "seller" && !roles.includes("seller")) {
+        await supabase.auth.signOut();
+        setBusy(false);
+        toast.error("Bu hesab satıcı kimi qeydiyyatdan keçməyib.");
+        return;
+      }
+      if (role === "pvz" && !roles.includes("pvz")) {
+        await supabase.auth.signOut();
+        setBusy(false);
+        toast.error("Bu hesab PVZ PUNKT işçisi kimi qeydiyyatdan keçməyib.");
         return;
       }
 
