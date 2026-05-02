@@ -20,7 +20,7 @@ interface P {
 }
 
 function ComparePage() {
-  const { user } = useAuth();
+  const { user, isSeller, isPvz } = useAuth();
   const navigate = useNavigate();
   const [items, setItems] = useState<P[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,6 +45,7 @@ function ComparePage() {
 
   const addToCart = async (productId: string) => {
     if (!user) { navigate({ to: "/auth" }); return; }
+    if (isSeller || isPvz) { toast.error("Satıcı və PVZ PUNKT hesabları məhsul sifariş verə bilməz."); return; }
     const { error } = await supabase.from("cart_items").insert({ user_id: user.id, product_id: productId, quantity: 1 });
     if (error) toast.error(error.message); else toast.success("Səbətə əlavə olundu");
   };
@@ -109,9 +110,11 @@ function ComparePage() {
                       <img src={p.image_url || "/placeholder.svg"} alt={p.title} className="w-full h-36 object-contain rounded-lg bg-secondary/30" />
                       <div className="font-semibold mt-2 text-sm hover:text-primary line-clamp-2 text-left">{p.title}</div>
                     </Link>
-                    <button onClick={() => addToCart(p.id)} className="mt-2 w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs hover:opacity-90">
-                      <ShoppingCart className="h-3.5 w-3.5" /> Səbətə
-                    </button>
+                    {!(isSeller || isPvz) && (
+                      <button onClick={() => addToCart(p.id)} className="mt-2 w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs hover:opacity-90">
+                        <ShoppingCart className="h-3.5 w-3.5" /> Səbətə
+                      </button>
+                    )}
                   </div>
                 </th>
               ))}

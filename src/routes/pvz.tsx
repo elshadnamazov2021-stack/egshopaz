@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { QRScannerDialog } from "@/components/QRScannerDialog";
 import { PvzOrderChat } from "@/components/PvzOrderChat";
@@ -55,10 +55,19 @@ const mockStorage = [
 
 function PvzPanel() {
   const { t } = useTranslation();
+  const { user, isPvz, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [tab, setTab] = useState<TabKey>("dashboard");
   const [shiftOpen, setShiftOpen] = useState(false);
   const [scan, setScan] = useState("");
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    if (!authLoading && !user) navigate({ to: "/auth" });
+    if (!authLoading && user && !isPvz) navigate({ to: "/" });
+  }, [user, isPvz, authLoading, navigate]);
+
+  if (!user || !isPvz) return null;
 
   const items: PanelNavItem[] = [
     { key: "dashboard", label: t("pvz.dashboard"), icon: Home, active: tab === "dashboard", onClick: () => setTab("dashboard") },
@@ -76,7 +85,7 @@ function PvzPanel() {
   ];
 
   return (
-    <PanelLayout title={t("pvz.title")} subtitle="Bakı — N-12 nöqtə" items={items}>
+    <PanelLayout title={t("pvz.title")} subtitle="PVZ PUNKT işçi paneli" items={items}>
       {!shiftOpen && tab !== "shift" && (
         <div className="mb-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-3 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm">
@@ -573,13 +582,9 @@ function AccountSec() {
       setFullName(prof?.full_name ?? "");
       setPhone(prof?.phone ?? "");
 
-      // Reliable lookup by user_id; fallback to phone for legacy rows
+      // Reliable lookup only by user_id so another phone-matched PVZ address never appears
       let staff = (await supabase.from("pvz_staff")
         .select("position,pickup_point_id").eq("user_id", user.id).maybeSingle()).data;
-      if (!staff && prof?.phone) {
-        staff = (await supabase.from("pvz_staff")
-          .select("position,pickup_point_id").eq("phone", prof.phone).maybeSingle()).data;
-      }
       if (staff?.position) setPosition(staff.position);
       if (staff?.pickup_point_id) {
         const { data: pp } = await supabase.from("pickup_points")
@@ -619,7 +624,7 @@ function AccountSec() {
         <UserCircle2 className="h-6 w-6 text-primary" /> PVZ PUNKT işçisinin şəxsi hesabı
       </h1>
       <p className="text-sm text-muted-foreground">
-        Bu səhifə yalnız PVZ PUNKT işçisinə aiddir — burada müştəri profili göstərilmir.
+        Qeydiyyatda hansı PVZ PUNKT ünvanı yazılıbsa, burada həmin ünvan göstərilir.
       </p>
 
       <div className="grid lg:grid-cols-2 gap-4">

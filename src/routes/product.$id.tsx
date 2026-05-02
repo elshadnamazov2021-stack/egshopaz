@@ -24,7 +24,7 @@ interface Product {
 function ProductPage() {
   const { id } = Route.useParams();
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, isSeller, isPvz } = useAuth();
   const navigate = useNavigate();
   const [p, setP] = useState<Product | null>(null);
   const [shopName, setShopName] = useState<string>("");
@@ -35,6 +35,7 @@ function ProductPage() {
 
   const sendMessage = async () => {
     if (!user) { navigate({ to: "/auth" }); return; }
+    if (isSeller || isPvz) { toast.error("Bu əməliyyat yalnız müştəri hesabı üçündür."); return; }
     if (!p) return;
     const body = msgBody.trim();
     if (body.length < 2) { toast.error(t("orders.messageShort")); return; }
@@ -69,6 +70,7 @@ function ProductPage() {
 
   const addToCart = async () => {
     if (!user) { navigate({ to: "/auth" }); return; }
+    if (isSeller || isPvz) { toast.error("Satıcı və PVZ PUNKT hesabları məhsul sifariş verə bilməz."); return; }
     if (!p) return;
     const { data: existing } = await supabase.from("cart_items")
       .select("id,quantity").eq("user_id", user.id).eq("product_id", p.id).maybeSingle();
@@ -120,7 +122,7 @@ function ProductPage() {
                 <span className="text-lg text-muted-foreground line-through">{formatAZN(p.old_price)}</span>
               )}
             </div>
-            <div className="flex gap-2">
+            {!(isSeller || isPvz) && <div className="flex gap-2">
               <button
                 onClick={addToCart}
                 disabled={p.stock === 0}
@@ -136,7 +138,7 @@ function ProductPage() {
               >
                 <Heart className="h-5 w-5" />
               </button>
-            </div>
+            </div>}
             <div className="text-xs text-muted-foreground">
               {t("product.stockLabel")}: <span className="font-semibold text-success">{t("product.stockUnits", { count: p.stock })}</span>
             </div>
@@ -159,7 +161,7 @@ function ProductPage() {
               <Link to="/shop/$id" params={{ id: p.seller_id }} className="font-semibold hover:text-primary inline-flex items-center gap-1.5">
                 <Store className="h-4 w-4" /> {shopName}
               </Link>
-              {user?.id !== p.seller_id && (
+              {user?.id !== p.seller_id && !(isSeller || isPvz) && (
                 <button
                   onClick={() => setMsgOpen((v) => !v)}
                   className="text-sm flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border hover:border-primary hover:text-primary transition font-semibold"
