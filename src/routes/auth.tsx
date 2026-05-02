@@ -79,7 +79,7 @@ function AuthPage() {
   const navigate = useNavigate();
 
   const [mode, setMode] = useState<"login" | "signup">("login");
-  const role = AUTH_ROLE;
+  const [role, setRole] = useState<RoleTab>("buyer");
 
   // shared
   const [email, setEmail] = useState("");
