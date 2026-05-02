@@ -101,13 +101,15 @@ function CartPage() {
   useEffect(() => {
     if (user) load();
     else if (!authLoading) setLoading(false);
-  }, [user, authLoading]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, authLoading]);
 
   useEffect(() => {
     if (authLoading || !user) return;
-    if (isPvz) navigate({ to: "/pvz" });
-    else if (isSeller) navigate({ to: "/seller" });
-  }, [authLoading, user, isPvz, isSeller, navigate]);
+    if (isPvz) navigate({ to: "/pvz", replace: true });
+    else if (isSeller) navigate({ to: "/seller", replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, user?.id, isPvz, isSeller]);
 
   const applyPromo = async () => {
     const code = promo.trim().toUpperCase();
