@@ -47,7 +47,7 @@ function PickupPointsPage() {
           <div className="grid sm:grid-cols-2 gap-3">
             {filtered.map((p) => (
               <div key={p.id} className="bg-card border border-border rounded-2xl p-4">
-                <div className="font-bold mb-1">{p.name}</div>
+                <div className="font-bold mb-1">#{p.point_number ?? "-"} · {p.name}</div>
                 <div className="text-xs text-primary font-semibold mb-2">{p.city}</div>
                 <div className="text-sm space-y-1 text-muted-foreground">
                   <div className="flex items-start gap-2"><MapPin className="h-4 w-4 mt-0.5 shrink-0" /> {p.address}</div>
