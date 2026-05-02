@@ -13,6 +13,7 @@ import {
   Wallet, ClipboardList, Settings, LifeBuoy, ScanLine, Search,
   CheckCircle2, AlertTriangle, Printer, Camera, PhoneCall, Clock,
   Plus, XCircle, FileText, TrendingUp, Bell, MessageCircle,
+  UserCircle2, KeyRound, LogOut,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -29,7 +30,7 @@ export const Route = createFileRoute("/pvz")({
 
 type TabKey =
   | "dashboard" | "intake" | "delivery" | "returns" | "storage"
-  | "reports" | "finance" | "shift" | "messages" | "settings" | "support";
+  | "reports" | "finance" | "shift" | "messages" | "account" | "settings" | "support";
 
 // ---------------- MOCK DATA ----------------
 const mockExpected = [
@@ -69,6 +70,7 @@ function PvzPanel() {
     { key: "finance", label: t("pvz.finance"), icon: Wallet, active: tab === "finance", onClick: () => setTab("finance") },
     { key: "shift", label: t("pvz.shift"), icon: ClipboardList, active: tab === "shift", onClick: () => setTab("shift") },
     { key: "messages", label: "Müştəri mesajları", icon: MessageCircle, active: tab === "messages", onClick: () => setTab("messages") },
+    { key: "account", label: "Şəxsi hesab", icon: UserCircle2, active: tab === "account", onClick: () => setTab("account") },
     { key: "settings", label: t("pvz.settings"), icon: Settings, active: tab === "settings", onClick: () => setTab("settings") },
     { key: "support", label: t("pvz.support"), icon: LifeBuoy, active: tab === "support", onClick: () => setTab("support") },
   ];
@@ -93,6 +95,7 @@ function PvzPanel() {
       {tab === "finance" && <Finance />}
       {tab === "shift" && <Shift open={shiftOpen} setOpen={setShiftOpen} />}
       {tab === "messages" && <PvzMessagesTab />}
+      {tab === "account" && <AccountSec />}
       {tab === "settings" && <SettingsSec />}
       {tab === "support" && <Support />}
     </PanelLayout>
@@ -545,6 +548,112 @@ function Shift({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => void
           <li className="flex justify-between"><span>Qaytarma (nağd)</span><b className="text-rose-600">- {formatAZN(35)}</b></li>
           <li className="flex justify-between border-t pt-2 mt-2"><span className="font-bold">Cari balans</span><b className="text-emerald-600">{formatAZN(385)}</b></li>
         </ul>
+      </div>
+    </div>
+  );
+}
+
+function AccountSec() {
+  const { user, signOut } = useAuth();
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [position, setPosition] = useState("operator");
+  const [pvzName, setPvzName] = useState("");
+  const [pvzCity, setPvzCity] = useState("");
+  const [pvzAddress, setPvzAddress] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [pwBusy, setPwBusy] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data: prof } = await supabase.from("profiles")
+        .select("full_name,phone").eq("id", user.id).maybeSingle();
+      const fn = prof?.full_name ?? "";
+      const ph = prof?.phone ?? "";
+      setFullName(fn);
+      setPhone(ph);
+      if (!ph) return;
+      const { data: staff } = await supabase.from("pvz_staff")
+        .select("position,pickup_point_id").eq("phone", ph).maybeSingle();
+      if (staff?.position) setPosition(staff.position);
+      if (staff?.pickup_point_id) {
+        const { data: pp } = await supabase.from("pickup_points")
+          .select("name,city,address").eq("id", staff.pickup_point_id).maybeSingle();
+        setPvzName(pp?.name ?? "");
+        setPvzCity(pp?.city ?? "");
+        setPvzAddress(pp?.address ?? "");
+      }
+    })();
+  }, [user]);
+
+  const save = async () => {
+    if (!user) return;
+    setSaving(true);
+    const { error } = await supabase.from("profiles").upsert({
+      id: user.id,
+      full_name: fullName.trim().slice(0, 100),
+      phone: phone.trim().slice(0, 30),
+    }, { onConflict: "id" });
+    setSaving(false);
+    if (error) toast.error("Yadda saxlanmadı");
+    else toast.success("Şəxsi məlumatlar yeniləndi");
+  };
+
+  const changePassword = async () => {
+    if (newPassword.length < 6) { toast.error("Şifrə minimum 6 simvol olmalıdır"); return; }
+    setPwBusy(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setPwBusy(false);
+    if (error) toast.error(error.message);
+    else { toast.success("Şifrə yeniləndi"); setNewPassword(""); }
+  };
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-extrabold flex items-center gap-2">
+        <UserCircle2 className="h-6 w-6 text-primary" /> PVZ PUNKT işçisinin şəxsi hesabı
+      </h1>
+      <p className="text-sm text-muted-foreground">
+        Bu səhifə yalnız PVZ PUNKT işçisinə aiddir — burada müştəri profili göstərilmir.
+      </p>
+
+      <div className="grid lg:grid-cols-2 gap-4">
+        <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
+          <div className="font-bold flex items-center gap-2"><UserCircle2 className="h-4 w-4" /> Şəxsi məlumatlar</div>
+          <div><Label>E-poçt</Label><Input value={user?.email ?? ""} disabled /></div>
+          <div><Label>Tam ad (Soyad Ad)</Label><Input value={fullName} onChange={(e) => setFullName(e.target.value)} /></div>
+          <div><Label>Telefon</Label><Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+994..." /></div>
+          <div><Label>Vəzifə</Label><Input value={position} disabled /></div>
+          <Button size="sm" onClick={save} disabled={saving}>{saving ? "..." : "Yadda saxla"}</Button>
+        </div>
+
+        <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
+          <div className="font-bold flex items-center gap-2"><Home className="h-4 w-4" /> İşlədiyi PVZ PUNKT</div>
+          <div><Label>PVZ PUNKT adı</Label><Input value={pvzName} disabled /></div>
+          <div><Label>Şəhər</Label><Input value={pvzCity} disabled /></div>
+          <div><Label>Ünvan</Label><Input value={pvzAddress} disabled /></div>
+          <p className="text-xs text-muted-foreground">PVZ PUNKT məlumatlarını dəyişmək üçün admin ilə əlaqə saxlayın.</p>
+        </div>
+
+        <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
+          <div className="font-bold flex items-center gap-2"><KeyRound className="h-4 w-4" /> Şifrəni dəyiş</div>
+          <div><Label>Yeni şifrə (min 6 simvol)</Label>
+            <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+          </div>
+          <Button size="sm" variant="outline" onClick={changePassword} disabled={pwBusy}>
+            {pwBusy ? "..." : "Şifrəni yenilə"}
+          </Button>
+        </div>
+
+        <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
+          <div className="font-bold flex items-center gap-2"><LogOut className="h-4 w-4" /> Hesabdan çıxış</div>
+          <p className="text-sm text-muted-foreground">Növbəni bağladıqdan sonra çıxış edin.</p>
+          <Button size="sm" variant="destructive" onClick={async () => { await signOut(); toast.success("Çıxış edildi"); }}>
+            Çıxış et
+          </Button>
+        </div>
       </div>
     </div>
   );
