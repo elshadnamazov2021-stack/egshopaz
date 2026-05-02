@@ -78,7 +78,7 @@ function CartPage() {
           .from("products")
           .select("id,title,price,image_url,stock,seller_id")
           .in("id", productIds)
-      : { data: [] };
+      : { data: [], error: null };
     if (productsError) {
       toast.error(`Məhsullar yüklənmədi: ${productsError.message}`);
       setLoading(false);
