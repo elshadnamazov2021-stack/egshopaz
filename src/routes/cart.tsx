@@ -147,6 +147,11 @@ function CartPage() {
 
   const updateQty = async (id: string, qty: number) => {
     if (qty < 1) return;
+    const item = items.find((i) => i.id === id);
+    if (item?.products && qty > item.products.stock) {
+      toast.error(`Maksimum stok: ${item.products.stock} ədəd`);
+      return;
+    }
     await supabase.from("cart_items").update({ quantity: qty }).eq("id", id);
     load();
   };
@@ -243,6 +248,41 @@ function CartPage() {
         .update({ bonus_balance: bonusBalance - bonusToUse })
         .eq("id", user.id);
     }
+
+    // Promo used_count artır
+    if (promoInfo?.code) {
+      await supabase.rpc("increment_promo_used_count" as never, { promo_code: promoInfo.code } as never).catch(() => {
+        // Fallback: manual increment
+        supabase.from("promo_codes")
+          .select("used_count")
+          .eq("code", promoInfo.code)
+          .maybeSingle()
+          .then(({ data }) => {
+            if (data) {
+              supabase.from("promo_codes")
+                .update({ used_count: (data.used_count ?? 0) + 1 })
+                .eq("code", promoInfo.code);
+            }
+          });
+      });
+    }
+
+    // Stoku azalt
+    await Promise.all(
+      items
+        .filter((i) => i.products)
+        .map((i) =>
+          supabase.rpc("decrement_stock" as never, {
+            product_id: i.products!.id,
+            qty: i.quantity,
+          } as never).catch(() => {
+            // Fallback: manual update
+            supabase.from("products")
+              .update({ stock: Math.max(0, (i.products!.stock ?? 0) - i.quantity) } as never)
+              .eq("id", i.products!.id);
+          })
+        )
+    );
 
     await supabase.from("cart_items").delete().eq("user_id", user.id);
     toast.success(t("cart.orderPlaced"));
