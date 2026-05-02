@@ -1,4 +1,5 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts, useLocation, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -6,7 +7,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { CategoryBar } from "@/components/CategoryBar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { MainSidebar } from "@/components/MainSidebar";
-import { LogOut, ArrowLeft } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import "@/i18n";
 
@@ -69,9 +70,6 @@ function WorkHeader({ label }: { label: string }) {
           {user && (
             <span className="hidden sm:inline text-xs text-muted-foreground truncate max-w-[180px]">{user.email}</span>
           )}
-          <Button variant="outline" size="sm" onClick={() => navigate({ to: "/" })}>
-            <ArrowLeft className="h-4 w-4 mr-1" /> Sayta qayıt
-          </Button>
           {user && (
             <Button variant="ghost" size="sm" onClick={async () => { await signOut(); navigate({ to: "/auth" }); }}>
               <LogOut className="h-4 w-4 mr-1" /> Çıxış
@@ -85,10 +83,18 @@ function WorkHeader({ label }: { label: string }) {
 
 function AppShell() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { user, loading, isSeller, isPvz } = useAuth();
   const isSellerPanel = pathname === "/seller" || pathname.startsWith("/seller/");
   const isPvzPanel = pathname === "/pvz" || pathname.startsWith("/pvz/");
   const isAdminPanel = pathname === "/admin" || pathname.startsWith("/admin/");
   const isWorkPanel = isSellerPanel || isPvzPanel || isAdminPanel;
+
+  useEffect(() => {
+    if (loading || !user || isWorkPanel || pathname === "/auth" || pathname === "/reset-password") return;
+    if (isPvz) navigate({ to: "/pvz" });
+    else if (isSeller) navigate({ to: "/seller" });
+  }, [loading, user, isPvz, isSeller, isWorkPanel, pathname, navigate]);
 
   if (isWorkPanel) {
     const label = isSellerPanel ? "Satıcı paneli" : isPvzPanel ? "PVZ PUNKT paneli" : "Admin";
