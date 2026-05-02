@@ -231,14 +231,35 @@ function AdminPanel() {
     const cityList = AZ_CITY_NAMES.join(", ");
     const city = prompt(`Şəhər (mümkün: ${cityList.slice(0, 200)}...):`) ?? "Bakı";
     const address = prompt("Ünvan:") ?? "";
+    const phone = prompt("Telefon (opsional):") || null;
+    const working_hours = prompt("İş saatları:", "09:00 - 21:00") || "09:00 - 21:00";
     const c = findCity(city);
     const { error } = await supabase.from("pickup_points").insert({
-      name, city, address, lat: c?.lat ?? null, lng: c?.lng ?? null,
+      name, city, address, phone, working_hours, lat: c?.lat ?? null, lng: c?.lng ?? null,
     });
     if (error) toast.error(error.message); else { toast.success("Əlavə edildi"); reload(); }
   };
   const togglePickup = async (id: string, active: boolean) => {
     await supabase.from("pickup_points").update({ is_active: !active }).eq("id", id); reload();
+  };
+  const editPickup = async (p: PickupRow) => {
+    const name = prompt("PVZ adı:", p.name); if (!name) return;
+    const city = prompt("Şəhər:", p.city) ?? p.city;
+    const address = prompt("Ünvan:", p.address) ?? p.address;
+    const phone = prompt("Telefon:", p.phone ?? "") || null;
+    const working_hours = prompt("İş saatları:", p.working_hours) || p.working_hours;
+    const numStr = prompt("Punkt nömrəsi (boş qoy avtomatik):", String(p.point_number ?? ""));
+    const point_number = numStr && /^\d+$/.test(numStr) ? parseInt(numStr) : p.point_number;
+    const c = findCity(city);
+    const { error } = await supabase.from("pickup_points")
+      .update({ name, city, address, phone, working_hours, point_number, lat: c?.lat ?? null, lng: c?.lng ?? null })
+      .eq("id", p.id);
+    if (error) toast.error(error.message); else { toast.success("Yeniləndi"); reload(); }
+  };
+  const deletePickup = async (id: string) => {
+    if (!confirm("PVZ punkt silinsin?")) return;
+    const { error } = await supabase.from("pickup_points").delete().eq("id", id);
+    if (error) toast.error(error.message); else { toast.success("Silindi"); reload(); }
   };
 
   const addBanner = async () => {
