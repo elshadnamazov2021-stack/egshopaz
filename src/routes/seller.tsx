@@ -35,6 +35,8 @@ interface OrderItem {
   id: string; title: string; price: number; quantity: number;
   image_url: string | null; order_id: string; status: string; product_id: string;
   pickup_code: string | null;
+  pickup_point_id: string | null;
+  pickup_point: { id: string; name: string; city: string; address: string; point_number: number | null; phone: string | null; working_hours: string } | null;
 }
 interface Profile {
   full_name: string | null; shop_name: string | null; phone: string | null; avatar_url: string | null;
