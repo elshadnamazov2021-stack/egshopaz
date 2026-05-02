@@ -203,15 +203,20 @@ function AuthPage() {
     }
 
     if (role === "pvz") {
-      const { error: e3 } = await supabase.rpc("register_pvz_staff", {
+      const rpcArgs: Record<string, string> = {
         _full_name: name.trim(),
         _phone: phone.trim(),
-        _pickup_point_id: pickupPointId || undefined,
         _position: position,
-        _new_pvz_name: pickupPointId ? undefined : newPvzName.trim(),
-        _new_pvz_city: pickupPointId ? undefined : newPvzCity.trim(),
-        _new_pvz_address: pickupPointId ? undefined : newPvzAddress.trim(),
-      });
+      };
+      if (pickupPointId) {
+        rpcArgs._pickup_point_id = pickupPointId;
+      } else {
+        rpcArgs._new_pvz_name = newPvzName.trim();
+        rpcArgs._new_pvz_city = newPvzCity.trim();
+        rpcArgs._new_pvz_address = newPvzAddress.trim();
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: e3 } = await supabase.rpc("register_pvz_staff", rpcArgs as any);
       if (e3) { setBusy(false); toast.error(e3.message); return; }
       toast.success("PVZ PUNKT qeydiyyatı tamamlandı");
       setBusy(false);
