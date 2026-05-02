@@ -659,15 +659,16 @@ function WarehousesSection({ warehouses, addWarehouse }: { warehouses: Warehouse
   );
 }
 
-function PickupSection({ pickups, addPickup, togglePickup }: { pickups: PickupRow[]; addPickup: () => void; togglePickup: (id: string, active: boolean) => void }) {
+function PickupSection({ pickups, addPickup, togglePickup, editPickup, deletePickup }: { pickups: PickupRow[]; addPickup: () => void; togglePickup: (id: string, active: boolean) => void; editPickup: (p: PickupRow) => void; deletePickup: (id: string) => void }) {
   return (
     <div className="space-y-4">
       <button onClick={addPickup} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold inline-flex items-center gap-2 hover:bg-primary/90">
         <Plus className="h-4 w-4" /> Yeni PVZ
       </button>
-      <Table headers={["Ad", "Şəhər", "Ünvan", "İş saatları", "Telefon", "Status"]}>
-        {pickups.length === 0 ? <EmptyRow cols={6} /> : pickups.map((p) => (
+      <Table headers={["#", "Ad", "Şəhər", "Ünvan", "İş saatları", "Telefon", "Status", "Əməliyyat"]}>
+        {pickups.length === 0 ? <EmptyRow cols={8} /> : pickups.map((p) => (
           <tr key={p.id} className="border-t border-border">
+            <td className="p-3 font-mono font-bold text-primary">#{p.point_number ?? "-"}</td>
             <td className="p-3 font-semibold">{p.name}</td>
             <td className="p-3">{p.city}</td>
             <td className="p-3 text-muted-foreground text-xs">{p.address}</td>
@@ -677,6 +678,12 @@ function PickupSection({ pickups, addPickup, togglePickup }: { pickups: PickupRo
               <button onClick={() => togglePickup(p.id, p.is_active)} className={`text-xs px-2 py-1 rounded-full font-semibold ${p.is_active ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>
                 {p.is_active ? "Aktiv" : "Deaktiv"}
               </button>
+            </td>
+            <td className="p-3">
+              <div className="flex gap-1">
+                <button onClick={() => editPickup(p)} className="text-xs px-2 py-1 rounded bg-primary/10 text-primary hover:bg-primary/20 font-semibold">Düzəliş</button>
+                <button onClick={() => deletePickup(p.id)} className="text-xs px-2 py-1 rounded bg-destructive/10 text-destructive hover:bg-destructive/20 font-semibold">Sil</button>
+              </div>
             </td>
           </tr>
         ))}
