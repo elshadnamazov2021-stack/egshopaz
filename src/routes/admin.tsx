@@ -32,7 +32,7 @@ interface ProductRow { id: string; title: string; price: number; stock: number; 
 interface CategoryRow { id: string; name: string; slug: string; icon: string | null; sort_order: number; parent_id: string | null }
 interface CourierRow { id: string; full_name: string; phone: string; vehicle_type: string; city: string; is_active: boolean; rating: number; total_deliveries: number; earnings: number }
 interface WarehouseRow { id: string; name: string; city: string; address: string; capacity: number; occupied: number; manager_name: string | null; is_active: boolean }
-interface PickupRow { id: string; name: string; city: string; address: string; phone: string | null; is_active: boolean; working_hours: string }
+interface PickupRow { id: string; name: string; city: string; address: string; phone: string | null; is_active: boolean; working_hours: string; point_number: number | null }
 interface BannerRow { id: string; title: string; image_url: string | null; link_url: string | null; position: string; is_active: boolean; clicks: number; impressions: number }
 interface DisputeRow { id: string; order_id: string | null; buyer_id: string; seller_id: string | null; reason: string; status: string; compensation: number | null; created_at: string }
 interface PromoRow { id: string; code: string; discount_percent: number | null; discount_amount: number | null; is_active: boolean; used_count: number; usage_limit: number | null; min_order: number }
