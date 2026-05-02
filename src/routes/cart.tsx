@@ -41,13 +41,22 @@ function CartPage() {
     setLoading(true);
     const [cart, prof, settings, pps] = await Promise.all([
       supabase.from("cart_items")
-        .select("id,quantity,product_id,products(id,title,price,image_url,stock,seller_id)")
+        .select("id,quantity,product_id")
         .eq("user_id", user.id),
       supabase.from("profiles").select("bonus_balance").eq("id", user.id).maybeSingle(),
       supabase.from("system_settings").select("bonus_to_azn").limit(1).maybeSingle(),
       supabase.from("pickup_points").select("id,name,city,address,point_number,phone,working_hours").eq("is_active", true).order("point_number", { ascending: true }),
     ]);
-    setItems((cart.data ?? []) as unknown as CartRow[]);
+    const cartRows = (cart.data ?? []) as { id: string; quantity: number; product_id: string }[];
+    const productIds = [...new Set(cartRows.map((row) => row.product_id))];
+    const { data: productRows } = productIds.length
+      ? await supabase.from("products").select("id,title,price,image_url,stock,seller_id").in("id", productIds)
+      : { data: [] };
+    const productMap = new Map((productRows ?? []).map((product) => [product.id, product]));
+    setItems(cartRows.map((row) => ({
+      ...row,
+      products: (productMap.get(row.product_id) as CartRow["products"]) ?? null,
+    })));
     setBonusBalance(prof.data?.bonus_balance ?? 0);
     setBonusToAzn(Number(settings.data?.bonus_to_azn ?? 0.01));
     setPvzList((pps.data ?? []) as never);
