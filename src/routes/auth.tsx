@@ -332,16 +332,28 @@ function AuthPage() {
 
           {mode === "signup" && role === "pvz" && (
             <>
-              <select value={pickupPointId} onChange={(e) => setPickupPointId(e.target.value)} className={inputCls}>
-                <option value="">+ Yeni PVZ PUNKT yarat</option>
-                {pvzList.map((p) => (
-                  <option key={p.id} value={p.id}>{p.city} — {p.name}</option>
-                ))}
-              </select>
+              <div>
+                <label className="text-xs font-semibold text-primary mb-1 block">PVZ PUNKT seçimi</label>
+                <select
+                  value={pickupPointId}
+                  onChange={(e) => setPickupPointId(e.target.value)}
+                  className={`${inputCls} ${!pickupPointId ? "border-primary ring-2 ring-primary/30 bg-primary/5 font-semibold text-primary" : ""}`}
+                >
+                  <option value="">+ Yeni PVZ PUNKT yarat</option>
+                  {pvzList.map((p) => (
+                    <option key={p.id} value={p.id}>{p.city} — {p.name}</option>
+                  ))}
+                </select>
+                {!pickupPointId && (
+                  <p className="text-[11px] text-primary mt-1 font-medium">
+                    ✓ Yeni PVZ PUNKT yaradılır — məlumatları aşağıda doldurun
+                  </p>
+                )}
+              </div>
 
               {!pickupPointId && (
-                <div className="space-y-2 p-3 rounded-lg border border-dashed border-primary/40 bg-primary/5">
-                  <div className="text-xs font-semibold text-primary">Yeni PVZ PUNKT məlumatları</div>
+                <div className="space-y-2 p-3 rounded-lg border-2 border-primary/40 bg-primary/5">
+                  <div className="text-xs font-bold text-primary">Yeni PVZ PUNKT məlumatları</div>
                   <input value={newPvzName} onChange={(e) => setNewPvzName(e.target.value)}
                     placeholder="PVZ PUNKT adı (məs. Mərkəz-1)" maxLength={80} className={inputCls} />
                   <select value={newPvzCity} onChange={(e) => setNewPvzCity(e.target.value)} className={inputCls}>
