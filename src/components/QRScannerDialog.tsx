@@ -104,8 +104,9 @@ export function QRScannerDialog({
       } catch {
         setHasFlash(false);
       }
-    } catch (e: any) {
-      const msg = String(e?.name || e?.message || "");
+    } catch (e: unknown) {
+      const err = e instanceof Error ? e : null;
+      const msg = String(err?.name || err?.message || "");
       setStarted(false);
       if (msg.includes("NotAllowed") || msg.includes("Permission")) {
         setError(
@@ -120,7 +121,7 @@ export function QRScannerDialog({
       } else if (location.protocol !== "https:" && location.hostname !== "localhost") {
         setError("Kamera yalnız HTTPS-də işləyir. Saytı HTTPS ilə açın.");
       } else {
-        setError(e?.message || "Kameraya giriş alınmadı.");
+        setError(err?.message || "Kameraya giriş alınmadı.");
       }
     } finally {
       setStarting(false);
