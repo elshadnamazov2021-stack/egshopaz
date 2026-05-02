@@ -70,6 +70,7 @@ function PvzPanel() {
     { key: "finance", label: t("pvz.finance"), icon: Wallet, active: tab === "finance", onClick: () => setTab("finance") },
     { key: "shift", label: t("pvz.shift"), icon: ClipboardList, active: tab === "shift", onClick: () => setTab("shift") },
     { key: "messages", label: "Müştəri mesajları", icon: MessageCircle, active: tab === "messages", onClick: () => setTab("messages") },
+    { key: "account", label: "Şəxsi hesab", icon: UserCircle2, active: tab === "account", onClick: () => setTab("account") },
     { key: "settings", label: t("pvz.settings"), icon: Settings, active: tab === "settings", onClick: () => setTab("settings") },
     { key: "support", label: t("pvz.support"), icon: LifeBuoy, active: tab === "support", onClick: () => setTab("support") },
   ];
