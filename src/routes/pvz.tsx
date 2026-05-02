@@ -13,6 +13,7 @@ import {
   Wallet, ClipboardList, Settings, LifeBuoy, ScanLine, Search,
   CheckCircle2, AlertTriangle, Printer, Camera, PhoneCall, Clock,
   Plus, XCircle, FileText, TrendingUp, Bell, MessageCircle,
+  UserCircle2, KeyRound, LogOut,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
