@@ -319,8 +319,12 @@ function AuthPage() {
             <>
               <input value={shopName} onChange={(e) => setShopName(e.target.value)}
                 placeholder="Mağaza adı" maxLength={100} className={inputCls} />
-              <input value={shopCity} onChange={(e) => setShopCity(e.target.value)}
-                placeholder="Şəhər (məs. Bakı)" maxLength={50} className={inputCls} />
+              <select value={shopCity} onChange={(e) => setShopCity(e.target.value)} className={inputCls}>
+                <option value="">Şəhər seçin</option>
+                {AZ_CITIES.map((c) => (
+                  <option key={c.name} value={c.name}>{c.name}</option>
+                ))}
+              </select>
               <input value={voen} onChange={(e) => setVoen(e.target.value)}
                 placeholder="VÖEN (ixtiyari)" maxLength={20} className={inputCls} />
             </>
