@@ -12,6 +12,8 @@ interface Props {
   subtitle?: string;
   pvzName?: string | null;
   pvzAddress?: string | null;
+  customerName?: string | null;
+  customerPhone?: string | null;
   mode?: "buyer" | "seller";
 }
 
