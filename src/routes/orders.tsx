@@ -246,6 +246,8 @@ function OrdersPage() {
           subtitle={`${t("orders.orderNumber")}${qrOrder?.id.slice(0, 8).toUpperCase()}`}
           pvzName={qrOrder?.pickup_points?.name ?? null}
           pvzAddress={qrOrder?.pickup_points ? `${qrOrder.pickup_points.city}, ${qrOrder.pickup_points.address}` : null}
+          customerName={qrOrder?.recipient_name ?? null}
+          customerPhone={qrOrder?.recipient_phone ?? null}
           mode="buyer"
         />
       )}
