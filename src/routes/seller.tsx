@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN } from "@/lib/format";
-import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon, LayoutDashboard, Settings, MessageCircle, QrCode, Download, Megaphone, LifeBuoy, BarChart3, FileSpreadsheet } from "lucide-react";
+import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon, LayoutDashboard, Settings, MessageCircle, QrCode, Download, Megaphone, LifeBuoy, BarChart3, FileSpreadsheet, Bell, Check } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import QRCode from "qrcode";
@@ -47,6 +47,7 @@ interface Profile {
   shop_description: string | null; shop_logo_url: string | null; shop_banner_url: string | null;
   shop_address: string | null; shop_city: string | null; shop_email: string | null;
 }
+interface SellerNotif { id: string; title: string; body: string; type: string; pickup_code: string | null; is_read: boolean; created_at: string }
 
 const productSchema = z.object({
   title: z.string().trim().min(2, "Başlıq minimum 2 simvol").max(200),
@@ -74,6 +75,7 @@ function SellerPanel() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<"dashboard" | "products" | "orders" | "messages" | "advertising" | "analytics" | "bulk" | "shop" | "support">("dashboard");
   const [unreadMsgs, setUnreadMsgs] = useState(0);
+  const [sellerNotifs, setSellerNotifs] = useState<SellerNotif[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
@@ -141,6 +143,22 @@ function SellerPanel() {
     return () => { supabase.removeChannel(ch); };
   }, [user, isSeller]);
 
+  useEffect(() => {
+    if (!user || !isSeller) return;
+    const loadNotifs = () => {
+      supabase.from("notifications").select("id,title,body,type,pickup_code,is_read,created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(20)
+        .then(({ data }) => setSellerNotifs((data ?? []) as SellerNotif[]));
+    };
+    loadNotifs();
+    const ch = supabase.channel(`seller-notifications-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` }, loadNotifs)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user, isSeller]);
+
   // Unread messages counter (with realtime)
   useEffect(() => {
     if (!user || !isSeller) return;
@@ -167,6 +185,7 @@ function SellerPanel() {
   const totalOrders = new Set(orderItems.map((i) => i.order_id)).size;
   const pendingOrders = orderItems.filter((i) => i.status === "pending").length;
   const lowStock = products.filter((p) => p.stock < 5 && p.is_active).length;
+  const unreadSellerNotifs = sellerNotifs.filter((n) => !n.is_read).length;
 
   const uploadImages = async (files: FileList | null) => {
     if (!files || !user || !editing) return;
