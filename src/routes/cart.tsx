@@ -50,6 +50,7 @@ function CartPage() {
   const [bonusBalance, setBonusBalance] = useState(0);
   const [bonusToUse, setBonusToUse] = useState(0);
   const [bonusToAzn, setBonusToAzn] = useState(0.01);
+  const [profile, setProfile] = useState<{ full_name: string | null; phone: string | null } | null>(null);
 
   const load = async () => {
     if (!user) return;
@@ -91,6 +92,7 @@ function CartPage() {
       })),
     );
     setBonusBalance(prof.data?.bonus_balance ?? 0);
+    setProfile({ full_name: prof.data?.full_name ?? null, phone: prof.data?.phone ?? null });
     setBonusToAzn(Number(settings.data?.bonus_to_azn ?? 0.01));
     setPvzList((pps.data ?? []) as never);
     setLoading(false);
@@ -186,8 +188,8 @@ function CartPage() {
         total: finalTotal,
         shipping_address: shippingAddress,
         pickup_point_id: pvzId,
-        recipient_name: prof.data?.full_name ?? user.user_metadata?.full_name ?? user.email ?? null,
-        recipient_phone: prof.data?.phone ?? user.user_metadata?.phone ?? null,
+        recipient_name: profile?.full_name ?? user.user_metadata?.full_name ?? user.email ?? null,
+        recipient_phone: profile?.phone ?? user.user_metadata?.phone ?? null,
         status: "pending",
         promo_code: promoInfo?.code ?? null,
         discount: promoDiscount + bonusDiscount,
@@ -212,8 +214,8 @@ function CartPage() {
         quantity: i.quantity,
         image_url: i.products!.image_url,
         pickup_point_id: pvzId,
-        customer_name: prof.data?.full_name ?? user.user_metadata?.full_name ?? user.email ?? null,
-        customer_phone: prof.data?.phone ?? user.user_metadata?.phone ?? null,
+        customer_name: profile?.full_name ?? user.user_metadata?.full_name ?? user.email ?? null,
+        customer_phone: profile?.phone ?? user.user_metadata?.phone ?? null,
       }));
     const { error: itemError } = await supabase.from("order_items").insert(orderItems);
     if (itemError) {
