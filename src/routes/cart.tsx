@@ -431,9 +431,9 @@ function CartPage() {
                 <span className="font-semibold text-success">{t("cart.free")}</span>
               )}
             </div>
-            {deliveryMethod === "home" && subtotal < FREE_SHIPPING_THRESHOLD && (
+            {shippingFee > 0 && (
               <div className="text-[11px] text-muted-foreground -mt-1">
-                {formatAZN(FREE_SHIPPING_THRESHOLD - subtotal)} daha alış-veriş edin və ev çatdırılması pulsuz olsun
+                {formatAZN(freeThreshold - subtotal)} daha alış-veriş edin və {deliveryMethod === "home" ? "ev" : "PVZ"} çatdırılması pulsuz olsun
               </div>
             )}
 
