@@ -494,6 +494,7 @@ function SellerPanel() {
           ) : orderItems.map((i) => {
             const st = ORDER_STATUSES.find((s) => s.v === i.status) ?? ORDER_STATUSES[0];
             const canPack = i.status === "pending" || i.status === "processing";
+            const canShip = !i.accepted_at && !i.delivered_at && (i.status === "pending" || i.status === "processing" || i.status === "packed");
             return (
               <div key={i.id} className="bg-card border border-border rounded-xl p-4 space-y-3">
                 <div className="flex flex-wrap items-center gap-3">
@@ -524,6 +525,13 @@ function SellerPanel() {
                               className="px-3 py-2 rounded-lg bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white text-xs font-bold inline-flex items-center gap-1"
                               title="Paketləndi olaraq qeyd et">
                         <Package className="h-3.5 w-3.5" /> Paketlə
+                      </button>
+                    )}
+                    {canShip && (
+                      <button onClick={() => updateOrderStatus(i, "shipped")}
+                              className="px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground text-xs font-bold inline-flex items-center gap-1"
+                              title="PVZ-yə göndərildi olaraq qeyd et">
+                        <ShoppingBag className="h-3.5 w-3.5" /> Göndərildi
                       </button>
                     )}
                     <button onClick={() => printShippingLabel(i)}
