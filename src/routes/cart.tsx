@@ -175,26 +175,43 @@ function CartPage() {
 
   const checkout = async () => {
     if (!user || items.length === 0) return;
-    if (!pvzId) {
-      toast.error("Zəhmət olmasa PVZ punkt seçin");
+    const finalRecipientName = recipientName.trim() || profile?.full_name || user.email || "";
+    const finalRecipientPhone = recipientPhone.trim() || profile?.phone || "";
+    if (!finalRecipientName || !finalRecipientPhone) {
+      toast.error("Ad və telefon nömrəsi daxil edin");
       return;
     }
-    const selected = pvzList.find((p) => p.id === pvzId);
-    if (!selected) {
-      toast.error("PVZ punkt tapılmadı");
-      return;
+    let shippingAddress = "";
+    let chosenPvzId: string | null = null;
+    if (deliveryMethod === "pvz") {
+      if (!pvzId) {
+        toast.error("Zəhmət olmasa PVZ punkt seçin");
+        return;
+      }
+      const selected = pvzList.find((p) => p.id === pvzId);
+      if (!selected) {
+        toast.error("PVZ punkt tapılmadı");
+        return;
+      }
+      shippingAddress = `PVZ #${selected.point_number ?? "-"} — ${selected.name}, ${selected.city}, ${selected.address}`;
+      chosenPvzId = pvzId;
+    } else {
+      if (!homeCity.trim() || !homeAddress.trim()) {
+        toast.error("Şəhər və ünvan daxil edin");
+        return;
+      }
+      shippingAddress = `🏠 Ev çatdırılması — ${homeCity.trim()}, ${homeAddress.trim()}${homeApartment.trim() ? `, mən./ev: ${homeApartment.trim()}` : ""}${homeNotes.trim() ? ` (Qeyd: ${homeNotes.trim()})` : ""}`;
     }
     setPlacing(true);
-    const shippingAddress = `PVZ #${selected.point_number ?? "-"} — ${selected.name}, ${selected.city}, ${selected.address}`;
     const { data: order, error } = await supabase
       .from("orders")
       .insert({
         buyer_id: user.id,
         total: finalTotal,
         shipping_address: shippingAddress,
-        pickup_point_id: pvzId,
-        recipient_name: profile?.full_name ?? user.user_metadata?.full_name ?? user.email ?? null,
-        recipient_phone: profile?.phone ?? user.user_metadata?.phone ?? null,
+        pickup_point_id: chosenPvzId,
+        recipient_name: finalRecipientName,
+        recipient_phone: finalRecipientPhone,
         status: "pending",
         promo_code: promoInfo?.code ?? null,
         discount: promoDiscount + bonusDiscount,
@@ -218,9 +235,9 @@ function CartPage() {
         price: i.products!.price,
         quantity: i.quantity,
         image_url: i.products!.image_url,
-        pickup_point_id: pvzId,
-        customer_name: profile?.full_name ?? user.user_metadata?.full_name ?? user.email ?? null,
-        customer_phone: profile?.phone ?? user.user_metadata?.phone ?? null,
+        pickup_point_id: chosenPvzId,
+        customer_name: finalRecipientName,
+        customer_phone: finalRecipientPhone,
       }));
     const { error: itemError } = await supabase.from("order_items").insert(orderItems);
     if (itemError) {
