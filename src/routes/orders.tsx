@@ -24,6 +24,7 @@ interface Order { id: string; total: number; status: string; created_at: string;
 const statusColor: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
   paid: "bg-blue-100 text-blue-800",
+  packed: "bg-purple-100 text-purple-800",
   shipped: "bg-purple-100 text-purple-800",
   delivered: "bg-green-100 text-green-800",
   cancelled: "bg-red-100 text-red-800",
@@ -46,7 +47,7 @@ function OrdersPage() {
   const qrOrder = qrItem ? orders.find((o) => o.order_items?.some((i) => i.id === qrItem.id)) : null;
 
   const statusLabel: Record<string, string> = {
-    pending: t("orders.pending"), paid: t("orders.paid"), shipped: t("orders.shipped"),
+    pending: t("orders.pending"), paid: t("orders.paid"), packed: "Paketləndi", shipped: t("orders.shipped"),
     delivered: t("orders.delivered"), cancelled: t("orders.cancelled"),
   };
 
@@ -106,6 +107,7 @@ function OrdersPage() {
     ["all", t("orders.all")],
     ["pending", t("orders.pending")],
     ["paid", t("orders.paid")],
+    ["packed", "Paketləndi"],
     ["shipped", t("orders.shipped")],
     ["delivered", t("orders.delivered")],
     ["cancelled", t("orders.cancelShort")],

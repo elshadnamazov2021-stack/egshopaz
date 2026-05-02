@@ -1,9 +1,9 @@
-import { Check, Clock, CreditCard, Truck, PackageCheck, X } from "lucide-react";
+import { Check, Clock, Package, Truck, PackageCheck, X } from "lucide-react";
 
 const STEPS = [
   { key: "pending", label: "Sifariş qəbul edildi", icon: Clock },
-  { key: "paid", label: "Ödəniş təsdiqi", icon: CreditCard },
-  { key: "shipped", label: "Göndərildi", icon: Truck },
+  { key: "packed", label: "Paketləndi", icon: Package },
+  { key: "shipped", label: "PVZ-yə göndərildi", icon: Truck },
   { key: "delivered", label: "Çatdırıldı", icon: PackageCheck },
 ] as const;
 
@@ -15,7 +15,8 @@ export function OrderTimeline({ status }: { status: string }) {
       </div>
     );
   }
-  const idx = STEPS.findIndex((s) => s.key === status);
+  const normalizedStatus = status === "paid" ? "pending" : status;
+  const idx = STEPS.findIndex((s) => s.key === normalizedStatus);
   const activeIdx = idx === -1 ? 0 : idx;
 
   return (
