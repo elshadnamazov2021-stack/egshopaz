@@ -261,10 +261,9 @@ function AuthPage() {
               >
                 <Icon className="h-5 w-5" />
                 {label}
-              </button>
-            ))}
-          </div>
-        )}
+            </button>
+          ))}
+        </div>
 
         <form onSubmit={submit} className="space-y-3">
           {mode === "signup" && (
