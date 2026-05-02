@@ -45,6 +45,13 @@ function CartPage() {
   >([]);
   const [pvzId, setPvzId] = useState<string>("");
   const [pvzSearch, setPvzSearch] = useState("");
+  const [deliveryMethod, setDeliveryMethod] = useState<"pvz" | "home">("pvz");
+  const [homeCity, setHomeCity] = useState("");
+  const [homeAddress, setHomeAddress] = useState("");
+  const [homeApartment, setHomeApartment] = useState("");
+  const [homeNotes, setHomeNotes] = useState("");
+  const [recipientName, setRecipientName] = useState("");
+  const [recipientPhone, setRecipientPhone] = useState("");
   const [promo, setPromo] = useState("");
   const [promoInfo, setPromoInfo] = useState<{ code: string; discount: number } | null>(null);
   const [bonusBalance, setBonusBalance] = useState(0);
