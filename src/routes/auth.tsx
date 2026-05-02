@@ -164,7 +164,12 @@ function AuthPage() {
       if (shopCity.trim().length < 2) { toast.error("Şəhər daxil edin"); return; }
     }
     if (role === "pvz") {
-      if (!pickupPointId) { toast.error("PVZ nöqtəsini seçin"); return; }
+      if (!pickupPointId) {
+        // creating a new PVZ PUNKT — require all fields
+        if (newPvzName.trim().length < 2) { toast.error("PVZ PUNKT adını daxil edin"); return; }
+        if (newPvzCity.trim().length < 2) { toast.error("Şəhəri daxil edin"); return; }
+        if (newPvzAddress.trim().length < 5) { toast.error("PVZ PUNKT-un tam ünvanını daxil edin"); return; }
+      }
     }
 
     setBusy(true);
