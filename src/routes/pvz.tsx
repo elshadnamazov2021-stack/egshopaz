@@ -95,6 +95,7 @@ function PvzPanel() {
       {tab === "finance" && <Finance />}
       {tab === "shift" && <Shift open={shiftOpen} setOpen={setShiftOpen} />}
       {tab === "messages" && <PvzMessagesTab />}
+      {tab === "account" && <AccountSec />}
       {tab === "settings" && <SettingsSec />}
       {tab === "support" && <Support />}
     </PanelLayout>
