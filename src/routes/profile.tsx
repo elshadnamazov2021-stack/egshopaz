@@ -135,7 +135,20 @@ function Profile() {
     setEditing(false);
   };
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <div className="container mx-auto flex min-h-[60vh] items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 text-center">
+          <UserIcon className="mx-auto mb-3 h-12 w-12 text-primary" />
+          <h1 className="text-2xl font-extrabold">Müştəri paneli</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Sifariş, səbət və sevimliləri görmək üçün hesaba daxil olun.</p>
+          <Link to="/auth" className="mt-5 inline-flex h-11 items-center justify-center rounded-lg bg-primary px-6 font-bold text-primary-foreground hover:bg-primary/90">
+            Daxil ol
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const displayName = fullName || user.email?.split("@")[0] || "Müştəri";
   const initial = displayName.charAt(0).toUpperCase();
