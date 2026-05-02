@@ -170,7 +170,11 @@ function CartPage() {
   const total = subtotal;
   const bonusDiscount = bonusToUse * bonusToAzn;
   const promoDiscount = promoInfo?.discount ?? 0;
-  const finalTotal = Math.max(0, subtotal - promoDiscount - bonusDiscount);
+  const FREE_SHIPPING_THRESHOLD = 50;
+  const HOME_SHIPPING_FEE = 5;
+  const shippingFee =
+    deliveryMethod === "home" && subtotal < FREE_SHIPPING_THRESHOLD ? HOME_SHIPPING_FEE : 0;
+  const finalTotal = Math.max(0, subtotal - promoDiscount - bonusDiscount + shippingFee);
   const maxBonus = Math.min(bonusBalance, Math.floor(subtotal / bonusToAzn));
 
   const checkout = async () => {
