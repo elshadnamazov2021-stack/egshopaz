@@ -99,12 +99,16 @@ function CartPage() {
   const checkout = async () => {
     if (!user || items.length === 0) return;
     if (isSeller || isPvz) { toast.error("Satıcı və PVZ PUNKT hesabları sifariş verə bilməz."); return; }
-    if (!address.trim()) { toast.error(t("cart.addressRequired")); return; }
+    if (!pvzId) { toast.error("Zəhmət olmasa PVZ punkt seçin"); return; }
+    const selected = pvzList.find((p) => p.id === pvzId);
+    if (!selected) { toast.error("PVZ punkt tapılmadı"); return; }
     setPlacing(true);
+    const shippingAddress = `PVZ #${selected.point_number ?? "-"} — ${selected.name}, ${selected.city}, ${selected.address}`;
     const { data: order, error } = await supabase.from("orders").insert({
       buyer_id: user.id,
       total: finalTotal,
-      shipping_address: address,
+      shipping_address: shippingAddress,
+      pickup_point_id: pvzId,
       status: "pending",
       promo_code: promoInfo?.code ?? null,
       discount: promoDiscount + bonusDiscount,
