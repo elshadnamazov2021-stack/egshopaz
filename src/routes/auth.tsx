@@ -206,11 +206,14 @@ function AuthPage() {
       const { error: e3 } = await supabase.rpc("register_pvz_staff", {
         _full_name: name.trim(),
         _phone: phone.trim(),
-        _pickup_point_id: pickupPointId,
+        _pickup_point_id: pickupPointId || undefined,
         _position: position,
+        _new_pvz_name: pickupPointId ? undefined : newPvzName.trim(),
+        _new_pvz_city: pickupPointId ? undefined : newPvzCity.trim(),
+        _new_pvz_address: pickupPointId ? undefined : newPvzAddress.trim(),
       });
       if (e3) { setBusy(false); toast.error(e3.message); return; }
-      toast.success("PVZ işçi qeydiyyatı tamamlandı");
+      toast.success("PVZ PUNKT qeydiyyatı tamamlandı");
       setBusy(false);
       navigate({ to: "/pvz" });
       return;
