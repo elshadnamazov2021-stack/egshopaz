@@ -126,7 +126,12 @@ function CartPage() {
       image_url: i.products!.image_url,
       pickup_point_id: pvzId,
     }));
-    await supabase.from("order_items").insert(orderItems);
+    const { error: itemError } = await supabase.from("order_items").insert(orderItems);
+    if (itemError) {
+      toast.error(`Sifariş məhsulları əlavə olunmadı: ${itemError.message}`);
+      setPlacing(false);
+      return;
+    }
 
     if (bonusToUse > 0) {
       await supabase.from("bonus_transactions").insert({
