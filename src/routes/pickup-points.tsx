@@ -22,12 +22,12 @@ function PickupPointsPage() {
   const [q, setQ] = useState("");
 
   useEffect(() => {
-    supabase.from("pickup_points").select("*").eq("is_active", true).order("city")
+    supabase.from("pickup_points").select("*").eq("is_active", true).order("point_number", { ascending: true })
       .then(({ data }) => setList((data ?? []) as PVZ[]));
   }, []);
 
   const filtered = list.filter((p) =>
-    !q || p.city.toLowerCase().includes(q.toLowerCase()) || p.address.toLowerCase().includes(q.toLowerCase()) || p.name.toLowerCase().includes(q.toLowerCase())
+    !q || p.city.toLowerCase().includes(q.toLowerCase()) || p.address.toLowerCase().includes(q.toLowerCase()) || p.name.toLowerCase().includes(q.toLowerCase()) || String(p.point_number ?? "").includes(q)
   );
 
   return (
