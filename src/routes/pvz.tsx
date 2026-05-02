@@ -567,23 +567,25 @@ function AccountSec() {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("profiles").select("full_name,phone").eq("id", user.id).maybeSingle()
-      .then(({ data }) => {
-        setFullName(data?.full_name ?? "");
-        setPhone(data?.phone ?? "");
-      });
-    supabase.from("pvz_staff").select("position,pickup_point_id").eq("phone", "").or(`phone.eq.${user.phone ?? ""}`)
-      .maybeSingle()
-      .then(async ({ data }) => {
-        if (data?.position) setPosition(data.position);
-        if (data?.pickup_point_id) {
-          const { data: pp } = await supabase.from("pickup_points")
-            .select("name,city,address").eq("id", data.pickup_point_id).maybeSingle();
-          setPvzName(pp?.name ?? "");
-          setPvzCity(pp?.city ?? "");
-          setPvzAddress(pp?.address ?? "");
-        }
-      });
+    (async () => {
+      const { data: prof } = await supabase.from("profiles")
+        .select("full_name,phone").eq("id", user.id).maybeSingle();
+      const fn = prof?.full_name ?? "";
+      const ph = prof?.phone ?? "";
+      setFullName(fn);
+      setPhone(ph);
+      if (!ph) return;
+      const { data: staff } = await supabase.from("pvz_staff")
+        .select("position,pickup_point_id").eq("phone", ph).maybeSingle();
+      if (staff?.position) setPosition(staff.position);
+      if (staff?.pickup_point_id) {
+        const { data: pp } = await supabase.from("pickup_points")
+          .select("name,city,address").eq("id", staff.pickup_point_id).maybeSingle();
+        setPvzName(pp?.name ?? "");
+        setPvzCity(pp?.city ?? "");
+        setPvzAddress(pp?.address ?? "");
+      }
+    })();
   }, [user]);
 
   const save = async () => {
