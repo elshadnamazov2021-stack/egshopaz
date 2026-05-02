@@ -150,7 +150,8 @@ function AuthPage() {
       setBusy(false);
       if (error) { toast.error("E-poçt və ya şifrə yanlışdır"); return; }
       toast.success("Xoş gəldiniz!");
-      navigate({ to: "/" });
+      const dest = role === "seller" ? "/seller" : role === "pvz" ? "/pvz" : "/";
+      navigate({ to: dest });
       return;
     }
 
