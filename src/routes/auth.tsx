@@ -246,11 +246,10 @@ function AuthPage() {
         </div>
         <h1 className="text-2xl font-extrabold mb-1 text-center">{mode === "login" ? "Giriş" : "Qeydiyyat"}</h1>
         <p className="text-sm text-muted-foreground mb-5 text-center">
-          {mode === "login" ? "Hesabınıza daxil olun" : "Hesab tipinizi seçin"}
+          {mode === "login" ? "Hesab tipinizi seçin və daxil olun" : "Hesab tipinizi seçin"}
         </p>
 
-        {mode === "signup" && (
-          <div className="grid grid-cols-3 gap-2 mb-5 p-1 bg-muted rounded-xl">
+        <div className="grid grid-cols-3 gap-2 mb-5 p-1 bg-muted rounded-xl">
             {tabs.map(({ key, label, Icon }) => (
               <button
                 key={key}
