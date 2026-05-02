@@ -100,6 +100,8 @@ function CartPage() {
     );
     setBonusBalance(prof.data?.bonus_balance ?? 0);
     setProfile({ full_name: prof.data?.full_name ?? null, phone: prof.data?.phone ?? null });
+    setRecipientName((prev) => prev || prof.data?.full_name || "");
+    setRecipientPhone((prev) => prev || prof.data?.phone || "");
     setBonusToAzn(Number(settings.data?.bonus_to_azn ?? 0.01));
     setPvzList((pps.data ?? []) as never);
     setLoading(false);
