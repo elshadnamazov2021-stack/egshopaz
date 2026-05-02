@@ -96,6 +96,10 @@ function AppShell() {
     else if (isSeller) navigate({ to: "/seller" });
   }, [loading, user, isPvz, isSeller, isWorkPanel, pathname, navigate]);
 
+  if (!loading && user && !isWorkPanel && pathname !== "/auth" && pathname !== "/reset-password" && (isSeller || isPvz)) {
+    return null;
+  }
+
   if (isWorkPanel) {
     const label = isSellerPanel ? "Satıcı paneli" : isPvzPanel ? "PVZ PUNKT paneli" : "Admin";
     return (
