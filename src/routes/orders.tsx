@@ -76,10 +76,21 @@ function OrdersPage() {
   const load = () => {
     if (!user) return;
     supabase.from("orders")
-      .select("*, pickup_points(name,address,city), order_items(id,title,price,quantity,image_url,status,seller_id,product_id,pickup_code,accepted_at,delivered_at,pickup_point_id)")
+      .select("*, order_items(id,title,price,quantity,image_url,status,seller_id,product_id,pickup_code,accepted_at,delivered_at,pickup_point_id)")
       .eq("buyer_id", user.id)
       .order("created_at", { ascending: false })
-      .then(({ data }) => setOrders((data ?? []) as unknown as Order[]));
+      .then(async ({ data }) => {
+        const orderRows = (data ?? []) as unknown as Order[];
+        const pickupIds = [...new Set(orderRows.map((o) => o.pickup_point_id).filter(Boolean))] as string[];
+        const { data: pickupRows } = pickupIds.length
+          ? await supabase.from("pickup_points").select("id,name,address,city").in("id", pickupIds)
+          : { data: [] };
+        const pickupMap = new Map((pickupRows ?? []).map((p) => [p.id, p]));
+        setOrders(orderRows.map((order) => ({
+          ...order,
+          pickup_points: order.pickup_point_id ? (pickupMap.get(order.pickup_point_id) ?? null) : null,
+        })));
+      });
   };
   useEffect(load, [user]);
 
