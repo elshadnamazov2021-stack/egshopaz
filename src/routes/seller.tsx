@@ -134,7 +134,6 @@ const productSchema = z.object({
 
 const ORDER_STATUSES = [
   { v: "pending", l: "Gözləyir", c: "bg-warning/10 text-warning" },
-  { v: "processing", l: "Hazırlanır", c: "bg-primary/10 text-primary" },
   { v: "packed", l: "Paketləndi", c: "bg-purple-500/10 text-purple-600" },
   { v: "shipped", l: "Göndərildi", c: "bg-primary/10 text-primary" },
   { v: "delivered", l: "Çatdırıldı", c: "bg-success/10 text-success" },
@@ -175,7 +174,7 @@ function SellerPanel() {
 
   const load = async () => {
     if (!user) return;
-    const [{ data: ps }, { data: cs }, { data: ois }, { data: pr }] = await Promise.all([
+    const [{ data: ps, error: productsError }, { data: cs, error: categoriesError }, { data: ois, error: itemsError }, { data: pr, error: profileError }] = await Promise.all([
       supabase
         .from("products")
         .select("*")
@@ -198,14 +197,23 @@ function SellerPanel() {
         .eq("id", user.id)
         .maybeSingle(),
     ]);
+    const firstError = productsError ?? categoriesError ?? itemsError ?? profileError;
+    if (firstError) {
+      toast.error(`Məlumat yüklənmədi: ${firstError.message}`);
+      return;
+    }
     const rawItems = (ois ?? []) as unknown as OrderItem[];
     const orderIds = [...new Set(rawItems.map((i) => i.order_id))];
-    const { data: orderRows } = orderIds.length
+    const { data: orderRows, error: ordersError } = orderIds.length
       ? await supabase
           .from("orders")
-          .select("id,pickup_point_id,recipient_name,recipient_phone")
+          .select("id,pickup_point_id,recipient_name,recipient_phone,created_at")
           .in("id", orderIds)
       : { data: [] };
+    if (ordersError) {
+      toast.error(`Sifariş məlumatı yüklənmədi: ${ordersError.message}`);
+      return;
+    }
     const orderMap = new Map((orderRows ?? []).map((o) => [o.id, o]));
     const pickupIds = [
       ...new Set(
@@ -214,12 +222,16 @@ function SellerPanel() {
           .filter(Boolean),
       ),
     ] as string[];
-    const { data: pickupRows } = pickupIds.length
+    const { data: pickupRows, error: pickupError } = pickupIds.length
       ? await supabase
           .from("pickup_points")
           .select("id,name,city,address,point_number,phone,working_hours")
           .in("id", pickupIds)
       : { data: [] };
+    if (pickupError) {
+      toast.error(`PVZ məlumatı yüklənmədi: ${pickupError.message}`);
+      return;
+    }
     const pickupMap = new Map((pickupRows ?? []).map((p) => [p.id, p]));
     setProducts((ps ?? []) as unknown as Product[]);
     setCategories((cs ?? []) as Category[]);
@@ -235,6 +247,10 @@ function SellerPanel() {
             ? ((pickupMap.get(pickupPointId) as OrderItem["pickup_point"]) ?? null)
             : null,
         };
+      }).sort((a, b) => {
+        const aDate = orderMap.get(a.order_id)?.created_at ?? "";
+        const bDate = orderMap.get(b.order_id)?.created_at ?? "";
+        return bDate.localeCompare(aDate);
       }),
     );
     setProfile(
@@ -881,11 +897,11 @@ function SellerPanel() {
           ) : (
             orderItems.map((i) => {
               const st = ORDER_STATUSES.find((s) => s.v === i.status) ?? ORDER_STATUSES[0];
-              const canPack = i.status === "pending" || i.status === "processing";
+              const canPack = i.status === "pending";
               const canShip =
                 !i.accepted_at &&
                 !i.delivered_at &&
-                (i.status === "pending" || i.status === "processing" || i.status === "packed");
+                (i.status === "pending" || i.status === "packed");
               return (
                 <div key={i.id} className="bg-card border border-border rounded-xl p-4 space-y-3">
                   <div className="flex flex-wrap items-center gap-3">
