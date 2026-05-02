@@ -2,6 +2,7 @@ export const formatAZN = (value: number | string | null | undefined): string => 
   const n = typeof value === "string" ? parseFloat(value) : (value ?? 0);
   if (!isFinite(n)) return "0 ₼";
   return new Intl.NumberFormat("az-AZ", {
+    useGrouping: false,
     maximumFractionDigits: 2,
     minimumFractionDigits: 0,
   }).format(n) + " ₼";
