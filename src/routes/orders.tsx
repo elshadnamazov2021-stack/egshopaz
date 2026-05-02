@@ -103,7 +103,7 @@ function OrdersPage() {
       pickup_points: order.pickup_point_id ? (pickupMap.get(order.pickup_point_id) ?? null) : null,
     })));
   };
-  useEffect(load, [user]);
+  useEffect(() => { void load(); }, [user]);
 
   useEffect(() => {
     if (!user) return;
