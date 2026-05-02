@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 export function useFavorite(productId: string) {
-  const { user, isSeller, isPvz } = useAuth();
+  const { user } = useAuth();
   const [isFav, setIsFav] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -20,7 +20,6 @@ export function useFavorite(productId: string) {
     e?.preventDefault();
     e?.stopPropagation();
     if (!user) { toast.error("Sevimlilər üçün daxil olun"); return; }
-    if (isSeller || isPvz) { toast.error("Sevimli yalnız müştəri hesabı üçündür"); return; }
     if (busy) return;
     setBusy(true);
     if (isFav) {

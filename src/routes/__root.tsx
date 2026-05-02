@@ -1,5 +1,4 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts, useLocation, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -83,23 +82,10 @@ function WorkHeader({ label }: { label: string }) {
 
 function AppShell() {
   const { pathname } = useLocation();
-  const navigate = useNavigate();
-  const { user, loading, isSeller, isPvz } = useAuth();
   const isSellerPanel = pathname === "/seller" || pathname.startsWith("/seller/");
   const isPvzPanel = pathname === "/pvz" || pathname.startsWith("/pvz/");
   const isAdminPanel = pathname === "/admin" || pathname.startsWith("/admin/");
   const isWorkPanel = isSellerPanel || isPvzPanel || isAdminPanel;
-
-  useEffect(() => {
-    if (loading || !user || isWorkPanel || pathname === "/auth" || pathname === "/reset-password") return;
-    if (isPvz) navigate({ to: "/pvz", replace: true });
-    else if (isSeller) navigate({ to: "/seller", replace: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, user?.id, isPvz, isSeller, isWorkPanel, pathname]);
-
-  if (!loading && user && !isWorkPanel && pathname !== "/auth" && pathname !== "/reset-password" && (isSeller || isPvz)) {
-    return <div className="flex min-h-screen items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>;
-  }
 
   if (isWorkPanel) {
     const label = isSellerPanel ? "Satıcı paneli" : isPvzPanel ? "PVZ PUNKT paneli" : "Admin";

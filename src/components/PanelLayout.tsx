@@ -23,16 +23,16 @@ export function PanelLayout({ title, subtitle, items, children }: Props) {
   const { pathname } = useLocation();
 
   return (
-    <div className="container mx-auto px-4 py-6 grid lg:grid-cols-[260px_1fr] gap-6">
-      <aside className="bg-card border border-border rounded-2xl p-3 h-fit lg:sticky lg:top-20 self-start">
-        <div className="px-3 py-3 border-b border-border mb-2">
+    <div className="container mx-auto px-4 py-6 grid gap-4 lg:grid-cols-[260px_1fr] lg:gap-6">
+      <aside className="bg-card border border-border rounded-2xl p-3 h-fit lg:sticky lg:top-20 lg:self-start">
+        <div className="px-3 py-3 border-b border-border mb-3 lg:mb-2">
           <div className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">{title}</div>
           {subtitle && <div className="text-sm font-bold mt-0.5 line-clamp-1">{subtitle}</div>}
         </div>
-        <nav className="space-y-0.5">
+        <nav className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-0.5 lg:overflow-visible lg:pb-0">
           {items.map((it) => {
             const isActive = it.active ?? (it.to ? pathname === it.to : false);
-            const cls = `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition w-full text-left ${
+            const cls = `flex shrink-0 items-center gap-2 whitespace-nowrap px-3 py-2.5 rounded-lg text-sm font-medium transition text-left lg:w-full lg:gap-3 ${
               isActive ? "bg-gradient-soft text-primary font-semibold" : "hover:bg-secondary text-foreground/80"
             }`;
             const inner = (

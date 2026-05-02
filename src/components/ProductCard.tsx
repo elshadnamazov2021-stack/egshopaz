@@ -27,7 +27,7 @@ export interface ProductCardData {
 
 export function ProductCard({ p }: { p: ProductCardData }) {
   const { t } = useTranslation();
-  const { user, isSeller, isPvz } = useAuth();
+  const { user } = useAuth();
   const [adding, setAdding] = useState(false);
   const { isFav, toggle: toggleFav, busy: favBusy } = useFavorite(p.id);
   const discount = calcDiscount(Number(p.price), p.old_price ? Number(p.old_price) : undefined);
@@ -36,15 +36,20 @@ export function ProductCard({ p }: { p: ProductCardData }) {
     e.preventDefault();
     e.stopPropagation();
     if (!user) { toast.error(t("cart.loginRequired")); return; }
-    if (isSeller || isPvz) { toast.error("Satıcı və PVZ PUNKT hesabları məhsul sifariş verə bilməz."); return; }
     setAdding(true);
     const { data: existing } = await supabase
       .from("cart_items").select("id, quantity")
       .eq("user_id", user.id).eq("product_id", p.id).maybeSingle();
+    let error: { message: string } | null = null;
     if (existing) {
-      await supabase.from("cart_items").update({ quantity: existing.quantity + 1 }).eq("id", existing.id);
+      ({ error } = await supabase.from("cart_items").update({ quantity: existing.quantity + 1 }).eq("id", existing.id));
     } else {
-      await supabase.from("cart_items").insert({ user_id: user.id, product_id: p.id, quantity: 1 });
+      ({ error } = await supabase.from("cart_items").insert({ user_id: user.id, product_id: p.id, quantity: 1 }));
+    }
+    if (error) {
+      toast.error(`Səbət yenilənmədi: ${error.message}`);
+      setAdding(false);
+      return;
     }
     toast.success(t("product.addToCart"));
     setAdding(false);
@@ -68,16 +73,14 @@ export function ProductCard({ p }: { p: ProductCardData }) {
             -{discount}%
           </span>
         )}
-        {!(isSeller || isPvz) && (
-          <button
-            onClick={toggleFav}
-            disabled={favBusy}
-            className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center transition ${isFav ? "text-discount" : "hover:text-primary"}`}
-            aria-label={t("product.addToFavorites")}
-          >
-            <Heart className={`h-4 w-4 ${isFav ? "fill-discount" : ""}`} />
-          </button>
-        )}
+        <button
+          onClick={toggleFav}
+          disabled={favBusy}
+          className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center transition ${isFav ? "text-discount" : "hover:text-primary"}`}
+          aria-label={t("product.addToFavorites")}
+        >
+          <Heart className={`h-4 w-4 ${isFav ? "fill-discount" : ""}`} />
+        </button>
       </div>
       <div className="p-3 flex flex-col gap-1.5 flex-1">
         <div className="flex items-baseline gap-2">
@@ -115,16 +118,14 @@ export function ProductCard({ p }: { p: ProductCardData }) {
           <span className="font-semibold text-foreground">{Number(p.rating).toFixed(1)}</span>
           <span>· {p.reviews_count}</span>
         </div>
-        {!(isSeller || isPvz) && (
-          <button
-            onClick={addToCart}
-            disabled={adding}
-            className="mt-2 w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 rounded-lg py-2 text-sm font-semibold flex items-center justify-center gap-1.5 transition"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            {t("product.addToCart")}
-          </button>
-        )}
+        <button
+          onClick={addToCart}
+          disabled={adding}
+          className="mt-2 w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 rounded-lg py-2 text-sm font-semibold flex items-center justify-center gap-1.5 transition"
+        >
+          <ShoppingCart className="h-4 w-4" />
+          {t("product.addToCart")}
+        </button>
       </div>
     </Link>
   );
