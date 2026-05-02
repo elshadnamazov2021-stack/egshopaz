@@ -1648,6 +1648,10 @@ export type Database = {
         Returns: boolean
       }
       cleanup_ai_chat_messages: { Args: never; Returns: undefined }
+      decrement_stock: {
+        Args: { product_id: string; qty: number }
+        Returns: undefined
+      }
       get_owner_admin_id: { Args: never; Returns: string }
       has_role: {
         Args: {
@@ -1655,6 +1659,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_promo_used_count: {
+        Args: { promo_code: string }
+        Returns: undefined
       }
       is_buyer_only: { Args: { _user_id: string }; Returns: boolean }
       order_belongs_to_user: {
