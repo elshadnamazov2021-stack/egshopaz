@@ -75,21 +75,29 @@ function OrdersPage() {
 
   const load = async () => {
     if (!user) return;
-    const { data } = await supabase.from("orders")
+    const { data, error } = await supabase.from("orders")
       .select("*")
       .eq("buyer_id", user.id)
       .order("created_at", { ascending: false });
+    if (error) {
+      toast.error(`Sifarişlər yüklənmədi: ${error.message}`);
+      return;
+    }
     const orderRows = (data ?? []) as unknown as Order[];
     const orderIds = orderRows.map((o) => o.id);
     const pickupIds = [...new Set(orderRows.map((o) => o.pickup_point_id).filter(Boolean))] as string[];
-    const [{ data: itemRows }, { data: pickupRows }] = await Promise.all([
+    const [{ data: itemRows, error: itemsError }, { data: pickupRows, error: pickupError }] = await Promise.all([
       orderIds.length
         ? supabase.from("order_items").select("id,title,price,quantity,image_url,status,seller_id,product_id,pickup_code,accepted_at,delivered_at,pickup_point_id,order_id").in("order_id", orderIds)
-        : Promise.resolve({ data: [] }),
+        : Promise.resolve({ data: [], error: null }),
       pickupIds.length
         ? supabase.from("pickup_points").select("id,name,address,city").in("id", pickupIds)
-        : Promise.resolve({ data: [] }),
+        : Promise.resolve({ data: [], error: null }),
     ]);
+    if (itemsError || pickupError) {
+      toast.error(`Sifariş detalları yüklənmədi: ${(itemsError ?? pickupError)?.message}`);
+      return;
+    }
     const itemsByOrder = new Map<string, OrderItem[]>();
     ((itemRows ?? []) as unknown as (OrderItem & { order_id: string })[]).forEach((item) => {
       const list = itemsByOrder.get(item.order_id) ?? [];
