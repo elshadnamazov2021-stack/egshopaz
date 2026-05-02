@@ -503,10 +503,19 @@ function SellerPanel() {
                   <div className="flex-1 min-w-[180px]">
                     <div className="font-semibold line-clamp-1">{i.title}</div>
                     <div className="text-xs text-muted-foreground">№ {i.order_id.slice(0, 8).toUpperCase()} · {i.quantity} ədəd · Kod: <b className="font-mono">{i.pickup_code ?? "—"}</b></div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      Müştəri: {i.customer_name ?? "—"}{i.customer_phone ? ` · ${i.customer_phone}` : ""}
+                    </div>
+                    {i.delivered_at ? (
+                      <div className="text-[10px] text-success font-bold mt-1">PVZ müştəriyə təhvil verib</div>
+                    ) : i.accepted_at ? (
+                      <div className="text-[10px] text-primary font-bold mt-1">PVZ paketi qəbul edib</div>
+                    ) : null}
                   </div>
                   <div className="font-extrabold whitespace-nowrap">{formatAZN(Number(i.price) * i.quantity)}</div>
                   <select value={i.status} onChange={(e) => updateOrderStatus(i, e.target.value)}
-                          className={`text-xs px-3 py-2 rounded-lg font-semibold border-0 ${st.c} cursor-pointer`}>
+                          disabled={!!i.accepted_at || !!i.delivered_at}
+                          className={`text-xs px-3 py-2 rounded-lg font-semibold border-0 ${st.c} cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed`}>
                     {ORDER_STATUSES.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}
                   </select>
                   <div className="flex gap-1">
