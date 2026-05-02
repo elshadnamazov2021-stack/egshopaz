@@ -213,7 +213,19 @@ interface DBOrderItem {
   id: string; title: string; price: number; quantity: number;
   pickup_code: string; status: string; accepted_at: string | null; delivered_at: string | null;
   pickup_point_id: string | null;
-  orders: { id: string; recipient_name: string | null; recipient_phone: string | null; pickup_point_id: string | null } | null;
+  order_id: string;
+  orders?: { id: string; recipient_name: string | null; recipient_phone: string | null; pickup_point_id: string | null } | null;
+}
+
+type OrderInfo = { id: string; recipient_name: string | null; recipient_phone: string | null; pickup_point_id: string | null };
+
+async function attachOrderInfo(rows: DBOrderItem[]): Promise<DBOrderItem[]> {
+  const ids = [...new Set(rows.map((row) => row.order_id).filter(Boolean))];
+  const { data } = ids.length
+    ? await supabase.from("orders").select("id,recipient_name,recipient_phone,pickup_point_id").in("id", ids)
+    : { data: [] };
+  const map = new Map((data ?? []).map((order) => [order.id, order as OrderInfo]));
+  return rows.map((row) => ({ ...row, orders: map.get(row.order_id) ?? null }));
 }
 
 async function findItemByCode(code: string): Promise<DBOrderItem | null> {
@@ -221,11 +233,13 @@ async function findItemByCode(code: string): Promise<DBOrderItem | null> {
   if (!trimmed) return null;
   const { data, error } = await supabase
     .from("order_items")
-    .select("id,title,price,quantity,pickup_code,status,accepted_at,delivered_at,pickup_point_id,orders(id,recipient_name,recipient_phone,pickup_point_id)")
+    .select("id,title,price,quantity,pickup_code,status,accepted_at,delivered_at,pickup_point_id,order_id")
     .eq("pickup_code", trimmed)
     .maybeSingle();
   if (error) { toast.error(error.message); return null; }
-  return data as unknown as DBOrderItem | null;
+  if (!data) return null;
+  const [item] = await attachOrderInfo([data as DBOrderItem]);
+  return item;
 }
 
 function Intake({ scan, setScan }: { scan: string; setScan: (v: string) => void }) {
