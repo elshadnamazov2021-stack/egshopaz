@@ -173,10 +173,16 @@ function AuthPage() {
         toast.error("Bu hesab PVZ PUNKT işçisi kimi qeydiyyatdan keçməyib.");
         return;
       }
+      if (role === "admin" && !roles.includes("admin")) {
+        await supabase.auth.signOut();
+        setBusy(false);
+        toast.error("Bu hesab admin deyil.");
+        return;
+      }
 
       setBusy(false);
       toast.success("Xoş gəldiniz!");
-      const dest = role === "seller" ? "/seller" : role === "pvz" ? "/pvz" : "/";
+      const dest = role === "seller" ? "/seller" : role === "pvz" ? "/pvz" : role === "admin" ? "/admin" : "/";
       navigate({ to: dest });
       return;
     }
