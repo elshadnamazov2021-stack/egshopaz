@@ -20,7 +20,7 @@ export const Route = createFileRoute("/auth")({
 
 type RoleTab = "buyer" | "seller" | "pvz" | "admin";
 
-const TERMS_TEXT: Record<RoleTab, { title: string; body: string }> = {
+const TERMS_TEXT: Record<Exclude<RoleTab, "admin">, { title: string; body: string }> = {
   buyer: {
     title: "Müştəri istifadəçi razılaşması",
     body: `Elzan Shop platformasından istifadə etməklə Siz aşağıdakı şərtləri qeyd-şərtsiz qəbul edirsiniz:
