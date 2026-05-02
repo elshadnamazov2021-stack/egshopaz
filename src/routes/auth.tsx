@@ -18,7 +18,6 @@ export const Route = createFileRoute("/auth")({
 });
 
 type RoleTab = "buyer" | "seller" | "pvz";
-const AUTH_ROLE: RoleTab = "buyer";
 
 const TERMS_TEXT: Record<RoleTab, { title: string; body: string }> = {
   buyer: {
