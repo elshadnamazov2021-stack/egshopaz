@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatAZN } from "@/lib/format";
-import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag, MapPin, Search } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/cart")({
