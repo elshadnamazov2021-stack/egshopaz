@@ -1183,6 +1183,7 @@ export type Database = {
           phone: string
           pickup_point_id: string | null
           position: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -1192,6 +1193,7 @@ export type Database = {
           phone: string
           pickup_point_id?: string | null
           position?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -1201,6 +1203,7 @@ export type Database = {
           phone?: string
           pickup_point_id?: string | null
           position?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -1623,28 +1626,18 @@ export type Database = {
         }
         Returns: boolean
       }
-      register_pvz_staff:
-        | {
-            Args: {
-              _full_name: string
-              _phone: string
-              _pickup_point_id: string
-              _position?: string
-            }
-            Returns: undefined
-          }
-        | {
-            Args: {
-              _full_name: string
-              _new_pvz_address?: string
-              _new_pvz_city?: string
-              _new_pvz_name?: string
-              _phone: string
-              _pickup_point_id: string
-              _position?: string
-            }
-            Returns: string
-          }
+      register_pvz_staff: {
+        Args: {
+          _full_name: string
+          _new_pvz_address?: string
+          _new_pvz_city?: string
+          _new_pvz_name?: string
+          _phone: string
+          _pickup_point_id: string
+          _position?: string
+        }
+        Returns: string
+      }
       register_seller: {
         Args: {
           _phone: string
