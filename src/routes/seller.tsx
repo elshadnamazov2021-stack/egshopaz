@@ -91,7 +91,7 @@ function SellerPanel() {
     const [{ data: ps }, { data: cs }, { data: ois }, { data: pr }] = await Promise.all([
       supabase.from("products").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("categories").select("id,name").order("sort_order"),
-      supabase.from("order_items").select("*").eq("seller_id", user.id).order("id", { ascending: false }).limit(100),
+      supabase.from("order_items").select("*,pickup_point:pickup_points(id,name,city,address,point_number,phone,working_hours)").eq("seller_id", user.id).order("id", { ascending: false }).limit(100),
       supabase.from("profiles").select("full_name,shop_name,phone,avatar_url,shop_description,shop_logo_url,shop_banner_url,shop_address,shop_city,shop_email").eq("id", user.id).maybeSingle(),
     ]);
     setProducts((ps ?? []) as unknown as Product[]);
