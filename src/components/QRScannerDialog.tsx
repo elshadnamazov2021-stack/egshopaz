@@ -13,12 +13,13 @@ interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   onScan: (value: string) => void;
+  onResult?: (value: string) => void;
   title?: string;
   acceptLabel?: string;
   resultDetails?: (value: string) => ReactNode;
 }
 
-export function QRScannerDialog({ open, onOpenChange, onScan, title = "QR / Ştrixkod skan", acceptLabel = "Təsdiqlə", resultDetails }: Props) {
+export function QRScannerDialog({ open, onOpenChange, onScan, onResult, title = "QR / Ştrixkod skan", acceptLabel = "Təsdiqlə", resultDetails }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const scannerRef = useRef<QrScanner | null>(null);
@@ -52,6 +53,7 @@ export function QRScannerDialog({ open, onOpenChange, onScan, title = "QR / Ştr
         (res) => {
           if (!res?.data) return;
           setLastValue(res.data);
+          onResult?.(res.data);
           setStarted(false);
           scanner.stop();
         },
@@ -111,6 +113,7 @@ export function QRScannerDialog({ open, onOpenChange, onScan, title = "QR / Ştr
     try {
       const res = await QrScanner.scanImage(f, { returnDetailedScanResult: true });
       setLastValue(res.data);
+      onResult?.(res.data);
       scannerRef.current?.stop();
     } catch {
       toast.error("Şəkildə QR tapılmadı");
