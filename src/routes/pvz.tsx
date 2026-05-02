@@ -593,6 +593,8 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
   const [busy, setBusy] = useState(false);
   const [confirmItem, setConfirmItem] = useState<DBOrderItem | null>(null);
   const [step, setStep] = useState<ConfirmStep>("found");
+  const [scannedItem, setScannedItem] = useState<DBOrderItem | null>(null);
+  const [scanLookup, setScanLookup] = useState(false);
 
   const load = () => {
     supabase
@@ -639,6 +641,15 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
     }
     setConfirmItem(item);
     setStep("found");
+  };
+
+  const previewScan = async (value: string) => {
+    const code = value.trim();
+    if (!code) return;
+    setScanLookup(true);
+    const item = await findItemByCode(code);
+    setScannedItem(item);
+    setScanLookup(false);
   };
 
   const confirmDeliver = async () => {
@@ -698,11 +709,36 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
 
       <QRScannerDialog
         open={scannerOpen}
-        onOpenChange={setScannerOpen}
+        onOpenChange={(open) => {
+          setScannerOpen(open);
+          if (!open) setScannedItem(null);
+        }}
         title="Müştəri QR skan"
+        acceptLabel="Anbarda axtar"
+        resultDetails={(value) => {
+          const item = scannedItem?.pickup_code === value.trim().toUpperCase() ? scannedItem : null;
+          return (
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-left text-xs space-y-1">
+              {scanLookup ? (
+                <div className="text-muted-foreground">Müştəri məlumatları yüklənir...</div>
+              ) : item ? (
+                <>
+                  <div className="text-[10px] uppercase font-semibold text-muted-foreground">Müştəri məlumatları</div>
+                  <div className="font-bold text-foreground">👤 {item.orders?.recipient_name ?? "—"}</div>
+                  <div className="text-muted-foreground">📞 {item.orders?.recipient_phone ?? "—"}</div>
+                  <div className="pt-1 border-t border-primary/20 text-foreground font-semibold line-clamp-2">📦 {item.title}</div>
+                  <div className="font-mono text-primary font-bold">Kod: {item.pickup_code}</div>
+                </>
+              ) : (
+                <div className="text-destructive font-semibold">Bu koda uyğun məhsul tapılmadı</div>
+              )}
+            </div>
+          );
+        }}
         onScan={(value) => {
           setSearch(value);
-          openConfirm(value);
+          setScannedItem(null);
+          void previewScan(value);
         }}
       />
 
