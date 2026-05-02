@@ -150,23 +150,17 @@ function AuthPage() {
       if (error || !signInData.user) { setBusy(false); toast.error("E-poçt və ya şifrə yanlışdır"); return; }
 
       // Verify the selected role matches the user's actual roles
-      const uid = signInData.user.id;
-      const [{ data: rolesData }, { data: sellerRow }, { data: pvzRow }] = await Promise.all([
-        supabase.from("user_roles").select("role").eq("user_id", uid),
-        supabase.from("sellers").select("id").eq("user_id", uid).maybeSingle(),
-        supabase.from("pvz_staff").select("id").eq("user_id", uid).maybeSingle(),
-      ]);
+      const { data: rolesData } = await supabase
+        .from("user_roles").select("role").eq("user_id", signInData.user.id);
       const roles = (rolesData ?? []).map((r) => r.role as string);
-      const isSeller = roles.includes("seller") || !!sellerRow;
-      const isPvz = roles.includes("pvz") || !!pvzRow;
 
-      if (role === "seller" && !isSeller) {
+      if (role === "seller" && !roles.includes("seller")) {
         await supabase.auth.signOut();
         setBusy(false);
         toast.error("Bu hesab satıcı kimi qeydiyyatdan keçməyib. Müştəri kimi daxil olun və ya satıcı qeydiyyatından keçin.");
         return;
       }
-      if (role === "pvz" && !isPvz) {
+      if (role === "pvz" && !roles.includes("pvz")) {
         await supabase.auth.signOut();
         setBusy(false);
         toast.error("Bu hesab PVZ PUNKT kimi qeydiyyatdan keçməyib. Müştəri kimi daxil olun və ya PVZ PUNKT qeydiyyatından keçin.");
