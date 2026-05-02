@@ -356,7 +356,7 @@ function AuthPage() {
           <button type="submit" disabled={busy}
             className="w-full h-11 bg-primary text-primary-foreground rounded-lg font-bold hover:bg-primary/90 disabled:opacity-60">
             {busy ? "..." : mode === "login" ? "Daxil ol" : (
-              role === "seller" ? "Satıcı kimi qeydiyyat" : role === "pvz" ? "PVZ işçisi kimi qeydiyyat" : "Qeydiyyat"
+              role === "seller" ? "Satıcı kimi qeydiyyat" : role === "pvz" ? "PVZ PUNKT qeydiyyatı" : "Qeydiyyat"
             )}
           </button>
         </form>
