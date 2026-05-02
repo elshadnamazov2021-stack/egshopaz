@@ -1635,6 +1635,18 @@ export type Database = {
         Args: { _channel: string; _message_id: string }
         Returns: undefined
       }
+      can_pvz_update_order_item: {
+        Args: { _item_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_read_order: {
+        Args: { _order_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_read_order_item: {
+        Args: { _item_id: string; _user_id: string }
+        Returns: boolean
+      }
       cleanup_ai_chat_messages: { Args: never; Returns: undefined }
       get_owner_admin_id: { Args: never; Returns: string }
       has_role: {
@@ -1645,6 +1657,10 @@ export type Database = {
         Returns: boolean
       }
       is_buyer_only: { Args: { _user_id: string }; Returns: boolean }
+      order_belongs_to_user: {
+        Args: { _order_id: string; _user_id: string }
+        Returns: boolean
+      }
       register_pvz_staff: {
         Args: {
           _full_name: string

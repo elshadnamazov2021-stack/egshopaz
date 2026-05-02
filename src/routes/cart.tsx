@@ -50,13 +50,14 @@ function CartPage() {
   const [bonusBalance, setBonusBalance] = useState(0);
   const [bonusToUse, setBonusToUse] = useState(0);
   const [bonusToAzn, setBonusToAzn] = useState(0.01);
+  const [profile, setProfile] = useState<{ full_name: string | null; phone: string | null } | null>(null);
 
   const load = async () => {
     if (!user) return;
     setLoading(true);
     const [cart, prof, settings, pps] = await Promise.all([
       supabase.from("cart_items").select("id,quantity,product_id").eq("user_id", user.id),
-      supabase.from("profiles").select("bonus_balance").eq("id", user.id).maybeSingle(),
+      supabase.from("profiles").select("bonus_balance,full_name,phone").eq("id", user.id).maybeSingle(),
       supabase.from("system_settings").select("bonus_to_azn").limit(1).maybeSingle(),
       supabase
         .from("pickup_points")
@@ -64,14 +65,25 @@ function CartPage() {
         .eq("is_active", true)
         .order("point_number", { ascending: true }),
     ]);
+    const firstError = cart.error ?? prof.error ?? settings.error ?? pps.error;
+    if (firstError) {
+      toast.error(`Səbət yüklənmədi: ${firstError.message}`);
+      setLoading(false);
+      return;
+    }
     const cartRows = (cart.data ?? []) as { id: string; quantity: number; product_id: string }[];
     const productIds = [...new Set(cartRows.map((row) => row.product_id))];
-    const { data: productRows } = productIds.length
+    const { data: productRows, error: productsError } = productIds.length
       ? await supabase
           .from("products")
           .select("id,title,price,image_url,stock,seller_id")
           .in("id", productIds)
-      : { data: [] };
+      : { data: [], error: null };
+    if (productsError) {
+      toast.error(`Məhsullar yüklənmədi: ${productsError.message}`);
+      setLoading(false);
+      return;
+    }
     const productMap = new Map((productRows ?? []).map((product) => [product.id, product]));
     setItems(
       cartRows.map((row) => ({
@@ -80,6 +92,7 @@ function CartPage() {
       })),
     );
     setBonusBalance(prof.data?.bonus_balance ?? 0);
+    setProfile({ full_name: prof.data?.full_name ?? null, phone: prof.data?.phone ?? null });
     setBonusToAzn(Number(settings.data?.bonus_to_azn ?? 0.01));
     setPvzList((pps.data ?? []) as never);
     setLoading(false);
@@ -175,8 +188,8 @@ function CartPage() {
         total: finalTotal,
         shipping_address: shippingAddress,
         pickup_point_id: pvzId,
-        recipient_name: user.user_metadata?.full_name ?? user.email ?? null,
-        recipient_phone: user.user_metadata?.phone ?? null,
+        recipient_name: profile?.full_name ?? user.user_metadata?.full_name ?? user.email ?? null,
+        recipient_phone: profile?.phone ?? user.user_metadata?.phone ?? null,
         status: "pending",
         promo_code: promoInfo?.code ?? null,
         discount: promoDiscount + bonusDiscount,
@@ -201,6 +214,8 @@ function CartPage() {
         quantity: i.quantity,
         image_url: i.products!.image_url,
         pickup_point_id: pvzId,
+        customer_name: profile?.full_name ?? user.user_metadata?.full_name ?? user.email ?? null,
+        customer_phone: profile?.phone ?? user.user_metadata?.phone ?? null,
       }));
     const { error: itemError } = await supabase.from("order_items").insert(orderItems);
     if (itemError) {
