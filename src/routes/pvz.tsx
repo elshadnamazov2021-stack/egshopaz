@@ -646,6 +646,7 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
   const previewScan = async (value: string) => {
     const code = value.trim();
     if (!code) return;
+    setScannedItem(null);
     setScanLookup(true);
     const item = await findItemByCode(code);
     setScannedItem(item);
@@ -715,6 +716,10 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
         }}
         title="Müştəri QR skan"
         acceptLabel="Anbarda axtar"
+        onResult={(value) => {
+          setSearch(value);
+          void previewScan(value);
+        }}
         resultDetails={(value) => {
           const item = scannedItem?.pickup_code === value.trim().toUpperCase() ? scannedItem : null;
           return (
@@ -737,8 +742,7 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
         }}
         onScan={(value) => {
           setSearch(value);
-          setScannedItem(null);
-          void previewScan(value);
+          void openConfirm(value);
         }}
       />
 
