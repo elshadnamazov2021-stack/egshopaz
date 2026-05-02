@@ -96,15 +96,35 @@ function SellerPanel() {
       supabase.from("products").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("categories").select("id,name").order("sort_order"),
       supabase.from("order_items")
-        .select("id,title,price,quantity,image_url,order_id,status,product_id,pickup_code,customer_name,customer_phone,accepted_at,delivered_at,pickup_point_id,pickup_point:pickup_points(id,name,city,address,point_number,phone,working_hours)")
+        .select("id,title,price,quantity,image_url,order_id,status,product_id,pickup_code,customer_name,customer_phone,accepted_at,delivered_at,pickup_point_id")
         .eq("seller_id", user.id)
         .order("id", { ascending: false })
         .limit(100),
       supabase.from("profiles").select("full_name,shop_name,phone,avatar_url,shop_description,shop_logo_url,shop_banner_url,shop_address,shop_city,shop_email").eq("id", user.id).maybeSingle(),
     ]);
+    const rawItems = (ois ?? []) as unknown as OrderItem[];
+    const orderIds = [...new Set(rawItems.map((i) => i.order_id))];
+    const { data: orderRows } = orderIds.length
+      ? await supabase.from("orders").select("id,pickup_point_id,recipient_name,recipient_phone").in("id", orderIds)
+      : { data: [] };
+    const orderMap = new Map((orderRows ?? []).map((o) => [o.id, o]));
+    const pickupIds = [...new Set(rawItems.map((i) => i.pickup_point_id ?? orderMap.get(i.order_id)?.pickup_point_id).filter(Boolean))] as string[];
+    const { data: pickupRows } = pickupIds.length
+      ? await supabase.from("pickup_points").select("id,name,city,address,point_number,phone,working_hours").in("id", pickupIds)
+      : { data: [] };
+    const pickupMap = new Map((pickupRows ?? []).map((p) => [p.id, p]));
     setProducts((ps ?? []) as unknown as Product[]);
     setCategories((cs ?? []) as Category[]);
-    setOrderItems((ois ?? []) as unknown as OrderItem[]);
+    setOrderItems(rawItems.map((item) => {
+      const order = orderMap.get(item.order_id);
+      const pickupPointId = item.pickup_point_id ?? order?.pickup_point_id ?? null;
+      return {
+        ...item,
+        customer_name: item.customer_name ?? order?.recipient_name ?? null,
+        customer_phone: item.customer_phone ?? order?.recipient_phone ?? null,
+        pickup_point: pickupPointId ? (pickupMap.get(pickupPointId) as OrderItem["pickup_point"] ?? null) : null,
+      };
+    }));
     setProfile((pr as Profile) ?? {
       full_name: "", shop_name: "", phone: "", avatar_url: "",
       shop_description: "", shop_logo_url: "", shop_banner_url: "",

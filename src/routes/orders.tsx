@@ -73,15 +73,37 @@ function OrdersPage() {
 
   useEffect(() => { if (!authLoading && !user) navigate({ to: "/auth" }); }, [user, authLoading, navigate]);
 
-  const load = () => {
+  const load = async () => {
     if (!user) return;
-    supabase.from("orders")
-      .select("*, pickup_points(name,address,city), order_items(id,title,price,quantity,image_url,status,seller_id,product_id,pickup_code,accepted_at,delivered_at,pickup_point_id)")
+    const { data } = await supabase.from("orders")
+      .select("*")
       .eq("buyer_id", user.id)
-      .order("created_at", { ascending: false })
-      .then(({ data }) => setOrders((data ?? []) as unknown as Order[]));
+      .order("created_at", { ascending: false });
+    const orderRows = (data ?? []) as unknown as Order[];
+    const orderIds = orderRows.map((o) => o.id);
+    const pickupIds = [...new Set(orderRows.map((o) => o.pickup_point_id).filter(Boolean))] as string[];
+    const [{ data: itemRows }, { data: pickupRows }] = await Promise.all([
+      orderIds.length
+        ? supabase.from("order_items").select("id,title,price,quantity,image_url,status,seller_id,product_id,pickup_code,accepted_at,delivered_at,pickup_point_id,order_id").in("order_id", orderIds)
+        : Promise.resolve({ data: [] }),
+      pickupIds.length
+        ? supabase.from("pickup_points").select("id,name,address,city").in("id", pickupIds)
+        : Promise.resolve({ data: [] }),
+    ]);
+    const itemsByOrder = new Map<string, OrderItem[]>();
+    ((itemRows ?? []) as unknown as (OrderItem & { order_id: string })[]).forEach((item) => {
+      const list = itemsByOrder.get(item.order_id) ?? [];
+      list.push(item);
+      itemsByOrder.set(item.order_id, list);
+    });
+    const pickupMap = new Map((pickupRows ?? []).map((p) => [p.id, p]));
+    setOrders(orderRows.map((order) => ({
+      ...order,
+      order_items: itemsByOrder.get(order.id) ?? [],
+      pickup_points: order.pickup_point_id ? (pickupMap.get(order.pickup_point_id) ?? null) : null,
+    })));
   };
-  useEffect(load, [user]);
+  useEffect(() => { void load(); }, [user]);
 
   useEffect(() => {
     if (!user) return;
