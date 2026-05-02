@@ -82,6 +82,17 @@ function OrdersPage() {
   };
   useEffect(load, [user]);
 
+  useEffect(() => {
+    if (!user) return;
+    const ordersCh = supabase.channel(`buyer-orders-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: `buyer_id=eq.${user.id}` }, load)
+      .subscribe();
+    const itemsCh = supabase.channel(`buyer-order-items-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "order_items" }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ordersCh); supabase.removeChannel(itemsCh); };
+  }, [user]);
+
   const cancel = async (id: string) => {
     if (!confirm(t("orders.cancelConfirm"))) return;
     const { error } = await supabase.from("orders").update({ status: "cancelled" }).eq("id", id);
