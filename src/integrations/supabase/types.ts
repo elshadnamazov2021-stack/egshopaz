@@ -1626,6 +1626,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_buyer_only: { Args: { _user_id: string }; Returns: boolean }
       register_pvz_staff: {
         Args: {
           _full_name: string
@@ -1633,7 +1634,7 @@ export type Database = {
           _new_pvz_city?: string
           _new_pvz_name?: string
           _phone: string
-          _pickup_point_id: string
+          _pickup_point_id?: string
           _position?: string
         }
         Returns: string
