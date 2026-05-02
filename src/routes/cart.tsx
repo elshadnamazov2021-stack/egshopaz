@@ -251,37 +251,41 @@ function CartPage() {
 
     // Promo used_count artır
     if (promoInfo?.code) {
-      await supabase.rpc("increment_promo_used_count" as never, { promo_code: promoInfo.code } as never).catch(() => {
-        // Fallback: manual increment
-        supabase.from("promo_codes")
+      const { error: rpcErr } = await supabase.rpc(
+        "increment_promo_used_count" as never,
+        { promo_code: promoInfo.code } as never
+      );
+      if (rpcErr) {
+        const { data } = await supabase
+          .from("promo_codes")
           .select("used_count")
           .eq("code", promoInfo.code)
-          .maybeSingle()
-          .then(({ data }) => {
-            if (data) {
-              supabase.from("promo_codes")
-                .update({ used_count: (data.used_count ?? 0) + 1 })
-                .eq("code", promoInfo.code);
-            }
-          });
-      });
+          .maybeSingle();
+        if (data) {
+          await supabase
+            .from("promo_codes")
+            .update({ used_count: (data.used_count ?? 0) + 1 })
+            .eq("code", promoInfo.code);
+        }
+      }
     }
 
     // Stoku azalt
     await Promise.all(
       items
         .filter((i) => i.products)
-        .map((i) =>
-          supabase.rpc("decrement_stock" as never, {
-            product_id: i.products!.id,
-            qty: i.quantity,
-          } as never).catch(() => {
-            // Fallback: manual update
-            supabase.from("products")
+        .map(async (i) => {
+          const { error: rpcErr } = await supabase.rpc(
+            "decrement_stock" as never,
+            { product_id: i.products!.id, qty: i.quantity } as never
+          );
+          if (rpcErr) {
+            await supabase
+              .from("products")
               .update({ stock: Math.max(0, (i.products!.stock ?? 0) - i.quantity) } as never)
               .eq("id", i.products!.id);
-          })
-        )
+          }
+        })
     );
 
     await supabase.from("cart_items").delete().eq("user_id", user.id);
