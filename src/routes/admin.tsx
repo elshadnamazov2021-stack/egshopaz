@@ -382,7 +382,7 @@ function AdminPanel() {
       {tab === "products" && <ProductsSection products={products} toggleProductActive={toggleProductActive} />}
       {tab === "shops" && <ShopsSection profiles={profiles} userRoles={userRoles} />}
       {tab === "warehouses" && <WarehousesSection warehouses={warehouses} addWarehouse={addWarehouse} />}
-      {tab === "pickup_points" && <PickupSection pickups={pickups} addPickup={addPickup} togglePickup={togglePickup} />}
+      {tab === "pickup_points" && <PickupSection pickups={pickups} addPickup={addPickup} togglePickup={togglePickup} editPickup={editPickup} deletePickup={deletePickup} />}
       {tab === "orders" && <OrdersSection orders={orders} updateOrderStatus={updateOrderStatus} />}
       {tab === "finance" && <FinanceSection stats={stats} orders={orders} settings={settings} />}
       {tab === "marketing" && <MarketingSection />}
