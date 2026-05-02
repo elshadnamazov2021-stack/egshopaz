@@ -170,10 +170,13 @@ function CartPage() {
   const total = subtotal;
   const bonusDiscount = bonusToUse * bonusToAzn;
   const promoDiscount = promoInfo?.discount ?? 0;
-  const FREE_SHIPPING_THRESHOLD = 50;
+  const HOME_FREE_THRESHOLD = 50;
   const HOME_SHIPPING_FEE = 5;
-  const shippingFee =
-    deliveryMethod === "home" && subtotal < FREE_SHIPPING_THRESHOLD ? HOME_SHIPPING_FEE : 0;
+  const PVZ_FREE_THRESHOLD = 30;
+  const PVZ_SHIPPING_FEE = 2;
+  const freeThreshold = deliveryMethod === "home" ? HOME_FREE_THRESHOLD : PVZ_FREE_THRESHOLD;
+  const baseFee = deliveryMethod === "home" ? HOME_SHIPPING_FEE : PVZ_SHIPPING_FEE;
+  const shippingFee = subtotal >= freeThreshold ? 0 : baseFee;
   const finalTotal = Math.max(0, subtotal - promoDiscount - bonusDiscount + shippingFee);
   const maxBonus = Math.min(bonusBalance, Math.floor(subtotal / bonusToAzn));
 
@@ -428,9 +431,9 @@ function CartPage() {
                 <span className="font-semibold text-success">{t("cart.free")}</span>
               )}
             </div>
-            {deliveryMethod === "home" && subtotal < FREE_SHIPPING_THRESHOLD && (
+            {shippingFee > 0 && (
               <div className="text-[11px] text-muted-foreground -mt-1">
-                {formatAZN(FREE_SHIPPING_THRESHOLD - subtotal)} daha alış-veriş edin və ev çatdırılması pulsuz olsun
+                {formatAZN(freeThreshold - subtotal)} daha alış-veriş edin və {deliveryMethod === "home" ? "ev" : "PVZ"} çatdırılması pulsuz olsun
               </div>
             )}
 
