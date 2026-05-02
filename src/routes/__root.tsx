@@ -1,11 +1,13 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useLocation, useNavigate } from "@tanstack/react-router";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { CategoryBar } from "@/components/CategoryBar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { MainSidebar } from "@/components/MainSidebar";
+import { LogOut, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import "@/i18n";
 
 import appCss from "../styles.css?url";
@@ -56,22 +58,71 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+function WorkHeader({ label }: { label: string }) {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  return (
+    <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
+      <div className="container mx-auto px-4 h-14 flex items-center gap-3">
+        <div className="font-extrabold text-primary tracking-tight">Elzan Shop · {label}</div>
+        <div className="ml-auto flex items-center gap-2">
+          {user && (
+            <span className="hidden sm:inline text-xs text-muted-foreground truncate max-w-[180px]">{user.email}</span>
+          )}
+          <Button variant="outline" size="sm" onClick={() => navigate({ to: "/" })}>
+            <ArrowLeft className="h-4 w-4 mr-1" /> Sayta qayıt
+          </Button>
+          {user && (
+            <Button variant="ghost" size="sm" onClick={async () => { await signOut(); navigate({ to: "/auth" }); }}>
+              <LogOut className="h-4 w-4 mr-1" /> Çıxış
+            </Button>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function AppShell() {
+  const { pathname } = useLocation();
+  const isSellerPanel = pathname === "/seller" || pathname.startsWith("/seller/");
+  const isPvzPanel = pathname === "/pvz" || pathname.startsWith("/pvz/");
+  const isAdminPanel = pathname === "/admin" || pathname.startsWith("/admin/");
+  const isWorkPanel = isSellerPanel || isPvzPanel || isAdminPanel;
+
+  if (isWorkPanel) {
+    const label = isSellerPanel ? "Satıcı paneli" : isPvzPanel ? "PVZ PUNKT paneli" : "Admin";
+    return (
+      <div className="min-h-screen flex flex-col bg-background w-full">
+        <WorkHeader label={label} />
+        <main className="flex-1">
+          <Outlet />
+        </main>
+      </div>
+    );
+  }
+
+  return (
+    <SidebarProvider defaultOpen={false}>
+      <div className="min-h-screen flex flex-col bg-background w-full">
+        <MainSidebar />
+        <div className="flex-1 flex flex-col min-w-0">
+          <SiteHeader />
+          <CategoryBar />
+          <main className="flex-1">
+            <Outlet />
+          </main>
+          <SiteFooter />
+        </div>
+      </div>
+    </SidebarProvider>
+  );
+}
+
 function RootComponent() {
   return (
     <AuthProvider>
-      <SidebarProvider defaultOpen={false}>
-        <div className="min-h-screen flex flex-col bg-background w-full">
-          <MainSidebar />
-          <div className="flex-1 flex flex-col min-w-0">
-            <SiteHeader />
-            <CategoryBar />
-            <main className="flex-1">
-              <Outlet />
-            </main>
-            <SiteFooter />
-          </div>
-        </div>
-      </SidebarProvider>
+      <AppShell />
       <Toaster position="top-center" richColors />
     </AuthProvider>
   );
