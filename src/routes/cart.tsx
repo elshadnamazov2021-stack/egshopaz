@@ -210,9 +210,11 @@ function CartPage() {
       shippingAddress = `🏠 Ev çatdırılması — ${homeCity.trim()}, ${homeAddress.trim()}${homeApartment.trim() ? `, mən./ev: ${homeApartment.trim()}` : ""}${homeNotes.trim() ? ` (Qeyd: ${homeNotes.trim()})` : ""}`;
     }
     setPlacing(true);
-    const { data: order, error } = await supabase
+    const orderId = crypto.randomUUID();
+    const { error } = await supabase
       .from("orders")
       .insert({
+        id: orderId,
         buyer_id: user.id,
         total: finalTotal,
         shipping_address: shippingAddress,
@@ -223,10 +225,8 @@ function CartPage() {
         promo_code: promoInfo?.code ?? null,
         discount: promoDiscount + bonusDiscount,
         bonus_used: bonusToUse,
-      } as never)
-      .select()
-      .single();
-    if (error || !order) {
+      } as never);
+    if (error) {
       toast.error(`Sifariş yaradıla bilmədi: ${error?.message ?? t("cart.orderError")}`);
       setPlacing(false);
       return;
@@ -235,7 +235,7 @@ function CartPage() {
     const orderItems = items
       .filter((i) => i.products)
       .map((i) => ({
-        order_id: order.id,
+        order_id: orderId,
         product_id: i.products!.id,
         seller_id: i.products!.seller_id,
         title: i.products!.title,
@@ -258,7 +258,7 @@ function CartPage() {
         user_id: user.id,
         amount: -bonusToUse,
         reason: t("cart.useBonus"),
-        order_id: order.id,
+        order_id: orderId,
       } as never);
       if (bonusError) {
         toast.error(`Bonus tətbiq olunmadı: ${bonusError.message}`);
