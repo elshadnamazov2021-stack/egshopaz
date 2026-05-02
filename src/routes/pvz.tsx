@@ -553,6 +553,110 @@ function Shift({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => void
   );
 }
 
+function AccountSec() {
+  const { user, signOut } = useAuth();
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [position, setPosition] = useState("operator");
+  const [pvzName, setPvzName] = useState("");
+  const [pvzCity, setPvzCity] = useState("");
+  const [pvzAddress, setPvzAddress] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [pwBusy, setPwBusy] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("profiles").select("full_name,phone").eq("id", user.id).maybeSingle()
+      .then(({ data }) => {
+        setFullName(data?.full_name ?? "");
+        setPhone(data?.phone ?? "");
+      });
+    supabase.from("pvz_staff").select("position,pickup_point_id").eq("phone", "").or(`phone.eq.${user.phone ?? ""}`)
+      .maybeSingle()
+      .then(async ({ data }) => {
+        if (data?.position) setPosition(data.position);
+        if (data?.pickup_point_id) {
+          const { data: pp } = await supabase.from("pickup_points")
+            .select("name,city,address").eq("id", data.pickup_point_id).maybeSingle();
+          setPvzName(pp?.name ?? "");
+          setPvzCity(pp?.city ?? "");
+          setPvzAddress(pp?.address ?? "");
+        }
+      });
+  }, [user]);
+
+  const save = async () => {
+    if (!user) return;
+    setSaving(true);
+    const { error } = await supabase.from("profiles").upsert({
+      id: user.id,
+      full_name: fullName.trim().slice(0, 100),
+      phone: phone.trim().slice(0, 30),
+    }, { onConflict: "id" });
+    setSaving(false);
+    if (error) toast.error("Yadda saxlanmadı");
+    else toast.success("Şəxsi məlumatlar yeniləndi");
+  };
+
+  const changePassword = async () => {
+    if (newPassword.length < 6) { toast.error("Şifrə minimum 6 simvol olmalıdır"); return; }
+    setPwBusy(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setPwBusy(false);
+    if (error) toast.error(error.message);
+    else { toast.success("Şifrə yeniləndi"); setNewPassword(""); }
+  };
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-extrabold flex items-center gap-2">
+        <UserCircle2 className="h-6 w-6 text-primary" /> PVZ PUNKT işçisinin şəxsi hesabı
+      </h1>
+      <p className="text-sm text-muted-foreground">
+        Bu səhifə yalnız PVZ PUNKT işçisinə aiddir — burada müştəri profili göstərilmir.
+      </p>
+
+      <div className="grid lg:grid-cols-2 gap-4">
+        <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
+          <div className="font-bold flex items-center gap-2"><UserCircle2 className="h-4 w-4" /> Şəxsi məlumatlar</div>
+          <div><Label>E-poçt</Label><Input value={user?.email ?? ""} disabled /></div>
+          <div><Label>Tam ad (Soyad Ad)</Label><Input value={fullName} onChange={(e) => setFullName(e.target.value)} /></div>
+          <div><Label>Telefon</Label><Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+994..." /></div>
+          <div><Label>Vəzifə</Label><Input value={position} disabled /></div>
+          <Button size="sm" onClick={save} disabled={saving}>{saving ? "..." : "Yadda saxla"}</Button>
+        </div>
+
+        <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
+          <div className="font-bold flex items-center gap-2"><Home className="h-4 w-4" /> İşlədiyi PVZ PUNKT</div>
+          <div><Label>PVZ PUNKT adı</Label><Input value={pvzName} disabled /></div>
+          <div><Label>Şəhər</Label><Input value={pvzCity} disabled /></div>
+          <div><Label>Ünvan</Label><Input value={pvzAddress} disabled /></div>
+          <p className="text-xs text-muted-foreground">PVZ PUNKT məlumatlarını dəyişmək üçün admin ilə əlaqə saxlayın.</p>
+        </div>
+
+        <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
+          <div className="font-bold flex items-center gap-2"><KeyRound className="h-4 w-4" /> Şifrəni dəyiş</div>
+          <div><Label>Yeni şifrə (min 6 simvol)</Label>
+            <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+          </div>
+          <Button size="sm" variant="outline" onClick={changePassword} disabled={pwBusy}>
+            {pwBusy ? "..." : "Şifrəni yenilə"}
+          </Button>
+        </div>
+
+        <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
+          <div className="font-bold flex items-center gap-2"><LogOut className="h-4 w-4" /> Hesabdan çıxış</div>
+          <p className="text-sm text-muted-foreground">Növbəni bağladıqdan sonra çıxış edin.</p>
+          <Button size="sm" variant="destructive" onClick={async () => { await signOut(); toast.success("Çıxış edildi"); }}>
+            Çıxış et
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SettingsSec() {
   return (
     <div className="space-y-4">
