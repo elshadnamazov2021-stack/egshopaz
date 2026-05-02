@@ -170,10 +170,13 @@ function CartPage() {
   const total = subtotal;
   const bonusDiscount = bonusToUse * bonusToAzn;
   const promoDiscount = promoInfo?.discount ?? 0;
-  const FREE_SHIPPING_THRESHOLD = 50;
+  const HOME_FREE_THRESHOLD = 50;
   const HOME_SHIPPING_FEE = 5;
-  const shippingFee =
-    deliveryMethod === "home" && subtotal < FREE_SHIPPING_THRESHOLD ? HOME_SHIPPING_FEE : 0;
+  const PVZ_FREE_THRESHOLD = 30;
+  const PVZ_SHIPPING_FEE = 2;
+  const freeThreshold = deliveryMethod === "home" ? HOME_FREE_THRESHOLD : PVZ_FREE_THRESHOLD;
+  const baseFee = deliveryMethod === "home" ? HOME_SHIPPING_FEE : PVZ_SHIPPING_FEE;
+  const shippingFee = subtotal >= freeThreshold ? 0 : baseFee;
   const finalTotal = Math.max(0, subtotal - promoDiscount - bonusDiscount + shippingFee);
   const maxBonus = Math.min(bonusBalance, Math.floor(subtotal / bonusToAzn));
 
