@@ -288,17 +288,18 @@ function AuthPage() {
           Hesab növünü seçin
         </p>
 
-        <div className="mb-5 grid grid-cols-3 gap-2">
+        <div className="mb-5 grid grid-cols-4 gap-2">
           {([
             { key: "buyer", label: "Müştəri", Icon: ShoppingBag },
             { key: "seller", label: "Satıcı", Icon: Store },
             { key: "pvz", label: "PVZ PUNKT", Icon: Building2 },
+            { key: "admin", label: "Admin", Icon: Shield },
           ] as const).map(({ key, label, Icon }) => (
             <button
               key={key}
               type="button"
-              onClick={() => setRole(key)}
-              className={`flex flex-col items-center gap-1 rounded-xl border px-2 py-3 text-xs font-bold transition ${
+              onClick={() => { setRole(key); if (key === "admin") setMode("login"); }}
+              className={`flex flex-col items-center gap-1 rounded-xl border px-1.5 py-3 text-[11px] font-bold transition ${
                 role === key
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border bg-background text-muted-foreground hover:border-primary/50"
