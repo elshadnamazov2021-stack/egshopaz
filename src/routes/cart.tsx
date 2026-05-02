@@ -22,7 +22,7 @@ interface CartRow {
 
 function CartPage() {
   const { t } = useTranslation();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, isSeller, isPvz } = useAuth();
   const navigate = useNavigate();
   const [items, setItems] = useState<CartRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,6 +51,12 @@ function CartPage() {
   };
 
   useEffect(() => { if (user) load(); else if (!authLoading) setLoading(false); }, [user, authLoading]);
+
+  useEffect(() => {
+    if (authLoading || !user) return;
+    if (isPvz) navigate({ to: "/pvz" });
+    else if (isSeller) navigate({ to: "/seller" });
+  }, [authLoading, user, isPvz, isSeller, navigate]);
 
   const applyPromo = async () => {
     const code = promo.trim().toUpperCase();
@@ -88,6 +94,7 @@ function CartPage() {
 
   const checkout = async () => {
     if (!user || items.length === 0) return;
+    if (isSeller || isPvz) { toast.error("Satıcı və PVZ PUNKT hesabları sifariş verə bilməz."); return; }
     if (!address.trim()) { toast.error(t("cart.addressRequired")); return; }
     setPlacing(true);
     const { data: order, error } = await supabase.from("orders").insert({
@@ -137,6 +144,8 @@ function CartPage() {
       </div>
     );
   }
+
+  if (user && (isSeller || isPvz)) return null;
 
   return (
     <div className="container mx-auto px-4 py-6">
