@@ -245,6 +245,20 @@ function OrdersPage() {
           pickupPointId={trackOrder.pickup_point_id}
         />
       )}
+
+      {returnItem && (
+        <ReturnRequestDialog
+          open={!!returnItem}
+          onOpenChange={(v) => !v && setReturnItem(null)}
+          orderItemId={returnItem.item.id}
+          orderId={returnItem.orderId}
+          buyerId={user.id}
+          sellerId={returnItem.item.seller_id}
+          productTitle={returnItem.item.title}
+          deliveredAt={returnItem.item.delivered_at}
+          onDone={load}
+        />
+      )}
     </PanelLayout>
   );
 }
