@@ -36,6 +36,7 @@ import {
   UserCircle2,
   KeyRound,
   LogOut,
+  type LucideIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -270,7 +271,7 @@ function StatCard({
   value,
   accent,
 }: {
-  icon: any;
+  icon: LucideIcon;
   label: string;
   value: string;
   accent?: string;
@@ -1075,7 +1076,7 @@ function AccountSec() {
       setPhone(prof?.phone ?? "");
 
       // Reliable lookup only by user_id so another phone-matched PVZ address never appears
-      let staff = (
+      const staff = (
         await supabase
           .from("pvz_staff")
           .select("position,pickup_point_id")
