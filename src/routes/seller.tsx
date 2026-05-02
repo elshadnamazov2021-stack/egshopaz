@@ -35,6 +35,10 @@ interface OrderItem {
   id: string; title: string; price: number; quantity: number;
   image_url: string | null; order_id: string; status: string; product_id: string;
   pickup_code: string | null;
+  customer_name: string | null;
+  customer_phone: string | null;
+  accepted_at: string | null;
+  delivered_at: string | null;
   pickup_point_id: string | null;
   pickup_point: { id: string; name: string; city: string; address: string; point_number: number | null; phone: string | null; working_hours: string } | null;
 }
@@ -91,7 +95,11 @@ function SellerPanel() {
     const [{ data: ps }, { data: cs }, { data: ois }, { data: pr }] = await Promise.all([
       supabase.from("products").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("categories").select("id,name").order("sort_order"),
-      supabase.from("order_items").select("*,pickup_point:pickup_points(id,name,city,address,point_number,phone,working_hours)").eq("seller_id", user.id).order("id", { ascending: false }).limit(100),
+      supabase.from("order_items")
+        .select("id,title,price,quantity,image_url,order_id,status,product_id,pickup_code,customer_name,customer_phone,accepted_at,delivered_at,pickup_point_id,pickup_point:pickup_points(id,name,city,address,point_number,phone,working_hours)")
+        .eq("seller_id", user.id)
+        .order("id", { ascending: false })
+        .limit(100),
       supabase.from("profiles").select("full_name,shop_name,phone,avatar_url,shop_description,shop_logo_url,shop_banner_url,shop_address,shop_city,shop_email").eq("id", user.id).maybeSingle(),
     ]);
     setProducts((ps ?? []) as unknown as Product[]);
@@ -104,6 +112,14 @@ function SellerPanel() {
     });
   };
   useEffect(() => { if (user && isSeller) load(); }, [user, isSeller]);
+
+  useEffect(() => {
+    if (!user || !isSeller) return;
+    const ch = supabase.channel(`seller-orders-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "order_items", filter: `seller_id=eq.${user.id}` }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user, isSeller]);
 
   // Unread messages counter (with realtime)
   useEffect(() => {
@@ -240,8 +256,12 @@ function SellerPanel() {
     load();
   };
 
-  const updateOrderStatus = async (id: string, status: string) => {
-    const { error } = await supabase.from("order_items").update({ status }).eq("id", id);
+  const updateOrderStatus = async (item: OrderItem, status: string) => {
+    if (item.accepted_at || item.delivered_at) {
+      toast.error("PVZ qəbulundan sonra statusu yalnız PVZ dəyişə bilər");
+      return;
+    }
+    const { error } = await supabase.from("order_items").update({ status }).eq("id", item.id);
     if (error) toast.error(error.message);
     else { toast.success("Status yeniləndi"); load(); }
   };
@@ -474,6 +494,7 @@ function SellerPanel() {
           ) : orderItems.map((i) => {
             const st = ORDER_STATUSES.find((s) => s.v === i.status) ?? ORDER_STATUSES[0];
             const canPack = i.status === "pending" || i.status === "processing";
+            const canShip = !i.accepted_at && !i.delivered_at && (i.status === "pending" || i.status === "processing" || i.status === "packed");
             return (
               <div key={i.id} className="bg-card border border-border rounded-xl p-4 space-y-3">
                 <div className="flex flex-wrap items-center gap-3">
@@ -483,18 +504,34 @@ function SellerPanel() {
                   <div className="flex-1 min-w-[180px]">
                     <div className="font-semibold line-clamp-1">{i.title}</div>
                     <div className="text-xs text-muted-foreground">№ {i.order_id.slice(0, 8).toUpperCase()} · {i.quantity} ədəd · Kod: <b className="font-mono">{i.pickup_code ?? "—"}</b></div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      Müştəri: {i.customer_name ?? "—"}{i.customer_phone ? ` · ${i.customer_phone}` : ""}
+                    </div>
+                    {i.delivered_at ? (
+                      <div className="text-[10px] text-success font-bold mt-1">PVZ müştəriyə təhvil verib</div>
+                    ) : i.accepted_at ? (
+                      <div className="text-[10px] text-primary font-bold mt-1">PVZ paketi qəbul edib</div>
+                    ) : null}
                   </div>
                   <div className="font-extrabold whitespace-nowrap">{formatAZN(Number(i.price) * i.quantity)}</div>
-                  <select value={i.status} onChange={(e) => updateOrderStatus(i.id, e.target.value)}
-                          className={`text-xs px-3 py-2 rounded-lg font-semibold border-0 ${st.c} cursor-pointer`}>
+                  <select value={i.status} onChange={(e) => updateOrderStatus(i, e.target.value)}
+                          disabled={!!i.accepted_at || !!i.delivered_at}
+                          className={`text-xs px-3 py-2 rounded-lg font-semibold border-0 ${st.c} cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed`}>
                     {ORDER_STATUSES.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}
                   </select>
                   <div className="flex gap-1">
                     {canPack && (
-                      <button onClick={() => updateOrderStatus(i.id, "packed")}
+                      <button onClick={() => updateOrderStatus(i, "packed")}
                               className="px-3 py-2 rounded-lg bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white text-xs font-bold inline-flex items-center gap-1"
                               title="Paketləndi olaraq qeyd et">
                         <Package className="h-3.5 w-3.5" /> Paketlə
+                      </button>
+                    )}
+                    {canShip && (
+                      <button onClick={() => updateOrderStatus(i, "shipped")}
+                              className="px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground text-xs font-bold inline-flex items-center gap-1"
+                              title="PVZ-yə göndərildi olaraq qeyd et">
+                        <ShoppingBag className="h-3.5 w-3.5" /> Göndərildi
                       </button>
                     )}
                     <button onClick={() => printShippingLabel(i)}

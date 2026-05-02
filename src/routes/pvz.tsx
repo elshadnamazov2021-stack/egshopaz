@@ -227,7 +227,13 @@ function Intake({ scan, setScan }: { scan: string; setScan: (v: string) => void 
       .limit(50)
       .then(({ data }) => setPending((data ?? []) as unknown as DBOrderItem[]));
   };
-  useEffect(load, []);
+  useEffect(() => {
+    load();
+    const ch = supabase.channel("pvz-intake-items")
+      .on("postgres_changes", { event: "*", schema: "public", table: "order_items" }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
 
   const acceptByCode = async (code: string) => {
     setBusy(true);
@@ -318,11 +324,19 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
       .limit(100)
       .then(({ data }) => setList((data ?? []) as unknown as DBOrderItem[]));
   };
-  useEffect(load, []);
+  useEffect(() => {
+    load();
+    const ch = supabase.channel("pvz-delivery-items")
+      .on("postgres_changes", { event: "*", schema: "public", table: "order_items" }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
 
   const deliverByCode = async (code: string) => {
     setBusy(true);
-    const item = await findItemByCode(code);
+    const q = code.trim();
+    const fromList = list.find((o) => o.pickup_code === q.toUpperCase() || o.orders?.recipient_phone?.includes(q));
+    const item = fromList ?? await findItemByCode(code);
     if (!item) { toast.error("Bu kod tapılmadı"); setBusy(false); return; }
     if (!item.accepted_at) { toast.error("Bu məhsul hələ PVZ-yə qəbul edilməyib"); setBusy(false); return; }
     if (item.delivered_at) { toast.info("Artıq təhvil verilib"); setBusy(false); return; }
