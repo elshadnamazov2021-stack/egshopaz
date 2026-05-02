@@ -6,11 +6,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { formatAZN } from "@/lib/format";
-import { Package, MapPin, X, MessageCircle, Send, QrCode, Map as MapIcon } from "lucide-react";
+import { Package, MapPin, X, MessageCircle, Send, QrCode, Map as MapIcon, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { OrderTimeline } from "@/components/OrderTimeline";
 import { OrderQRDialog } from "@/components/OrderQRDialog";
 import { OrderTrackDialog } from "@/components/OrderTrackDialog";
+import { ReturnRequestDialog } from "@/components/ReturnRequestDialog";
 
 export const Route = createFileRoute("/orders")({
   head: () => ({ meta: [{ title: "Sifarişlərim — Elzan Shop" }] }),
