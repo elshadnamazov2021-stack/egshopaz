@@ -61,16 +61,31 @@ function PvzPanel() {
   const [shiftOpen, setShiftOpen] = useState(false);
   const [scan, setScan] = useState("");
   const [search, setSearch] = useState("");
+  const [pvzUnread, setPvzUnread] = useState(0);
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/auth" });
     if (!authLoading && user && !isPvz) navigate({ to: "/" });
   }, [user, isPvz, authLoading, navigate]);
 
+  useEffect(() => {
+    if (!user || !isPvz) return;
+    const refreshUnread = () => {
+      supabase.from("pvz_notifications").select("id", { count: "exact", head: true }).eq("is_read", false)
+        .then(({ count }) => setPvzUnread(count ?? 0));
+    };
+    refreshUnread();
+    const ch = supabase.channel(`pvz-unread-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "pvz_notifications" }, refreshUnread)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user, isPvz]);
+
   if (!user || !isPvz) return null;
 
   const items: PanelNavItem[] = [
     { key: "dashboard", label: t("pvz.dashboard"), icon: Home, active: tab === "dashboard", onClick: () => setTab("dashboard") },
+    { key: "notifications", label: "Bildirişlər", icon: Bell, badge: pvzUnread, active: tab === "dashboard", onClick: () => setTab("dashboard") },
     { key: "intake", label: t("pvz.intake"), icon: PackageOpen, active: tab === "intake", onClick: () => setTab("intake"), badge: mockExpected.length },
     { key: "delivery", label: t("pvz.delivery"), icon: ShoppingBag, active: tab === "delivery", onClick: () => setTab("delivery"), badge: mockPending.length },
     { key: "returns", label: t("pvz.returns"), icon: Undo2, active: tab === "returns", onClick: () => setTab("returns") },
