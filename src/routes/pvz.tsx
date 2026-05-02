@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { QRScannerDialog } from "@/components/QRScannerDialog";
 import { PvzOrderChat } from "@/components/PvzOrderChat";
@@ -55,10 +55,19 @@ const mockStorage = [
 
 function PvzPanel() {
   const { t } = useTranslation();
+  const { user, isPvz, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [tab, setTab] = useState<TabKey>("dashboard");
   const [shiftOpen, setShiftOpen] = useState(false);
   const [scan, setScan] = useState("");
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    if (!authLoading && !user) navigate({ to: "/auth" });
+    if (!authLoading && user && !isPvz) navigate({ to: "/" });
+  }, [user, isPvz, authLoading, navigate]);
+
+  if (!user || !isPvz) return null;
 
   const items: PanelNavItem[] = [
     { key: "dashboard", label: t("pvz.dashboard"), icon: Home, active: tab === "dashboard", onClick: () => setTab("dashboard") },
@@ -619,7 +628,7 @@ function AccountSec() {
         <UserCircle2 className="h-6 w-6 text-primary" /> PVZ PUNKT işçisinin şəxsi hesabı
       </h1>
       <p className="text-sm text-muted-foreground">
-        Bu səhifə yalnız PVZ PUNKT işçisinə aiddir — burada müştəri profili göstərilmir.
+        Qeydiyyatda hansı PVZ PUNKT ünvanı yazılıbsa, burada həmin ünvan göstərilir.
       </p>
 
       <div className="grid lg:grid-cols-2 gap-4">
