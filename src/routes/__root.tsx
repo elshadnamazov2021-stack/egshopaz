@@ -82,7 +82,6 @@ function WorkHeader({ label }: { label: string }) {
 
 function AppShell() {
   const { pathname } = useLocation();
-  const { user } = useAuth();
   const isSellerPanel = pathname === "/seller" || pathname.startsWith("/seller/");
   const isPvzPanel = pathname === "/pvz" || pathname.startsWith("/pvz/");
   const isAdminPanel = pathname === "/admin" || pathname.startsWith("/admin/");
