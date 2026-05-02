@@ -27,7 +27,9 @@ function CartPage() {
   const [items, setItems] = useState<CartRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [placing, setPlacing] = useState(false);
-  const [address, setAddress] = useState("");
+  const [pvzList, setPvzList] = useState<{ id: string; name: string; city: string; address: string; point_number: number | null; phone: string | null; working_hours: string }[]>([]);
+  const [pvzId, setPvzId] = useState<string>("");
+  const [pvzSearch, setPvzSearch] = useState("");
   const [promo, setPromo] = useState("");
   const [promoInfo, setPromoInfo] = useState<{ code: string; discount: number } | null>(null);
   const [bonusBalance, setBonusBalance] = useState(0);
