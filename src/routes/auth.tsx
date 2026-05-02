@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ShoppingBag, Store, Building2, Eye, EyeOff } from "lucide-react";
+import { ShoppingBag, Store, Building2, Eye, EyeOff, Shield } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
@@ -18,9 +18,9 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-type RoleTab = "buyer" | "seller" | "pvz";
+type RoleTab = "buyer" | "seller" | "pvz" | "admin";
 
-const TERMS_TEXT: Record<RoleTab, { title: string; body: string }> = {
+const TERMS_TEXT: Record<Exclude<RoleTab, "admin">, { title: string; body: string }> = {
   buyer: {
     title: "Müştəri istifadəçi razılaşması",
     body: `Elzan Shop platformasından istifadə etməklə Siz aşağıdakı şərtləri qeyd-şərtsiz qəbul edirsiniz:
@@ -173,10 +173,16 @@ function AuthPage() {
         toast.error("Bu hesab PVZ PUNKT işçisi kimi qeydiyyatdan keçməyib.");
         return;
       }
+      if (role === "admin" && !roles.includes("admin")) {
+        await supabase.auth.signOut();
+        setBusy(false);
+        toast.error("Bu hesab admin deyil.");
+        return;
+      }
 
       setBusy(false);
       toast.success("Xoş gəldiniz!");
-      const dest = role === "seller" ? "/seller" : role === "pvz" ? "/pvz" : "/";
+      const dest = role === "seller" ? "/seller" : role === "pvz" ? "/pvz" : role === "admin" ? "/admin" : "/";
       navigate({ to: dest });
       return;
     }
@@ -288,17 +294,18 @@ function AuthPage() {
           Hesab növünü seçin
         </p>
 
-        <div className="mb-5 grid grid-cols-3 gap-2">
+        <div className="mb-5 grid grid-cols-4 gap-2">
           {([
             { key: "buyer", label: "Müştəri", Icon: ShoppingBag },
             { key: "seller", label: "Satıcı", Icon: Store },
             { key: "pvz", label: "PVZ PUNKT", Icon: Building2 },
+            { key: "admin", label: "Admin", Icon: Shield },
           ] as const).map(({ key, label, Icon }) => (
             <button
               key={key}
               type="button"
-              onClick={() => setRole(key)}
-              className={`flex flex-col items-center gap-1 rounded-xl border px-2 py-3 text-xs font-bold transition ${
+              onClick={() => { setRole(key); if (key === "admin") setMode("login"); }}
+              className={`flex flex-col items-center gap-1 rounded-xl border px-1.5 py-3 text-[11px] font-bold transition ${
                 role === key
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border bg-background text-muted-foreground hover:border-primary/50"
@@ -393,7 +400,7 @@ function AuthPage() {
             </>
           )}
 
-          {mode === "signup" && (
+          {mode === "signup" && role !== "admin" && (
             <label className="flex items-start gap-2 text-sm text-muted-foreground pt-1">
               <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)}
                 className="mt-1 h-4 w-4 accent-primary" />
@@ -401,13 +408,13 @@ function AuthPage() {
                 <Dialog>
                   <DialogTrigger asChild>
                     <button type="button" className="text-primary underline underline-offset-2 hover:opacity-80">
-                      {TERMS_TEXT[role].title}
+                      {TERMS_TEXT[role as Exclude<RoleTab, "admin">].title}
                     </button>
                   </DialogTrigger>
                   <DialogContent className="max-w-xl">
-                    <DialogHeader><DialogTitle>{TERMS_TEXT[role].title}</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle>{TERMS_TEXT[role as Exclude<RoleTab, "admin">].title}</DialogTitle></DialogHeader>
                     <ScrollArea className="max-h-[60vh] pr-4">
-                      <p className="text-sm whitespace-pre-line leading-relaxed">{TERMS_TEXT[role].body}</p>
+                      <p className="text-sm whitespace-pre-line leading-relaxed">{TERMS_TEXT[role as Exclude<RoleTab, "admin">].body}</p>
                     </ScrollArea>
                   </DialogContent>
                 </Dialog>
@@ -431,10 +438,12 @@ function AuthPage() {
           </button>
         )}
 
-        <button onClick={() => setMode(mode === "login" ? "signup" : "login")}
-          className="mt-4 w-full text-sm text-muted-foreground hover:text-primary">
-          {mode === "login" ? "Hesabınız yoxdur? Qeydiyyat" : "Artıq hesabınız var? Daxil olun"}
-        </button>
+        {role !== "admin" && (
+          <button onClick={() => setMode(mode === "login" ? "signup" : "login")}
+            className="mt-4 w-full text-sm text-muted-foreground hover:text-primary">
+            {mode === "login" ? "Hesabınız yoxdur? Qeydiyyat" : "Artıq hesabınız var? Daxil olun"}
+          </button>
+        )}
       </div>
 
       <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
