@@ -118,6 +118,8 @@ function CartPage() {
       total: finalTotal,
       shipping_address: shippingAddress,
       pickup_point_id: pvzId,
+      recipient_name: user.user_metadata?.full_name ?? user.email ?? null,
+      recipient_phone: user.user_metadata?.phone ?? null,
       status: "pending",
       promo_code: promoInfo?.code ?? null,
       discount: promoDiscount + bonusDiscount,
@@ -143,13 +145,15 @@ function CartPage() {
     }
 
     if (bonusToUse > 0) {
-      await supabase.from("bonus_transactions").insert({
+      const { error: bonusError } = await supabase.from("bonus_transactions").insert({
         user_id: user.id, amount: -bonusToUse, reason: t("cart.useBonus"), order_id: order.id,
       } as never);
+      if (bonusError) {
+        toast.error(`Bonus tətbiq olunmadı: ${bonusError.message}`);
+        setPlacing(false);
+        return;
+      }
       await supabase.from("profiles").update({ bonus_balance: bonusBalance - bonusToUse }).eq("id", user.id);
-    }
-    if (promoInfo) {
-      await supabase.rpc("noop" as never).then(() => {});
     }
 
     await supabase.from("cart_items").delete().eq("user_id", user.id);
