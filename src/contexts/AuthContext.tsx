@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
 
-type Role = "admin" | "seller" | "buyer";
+type Role = "admin" | "seller" | "buyer" | "pvz";
 
 interface AuthCtx {
   session: Session | null;
@@ -11,6 +11,7 @@ interface AuthCtx {
   loading: boolean;
   isSeller: boolean;
   isAdmin: boolean;
+  isPvz: boolean;
   signOut: () => Promise<void>;
   refreshRoles: () => Promise<void>;
 }
@@ -65,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       session, user, roles, loading,
       isSeller: roles.includes("seller"),
       isAdmin: roles.includes("admin"),
+      isPvz: roles.includes("pvz"),
       signOut, refreshRoles,
     }}>
       {children}
