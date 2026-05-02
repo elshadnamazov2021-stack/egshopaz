@@ -4,12 +4,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import {
   User as UserIcon, Package, MapPin, CreditCard, Star,
-  Gift, Bell, MessageCircle, Coins, Store, AlertTriangle,
+  Gift, Bell, MessageCircle, Coins, AlertTriangle,
 } from "lucide-react";
 import type { PanelNavItem } from "@/components/PanelLayout";
 
 export function useBuyerNav(): { items: PanelNavItem[]; bonusBalance: number } {
-  const { user, isSeller } = useAuth();
+  const { user } = useAuth();
   const { t } = useTranslation();
   const [orderCount, setOrderCount] = useState(0);
   const [bonusBalance, setBonusBalance] = useState(0);
@@ -50,7 +50,6 @@ export function useBuyerNav(): { items: PanelNavItem[]; bonusBalance: number } {
     { to: "/notifications", label: t("sidebar.notifications"), icon: Bell },
     { to: "/disputes", label: t("sidebar.disputes"), icon: AlertTriangle },
     { to: "/support", label: t("sidebar.support"), icon: MessageCircle, badge: openTickets },
-    ...(!isSeller ? [{ to: "/become-seller", label: t("sidebar.openShop"), icon: Store }] : []),
   ];
 
   return { items, bonusBalance };
