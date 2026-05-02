@@ -593,6 +593,8 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
   const [busy, setBusy] = useState(false);
   const [confirmItem, setConfirmItem] = useState<DBOrderItem | null>(null);
   const [step, setStep] = useState<ConfirmStep>("found");
+  const [scannedItem, setScannedItem] = useState<DBOrderItem | null>(null);
+  const [scanLookup, setScanLookup] = useState(false);
 
   const load = () => {
     supabase
@@ -639,6 +641,16 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
     }
     setConfirmItem(item);
     setStep("found");
+  };
+
+  const previewScan = async (value: string) => {
+    const code = value.trim();
+    if (!code) return;
+    setScannedItem(null);
+    setScanLookup(true);
+    const item = await findItemByCode(code);
+    setScannedItem(item);
+    setScanLookup(false);
   };
 
   const confirmDeliver = async () => {
@@ -698,40 +710,99 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
 
       <QRScannerDialog
         open={scannerOpen}
-        onOpenChange={setScannerOpen}
+        onOpenChange={(open) => {
+          setScannerOpen(open);
+          if (!open) setScannedItem(null);
+        }}
         title="Müştəri QR skan"
+        acceptLabel="Anbarda axtar"
+        onResult={(value) => {
+          setSearch(value);
+          void previewScan(value);
+        }}
+        resultDetails={(value) => {
+          const item = scannedItem?.pickup_code === value.trim().toUpperCase() ? scannedItem : null;
+          return (
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-left text-xs space-y-1">
+              {scanLookup ? (
+                <div className="text-muted-foreground">Müştəri məlumatları yüklənir...</div>
+              ) : item ? (
+                <>
+                  <div className="text-[10px] uppercase font-semibold text-muted-foreground">
+                    Müştəri məlumatları
+                  </div>
+                  <div className="font-bold text-foreground">
+                    👤 {item.orders?.recipient_name ?? "—"}
+                  </div>
+                  <div className="text-muted-foreground">
+                    📞 {item.orders?.recipient_phone ?? "—"}
+                  </div>
+                  <div className="pt-1 border-t border-primary/20 text-foreground font-semibold line-clamp-2">
+                    📦 {item.title}
+                  </div>
+                  <div className="font-mono text-primary font-bold">Kod: {item.pickup_code}</div>
+                </>
+              ) : (
+                <div className="text-destructive font-semibold">Bu koda uyğun məhsul tapılmadı</div>
+              )}
+            </div>
+          );
+        }}
         onScan={(value) => {
           setSearch(value);
-          openConfirm(value);
+          void openConfirm(value);
         }}
       />
 
       {confirmItem && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => !busy && setConfirmItem(null)}>
-          <div className="bg-card rounded-2xl p-5 w-full max-w-md space-y-4" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+          onClick={() => !busy && setConfirmItem(null)}
+        >
+          <div
+            className="bg-card rounded-2xl p-5 w-full max-w-md space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-lg flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-primary" /> Təhvil təsdiqi
               </h3>
-              <button onClick={() => !busy && setConfirmItem(null)} className="text-muted-foreground hover:text-foreground"><XCircle className="h-5 w-5" /></button>
+              <button
+                onClick={() => !busy && setConfirmItem(null)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <XCircle className="h-5 w-5" />
+              </button>
             </div>
 
             <div className="bg-primary/5 border border-primary/30 rounded-xl p-3 space-y-1">
-              <div className="text-[11px] uppercase text-muted-foreground font-semibold">Müştəri</div>
+              <div className="text-[11px] uppercase text-muted-foreground font-semibold">
+                Müştəri
+              </div>
               <div className="font-bold">👤 {confirmItem.orders?.recipient_name ?? "—"}</div>
-              <div className="text-sm text-muted-foreground">📞 {confirmItem.orders?.recipient_phone ?? "—"}</div>
+              <div className="text-sm text-muted-foreground">
+                📞 {confirmItem.orders?.recipient_phone ?? "—"}
+              </div>
             </div>
 
             <div className="bg-secondary/60 rounded-xl p-3 space-y-1">
-              <div className="text-[11px] uppercase text-muted-foreground font-semibold">Məhsul</div>
+              <div className="text-[11px] uppercase text-muted-foreground font-semibold">
+                Məhsul
+              </div>
               <div className="font-semibold line-clamp-2">{confirmItem.title}</div>
-              <div className="text-xs text-muted-foreground">Say: {confirmItem.quantity} · {formatAZN(confirmItem.price * confirmItem.quantity)}</div>
-              <div className="font-mono text-sm font-bold text-primary mt-1">Kod: {confirmItem.pickup_code}</div>
+              <div className="text-xs text-muted-foreground">
+                Say: {confirmItem.quantity} · {formatAZN(confirmItem.price * confirmItem.quantity)}
+              </div>
+              <div className="font-mono text-sm font-bold text-primary mt-1">
+                Kod: {confirmItem.pickup_code}
+              </div>
             </div>
 
             {step === "found" && (
               <>
-                <p className="text-sm text-muted-foreground">1️⃣ Bu məhsulu anbardan tapın və müştəri ilə yoxlayın.</p>
+                <p className="text-sm text-muted-foreground">
+                  1️⃣ Bu məhsulu anbardan tapın və müştəri ilə yoxlayın.
+                </p>
                 <Button className="w-full" onClick={() => setStep("ready")}>
                   <PackageOpen className="h-4 w-4 mr-2" /> Anbardan tapdım
                 </Button>
@@ -740,11 +811,15 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
 
             {step === "ready" && (
               <>
-                <p className="text-sm text-success font-semibold">✓ Məhsul hazırdır. İndi müştəriyə təhvil verin.</p>
+                <p className="text-sm text-success font-semibold">
+                  ✓ Məhsul hazırdır. İndi müştəriyə təhvil verin.
+                </p>
                 <Button className="w-full" disabled={busy} onClick={confirmDeliver}>
                   <CheckCircle2 className="h-4 w-4 mr-2" /> {busy ? "..." : "Təhvil verildi"}
                 </Button>
-                <Button variant="outline" className="w-full" onClick={() => setStep("found")}>Geri</Button>
+                <Button variant="outline" className="w-full" onClick={() => setStep("found")}>
+                  Geri
+                </Button>
               </>
             )}
           </div>
