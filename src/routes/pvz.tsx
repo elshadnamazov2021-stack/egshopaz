@@ -570,13 +570,16 @@ function AccountSec() {
     (async () => {
       const { data: prof } = await supabase.from("profiles")
         .select("full_name,phone").eq("id", user.id).maybeSingle();
-      const fn = prof?.full_name ?? "";
-      const ph = prof?.phone ?? "";
-      setFullName(fn);
-      setPhone(ph);
-      if (!ph) return;
-      const { data: staff } = await supabase.from("pvz_staff")
-        .select("position,pickup_point_id").eq("phone", ph).maybeSingle();
+      setFullName(prof?.full_name ?? "");
+      setPhone(prof?.phone ?? "");
+
+      // Reliable lookup by user_id; fallback to phone for legacy rows
+      let staff = (await supabase.from("pvz_staff")
+        .select("position,pickup_point_id").eq("user_id", user.id).maybeSingle()).data;
+      if (!staff && prof?.phone) {
+        staff = (await supabase.from("pvz_staff")
+          .select("position,pickup_point_id").eq("phone", prof.phone).maybeSingle()).data;
+      }
       if (staff?.position) setPosition(staff.position);
       if (staff?.pickup_point_id) {
         const { data: pp } = await supabase.from("pickup_points")
