@@ -438,10 +438,12 @@ function AuthPage() {
           </button>
         )}
 
-        <button onClick={() => setMode(mode === "login" ? "signup" : "login")}
-          className="mt-4 w-full text-sm text-muted-foreground hover:text-primary">
-          {mode === "login" ? "Hesabınız yoxdur? Qeydiyyat" : "Artıq hesabınız var? Daxil olun"}
-        </button>
+        {role !== "admin" && (
+          <button onClick={() => setMode(mode === "login" ? "signup" : "login")}
+            className="mt-4 w-full text-sm text-muted-foreground hover:text-primary">
+            {mode === "login" ? "Hesabınız yoxdur? Qeydiyyat" : "Artıq hesabınız var? Daxil olun"}
+          </button>
+        )}
       </div>
 
       <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
