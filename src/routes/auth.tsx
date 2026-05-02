@@ -304,11 +304,24 @@ function AuthPage() {
           {mode === "signup" && role === "pvz" && (
             <>
               <select value={pickupPointId} onChange={(e) => setPickupPointId(e.target.value)} className={inputCls}>
-                <option value="">— PVZ nöqtəsini seçin —</option>
+                <option value="">+ Yeni PVZ PUNKT yarat</option>
                 {pvzList.map((p) => (
                   <option key={p.id} value={p.id}>{p.city} — {p.name}</option>
                 ))}
               </select>
+
+              {!pickupPointId && (
+                <div className="space-y-2 p-3 rounded-lg border border-dashed border-primary/40 bg-primary/5">
+                  <div className="text-xs font-semibold text-primary">Yeni PVZ PUNKT məlumatları</div>
+                  <input value={newPvzName} onChange={(e) => setNewPvzName(e.target.value)}
+                    placeholder="PVZ PUNKT adı (məs. Mərkəz-1)" maxLength={80} className={inputCls} />
+                  <input value={newPvzCity} onChange={(e) => setNewPvzCity(e.target.value)}
+                    placeholder="Şəhər (məs. Bakı)" maxLength={50} className={inputCls} />
+                  <input value={newPvzAddress} onChange={(e) => setNewPvzAddress(e.target.value)}
+                    placeholder="Tam ünvan (küçə, bina, mənzil)" maxLength={200} className={inputCls} />
+                </div>
+              )}
+
               <select value={position} onChange={(e) => setPosition(e.target.value)} className={inputCls}>
                 <option value="operator">Operator</option>
                 <option value="manager">Menecer</option>
