@@ -17,7 +17,7 @@ interface Props {
   mode?: "buyer" | "seller";
 }
 
-export function OrderQRDialog({ open, onOpenChange, pickupCode, title, subtitle, pvzName, pvzAddress, mode = "buyer" }: Props) {
+export function OrderQRDialog({ open, onOpenChange, pickupCode, title, subtitle, pvzName, pvzAddress, customerName, customerPhone, mode = "buyer" }: Props) {
   const [qr, setQr] = useState("");
 
   useEffect(() => {
