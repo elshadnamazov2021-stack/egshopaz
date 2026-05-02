@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ShoppingBag, Store, Package, Eye, EyeOff } from "lucide-react";
+import { ShoppingBag, Eye, EyeOff } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
@@ -18,6 +18,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 type RoleTab = "buyer" | "seller" | "pvz";
+const AUTH_ROLE: RoleTab = "buyer";
 
 const TERMS_TEXT: Record<RoleTab, { title: string; body: string }> = {
   buyer: {
@@ -79,7 +80,7 @@ function AuthPage() {
   const navigate = useNavigate();
 
   const [mode, setMode] = useState<"login" | "signup">("login");
-  const [role, setRole] = useState<RoleTab>("buyer");
+  const role = AUTH_ROLE;
 
   // shared
   const [email, setEmail] = useState("");
@@ -149,21 +150,15 @@ function AuthPage() {
       const { data: signInData, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error || !signInData.user) { setBusy(false); toast.error("E-poçt və ya şifrə yanlışdır"); return; }
 
-      // Verify the selected role matches the user's actual roles
+      // Müştəri girişində satıcı/PVZ hesabını buraxmırıq
       const { data: rolesData } = await supabase
         .from("user_roles").select("role").eq("user_id", signInData.user.id);
       const roles = (rolesData ?? []).map((r) => r.role as string);
 
-      if (role === "seller" && !roles.includes("seller")) {
+      if (roles.includes("seller") || roles.includes("pvz")) {
         await supabase.auth.signOut();
         setBusy(false);
-        toast.error("Bu hesab satıcı kimi qeydiyyatdan keçməyib. Müştəri kimi daxil olun və ya satıcı qeydiyyatından keçin.");
-        return;
-      }
-      if (role === "pvz" && !roles.includes("pvz")) {
-        await supabase.auth.signOut();
-        setBusy(false);
-        toast.error("Bu hesab PVZ PUNKT kimi qeydiyyatdan keçməyib. Müştəri kimi daxil olun və ya PVZ PUNKT qeydiyyatından keçin.");
+        toast.error("Bu səhifə yalnız müştərilər üçündür. Satıcı üçün Satıcı panelindən, PVZ PUNKT üçün PVZ panelindən daxil olun.");
         return;
       }
 
@@ -197,7 +192,7 @@ function AuthPage() {
       email, password,
       options: {
         emailRedirectTo: `${window.location.origin}/`,
-        data: { full_name: name, phone, referral_code: referralCode.trim().toUpperCase() || undefined },
+        data: { account_role: "buyer", full_name: name, phone, referral_code: referralCode.trim().toUpperCase() || undefined },
       },
     });
     if (error) { setBusy(false); toast.error(error.message); return; }
@@ -252,12 +247,6 @@ function AuthPage() {
 
   const inputCls = "w-full h-11 px-3 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring";
 
-  const tabs: { key: RoleTab; label: string; Icon: typeof Store }[] = [
-    { key: "buyer", label: "Müştəri", Icon: ShoppingBag },
-    { key: "seller", label: "Satıcı", Icon: Store },
-    { key: "pvz", label: "PVZ PUNKT", Icon: Package },
-  ];
-
   return (
     <div className="container mx-auto px-4 py-10 max-w-lg">
       <div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-card">
@@ -266,23 +255,11 @@ function AuthPage() {
         </div>
         <h1 className="text-2xl font-extrabold mb-1 text-center">{mode === "login" ? "Giriş" : "Qeydiyyat"}</h1>
         <p className="text-sm text-muted-foreground mb-5 text-center">
-          {mode === "login" ? "Hesab tipinizi seçin və daxil olun" : "Hesab tipinizi seçin"}
+          {mode === "login" ? "Müştəri hesabınıza daxil olun" : "Yalnız müştəri hesabı yaradın"}
         </p>
 
-        <div className="grid grid-cols-3 gap-2 mb-5 p-1 bg-muted rounded-xl">
-            {tabs.map(({ key, label, Icon }) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setRole(key)}
-                className={`flex flex-col items-center gap-1 py-3 rounded-lg text-xs font-semibold transition ${
-                  role === key ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <Icon className="h-5 w-5" />
-                {label}
-            </button>
-          ))}
+        <div className="mb-5 flex items-center justify-center gap-2 rounded-xl bg-primary/10 px-3 py-3 text-sm font-bold text-primary">
+          <ShoppingBag className="h-5 w-5" /> Müştəri hesabı
         </div>
 
         <form onSubmit={submit} className="space-y-3">
