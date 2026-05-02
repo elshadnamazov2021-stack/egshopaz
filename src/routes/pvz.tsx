@@ -30,7 +30,7 @@ export const Route = createFileRoute("/pvz")({
 
 type TabKey =
   | "dashboard" | "intake" | "delivery" | "returns" | "storage"
-  | "reports" | "finance" | "shift" | "messages" | "settings" | "support";
+  | "reports" | "finance" | "shift" | "messages" | "account" | "settings" | "support";
 
 // ---------------- MOCK DATA ----------------
 const mockExpected = [
