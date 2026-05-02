@@ -150,7 +150,8 @@ function AuthPage() {
       setBusy(false);
       if (error) { toast.error("E-poçt və ya şifrə yanlışdır"); return; }
       toast.success("Xoş gəldiniz!");
-      navigate({ to: "/" });
+      const dest = role === "seller" ? "/seller" : role === "pvz" ? "/pvz" : "/";
+      navigate({ to: dest });
       return;
     }
 
@@ -246,11 +247,10 @@ function AuthPage() {
         </div>
         <h1 className="text-2xl font-extrabold mb-1 text-center">{mode === "login" ? "Giriş" : "Qeydiyyat"}</h1>
         <p className="text-sm text-muted-foreground mb-5 text-center">
-          {mode === "login" ? "Hesabınıza daxil olun" : "Hesab tipinizi seçin"}
+          {mode === "login" ? "Hesab tipinizi seçin və daxil olun" : "Hesab tipinizi seçin"}
         </p>
 
-        {mode === "signup" && (
-          <div className="grid grid-cols-3 gap-2 mb-5 p-1 bg-muted rounded-xl">
+        <div className="grid grid-cols-3 gap-2 mb-5 p-1 bg-muted rounded-xl">
             {tabs.map(({ key, label, Icon }) => (
               <button
                 key={key}
@@ -262,10 +262,9 @@ function AuthPage() {
               >
                 <Icon className="h-5 w-5" />
                 {label}
-              </button>
-            ))}
-          </div>
-        )}
+            </button>
+          ))}
+        </div>
 
         <form onSubmit={submit} className="space-y-3">
           {mode === "signup" && (
