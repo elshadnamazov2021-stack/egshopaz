@@ -124,6 +124,7 @@ function CartPage() {
       price: i.products!.price,
       quantity: i.quantity,
       image_url: i.products!.image_url,
+      pickup_point_id: pvzId,
     }));
     await supabase.from("order_items").insert(orderItems);
 
