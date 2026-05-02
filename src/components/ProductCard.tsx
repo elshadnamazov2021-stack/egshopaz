@@ -29,11 +29,12 @@ export function ProductCard({ p }: { p: ProductCardData }) {
   const { t } = useTranslation();
   const { user, isSeller, isPvz } = useAuth();
   const [adding, setAdding] = useState(false);
-  const { isFav, toggle: toggleFav } = useFavorite(p.id);
+  const { isFav, toggle: toggleFav, busy: favBusy } = useFavorite(p.id);
   const discount = calcDiscount(Number(p.price), p.old_price ? Number(p.old_price) : undefined);
 
   const addToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!user) { toast.error(t("cart.loginRequired")); return; }
     if (isSeller || isPvz) { toast.error("Satıcı və PVZ PUNKT hesabları məhsul sifariş verə bilməz."); return; }
     setAdding(true);
@@ -70,6 +71,7 @@ export function ProductCard({ p }: { p: ProductCardData }) {
         {!(isSeller || isPvz) && (
           <button
             onClick={toggleFav}
+            disabled={favBusy}
             className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center transition ${isFav ? "text-discount" : "hover:text-primary"}`}
             aria-label={t("product.addToFavorites")}
           >
