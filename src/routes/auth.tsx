@@ -146,9 +146,34 @@ function AuthPage() {
 
     if (mode === "login") {
       setBusy(true);
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data: signInData, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error || !signInData.user) { setBusy(false); toast.error("E-poçt və ya şifrə yanlışdır"); return; }
+
+      // Verify the selected role matches the user's actual roles
+      const uid = signInData.user.id;
+      const [{ data: rolesData }, { data: sellerRow }, { data: pvzRow }] = await Promise.all([
+        supabase.from("user_roles").select("role").eq("user_id", uid),
+        supabase.from("sellers").select("id").eq("user_id", uid).maybeSingle(),
+        supabase.from("pvz_staff").select("id").eq("user_id", uid).maybeSingle(),
+      ]);
+      const roles = (rolesData ?? []).map((r) => r.role as string);
+      const isSeller = roles.includes("seller") || !!sellerRow;
+      const isPvz = roles.includes("pvz") || !!pvzRow;
+
+      if (role === "seller" && !isSeller) {
+        await supabase.auth.signOut();
+        setBusy(false);
+        toast.error("Bu hesab satıcı kimi qeydiyyatdan keçməyib. Müştəri kimi daxil olun və ya satıcı qeydiyyatından keçin.");
+        return;
+      }
+      if (role === "pvz" && !isPvz) {
+        await supabase.auth.signOut();
+        setBusy(false);
+        toast.error("Bu hesab PVZ PUNKT kimi qeydiyyatdan keçməyib. Müştəri kimi daxil olun və ya PVZ PUNKT qeydiyyatından keçin.");
+        return;
+      }
+
       setBusy(false);
-      if (error) { toast.error("E-poçt və ya şifrə yanlışdır"); return; }
       toast.success("Xoş gəldiniz!");
       const dest = role === "seller" ? "/seller" : role === "pvz" ? "/pvz" : "/";
       navigate({ to: dest });
@@ -243,7 +268,7 @@ function AuthPage() {
     <div className="container mx-auto px-4 py-10 max-w-lg">
       <div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-card">
         <div className="flex justify-center mb-4">
-          <img src={elzanLogo} alt="Elzan Shop logo" className="h-24 w-auto object-contain drop-shadow-md" />
+          <img src={elzanLogo} alt="Elzan Shop logo" className="h-24 w-24 rounded-full object-cover ring-2 ring-primary/30 shadow-lg bg-white" />
         </div>
         <h1 className="text-2xl font-extrabold mb-1 text-center">{mode === "login" ? "Giriş" : "Qeydiyyat"}</h1>
         <p className="text-sm text-muted-foreground mb-5 text-center">
