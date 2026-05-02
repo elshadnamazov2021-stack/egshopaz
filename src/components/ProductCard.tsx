@@ -40,10 +40,16 @@ export function ProductCard({ p }: { p: ProductCardData }) {
     const { data: existing } = await supabase
       .from("cart_items").select("id, quantity")
       .eq("user_id", user.id).eq("product_id", p.id).maybeSingle();
+    let error: { message: string } | null = null;
     if (existing) {
-      await supabase.from("cart_items").update({ quantity: existing.quantity + 1 }).eq("id", existing.id);
+      ({ error } = await supabase.from("cart_items").update({ quantity: existing.quantity + 1 }).eq("id", existing.id));
     } else {
-      await supabase.from("cart_items").insert({ user_id: user.id, product_id: p.id, quantity: 1 });
+      ({ error } = await supabase.from("cart_items").insert({ user_id: user.id, product_id: p.id, quantity: 1 }));
+    }
+    if (error) {
+      toast.error(`Səbət yenilənmədi: ${error.message}`);
+      setAdding(false);
+      return;
     }
     toast.success(t("product.addToCart"));
     setAdding(false);
