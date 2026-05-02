@@ -30,7 +30,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const applySession = async (s: Session | null) => {
+    let lastUserId: string | null = null;
+    const applySession = async (s: Session | null, force = false) => {
+      const newUid = s?.user?.id ?? null;
+      if (!force && newUid === lastUserId) {
+        // Same user — just refresh session/user refs, no role refetch, no loading flicker
+        setSession(s);
+        setUser(s?.user ?? null);
+        return;
+      }
+      lastUserId = newUid;
       setLoading(true);
       setSession(s);
       setUser(s?.user ?? null);
@@ -47,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     supabase.auth.getSession().then(({ data: { session: s } }) => {
-      void applySession(s);
+      void applySession(s, true);
     });
 
     return () => sub.subscription.unsubscribe();

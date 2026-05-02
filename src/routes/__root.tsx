@@ -92,9 +92,10 @@ function AppShell() {
 
   useEffect(() => {
     if (loading || !user || isWorkPanel || pathname === "/auth" || pathname === "/reset-password") return;
-    if (isPvz) navigate({ to: "/pvz" });
-    else if (isSeller) navigate({ to: "/seller" });
-  }, [loading, user, isPvz, isSeller, isWorkPanel, pathname, navigate]);
+    if (isPvz) navigate({ to: "/pvz", replace: true });
+    else if (isSeller) navigate({ to: "/seller", replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, user?.id, isPvz, isSeller, isWorkPanel, pathname]);
 
   if (!loading && user && !isWorkPanel && pathname !== "/auth" && pathname !== "/reset-password" && (isSeller || isPvz)) {
     return null;
