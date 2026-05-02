@@ -27,7 +27,7 @@ interface CartRow {
 
 function CartPage() {
   const { t } = useTranslation();
-  const { user, loading: authLoading, isSeller, isPvz } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [items, setItems] = useState<CartRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -104,13 +104,6 @@ function CartPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, authLoading]);
 
-  useEffect(() => {
-    if (authLoading || !user) return;
-    if (isPvz) navigate({ to: "/pvz", replace: true });
-    else if (isSeller) navigate({ to: "/seller", replace: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLoading, user?.id, isPvz, isSeller]);
-
   const applyPromo = async () => {
     const code = promo.trim().toUpperCase();
     if (!code) return;
@@ -173,10 +166,6 @@ function CartPage() {
 
   const checkout = async () => {
     if (!user || items.length === 0) return;
-    if (isSeller || isPvz) {
-      toast.error("Satıcı və PVZ PUNKT hesabları sifariş verə bilməz.");
-      return;
-    }
     if (!pvzId) {
       toast.error("Zəhmət olmasa PVZ punkt seçin");
       return;
@@ -308,8 +297,6 @@ function CartPage() {
       </div>
     );
   }
-
-  if (user && (isSeller || isPvz)) return null;
 
   return (
     <div className="container mx-auto px-4 py-6">
