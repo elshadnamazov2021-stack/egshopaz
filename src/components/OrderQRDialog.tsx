@@ -69,6 +69,12 @@ export function OrderQRDialog({ open, onOpenChange, pickupCode, title, subtitle,
             {qr ? <img src={qr} alt="QR" className="w-56 h-56" /> : <div className="w-56 h-56 bg-muted animate-pulse rounded" />}
           </div>
           <div className="font-mono text-xl font-extrabold tracking-widest text-primary">{pickupCode}</div>
+          {(customerName || customerPhone) && mode === "seller" && (
+            <div className="text-xs bg-primary/5 border border-primary/30 rounded-lg p-2 text-left">
+              <div className="font-bold text-foreground mb-0.5">👤 {customerName ?? "—"}</div>
+              {customerPhone && <div className="text-muted-foreground">📞 {customerPhone}</div>}
+            </div>
+          )}
           {pvzName && (
             <div className="text-xs bg-secondary/60 rounded-lg p-2 text-left">
               <div className="font-bold text-foreground mb-0.5">📍 {pvzName}</div>
