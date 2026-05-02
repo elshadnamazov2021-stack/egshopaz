@@ -39,7 +39,18 @@ function Profile() {
   const { items } = useBuyerNav();
 
   useEffect(() => {
-    if (!authLoading && !user) navigate({ to: "/auth" });
+    if (!authLoading && !user) { navigate({ to: "/auth" }); return; }
+    if (!user) return;
+    // Redirect staff/seller away from the buyer profile page to their own panel
+    supabase.from("user_roles").select("role").eq("user_id", user.id).then(({ data }) => {
+      const roles = (data ?? []).map((r) => r.role as string);
+      if (roles.includes("pvz")) {
+        toast.info("PVZ PUNKT işçisi üçün şəxsi hesab PVZ panelindədir");
+        navigate({ to: "/pvz" });
+      } else if (roles.includes("seller") && !roles.includes("admin")) {
+        navigate({ to: "/seller" });
+      }
+    });
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
