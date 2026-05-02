@@ -45,6 +45,13 @@ function CartPage() {
   >([]);
   const [pvzId, setPvzId] = useState<string>("");
   const [pvzSearch, setPvzSearch] = useState("");
+  const [deliveryMethod, setDeliveryMethod] = useState<"pvz" | "home">("pvz");
+  const [homeCity, setHomeCity] = useState("");
+  const [homeAddress, setHomeAddress] = useState("");
+  const [homeApartment, setHomeApartment] = useState("");
+  const [homeNotes, setHomeNotes] = useState("");
+  const [recipientName, setRecipientName] = useState("");
+  const [recipientPhone, setRecipientPhone] = useState("");
   const [promo, setPromo] = useState("");
   const [promoInfo, setPromoInfo] = useState<{ code: string; discount: number } | null>(null);
   const [bonusBalance, setBonusBalance] = useState(0);
@@ -93,6 +100,8 @@ function CartPage() {
     );
     setBonusBalance(prof.data?.bonus_balance ?? 0);
     setProfile({ full_name: prof.data?.full_name ?? null, phone: prof.data?.phone ?? null });
+    setRecipientName((prev) => prev || prof.data?.full_name || "");
+    setRecipientPhone((prev) => prev || prof.data?.phone || "");
     setBonusToAzn(Number(settings.data?.bonus_to_azn ?? 0.01));
     setPvzList((pps.data ?? []) as never);
     setLoading(false);
@@ -166,26 +175,43 @@ function CartPage() {
 
   const checkout = async () => {
     if (!user || items.length === 0) return;
-    if (!pvzId) {
-      toast.error("Zəhmət olmasa PVZ punkt seçin");
+    const finalRecipientName = recipientName.trim() || profile?.full_name || user.email || "";
+    const finalRecipientPhone = recipientPhone.trim() || profile?.phone || "";
+    if (!finalRecipientName || !finalRecipientPhone) {
+      toast.error("Ad və telefon nömrəsi daxil edin");
       return;
     }
-    const selected = pvzList.find((p) => p.id === pvzId);
-    if (!selected) {
-      toast.error("PVZ punkt tapılmadı");
-      return;
+    let shippingAddress = "";
+    let chosenPvzId: string | null = null;
+    if (deliveryMethod === "pvz") {
+      if (!pvzId) {
+        toast.error("Zəhmət olmasa PVZ punkt seçin");
+        return;
+      }
+      const selected = pvzList.find((p) => p.id === pvzId);
+      if (!selected) {
+        toast.error("PVZ punkt tapılmadı");
+        return;
+      }
+      shippingAddress = `PVZ #${selected.point_number ?? "-"} — ${selected.name}, ${selected.city}, ${selected.address}`;
+      chosenPvzId = pvzId;
+    } else {
+      if (!homeCity.trim() || !homeAddress.trim()) {
+        toast.error("Şəhər və ünvan daxil edin");
+        return;
+      }
+      shippingAddress = `🏠 Ev çatdırılması — ${homeCity.trim()}, ${homeAddress.trim()}${homeApartment.trim() ? `, mən./ev: ${homeApartment.trim()}` : ""}${homeNotes.trim() ? ` (Qeyd: ${homeNotes.trim()})` : ""}`;
     }
     setPlacing(true);
-    const shippingAddress = `PVZ #${selected.point_number ?? "-"} — ${selected.name}, ${selected.city}, ${selected.address}`;
     const { data: order, error } = await supabase
       .from("orders")
       .insert({
         buyer_id: user.id,
         total: finalTotal,
         shipping_address: shippingAddress,
-        pickup_point_id: pvzId,
-        recipient_name: profile?.full_name ?? user.user_metadata?.full_name ?? user.email ?? null,
-        recipient_phone: profile?.phone ?? user.user_metadata?.phone ?? null,
+        pickup_point_id: chosenPvzId,
+        recipient_name: finalRecipientName,
+        recipient_phone: finalRecipientPhone,
         status: "pending",
         promo_code: promoInfo?.code ?? null,
         discount: promoDiscount + bonusDiscount,
@@ -209,9 +235,9 @@ function CartPage() {
         price: i.products!.price,
         quantity: i.quantity,
         image_url: i.products!.image_url,
-        pickup_point_id: pvzId,
-        customer_name: profile?.full_name ?? user.user_metadata?.full_name ?? user.email ?? null,
-        customer_phone: profile?.phone ?? user.user_metadata?.phone ?? null,
+        pickup_point_id: chosenPvzId,
+        customer_name: finalRecipientName,
+        customer_phone: finalRecipientPhone,
       }));
     const { error: itemError } = await supabase.from("order_items").insert(orderItems);
     if (itemError) {
@@ -473,56 +499,125 @@ function CartPage() {
               <span>{formatAZN(finalTotal)}</span>
             </div>
             <div className="border-t border-border pt-3 space-y-2">
-              <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5" /> PVZ punkt seçin
-              </label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input
-                  value={pvzSearch}
-                  onChange={(e) => setPvzSearch(e.target.value)}
-                  placeholder="Şəhər, ünvan və ya nömrə..."
-                  className="w-full pl-9 pr-3 h-9 rounded-lg border border-input bg-background text-sm"
-                />
-              </div>
-              <div className="max-h-56 overflow-y-auto space-y-1 border border-border rounded-lg p-1">
-                {pvzList
-                  .filter((p) => {
-                    const q = pvzSearch.toLowerCase().trim();
-                    if (!q) return true;
-                    return (
-                      p.city.toLowerCase().includes(q) ||
-                      p.address.toLowerCase().includes(q) ||
-                      p.name.toLowerCase().includes(q) ||
-                      String(p.point_number ?? "").includes(q)
-                    );
-                  })
-                  .map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => setPvzId(p.id)}
-                      className={`w-full text-left p-2 rounded-md text-xs hover:bg-secondary transition ${pvzId === p.id ? "bg-primary/10 ring-2 ring-primary" : ""}`}
-                    >
-                      <div className="font-bold">
-                        #{p.point_number ?? "-"} · {p.name}
-                      </div>
-                      <div className="text-muted-foreground">
-                        {p.city} — {p.address}
-                      </div>
-                      <div className="text-muted-foreground">
-                        {p.working_hours}
-                        {p.phone ? ` · ${p.phone}` : ""}
-                      </div>
-                    </button>
-                  ))}
-                {pvzList.length === 0 && (
-                  <div className="text-xs text-muted-foreground p-3 text-center">
-                    PVZ punkt mövcud deyil
-                  </div>
-                )}
+              <label className="text-xs font-semibold text-muted-foreground">Alıcı məlumatları</label>
+              <input
+                value={recipientName}
+                onChange={(e) => setRecipientName(e.target.value)}
+                placeholder="Ad Soyad"
+                className="w-full h-9 rounded-lg border border-input bg-background px-3 text-sm"
+              />
+              <input
+                value={recipientPhone}
+                onChange={(e) => setRecipientPhone(e.target.value)}
+                placeholder="Telefon (+994...)"
+                className="w-full h-9 rounded-lg border border-input bg-background px-3 text-sm"
+              />
+            </div>
+
+            <div className="border-t border-border pt-3 space-y-2">
+              <label className="text-xs font-semibold text-muted-foreground">Çatdırılma üsulu</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setDeliveryMethod("pvz")}
+                  className={`p-2 rounded-lg text-xs font-bold border transition ${deliveryMethod === "pvz" ? "bg-primary text-primary-foreground border-primary" : "bg-background border-input"}`}
+                >
+                  📦 PVZ punkt
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeliveryMethod("home")}
+                  className={`p-2 rounded-lg text-xs font-bold border transition ${deliveryMethod === "home" ? "bg-primary text-primary-foreground border-primary" : "bg-background border-input"}`}
+                >
+                  🏠 Ev ünvanı
+                </button>
               </div>
             </div>
+
+            {deliveryMethod === "pvz" ? (
+              <div className="border-t border-border pt-3 space-y-2">
+                <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
+                  <MapPin className="h-3.5 w-3.5" /> PVZ punkt seçin
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    value={pvzSearch}
+                    onChange={(e) => setPvzSearch(e.target.value)}
+                    placeholder="Şəhər, ünvan və ya nömrə..."
+                    className="w-full pl-9 pr-3 h-9 rounded-lg border border-input bg-background text-sm"
+                  />
+                </div>
+                <div className="max-h-56 overflow-y-auto space-y-1 border border-border rounded-lg p-1">
+                  {pvzList
+                    .filter((p) => {
+                      const q = pvzSearch.toLowerCase().trim();
+                      if (!q) return true;
+                      return (
+                        p.city.toLowerCase().includes(q) ||
+                        p.address.toLowerCase().includes(q) ||
+                        p.name.toLowerCase().includes(q) ||
+                        String(p.point_number ?? "").includes(q)
+                      );
+                    })
+                    .map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setPvzId(p.id)}
+                        className={`w-full text-left p-2 rounded-md text-xs hover:bg-secondary transition ${pvzId === p.id ? "bg-primary/10 ring-2 ring-primary" : ""}`}
+                      >
+                        <div className="font-bold">
+                          #{p.point_number ?? "-"} · {p.name}
+                        </div>
+                        <div className="text-muted-foreground">
+                          {p.city} — {p.address}
+                        </div>
+                        <div className="text-muted-foreground">
+                          {p.working_hours}
+                          {p.phone ? ` · ${p.phone}` : ""}
+                        </div>
+                      </button>
+                    ))}
+                  {pvzList.length === 0 && (
+                    <div className="text-xs text-muted-foreground p-3 text-center">
+                      PVZ punkt mövcud deyil
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="border-t border-border pt-3 space-y-2">
+                <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
+                  <MapPin className="h-3.5 w-3.5" /> Ev ünvanı
+                </label>
+                <input
+                  value={homeCity}
+                  onChange={(e) => setHomeCity(e.target.value)}
+                  placeholder="Şəhər (məs. Bakı)"
+                  className="w-full h-9 rounded-lg border border-input bg-background px-3 text-sm"
+                />
+                <input
+                  value={homeAddress}
+                  onChange={(e) => setHomeAddress(e.target.value)}
+                  placeholder="Küçə, bina"
+                  className="w-full h-9 rounded-lg border border-input bg-background px-3 text-sm"
+                />
+                <input
+                  value={homeApartment}
+                  onChange={(e) => setHomeApartment(e.target.value)}
+                  placeholder="Mənzil / ev nömrəsi (istəyə bağlı)"
+                  className="w-full h-9 rounded-lg border border-input bg-background px-3 text-sm"
+                />
+                <textarea
+                  value={homeNotes}
+                  onChange={(e) => setHomeNotes(e.target.value)}
+                  placeholder="Əlavə qeyd (mərtəbə, domofon və s.)"
+                  rows={2}
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm resize-none"
+                />
+              </div>
+            )}
             <button
               onClick={checkout}
               disabled={placing}
