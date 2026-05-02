@@ -203,7 +203,7 @@ function AuthPage() {
       email, password,
       options: {
         emailRedirectTo: `${window.location.origin}/`,
-        data: { account_role: "buyer", full_name: name, phone, referral_code: referralCode.trim().toUpperCase() || undefined },
+        data: { account_role: role, full_name: name, phone, referral_code: referralCode.trim().toUpperCase() || undefined },
       },
     });
     if (error) { setBusy(false); toast.error(error.message); return; }
