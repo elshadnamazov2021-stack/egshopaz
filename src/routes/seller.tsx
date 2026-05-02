@@ -396,6 +396,7 @@ function SellerPanel() {
     { key: "products", label: "Məhsullar", icon: Package, badge: products.length, active: tab === "products", onClick: () => setTab("products") },
     { key: "bulk", label: "Toplu yükləmə", icon: FileSpreadsheet, active: tab === "bulk", onClick: () => setTab("bulk") },
     { key: "orders", label: "Sifarişlər", icon: ShoppingBag, badge: pendingOrders, active: tab === "orders", onClick: () => setTab("orders") },
+    { key: "notifications", label: "Bildirişlər", icon: Bell, badge: unreadSellerNotifs, active: tab === "dashboard", onClick: () => setTab("dashboard") },
     { key: "analytics", label: "Analitika", icon: BarChart3, active: tab === "analytics", onClick: () => setTab("analytics") },
     { key: "messages", label: "Mesajlar", icon: MessageCircle, badge: unreadMsgs, active: tab === "messages", onClick: () => setTab("messages") },
     { key: "advertising", label: "Reklam & Paketlər", icon: Megaphone, active: tab === "advertising", onClick: () => setTab("advertising") },
@@ -432,6 +433,33 @@ function SellerPanel() {
               <strong>{lowStock}</strong> məhsulun stoku azdır (5-dən az). Stoku yeniləyin.
             </div>
           )}
+          <div className="bg-card border border-border rounded-2xl p-6">
+            <div className="font-bold text-lg mb-4 flex items-center justify-between gap-3">
+              <span className="flex items-center gap-2"><Bell className="h-5 w-5 text-primary" /> Bildirişlər</span>
+              {unreadSellerNotifs > 0 && (
+                <button
+                  onClick={async () => { await supabase.from("notifications").update({ is_read: true }).eq("user_id", user.id).eq("is_read", false); }}
+                  className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+                >
+                  <Check className="h-3.5 w-3.5" /> Hamısı oxundu
+                </button>
+              )}
+            </div>
+            {sellerNotifs.length === 0 ? (
+              <div className="text-sm text-muted-foreground text-center py-6">Bildiriş yoxdur</div>
+            ) : (
+              <div className="space-y-2 max-h-80 overflow-y-auto">
+                {sellerNotifs.map((n) => (
+                  <div key={n.id} className={`p-3 rounded-xl border ${!n.is_read ? "border-primary/40 bg-primary/5" : "border-border bg-card"}`}>
+                    <div className="font-semibold text-sm">{n.title}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">{n.body}</div>
+                    {n.pickup_code && <div className="mt-1.5 inline-block font-mono text-xs font-bold bg-primary/10 text-primary px-2 py-1 rounded">Kod: {n.pickup_code}</div>}
+                    <div className="text-[10px] text-muted-foreground mt-1">{new Date(n.created_at).toLocaleString("az-AZ")}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="bg-card border border-border rounded-2xl p-6">
             <h3 className="font-bold text-lg mb-4">Tez başlamaq</h3>
             <div className="grid sm:grid-cols-3 gap-3">
