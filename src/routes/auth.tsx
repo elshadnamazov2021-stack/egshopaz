@@ -394,7 +394,7 @@ function AuthPage() {
             </>
           )}
 
-          {mode === "signup" && (
+          {mode === "signup" && role !== "admin" && (
             <label className="flex items-start gap-2 text-sm text-muted-foreground pt-1">
               <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)}
                 className="mt-1 h-4 w-4 accent-primary" />
@@ -402,13 +402,13 @@ function AuthPage() {
                 <Dialog>
                   <DialogTrigger asChild>
                     <button type="button" className="text-primary underline underline-offset-2 hover:opacity-80">
-                      {TERMS_TEXT[role].title}
+                      {TERMS_TEXT[role as Exclude<RoleTab, "admin">].title}
                     </button>
                   </DialogTrigger>
                   <DialogContent className="max-w-xl">
-                    <DialogHeader><DialogTitle>{TERMS_TEXT[role].title}</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle>{TERMS_TEXT[role as Exclude<RoleTab, "admin">].title}</DialogTitle></DialogHeader>
                     <ScrollArea className="max-h-[60vh] pr-4">
-                      <p className="text-sm whitespace-pre-line leading-relaxed">{TERMS_TEXT[role].body}</p>
+                      <p className="text-sm whitespace-pre-line leading-relaxed">{TERMS_TEXT[role as Exclude<RoleTab, "admin">].body}</p>
                     </ScrollArea>
                   </DialogContent>
                 </Dialog>
