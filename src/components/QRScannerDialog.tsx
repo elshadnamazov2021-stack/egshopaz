@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import QrScanner from "qr-scanner";
 // Vite: bundle the worker as an asset and give qr-scanner an explicit URL
 import qrWorkerUrl from "qr-scanner/qr-scanner-worker.min.js?url";
@@ -14,9 +14,11 @@ interface Props {
   onOpenChange: (v: boolean) => void;
   onScan: (value: string) => void;
   title?: string;
+  acceptLabel?: string;
+  resultDetails?: (value: string) => ReactNode;
 }
 
-export function QRScannerDialog({ open, onOpenChange, onScan, title = "QR / Ştrixkod skan" }: Props) {
+export function QRScannerDialog({ open, onOpenChange, onScan, title = "QR / Ştrixkod skan", acceptLabel = "Təsdiqlə", resultDetails }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const scannerRef = useRef<QrScanner | null>(null);
@@ -150,9 +152,10 @@ export function QRScannerDialog({ open, onOpenChange, onScan, title = "QR / Ştr
           )}
           {lastValue && (
             <div className="absolute inset-0 flex items-center justify-center bg-success/20 backdrop-blur-sm">
-              <div className="bg-card rounded-xl p-4 max-w-[85%] text-center shadow-2xl">
+              <div className="bg-card rounded-xl p-4 max-w-[88%] text-center shadow-2xl space-y-3">
                 <div className="text-xs text-muted-foreground mb-1">Tapıldı</div>
                 <div className="font-mono text-sm break-all">{lastValue}</div>
+                {resultDetails?.(lastValue)}
               </div>
             </div>
           )}
@@ -187,7 +190,7 @@ export function QRScannerDialog({ open, onOpenChange, onScan, title = "QR / Ştr
                 <RefreshCw className="h-4 w-4 mr-1" /> Yenidən skan
               </Button>
               <Button className="flex-1" onClick={accept}>
-                Təsdiqlə
+                {acceptLabel}
               </Button>
             </div>
           )}
