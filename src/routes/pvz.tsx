@@ -477,10 +477,10 @@ function Storage() {
   const [list, setList] = useState<DBOrderItem[]>([]);
   useEffect(() => {
     supabase.from("order_items")
-      .select("id,title,price,quantity,pickup_code,status,accepted_at,delivered_at,pickup_point_id,orders(id,recipient_name,recipient_phone,pickup_point_id)")
+      .select("id,title,price,quantity,pickup_code,status,accepted_at,delivered_at,pickup_point_id,order_id")
       .not("accepted_at", "is", null).is("delivered_at", null)
       .order("accepted_at", { ascending: true }).limit(100)
-      .then(({ data }) => setList((data ?? []) as unknown as DBOrderItem[]));
+      .then(async ({ data }) => setList(await attachOrderInfo((data ?? []) as DBOrderItem[])));
   }, []);
   const now = Date.now();
   const days = (a: string | null) => a ? Math.floor((now - new Date(a).getTime()) / 86400000) : 0;
