@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   User as UserIcon, Package, MapPin, CreditCard, Star,
   Gift, Bell, MessageCircle, Coins, AlertTriangle,
+  Heart, ShoppingCart,
 } from "lucide-react";
 import type { PanelNavItem } from "@/components/PanelLayout";
 
@@ -39,6 +40,8 @@ export function useBuyerNav(): { items: PanelNavItem[]; bonusBalance: number } {
   const items: PanelNavItem[] = [
     { to: "/profile", label: t("sidebar.profile"), icon: UserIcon },
     { to: "/orders", label: t("sidebar.orders"), icon: Package, badge: orderCount },
+    { to: "/favorites", label: t("sidebar.favorites"), icon: Heart },
+    { to: "/cart", label: t("sidebar.cart"), icon: ShoppingCart },
     { to: "/messages", label: t("sidebar.messages"), icon: MessageCircle, badge: unreadMsgs },
     { to: "/messages-pvz", label: t("sidebar.pvzPanel"), icon: MessageCircle },
     { to: "/addresses", label: t("sidebar.addresses"), icon: MapPin },
