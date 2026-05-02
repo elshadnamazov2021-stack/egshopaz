@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ShoppingBag, Eye, EyeOff } from "lucide-react";
+import { ShoppingBag, Store, Building2, Eye, EyeOff } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
