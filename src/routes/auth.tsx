@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ShoppingBag, Eye, EyeOff } from "lucide-react";
+import { ShoppingBag, Store, Building2, Eye, EyeOff } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
@@ -18,7 +18,6 @@ export const Route = createFileRoute("/auth")({
 });
 
 type RoleTab = "buyer" | "seller" | "pvz";
-const AUTH_ROLE: RoleTab = "buyer";
 
 const TERMS_TEXT: Record<RoleTab, { title: string; body: string }> = {
   buyer: {
@@ -80,7 +79,7 @@ function AuthPage() {
   const navigate = useNavigate();
 
   const [mode, setMode] = useState<"login" | "signup">("login");
-  const role = AUTH_ROLE;
+  const [role, setRole] = useState<RoleTab>("buyer");
 
   // shared
   const [email, setEmail] = useState("");
@@ -150,15 +149,27 @@ function AuthPage() {
       const { data: signInData, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error || !signInData.user) { setBusy(false); toast.error("E-poçt və ya şifrə yanlışdır"); return; }
 
-      // Müştəri girişində satıcı/PVZ hesabını buraxmırıq
+      // Rol uyğunluğunu yoxla — hər rol yalnız öz panelinə daxil ola bilər
       const { data: rolesData } = await supabase
         .from("user_roles").select("role").eq("user_id", signInData.user.id);
       const roles = (rolesData ?? []).map((r) => r.role as string);
 
-      if (roles.includes("seller") || roles.includes("pvz")) {
+      if (role === "buyer" && (roles.includes("seller") || roles.includes("pvz"))) {
         await supabase.auth.signOut();
         setBusy(false);
-        toast.error("Bu səhifə yalnız müştərilər üçündür. Satıcı üçün Satıcı panelindən, PVZ PUNKT üçün PVZ panelindən daxil olun.");
+        toast.error("Bu hesab müştəri deyil. Satıcı və ya PVZ PUNKT seçimini istifadə edin.");
+        return;
+      }
+      if (role === "seller" && !roles.includes("seller")) {
+        await supabase.auth.signOut();
+        setBusy(false);
+        toast.error("Bu hesab satıcı kimi qeydiyyatdan keçməyib.");
+        return;
+      }
+      if (role === "pvz" && !roles.includes("pvz")) {
+        await supabase.auth.signOut();
+        setBusy(false);
+        toast.error("Bu hesab PVZ PUNKT işçisi kimi qeydiyyatdan keçməyib.");
         return;
       }
 
@@ -192,7 +203,7 @@ function AuthPage() {
       email, password,
       options: {
         emailRedirectTo: `${window.location.origin}/`,
-        data: { account_role: "buyer", full_name: name, phone, referral_code: referralCode.trim().toUpperCase() || undefined },
+        data: { account_role: role, full_name: name, phone, referral_code: referralCode.trim().toUpperCase() || undefined },
       },
     });
     if (error) { setBusy(false); toast.error(error.message); return; }
@@ -254,12 +265,30 @@ function AuthPage() {
           <img src={elzanLogo} alt="Elzan Shop logo" className="h-24 w-24 rounded-full object-cover ring-2 ring-primary/30 shadow-lg bg-white" />
         </div>
         <h1 className="text-2xl font-extrabold mb-1 text-center">{mode === "login" ? "Giriş" : "Qeydiyyat"}</h1>
-        <p className="text-sm text-muted-foreground mb-5 text-center">
-          {mode === "login" ? "Müştəri hesabınıza daxil olun" : "Yalnız müştəri hesabı yaradın"}
+        <p className="text-sm text-muted-foreground mb-4 text-center">
+          Hesab növünü seçin
         </p>
 
-        <div className="mb-5 flex items-center justify-center gap-2 rounded-xl bg-primary/10 px-3 py-3 text-sm font-bold text-primary">
-          <ShoppingBag className="h-5 w-5" /> Müştəri hesabı
+        <div className="mb-5 grid grid-cols-3 gap-2">
+          {([
+            { key: "buyer", label: "Müştəri", Icon: ShoppingBag },
+            { key: "seller", label: "Satıcı", Icon: Store },
+            { key: "pvz", label: "PVZ PUNKT", Icon: Building2 },
+          ] as const).map(({ key, label, Icon }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setRole(key)}
+              className={`flex flex-col items-center gap-1 rounded-xl border px-2 py-3 text-xs font-bold transition ${
+                role === key
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-background text-muted-foreground hover:border-primary/50"
+              }`}
+            >
+              <Icon className="h-5 w-5" />
+              <span className="leading-tight text-center">{label}</span>
+            </button>
+          ))}
         </div>
 
         <form onSubmit={submit} className="space-y-3">
