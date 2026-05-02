@@ -3,7 +3,30 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN } from "@/lib/format";
-import { Package, ShoppingBag, DollarSign, Plus, Trash2, Edit, X, Upload, Store, TrendingUp, Image as ImageIcon, LayoutDashboard, Settings, MessageCircle, QrCode, Download, Megaphone, LifeBuoy, BarChart3, FileSpreadsheet, Bell, Check } from "lucide-react";
+import {
+  Package,
+  ShoppingBag,
+  DollarSign,
+  Plus,
+  Trash2,
+  Edit,
+  X,
+  Upload,
+  Store,
+  TrendingUp,
+  Image as ImageIcon,
+  LayoutDashboard,
+  Settings,
+  MessageCircle,
+  QrCode,
+  Download,
+  Megaphone,
+  LifeBuoy,
+  BarChart3,
+  FileSpreadsheet,
+  Bell,
+  Check,
+} from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import QRCode from "qrcode";
@@ -22,32 +45,80 @@ export const Route = createFileRoute("/seller")({
 });
 
 interface Product {
-  id: string; title: string; price: number; old_price: number | null; stock: number;
-  image_url: string | null; images: string[]; is_active: boolean; category_id: string | null;
-  brand: string | null; description: string | null; sku: string | null; weight: number | null;
-  rating: number; reviews_count: number;
-  delivery_days_min?: number | null; delivery_days_max?: number | null;
-  delivery_city?: string | null; free_shipping?: boolean | null; fast_delivery?: boolean | null;
-  condition?: string | null; color?: string | null; size?: string | null;
+  id: string;
+  title: string;
+  price: number;
+  old_price: number | null;
+  stock: number;
+  image_url: string | null;
+  images: string[];
+  is_active: boolean;
+  category_id: string | null;
+  brand: string | null;
+  description: string | null;
+  sku: string | null;
+  weight: number | null;
+  rating: number;
+  reviews_count: number;
+  delivery_days_min?: number | null;
+  delivery_days_max?: number | null;
+  delivery_city?: string | null;
+  free_shipping?: boolean | null;
+  fast_delivery?: boolean | null;
+  condition?: string | null;
+  color?: string | null;
+  size?: string | null;
 }
-interface Category { id: string; name: string }
+interface Category {
+  id: string;
+  name: string;
+}
 interface OrderItem {
-  id: string; title: string; price: number; quantity: number;
-  image_url: string | null; order_id: string; status: string; product_id: string;
+  id: string;
+  title: string;
+  price: number;
+  quantity: number;
+  image_url: string | null;
+  order_id: string;
+  status: string;
+  product_id: string;
   pickup_code: string | null;
   customer_name: string | null;
   customer_phone: string | null;
   accepted_at: string | null;
   delivered_at: string | null;
   pickup_point_id: string | null;
-  pickup_point: { id: string; name: string; city: string; address: string; point_number: number | null; phone: string | null; working_hours: string } | null;
+  pickup_point: {
+    id: string;
+    name: string;
+    city: string;
+    address: string;
+    point_number: number | null;
+    phone: string | null;
+    working_hours: string;
+  } | null;
 }
 interface Profile {
-  full_name: string | null; shop_name: string | null; phone: string | null; avatar_url: string | null;
-  shop_description: string | null; shop_logo_url: string | null; shop_banner_url: string | null;
-  shop_address: string | null; shop_city: string | null; shop_email: string | null;
+  full_name: string | null;
+  shop_name: string | null;
+  phone: string | null;
+  avatar_url: string | null;
+  shop_description: string | null;
+  shop_logo_url: string | null;
+  shop_banner_url: string | null;
+  shop_address: string | null;
+  shop_city: string | null;
+  shop_email: string | null;
 }
-interface SellerNotif { id: string; title: string; body: string; type: string; pickup_code: string | null; is_read: boolean; created_at: string }
+interface SellerNotif {
+  id: string;
+  title: string;
+  body: string;
+  type: string;
+  pickup_code: string | null;
+  is_read: boolean;
+  created_at: string;
+}
 
 const productSchema = z.object({
   title: z.string().trim().min(2, "Başlıq minimum 2 simvol").max(200),
@@ -73,7 +144,17 @@ const ORDER_STATUSES = [
 function SellerPanel() {
   const { user, isSeller, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"dashboard" | "products" | "orders" | "messages" | "advertising" | "analytics" | "bulk" | "shop" | "support">("dashboard");
+  const [tab, setTab] = useState<
+    | "dashboard"
+    | "products"
+    | "orders"
+    | "messages"
+    | "advertising"
+    | "analytics"
+    | "bulk"
+    | "shop"
+    | "support"
+  >("dashboard");
   const [unreadMsgs, setUnreadMsgs] = useState(0);
   const [sellerNotifs, setSellerNotifs] = useState<SellerNotif[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -95,68 +176,124 @@ function SellerPanel() {
   const load = async () => {
     if (!user) return;
     const [{ data: ps }, { data: cs }, { data: ois }, { data: pr }] = await Promise.all([
-      supabase.from("products").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }),
+      supabase
+        .from("products")
+        .select("*")
+        .eq("seller_id", user.id)
+        .order("created_at", { ascending: false }),
       supabase.from("categories").select("id,name").order("sort_order"),
-      supabase.from("order_items")
-        .select("id,title,price,quantity,image_url,order_id,status,product_id,pickup_code,customer_name,customer_phone,accepted_at,delivered_at,pickup_point_id")
+      supabase
+        .from("order_items")
+        .select(
+          "id,title,price,quantity,image_url,order_id,status,product_id,pickup_code,customer_name,customer_phone,accepted_at,delivered_at,pickup_point_id",
+        )
         .eq("seller_id", user.id)
         .order("id", { ascending: false })
         .limit(100),
-      supabase.from("profiles").select("full_name,shop_name,phone,avatar_url,shop_description,shop_logo_url,shop_banner_url,shop_address,shop_city,shop_email").eq("id", user.id).maybeSingle(),
+      supabase
+        .from("profiles")
+        .select(
+          "full_name,shop_name,phone,avatar_url,shop_description,shop_logo_url,shop_banner_url,shop_address,shop_city,shop_email",
+        )
+        .eq("id", user.id)
+        .maybeSingle(),
     ]);
     const rawItems = (ois ?? []) as unknown as OrderItem[];
     const orderIds = [...new Set(rawItems.map((i) => i.order_id))];
     const { data: orderRows } = orderIds.length
-      ? await supabase.from("orders").select("id,pickup_point_id,recipient_name,recipient_phone").in("id", orderIds)
+      ? await supabase
+          .from("orders")
+          .select("id,pickup_point_id,recipient_name,recipient_phone")
+          .in("id", orderIds)
       : { data: [] };
     const orderMap = new Map((orderRows ?? []).map((o) => [o.id, o]));
-    const pickupIds = [...new Set(rawItems.map((i) => i.pickup_point_id ?? orderMap.get(i.order_id)?.pickup_point_id).filter(Boolean))] as string[];
+    const pickupIds = [
+      ...new Set(
+        rawItems
+          .map((i) => i.pickup_point_id ?? orderMap.get(i.order_id)?.pickup_point_id)
+          .filter(Boolean),
+      ),
+    ] as string[];
     const { data: pickupRows } = pickupIds.length
-      ? await supabase.from("pickup_points").select("id,name,city,address,point_number,phone,working_hours").in("id", pickupIds)
+      ? await supabase
+          .from("pickup_points")
+          .select("id,name,city,address,point_number,phone,working_hours")
+          .in("id", pickupIds)
       : { data: [] };
     const pickupMap = new Map((pickupRows ?? []).map((p) => [p.id, p]));
     setProducts((ps ?? []) as unknown as Product[]);
     setCategories((cs ?? []) as Category[]);
-    setOrderItems(rawItems.map((item) => {
-      const order = orderMap.get(item.order_id);
-      const pickupPointId = item.pickup_point_id ?? order?.pickup_point_id ?? null;
-      return {
-        ...item,
-        customer_name: item.customer_name ?? order?.recipient_name ?? null,
-        customer_phone: item.customer_phone ?? order?.recipient_phone ?? null,
-        pickup_point: pickupPointId ? (pickupMap.get(pickupPointId) as OrderItem["pickup_point"] ?? null) : null,
-      };
-    }));
-    setProfile((pr as Profile) ?? {
-      full_name: "", shop_name: "", phone: "", avatar_url: "",
-      shop_description: "", shop_logo_url: "", shop_banner_url: "",
-      shop_address: "", shop_city: "", shop_email: "",
-    });
+    setOrderItems(
+      rawItems.map((item) => {
+        const order = orderMap.get(item.order_id);
+        const pickupPointId = item.pickup_point_id ?? order?.pickup_point_id ?? null;
+        return {
+          ...item,
+          customer_name: item.customer_name ?? order?.recipient_name ?? null,
+          customer_phone: item.customer_phone ?? order?.recipient_phone ?? null,
+          pickup_point: pickupPointId
+            ? ((pickupMap.get(pickupPointId) as OrderItem["pickup_point"]) ?? null)
+            : null,
+        };
+      }),
+    );
+    setProfile(
+      (pr as Profile) ?? {
+        full_name: "",
+        shop_name: "",
+        phone: "",
+        avatar_url: "",
+        shop_description: "",
+        shop_logo_url: "",
+        shop_banner_url: "",
+        shop_address: "",
+        shop_city: "",
+        shop_email: "",
+      },
+    );
   };
-  useEffect(() => { if (user && isSeller) load(); }, [user, isSeller]);
+  useEffect(() => {
+    if (user && isSeller) load();
+  }, [user, isSeller]);
 
   useEffect(() => {
     if (!user || !isSeller) return;
-    const ch = supabase.channel(`seller-orders-${user.id}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "order_items", filter: `seller_id=eq.${user.id}` }, load)
+    const ch = supabase
+      .channel(`seller-orders-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "order_items", filter: `seller_id=eq.${user.id}` },
+        load,
+      )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [user, isSeller]);
 
   useEffect(() => {
     if (!user || !isSeller) return;
     const loadNotifs = () => {
-      supabase.from("notifications").select("id,title,body,type,pickup_code,is_read,created_at")
+      supabase
+        .from("notifications")
+        .select("id,title,body,type,pickup_code,is_read,created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(20)
         .then(({ data }) => setSellerNotifs((data ?? []) as SellerNotif[]));
     };
     loadNotifs();
-    const ch = supabase.channel(`seller-notifications-${user.id}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` }, loadNotifs)
+    const ch = supabase
+      .channel(`seller-notifications-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        loadNotifs,
+      )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [user, isSeller]);
 
   // Unread messages counter (with realtime)
@@ -174,9 +311,15 @@ function SellerPanel() {
     refreshUnread();
     const ch = supabase
       .channel(`seller-unread-${user.id}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "shop_messages", filter: `seller_id=eq.${user.id}` }, refreshUnread)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "shop_messages", filter: `seller_id=eq.${user.id}` },
+        refreshUnread,
+      )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [user, isSeller]);
 
   if (!user || !isSeller) return null;
@@ -192,12 +335,21 @@ function SellerPanel() {
     setUploading(true);
     const newImages: string[] = [...(editing.images ?? [])];
     for (const file of Array.from(files)) {
-      if (file.size > 5 * 1024 * 1024) { toast.error(`${file.name} 5MB-dan böyükdür`); continue; }
-      if (!file.type.startsWith("image/")) { toast.error(`${file.name} şəkil deyil`); continue; }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`${file.name} 5MB-dan böyükdür`);
+        continue;
+      }
+      if (!file.type.startsWith("image/")) {
+        toast.error(`${file.name} şəkil deyil`);
+        continue;
+      }
       const ext = file.name.split(".").pop();
       const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
       const { error } = await supabase.storage.from("product-images").upload(path, file);
-      if (error) { toast.error(error.message); continue; }
+      if (error) {
+        toast.error(error.message);
+        continue;
+      }
       const { data } = supabase.storage.from("product-images").getPublicUrl(path);
       newImages.push(data.publicUrl);
     }
@@ -234,7 +386,10 @@ function SellerPanel() {
       weight: editing.weight ? Number(editing.weight) : null,
     };
     const v = productSchema.safeParse(payload);
-    if (!v.success) { toast.error(v.error.issues[0].message); return; }
+    if (!v.success) {
+      toast.error(v.error.issues[0].message);
+      return;
+    }
 
     const images = editing.images ?? [];
     const data = {
@@ -256,11 +411,17 @@ function SellerPanel() {
 
     if (editing.id) {
       const { error } = await supabase.from("products").update(data).eq("id", editing.id);
-      if (error) { toast.error("Məhsul yadda saxlanmadı. Satıcı icazənizi və məlumatları yoxlayın."); return; }
+      if (error) {
+        toast.error("Məhsul yadda saxlanmadı. Satıcı icazənizi və məlumatları yoxlayın.");
+        return;
+      }
       toast.success("Yeniləndi");
     } else {
       const { error } = await supabase.from("products").insert(data);
-      if (error) { toast.error("Məhsul əlavə olunmadı. Satıcı icazənizi və məlumatları yoxlayın."); return; }
+      if (error) {
+        toast.error("Məhsul əlavə olunmadı. Satıcı icazənizi və məlumatları yoxlayın.");
+        return;
+      }
       toast.success("Məhsul əlavə olundu");
     }
     setEditing(null);
@@ -270,7 +431,10 @@ function SellerPanel() {
   const remove = async (id: string) => {
     if (!confirm("Bu məhsul silinsin? Bu əməliyyat geri qaytarıla bilməz.")) return;
     const { error } = await supabase.from("products").delete().eq("id", id);
-    if (error) { toast.error("Silinmədi: " + error.message); return; }
+    if (error) {
+      toast.error("Silinmədi: " + error.message);
+      return;
+    }
     toast.success("Məhsul silindi");
     load();
   };
@@ -302,7 +466,10 @@ function SellerPanel() {
     }
     const { error } = await supabase.from("order_items").update({ status }).eq("id", item.id);
     if (error) toast.error(error.message);
-    else { toast.success("Status yeniləndi"); load(); }
+    else {
+      toast.success("Status yeniləndi");
+      load();
+    }
   };
 
   const printShippingLabel = async (item: OrderItem) => {
@@ -351,7 +518,10 @@ function SellerPanel() {
 <script>setTimeout(()=>window.print(),300);</script>
 </body></html>`;
     const w = window.open("", "_blank", "width=420,height=640");
-    if (!w) { toast.error("Pop-up bloklanıb. İcazə verin."); return; }
+    if (!w) {
+      toast.error("Pop-up bloklanıb. İcazə verin.");
+      return;
+    }
     w.document.write(html);
     w.document.close();
   };
@@ -360,48 +530,122 @@ function SellerPanel() {
     if (!user || !profile) return;
     setSavingShop(true);
     const c = findCity(profile.shop_city);
-    const { error } = await supabase.from("profiles").upsert({
-      id: user.id,
-      shop_name: profile.shop_name?.slice(0, 100) ?? null,
-      full_name: profile.full_name?.slice(0, 100) ?? null,
-      phone: profile.phone?.slice(0, 20) ?? null,
-      avatar_url: profile.avatar_url ?? null,
-      shop_description: profile.shop_description?.slice(0, 1000) ?? null,
-      shop_logo_url: profile.shop_logo_url ?? null,
-      shop_banner_url: profile.shop_banner_url ?? null,
-      shop_address: profile.shop_address?.slice(0, 300) ?? null,
-      shop_city: profile.shop_city?.slice(0, 100) ?? null,
-      shop_email: profile.shop_email?.slice(0, 200) ?? null,
-      shop_lat: c?.lat ?? null,
-      shop_lng: c?.lng ?? null,
-    }, { onConflict: "id" });
-    if (error) toast.error(error.message); else toast.success("Mağaza məlumatları yadda saxlanıldı");
+    const { error } = await supabase.from("profiles").upsert(
+      {
+        id: user.id,
+        shop_name: profile.shop_name?.slice(0, 100) ?? null,
+        full_name: profile.full_name?.slice(0, 100) ?? null,
+        phone: profile.phone?.slice(0, 20) ?? null,
+        avatar_url: profile.avatar_url ?? null,
+        shop_description: profile.shop_description?.slice(0, 1000) ?? null,
+        shop_logo_url: profile.shop_logo_url ?? null,
+        shop_banner_url: profile.shop_banner_url ?? null,
+        shop_address: profile.shop_address?.slice(0, 300) ?? null,
+        shop_city: profile.shop_city?.slice(0, 100) ?? null,
+        shop_email: profile.shop_email?.slice(0, 200) ?? null,
+        shop_lat: c?.lat ?? null,
+        shop_lng: c?.lng ?? null,
+      },
+      { onConflict: "id" },
+    );
+    if (error) toast.error(error.message);
+    else toast.success("Mağaza məlumatları yadda saxlanıldı");
     setSavingShop(false);
   };
 
   const uploadShopImage = async (file: File, field: "shop_logo_url" | "shop_banner_url") => {
     if (!user || !profile) return;
-    if (file.size > 5 * 1024 * 1024) { toast.error("Şəkil 5MB-dan böyükdür"); return; }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Şəkil 5MB-dan böyükdür");
+      return;
+    }
     const ext = file.name.split(".").pop();
     const path = `${user.id}/shop-${field}-${Date.now()}.${ext}`;
     const { error } = await supabase.storage.from("product-images").upload(path, file);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     const { data } = supabase.storage.from("product-images").getPublicUrl(path);
     setProfile({ ...profile, [field]: data.publicUrl });
     toast.success("Yükləndi");
   };
 
   const navItems: PanelNavItem[] = [
-    { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, active: tab === "dashboard", onClick: () => setTab("dashboard") },
-    { key: "products", label: "Məhsullar", icon: Package, badge: products.length, active: tab === "products", onClick: () => setTab("products") },
-    { key: "bulk", label: "Toplu yükləmə", icon: FileSpreadsheet, active: tab === "bulk", onClick: () => setTab("bulk") },
-    { key: "orders", label: "Sifarişlər", icon: ShoppingBag, badge: pendingOrders, active: tab === "orders", onClick: () => setTab("orders") },
-    { key: "notifications", label: "Bildirişlər", icon: Bell, badge: unreadSellerNotifs, active: tab === "dashboard", onClick: () => setTab("dashboard") },
-    { key: "analytics", label: "Analitika", icon: BarChart3, active: tab === "analytics", onClick: () => setTab("analytics") },
-    { key: "messages", label: "Mesajlar", icon: MessageCircle, badge: unreadMsgs, active: tab === "messages", onClick: () => setTab("messages") },
-    { key: "advertising", label: "Reklam & Paketlər", icon: Megaphone, active: tab === "advertising", onClick: () => setTab("advertising") },
-    { key: "shop", label: "Mağaza ayarları", icon: Settings, active: tab === "shop", onClick: () => setTab("shop") },
-    { key: "support", label: "AI Dəstək", icon: LifeBuoy, active: tab === "support", onClick: () => setTab("support") },
+    {
+      key: "dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      active: tab === "dashboard",
+      onClick: () => setTab("dashboard"),
+    },
+    {
+      key: "products",
+      label: "Məhsullar",
+      icon: Package,
+      badge: products.length,
+      active: tab === "products",
+      onClick: () => setTab("products"),
+    },
+    {
+      key: "bulk",
+      label: "Toplu yükləmə",
+      icon: FileSpreadsheet,
+      active: tab === "bulk",
+      onClick: () => setTab("bulk"),
+    },
+    {
+      key: "orders",
+      label: "Sifarişlər",
+      icon: ShoppingBag,
+      badge: pendingOrders,
+      active: tab === "orders",
+      onClick: () => setTab("orders"),
+    },
+    {
+      key: "notifications",
+      label: "Bildirişlər",
+      icon: Bell,
+      badge: unreadSellerNotifs,
+      active: tab === "dashboard",
+      onClick: () => setTab("dashboard"),
+    },
+    {
+      key: "analytics",
+      label: "Analitika",
+      icon: BarChart3,
+      active: tab === "analytics",
+      onClick: () => setTab("analytics"),
+    },
+    {
+      key: "messages",
+      label: "Mesajlar",
+      icon: MessageCircle,
+      badge: unreadMsgs,
+      active: tab === "messages",
+      onClick: () => setTab("messages"),
+    },
+    {
+      key: "advertising",
+      label: "Reklam & Paketlər",
+      icon: Megaphone,
+      active: tab === "advertising",
+      onClick: () => setTab("advertising"),
+    },
+    {
+      key: "shop",
+      label: "Mağaza ayarları",
+      icon: Settings,
+      active: tab === "shop",
+      onClick: () => setTab("shop"),
+    },
+    {
+      key: "support",
+      label: "AI Dəstək",
+      icon: LifeBuoy,
+      active: tab === "support",
+      onClick: () => setTab("support"),
+    },
   ];
 
   return (
@@ -412,7 +656,11 @@ function SellerPanel() {
             {[
               { icon: DollarSign, label: "Ümumi gəlir", value: formatAZN(totalRevenue) },
               { icon: ShoppingBag, label: "Sifarişlər", value: totalOrders },
-              { icon: Package, label: "Aktiv məhsullar", value: products.filter((p) => p.is_active).length },
+              {
+                icon: Package,
+                label: "Aktiv məhsullar",
+                value: products.filter((p) => p.is_active).length,
+              },
               { icon: TrendingUp, label: "Gözləyən sifariş", value: pendingOrders },
             ].map((s, i) => (
               <div key={i} className="bg-card border border-border rounded-2xl p-5 shadow-card">
@@ -435,10 +683,18 @@ function SellerPanel() {
           )}
           <div className="bg-card border border-border rounded-2xl p-6">
             <div className="font-bold text-lg mb-4 flex items-center justify-between gap-3">
-              <span className="flex items-center gap-2"><Bell className="h-5 w-5 text-primary" /> Bildirişlər</span>
+              <span className="flex items-center gap-2">
+                <Bell className="h-5 w-5 text-primary" /> Bildirişlər
+              </span>
               {unreadSellerNotifs > 0 && (
                 <button
-                  onClick={async () => { await supabase.from("notifications").update({ is_read: true }).eq("user_id", user.id).eq("is_read", false); }}
+                  onClick={async () => {
+                    await supabase
+                      .from("notifications")
+                      .update({ is_read: true })
+                      .eq("user_id", user.id)
+                      .eq("is_read", false);
+                  }}
                   className="text-xs text-primary hover:underline inline-flex items-center gap-1"
                 >
                   <Check className="h-3.5 w-3.5" /> Hamısı oxundu
@@ -450,11 +706,20 @@ function SellerPanel() {
             ) : (
               <div className="space-y-2 max-h-80 overflow-y-auto">
                 {sellerNotifs.map((n) => (
-                  <div key={n.id} className={`p-3 rounded-xl border ${!n.is_read ? "border-primary/40 bg-primary/5" : "border-border bg-card"}`}>
+                  <div
+                    key={n.id}
+                    className={`p-3 rounded-xl border ${!n.is_read ? "border-primary/40 bg-primary/5" : "border-border bg-card"}`}
+                  >
                     <div className="font-semibold text-sm">{n.title}</div>
                     <div className="text-xs text-muted-foreground mt-0.5">{n.body}</div>
-                    {n.pickup_code && <div className="mt-1.5 inline-block font-mono text-xs font-bold bg-primary/10 text-primary px-2 py-1 rounded">Kod: {n.pickup_code}</div>}
-                    <div className="text-[10px] text-muted-foreground mt-1">{new Date(n.created_at).toLocaleString("az-AZ")}</div>
+                    {n.pickup_code && (
+                      <div className="mt-1.5 inline-block font-mono text-xs font-bold bg-primary/10 text-primary px-2 py-1 rounded">
+                        Kod: {n.pickup_code}
+                      </div>
+                    )}
+                    <div className="text-[10px] text-muted-foreground mt-1">
+                      {new Date(n.created_at).toLocaleString("az-AZ")}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -463,18 +728,27 @@ function SellerPanel() {
           <div className="bg-card border border-border rounded-2xl p-6">
             <h3 className="font-bold text-lg mb-4">Tez başlamaq</h3>
             <div className="grid sm:grid-cols-3 gap-3">
-              <button onClick={() => { setTab("products"); setEditing({ title: "", price: 0, stock: 0, images: [], is_active: true }); }}
-                      className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-primary hover:bg-secondary/50 transition text-left">
+              <button
+                onClick={() => {
+                  setTab("products");
+                  setEditing({ title: "", price: 0, stock: 0, images: [], is_active: true });
+                }}
+                className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-primary hover:bg-secondary/50 transition text-left"
+              >
                 <Plus className="h-5 w-5 text-primary" />
                 <span className="font-semibold text-sm">Yeni məhsul əlavə et</span>
               </button>
-              <button onClick={() => setTab("orders")}
-                      className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-primary hover:bg-secondary/50 transition text-left">
+              <button
+                onClick={() => setTab("orders")}
+                className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-primary hover:bg-secondary/50 transition text-left"
+              >
                 <ShoppingBag className="h-5 w-5 text-primary" />
                 <span className="font-semibold text-sm">Sifarişlərə bax</span>
               </button>
-              <button onClick={() => setTab("shop")}
-                      className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-primary hover:bg-secondary/50 transition text-left">
+              <button
+                onClick={() => setTab("shop")}
+                className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-primary hover:bg-secondary/50 transition text-left"
+              >
                 <Store className="h-5 w-5 text-primary" />
                 <span className="font-semibold text-sm">Mağaza ayarları</span>
               </button>
@@ -485,16 +759,26 @@ function SellerPanel() {
 
       {tab === "products" && (
         <div>
-          <button onClick={() => setEditing({ title: "", price: 0, stock: 0, images: [], is_active: true })}
-                  className="mb-4 bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold hover:bg-primary/90 inline-flex items-center gap-2">
+          <button
+            onClick={() =>
+              setEditing({ title: "", price: 0, stock: 0, images: [], is_active: true })
+            }
+            className="mb-4 bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold hover:bg-primary/90 inline-flex items-center gap-2"
+          >
             <Plus className="h-4 w-4" /> Yeni məhsul
           </button>
           {products.length === 0 ? (
             <div className="bg-secondary/40 rounded-2xl p-10 text-center">
               <Package className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-              <p className="text-muted-foreground mb-4">Hələ məhsul yoxdur. İlk məhsulunuzu əlavə edin.</p>
-              <button onClick={() => setEditing({ title: "", price: 0, stock: 0, images: [], is_active: true })}
-                      className="bg-primary text-primary-foreground px-6 py-2 rounded-lg font-bold">
+              <p className="text-muted-foreground mb-4">
+                Hələ məhsul yoxdur. İlk məhsulunuzu əlavə edin.
+              </p>
+              <button
+                onClick={() =>
+                  setEditing({ title: "", price: 0, stock: 0, images: [], is_active: true })
+                }
+                className="bg-primary text-primary-foreground px-6 py-2 rounded-lg font-bold"
+              >
                 Məhsul əlavə et
               </button>
             </div>
@@ -516,29 +800,65 @@ function SellerPanel() {
                       <td className="p-3">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 rounded-lg bg-secondary overflow-hidden shrink-0">
-                            {p.image_url && <img src={p.image_url} alt="" className="w-full h-full object-cover" />}
+                            {p.image_url && (
+                              <img
+                                src={p.image_url}
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                            )}
                           </div>
                           <div className="min-w-0">
-                            <Link to="/product/$id" params={{ id: p.id }} className="font-medium line-clamp-1 hover:text-primary">{p.title}</Link>
-                            {p.sku && <div className="text-xs text-muted-foreground">SKU: {p.sku}</div>}
+                            <Link
+                              to="/product/$id"
+                              params={{ id: p.id }}
+                              className="font-medium line-clamp-1 hover:text-primary"
+                            >
+                              {p.title}
+                            </Link>
+                            {p.sku && (
+                              <div className="text-xs text-muted-foreground">SKU: {p.sku}</div>
+                            )}
                           </div>
                         </div>
                       </td>
                       <td className="p-3 font-semibold whitespace-nowrap">{formatAZN(p.price)}</td>
                       <td className="p-3">
-                        <span className={p.stock < 5 ? "text-destructive font-semibold" : ""}>{p.stock}</span>
+                        <span className={p.stock < 5 ? "text-destructive font-semibold" : ""}>
+                          {p.stock}
+                        </span>
                       </td>
                       <td className="p-3">
-                        <button onClick={() => toggleActive(p)} className={`text-xs px-2 py-1 rounded-full font-semibold ${p.is_active ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>
+                        <button
+                          onClick={() => toggleActive(p)}
+                          className={`text-xs px-2 py-1 rounded-full font-semibold ${p.is_active ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}
+                        >
                           {p.is_active ? "Aktiv" : "Deaktiv"}
                         </button>
                       </td>
                       <td className="p-3">
                         <div className="flex gap-1 justify-end">
-                          <button onClick={() => setEditing(p)} className="p-2 hover:bg-secondary rounded" title="Redaktə"><Edit className="h-4 w-4" /></button>
-                          <button onClick={() => openQR(p)} className="p-2 hover:bg-primary/10 hover:text-primary rounded" title="QR kod"><QrCode className="h-4 w-4" /></button>
-                          <button onClick={() => remove(p.id)} className="p-2 bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground rounded inline-flex items-center gap-1" title="Sil">
-                            <Trash2 className="h-4 w-4" /><span className="text-xs font-semibold hidden sm:inline">Sil</span>
+                          <button
+                            onClick={() => setEditing(p)}
+                            className="p-2 hover:bg-secondary rounded"
+                            title="Redaktə"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => openQR(p)}
+                            className="p-2 hover:bg-primary/10 hover:text-primary rounded"
+                            title="QR kod"
+                          >
+                            <QrCode className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => remove(p.id)}
+                            className="p-2 bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground rounded inline-flex items-center gap-1"
+                            title="Sil"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            <span className="text-xs font-semibold hidden sm:inline">Sil</span>
                           </button>
                         </div>
                       </td>
@@ -558,69 +878,108 @@ function SellerPanel() {
               <ShoppingBag className="h-12 w-12 mx-auto mb-3 opacity-50" />
               Hələ sifariş yoxdur
             </div>
-          ) : orderItems.map((i) => {
-            const st = ORDER_STATUSES.find((s) => s.v === i.status) ?? ORDER_STATUSES[0];
-            const canPack = i.status === "pending" || i.status === "processing";
-            const canShip = !i.accepted_at && !i.delivered_at && (i.status === "pending" || i.status === "processing" || i.status === "packed");
-            return (
-              <div key={i.id} className="bg-card border border-border rounded-xl p-4 space-y-3">
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="w-14 h-14 bg-secondary rounded-lg overflow-hidden shrink-0">
-                    {i.image_url && <img src={i.image_url} alt="" className="w-full h-full object-cover" />}
-                  </div>
-                  <div className="flex-1 min-w-[180px]">
-                    <div className="font-semibold line-clamp-1">{i.title}</div>
-                    <div className="text-xs text-muted-foreground">№ {i.order_id.slice(0, 8).toUpperCase()} · {i.quantity} ədəd · Kod: <b className="font-mono">{i.pickup_code ?? "—"}</b></div>
-                    <div className="text-xs text-muted-foreground mt-0.5">
-                      Müştəri: {i.customer_name ?? "—"}{i.customer_phone ? ` · ${i.customer_phone}` : ""}
+          ) : (
+            orderItems.map((i) => {
+              const st = ORDER_STATUSES.find((s) => s.v === i.status) ?? ORDER_STATUSES[0];
+              const canPack = i.status === "pending" || i.status === "processing";
+              const canShip =
+                !i.accepted_at &&
+                !i.delivered_at &&
+                (i.status === "pending" || i.status === "processing" || i.status === "packed");
+              return (
+                <div key={i.id} className="bg-card border border-border rounded-xl p-4 space-y-3">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="w-14 h-14 bg-secondary rounded-lg overflow-hidden shrink-0">
+                      {i.image_url && (
+                        <img src={i.image_url} alt="" className="w-full h-full object-cover" />
+                      )}
                     </div>
-                    {i.delivered_at ? (
-                      <div className="text-[10px] text-success font-bold mt-1">PVZ müştəriyə təhvil verib</div>
-                    ) : i.accepted_at ? (
-                      <div className="text-[10px] text-primary font-bold mt-1">PVZ paketi qəbul edib</div>
-                    ) : null}
-                  </div>
-                  <div className="font-extrabold whitespace-nowrap">{formatAZN(Number(i.price) * i.quantity)}</div>
-                  <select value={i.status} onChange={(e) => updateOrderStatus(i, e.target.value)}
-                          disabled={!!i.accepted_at || !!i.delivered_at}
-                          className={`text-xs px-3 py-2 rounded-lg font-semibold border-0 ${st.c} cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed`}>
-                    {ORDER_STATUSES.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}
-                  </select>
-                  <div className="flex gap-1">
-                    {canPack && (
-                      <button onClick={() => updateOrderStatus(i, "packed")}
-                              className="px-3 py-2 rounded-lg bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white text-xs font-bold inline-flex items-center gap-1"
-                              title="Paketləndi olaraq qeyd et">
-                        <Package className="h-3.5 w-3.5" /> Paketlə
+                    <div className="flex-1 min-w-[180px]">
+                      <div className="font-semibold line-clamp-1">{i.title}</div>
+                      <div className="text-xs text-muted-foreground">
+                        № {i.order_id.slice(0, 8).toUpperCase()} · {i.quantity} ədəd · Kod:{" "}
+                        <b className="font-mono">{i.pickup_code ?? "—"}</b>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        Müştəri: {i.customer_name ?? "—"}
+                        {i.customer_phone ? ` · ${i.customer_phone}` : ""}
+                      </div>
+                      {i.delivered_at ? (
+                        <div className="text-[10px] text-success font-bold mt-1">
+                          PVZ müştəriyə təhvil verib
+                        </div>
+                      ) : i.accepted_at ? (
+                        <div className="text-[10px] text-primary font-bold mt-1">
+                          PVZ paketi qəbul edib
+                        </div>
+                      ) : null}
+                    </div>
+                    <div className="font-extrabold whitespace-nowrap">
+                      {formatAZN(Number(i.price) * i.quantity)}
+                    </div>
+                    <select
+                      value={i.status}
+                      onChange={(e) => updateOrderStatus(i, e.target.value)}
+                      disabled={!!i.accepted_at || !!i.delivered_at}
+                      className={`text-xs px-3 py-2 rounded-lg font-semibold border-0 ${st.c} cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed`}
+                    >
+                      {ORDER_STATUSES.map((s) => (
+                        <option key={s.v} value={s.v}>
+                          {s.l}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="flex gap-1">
+                      {canPack && (
+                        <button
+                          onClick={() => updateOrderStatus(i, "packed")}
+                          className="px-3 py-2 rounded-lg bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white text-xs font-bold inline-flex items-center gap-1"
+                          title="Paketləndi olaraq qeyd et"
+                        >
+                          <Package className="h-3.5 w-3.5" /> Paketlə
+                        </button>
+                      )}
+                      {canShip && (
+                        <button
+                          onClick={() => updateOrderStatus(i, "shipped")}
+                          className="px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground text-xs font-bold inline-flex items-center gap-1"
+                          title="PVZ-yə göndərildi olaraq qeyd et"
+                        >
+                          <ShoppingBag className="h-3.5 w-3.5" /> Göndərildi
+                        </button>
+                      )}
+                      <button
+                        onClick={() => printShippingLabel(i)}
+                        className="px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground text-xs font-bold inline-flex items-center gap-1"
+                        title="Qablaşdırma etiketi (QR + sifariş kodu)"
+                      >
+                        <QrCode className="h-3.5 w-3.5" /> Etiket çap et
                       </button>
-                    )}
-                    {canShip && (
-                      <button onClick={() => updateOrderStatus(i, "shipped")}
-                              className="px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground text-xs font-bold inline-flex items-center gap-1"
-                              title="PVZ-yə göndərildi olaraq qeyd et">
-                        <ShoppingBag className="h-3.5 w-3.5" /> Göndərildi
-                      </button>
-                    )}
-                    <button onClick={() => printShippingLabel(i)}
-                            className="px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground text-xs font-bold inline-flex items-center gap-1"
-                            title="Qablaşdırma etiketi (QR + sifariş kodu)">
-                      <QrCode className="h-3.5 w-3.5" /> Etiket çap et
-                    </button>
+                    </div>
                   </div>
+                  {i.pickup_point ? (
+                    <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-xs">
+                      <div className="font-bold text-primary mb-1">
+                        📍 Çatdırılma PVZ #{i.pickup_point.point_number ?? "-"}
+                      </div>
+                      <div>
+                        <b>{i.pickup_point.name}</b> — {i.pickup_point.city}
+                      </div>
+                      <div className="text-muted-foreground">{i.pickup_point.address}</div>
+                      <div className="text-muted-foreground">
+                        {i.pickup_point.working_hours}
+                        {i.pickup_point.phone ? ` · ${i.pickup_point.phone}` : ""}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-xs text-muted-foreground italic">
+                      PVZ punkt təyin olunmayıb
+                    </div>
+                  )}
                 </div>
-                {i.pickup_point ? (
-                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-xs">
-                    <div className="font-bold text-primary mb-1">📍 Çatdırılma PVZ #{i.pickup_point.point_number ?? "-"}</div>
-                    <div><b>{i.pickup_point.name}</b> — {i.pickup_point.city}</div>
-                    <div className="text-muted-foreground">{i.pickup_point.address}</div>
-                    <div className="text-muted-foreground">{i.pickup_point.working_hours}{i.pickup_point.phone ? ` · ${i.pickup_point.phone}` : ""}</div>
-                  </div>
-                ) : (
-                  <div className="text-xs text-muted-foreground italic">PVZ punkt təyin olunmayıb</div>
-                )}
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       )}
 
@@ -639,7 +998,8 @@ function SellerPanel() {
               <LifeBuoy className="h-6 w-6 text-primary" /> AI Dəstək
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Satıcı suallarınıza 24/7 avtomatik cavab — məhsul, sifariş, reklam, ödəniş, mübahisələr.
+              Satıcı suallarınıza 24/7 avtomatik cavab — məhsul, sifariş, reklam, ödəniş,
+              mübahisələr.
             </p>
           </div>
           <AISupportChat userId={user.id} audience="seller" />
@@ -651,69 +1011,122 @@ function SellerPanel() {
           {/* Banner & Logo */}
           <div className="bg-card border border-border rounded-2xl overflow-hidden">
             <div className="relative h-40 bg-gradient-soft">
-              {profile.shop_banner_url && <img src={profile.shop_banner_url} alt="" className="w-full h-full object-cover" />}
+              {profile.shop_banner_url && (
+                <img src={profile.shop_banner_url} alt="" className="w-full h-full object-cover" />
+              )}
               <label className="absolute bottom-2 right-2 bg-background/90 backdrop-blur px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer hover:bg-background inline-flex items-center gap-1">
                 <Upload className="h-3 w-3" /> Banner yüklə
-                <input type="file" accept="image/*" className="hidden"
-                       onChange={(e) => e.target.files?.[0] && uploadShopImage(e.target.files[0], "shop_banner_url")} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) =>
+                    e.target.files?.[0] && uploadShopImage(e.target.files[0], "shop_banner_url")
+                  }
+                />
               </label>
               <div className="absolute -bottom-10 left-6 w-20 h-20 rounded-2xl border-4 border-card bg-secondary overflow-hidden">
-                {profile.shop_logo_url && <img src={profile.shop_logo_url} alt="" className="w-full h-full object-cover" />}
+                {profile.shop_logo_url && (
+                  <img src={profile.shop_logo_url} alt="" className="w-full h-full object-cover" />
+                )}
               </div>
             </div>
             <div className="pt-12 pb-4 px-6">
               <label className="text-xs text-primary font-semibold cursor-pointer inline-flex items-center gap-1 hover:underline">
                 <Upload className="h-3 w-3" /> Loqo dəyişdir
-                <input type="file" accept="image/*" className="hidden"
-                       onChange={(e) => e.target.files?.[0] && uploadShopImage(e.target.files[0], "shop_logo_url")} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) =>
+                    e.target.files?.[0] && uploadShopImage(e.target.files[0], "shop_logo_url")
+                  }
+                />
               </label>
             </div>
           </div>
 
           {/* Form */}
           <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
-            <h3 className="font-bold text-lg flex items-center gap-2"><Store className="h-5 w-5 text-primary" /> Mağaza məlumatları</h3>
+            <h3 className="font-bold text-lg flex items-center gap-2">
+              <Store className="h-5 w-5 text-primary" /> Mağaza məlumatları
+            </h3>
             <div className="grid sm:grid-cols-2 gap-3">
               <div className="sm:col-span-2">
                 <label className="text-sm font-semibold">Mağaza adı *</label>
-                <input value={profile.shop_name ?? ""} onChange={(e) => setProfile({ ...profile, shop_name: e.target.value })}
-                       maxLength={100} className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+                <input
+                  value={profile.shop_name ?? ""}
+                  onChange={(e) => setProfile({ ...profile, shop_name: e.target.value })}
+                  maxLength={100}
+                  className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
+                />
               </div>
               <div className="sm:col-span-2">
                 <label className="text-sm font-semibold">Mağaza haqqında</label>
-                <textarea value={profile.shop_description ?? ""} onChange={(e) => setProfile({ ...profile, shop_description: e.target.value })}
-                          maxLength={1000} placeholder="Müştərilərinizə özünüzdən bəhs edin..."
-                          className="mt-1 w-full px-3 py-2 rounded-lg border border-input bg-background min-h-24" />
+                <textarea
+                  value={profile.shop_description ?? ""}
+                  onChange={(e) => setProfile({ ...profile, shop_description: e.target.value })}
+                  maxLength={1000}
+                  placeholder="Müştərilərinizə özünüzdən bəhs edin..."
+                  className="mt-1 w-full px-3 py-2 rounded-lg border border-input bg-background min-h-24"
+                />
               </div>
               <div>
                 <label className="text-sm font-semibold">Tam ad</label>
-                <input value={profile.full_name ?? ""} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                       maxLength={100} className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+                <input
+                  value={profile.full_name ?? ""}
+                  onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                  maxLength={100}
+                  className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
+                />
               </div>
               <div>
                 <label className="text-sm font-semibold">Telefon</label>
-                <input value={profile.phone ?? ""} onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                       maxLength={20} placeholder="+994 ..." className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+                <input
+                  value={profile.phone ?? ""}
+                  onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                  maxLength={20}
+                  placeholder="+994 ..."
+                  className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
+                />
               </div>
               <div>
                 <label className="text-sm font-semibold">E-poçt (mağaza)</label>
-                <input type="email" value={profile.shop_email ?? ""} onChange={(e) => setProfile({ ...profile, shop_email: e.target.value })}
-                       maxLength={200} placeholder="info@magaza.az" className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+                <input
+                  type="email"
+                  value={profile.shop_email ?? ""}
+                  onChange={(e) => setProfile({ ...profile, shop_email: e.target.value })}
+                  maxLength={200}
+                  placeholder="info@magaza.az"
+                  className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
+                />
               </div>
               <div>
                 <label className="text-sm font-semibold">Şəhər</label>
-                <CitySelect value={profile.shop_city ?? ""}
-                       onChange={(v) => setProfile({ ...profile, shop_city: v })}
-                       includeEmpty placeholder="Şəhər seçin" className="mt-1 w-full h-11" />
+                <CitySelect
+                  value={profile.shop_city ?? ""}
+                  onChange={(v) => setProfile({ ...profile, shop_city: v })}
+                  includeEmpty
+                  placeholder="Şəhər seçin"
+                  className="mt-1 w-full h-11"
+                />
               </div>
               <div className="sm:col-span-2">
                 <label className="text-sm font-semibold">Ünvan</label>
-                <input value={profile.shop_address ?? ""} onChange={(e) => setProfile({ ...profile, shop_address: e.target.value })}
-                       maxLength={300} placeholder="H. Əliyev pr. 12" className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+                <input
+                  value={profile.shop_address ?? ""}
+                  onChange={(e) => setProfile({ ...profile, shop_address: e.target.value })}
+                  maxLength={300}
+                  placeholder="H. Əliyev pr. 12"
+                  className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
+                />
               </div>
             </div>
-            <button onClick={saveShop} disabled={savingShop}
-                    className="bg-primary text-primary-foreground rounded-lg px-6 h-11 font-bold hover:bg-primary/90 disabled:opacity-60">
+            <button
+              onClick={saveShop}
+              disabled={savingShop}
+              className="bg-primary text-primary-foreground rounded-lg px-6 h-11 font-bold hover:bg-primary/90 disabled:opacity-60"
+            >
               {savingShop ? "..." : "Mağazanı yadda saxla"}
             </button>
           </div>
@@ -721,37 +1134,71 @@ function SellerPanel() {
       )}
 
       {editing && (
-        <div className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-4" onClick={() => setEditing(null)}>
-          <div className="bg-card rounded-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-4"
+          onClick={() => setEditing(null)}
+        >
+          <div
+            className="bg-card rounded-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold">{editing.id ? "Məhsulu redaktə et" : "Yeni məhsul"}</h3>
-              <button onClick={() => setEditing(null)} className="p-1 hover:bg-secondary rounded"><X className="h-5 w-5" /></button>
+              <h3 className="text-xl font-bold">
+                {editing.id ? "Məhsulu redaktə et" : "Yeni məhsul"}
+              </h3>
+              <button onClick={() => setEditing(null)} className="p-1 hover:bg-secondary rounded">
+                <X className="h-5 w-5" />
+              </button>
             </div>
             <div className="space-y-4">
               {/* Images */}
               <div>
-                <label className="text-sm font-semibold mb-2 block">Şəkillər (ilk şəkil əsas olacaq)</label>
+                <label className="text-sm font-semibold mb-2 block">
+                  Şəkillər (ilk şəkil əsas olacaq)
+                </label>
                 <div className="grid grid-cols-4 gap-2 mb-2">
                   {(editing.images ?? []).map((url, idx) => (
-                    <div key={idx} className="relative aspect-square bg-secondary rounded-lg overflow-hidden group">
+                    <div
+                      key={idx}
+                      className="relative aspect-square bg-secondary rounded-lg overflow-hidden group"
+                    >
                       <img src={url} alt="" className="w-full h-full object-cover" />
-                      {idx === 0 && <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded font-bold">Əsas</span>}
-                      <button onClick={() => removeImage(url)}
-                              className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                      {idx === 0 && (
+                        <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded font-bold">
+                          Əsas
+                        </span>
+                      )}
+                      <button
+                        onClick={() => removeImage(url)}
+                        className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                      >
                         <X className="h-3 w-3" />
                       </button>
                     </div>
                   ))}
-                  <button onClick={() => fileRef.current?.click()} disabled={uploading}
-                          className="aspect-square border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center hover:border-primary hover:bg-secondary/50 transition disabled:opacity-60">
-                    {uploading ? <span className="text-xs">Yüklənir...</span> : <>
-                      <Upload className="h-5 w-5 text-muted-foreground mb-1" />
-                      <span className="text-xs text-muted-foreground">Şəkil əlavə et</span>
-                    </>}
+                  <button
+                    onClick={() => fileRef.current?.click()}
+                    disabled={uploading}
+                    className="aspect-square border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center hover:border-primary hover:bg-secondary/50 transition disabled:opacity-60"
+                  >
+                    {uploading ? (
+                      <span className="text-xs">Yüklənir...</span>
+                    ) : (
+                      <>
+                        <Upload className="h-5 w-5 text-muted-foreground mb-1" />
+                        <span className="text-xs text-muted-foreground">Şəkil əlavə et</span>
+                      </>
+                    )}
                   </button>
                 </div>
-                <input ref={fileRef} type="file" accept="image/*" multiple className="hidden"
-                       onChange={(e) => uploadImages(e.target.files)} />
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => uploadImages(e.target.files)}
+                />
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <ImageIcon className="h-3 w-3" /> JPG, PNG, WebP. Maks 5MB.
                 </p>
@@ -759,111 +1206,191 @@ function SellerPanel() {
 
               <div>
                 <label className="text-sm font-semibold">Başlıq *</label>
-                <input value={editing.title ?? ""} onChange={(e) => setEditing({ ...editing, title: e.target.value })}
-                       placeholder="Məhsulun adı" maxLength={200}
-                       className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+                <input
+                  value={editing.title ?? ""}
+                  onChange={(e) => setEditing({ ...editing, title: e.target.value })}
+                  placeholder="Məhsulun adı"
+                  maxLength={200}
+                  className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
+                />
               </div>
 
               <div>
                 <label className="text-sm font-semibold">Təsvir</label>
-                <textarea value={editing.description ?? ""} onChange={(e) => setEditing({ ...editing, description: e.target.value })}
-                          placeholder="Məhsul haqqında ətraflı məlumat" maxLength={2000}
-                          className="mt-1 w-full px-3 py-2 rounded-lg border border-input bg-background min-h-24" />
+                <textarea
+                  value={editing.description ?? ""}
+                  onChange={(e) => setEditing({ ...editing, description: e.target.value })}
+                  placeholder="Məhsul haqqında ətraflı məlumat"
+                  maxLength={2000}
+                  className="mt-1 w-full px-3 py-2 rounded-lg border border-input bg-background min-h-24"
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-sm font-semibold">Qiymət (₼) *</label>
-                  <input type="number" step="0.01" value={editing.price ?? 0}
-                         onChange={(e) => setEditing({ ...editing, price: parseFloat(e.target.value) || 0 })}
-                         className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={editing.price ?? 0}
+                    onChange={(e) =>
+                      setEditing({ ...editing, price: parseFloat(e.target.value) || 0 })
+                    }
+                    className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-semibold">Köhnə qiymət (₼)</label>
-                  <input type="number" step="0.01" value={editing.old_price ?? ""}
-                         onChange={(e) => setEditing({ ...editing, old_price: e.target.value ? parseFloat(e.target.value) : null })}
-                         placeholder="Endirim üçün" className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={editing.old_price ?? ""}
+                    onChange={(e) =>
+                      setEditing({
+                        ...editing,
+                        old_price: e.target.value ? parseFloat(e.target.value) : null,
+                      })
+                    }
+                    placeholder="Endirim üçün"
+                    className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
+                  />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-sm font-semibold">Stok *</label>
-                  <input type="number" value={editing.stock ?? 0}
-                         onChange={(e) => setEditing({ ...editing, stock: parseInt(e.target.value) || 0 })}
-                         className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+                  <input
+                    type="number"
+                    value={editing.stock ?? 0}
+                    onChange={(e) =>
+                      setEditing({ ...editing, stock: parseInt(e.target.value) || 0 })
+                    }
+                    className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-semibold">Marka</label>
-                  <input value={editing.brand ?? ""} onChange={(e) => setEditing({ ...editing, brand: e.target.value })}
-                         maxLength={100} className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+                  <input
+                    value={editing.brand ?? ""}
+                    onChange={(e) => setEditing({ ...editing, brand: e.target.value })}
+                    maxLength={100}
+                    className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
+                  />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-sm font-semibold">SKU kodu</label>
-                  <input value={editing.sku ?? ""} onChange={(e) => setEditing({ ...editing, sku: e.target.value })}
-                         maxLength={50} placeholder="ART-001" className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+                  <input
+                    value={editing.sku ?? ""}
+                    onChange={(e) => setEditing({ ...editing, sku: e.target.value })}
+                    maxLength={50}
+                    placeholder="ART-001"
+                    className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-semibold">Çəki (kq)</label>
-                  <input type="number" step="0.01" value={editing.weight ?? ""}
-                         onChange={(e) => setEditing({ ...editing, weight: e.target.value ? parseFloat(e.target.value) : null })}
-                         className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background" />
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={editing.weight ?? ""}
+                    onChange={(e) =>
+                      setEditing({
+                        ...editing,
+                        weight: e.target.value ? parseFloat(e.target.value) : null,
+                      })
+                    }
+                    className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
+                  />
                 </div>
               </div>
 
               <div>
                 <label className="text-sm font-semibold">Kateqoriya</label>
-                <select value={editing.category_id ?? ""} onChange={(e) => setEditing({ ...editing, category_id: e.target.value || null })}
-                        className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background">
+                <select
+                  value={editing.category_id ?? ""}
+                  onChange={(e) => setEditing({ ...editing, category_id: e.target.value || null })}
+                  className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
+                >
                   <option value="">Seçin...</option>
-                  {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="border-t border-border pt-4">
-                <h4 className="text-sm font-bold mb-3 flex items-center gap-2">🚚 Çatdırılma şərtləri</h4>
+                <h4 className="text-sm font-bold mb-3 flex items-center gap-2">
+                  🚚 Çatdırılma şərtləri
+                </h4>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-xs font-semibold text-muted-foreground">Min gün</label>
-                    <input type="number" min={0} value={editing.delivery_days_min ?? 1}
-                           onChange={(e) => setEditing({ ...editing, delivery_days_min: parseInt(e.target.value) || 0 })}
-                           className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+                    <input
+                      type="number"
+                      min={0}
+                      value={editing.delivery_days_min ?? 1}
+                      onChange={(e) =>
+                        setEditing({ ...editing, delivery_days_min: parseInt(e.target.value) || 0 })
+                      }
+                      className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background"
+                    />
                   </div>
                   <div>
                     <label className="text-xs font-semibold text-muted-foreground">Max gün</label>
-                    <input type="number" min={0} value={editing.delivery_days_max ?? 3}
-                           onChange={(e) => setEditing({ ...editing, delivery_days_max: parseInt(e.target.value) || 0 })}
-                           className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+                    <input
+                      type="number"
+                      min={0}
+                      value={editing.delivery_days_max ?? 3}
+                      onChange={(e) =>
+                        setEditing({ ...editing, delivery_days_max: parseInt(e.target.value) || 0 })
+                      }
+                      className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background"
+                    />
                   </div>
                 </div>
                 <div className="mt-3">
-                  <label className="text-xs font-semibold text-muted-foreground">Çatdırılma şəhəri</label>
-                  <CitySelect value={editing.delivery_city ?? "Bakı"}
-                          onChange={(v) => setEditing({ ...editing, delivery_city: v })}
-                          className="mt-1 w-full" />
+                  <label className="text-xs font-semibold text-muted-foreground">
+                    Çatdırılma şəhəri
+                  </label>
+                  <CitySelect
+                    value={editing.delivery_city ?? "Bakı"}
+                    onChange={(v) => setEditing({ ...editing, delivery_city: v })}
+                    className="mt-1 w-full"
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-3 mt-3">
                   <label className="flex items-center gap-2 cursor-pointer p-2 rounded-lg border border-border hover:border-primary">
-                    <input type="checkbox" checked={!!editing.free_shipping}
-                           onChange={(e) => setEditing({ ...editing, free_shipping: e.target.checked })}
-                           className="w-4 h-4 accent-primary" />
+                    <input
+                      type="checkbox"
+                      checked={!!editing.free_shipping}
+                      onChange={(e) => setEditing({ ...editing, free_shipping: e.target.checked })}
+                      className="w-4 h-4 accent-primary"
+                    />
                     <span className="text-xs font-semibold">🆓 Pulsuz çatdırılma</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer p-2 rounded-lg border border-border hover:border-primary">
-                    <input type="checkbox" checked={!!editing.fast_delivery}
-                           onChange={(e) => setEditing({ ...editing, fast_delivery: e.target.checked })}
-                           className="w-4 h-4 accent-primary" />
+                    <input
+                      type="checkbox"
+                      checked={!!editing.fast_delivery}
+                      onChange={(e) => setEditing({ ...editing, fast_delivery: e.target.checked })}
+                      className="w-4 h-4 accent-primary"
+                    />
                     <span className="text-xs font-semibold">⚡ 24 saat ərzində</span>
                   </label>
                 </div>
                 <div className="mt-3">
                   <label className="text-xs font-semibold text-muted-foreground">Vəziyyəti</label>
-                  <select value={editing.condition ?? "new"}
-                          onChange={(e) => setEditing({ ...editing, condition: e.target.value })}
-                          className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background">
+                  <select
+                    value={editing.condition ?? "new"}
+                    onChange={(e) => setEditing({ ...editing, condition: e.target.value })}
+                    className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background"
+                  >
                     <option value="new">Yeni</option>
                     <option value="used">İşlənmiş</option>
                   </select>
@@ -871,19 +1398,27 @@ function SellerPanel() {
               </div>
 
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={editing.is_active ?? true}
-                       onChange={(e) => setEditing({ ...editing, is_active: e.target.checked })}
-                       className="w-4 h-4" />
+                <input
+                  type="checkbox"
+                  checked={editing.is_active ?? true}
+                  onChange={(e) => setEditing({ ...editing, is_active: e.target.checked })}
+                  className="w-4 h-4"
+                />
                 <span className="text-sm font-semibold">Aktiv (mağazada göstər)</span>
               </label>
 
               <div className="flex gap-2 pt-2">
-                <button onClick={() => setEditing(null)}
-                        className="flex-1 h-11 border border-border rounded-lg font-bold hover:bg-secondary">
+                <button
+                  onClick={() => setEditing(null)}
+                  className="flex-1 h-11 border border-border rounded-lg font-bold hover:bg-secondary"
+                >
                   Ləğv et
                 </button>
-                <button onClick={save} disabled={uploading}
-                        className="flex-1 h-11 bg-primary text-primary-foreground rounded-lg font-bold hover:bg-primary/90 disabled:opacity-60">
+                <button
+                  onClick={save}
+                  disabled={uploading}
+                  className="flex-1 h-11 bg-primary text-primary-foreground rounded-lg font-bold hover:bg-primary/90 disabled:opacity-60"
+                >
                   Yadda saxla
                 </button>
               </div>
@@ -893,11 +1428,19 @@ function SellerPanel() {
       )}
 
       {qrProduct && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setQrProduct(null)}>
-          <div className="bg-card rounded-2xl p-6 max-w-sm w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
+          onClick={() => setQrProduct(null)}
+        >
+          <div
+            className="bg-card rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-lg">Məhsul QR kodu</h3>
-              <button onClick={() => setQrProduct(null)} className="p-1 hover:bg-secondary rounded"><X className="h-5 w-5" /></button>
+              <button onClick={() => setQrProduct(null)} className="p-1 hover:bg-secondary rounded">
+                <X className="h-5 w-5" />
+              </button>
             </div>
             <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{qrProduct.title}</p>
             {qrDataUrl && (
@@ -909,12 +1452,16 @@ function SellerPanel() {
               {window.location.origin}/product/{qrProduct.id}
             </div>
             <div className="flex gap-2 flex-wrap">
-              <button onClick={downloadQR} className="flex-1 min-w-[120px] bg-primary text-primary-foreground px-3 py-2 rounded-lg font-bold hover:bg-primary/90 inline-flex items-center justify-center gap-2 text-sm">
+              <button
+                onClick={downloadQR}
+                className="flex-1 min-w-[120px] bg-primary text-primary-foreground px-3 py-2 rounded-lg font-bold hover:bg-primary/90 inline-flex items-center justify-center gap-2 text-sm"
+              >
                 <Download className="h-4 w-4" /> PNG yüklə
               </button>
-              <button onClick={() => {
-                if (!qrProduct || !qrDataUrl) return;
-                const html = `<!doctype html><html><head><meta charset="utf-8"><title>${qrProduct.title}</title>
+              <button
+                onClick={() => {
+                  if (!qrProduct || !qrDataUrl) return;
+                  const html = `<!doctype html><html><head><meta charset="utf-8"><title>${qrProduct.title}</title>
 <style>
   @page { size: 80mm 100mm; margin: 3mm; }
   * { box-sizing: border-box; font-family: -apple-system, system-ui, Arial, sans-serif; }
@@ -938,13 +1485,24 @@ function SellerPanel() {
 </div>
 <script>setTimeout(()=>window.print(),300);</script>
 </body></html>`;
-                const w = window.open("", "_blank", "width=380,height=520");
-                if (!w) { toast.error("Pop-up bloklanıb"); return; }
-                w.document.write(html); w.document.close();
-              }} className="flex-1 min-w-[120px] bg-secondary text-foreground px-3 py-2 rounded-lg font-bold hover:bg-secondary/80 inline-flex items-center justify-center gap-2 text-sm">
+                  const w = window.open("", "_blank", "width=380,height=520");
+                  if (!w) {
+                    toast.error("Pop-up bloklanıb");
+                    return;
+                  }
+                  w.document.write(html);
+                  w.document.close();
+                }}
+                className="flex-1 min-w-[120px] bg-secondary text-foreground px-3 py-2 rounded-lg font-bold hover:bg-secondary/80 inline-flex items-center justify-center gap-2 text-sm"
+              >
                 <QrCode className="h-4 w-4" /> Etiket çap et
               </button>
-              <button onClick={() => setQrProduct(null)} className="px-3 py-2 rounded-lg border border-border hover:bg-secondary text-sm">Bağla</button>
+              <button
+                onClick={() => setQrProduct(null)}
+                className="px-3 py-2 rounded-lg border border-border hover:bg-secondary text-sm"
+              >
+                Bağla
+              </button>
             </div>
           </div>
         </div>
