@@ -1666,6 +1666,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      sync_order_status_from_items: {
+        Args: { _order_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "seller" | "buyer" | "pvz"
