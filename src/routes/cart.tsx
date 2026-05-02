@@ -419,9 +419,20 @@ function CartPage() {
               <span className="font-semibold">{formatAZN(subtotal)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">{t("cart.delivery")}</span>
-              <span className="font-semibold text-success">{t("cart.free")}</span>
+              <span className="text-muted-foreground">
+                {t("cart.delivery")} {deliveryMethod === "home" ? "(Ev)" : "(PVZ)"}
+              </span>
+              {shippingFee > 0 ? (
+                <span className="font-semibold">{formatAZN(shippingFee)}</span>
+              ) : (
+                <span className="font-semibold text-success">{t("cart.free")}</span>
+              )}
             </div>
+            {deliveryMethod === "home" && subtotal < FREE_SHIPPING_THRESHOLD && (
+              <div className="text-[11px] text-muted-foreground -mt-1">
+                {formatAZN(FREE_SHIPPING_THRESHOLD - subtotal)} daha alış-veriş edin və ev çatdırılması pulsuz olsun
+              </div>
+            )}
 
             <div className="border-t border-border pt-3 space-y-2">
               <label className="text-xs font-semibold text-muted-foreground">
