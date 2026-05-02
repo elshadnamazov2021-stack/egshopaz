@@ -493,6 +493,17 @@ function SellerPanel() {
     const qrDataUrl = await QRCode.toDataURL(pickupCode, { width: 320, margin: 1 });
     const orderCode = item.order_id.slice(0, 8).toUpperCase();
     const shopName = profile?.shop_name ?? "Mağaza";
+    const escapeHtml = (value: string) =>
+      value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    const customerName = escapeHtml(item.customer_name?.trim() || "—");
+    const customerPhone = escapeHtml(item.customer_phone?.trim() || "—");
+    const safeShopName = escapeHtml(shopName);
+    const safeTitle = escapeHtml(item.title);
     const html = `<!doctype html><html><head><meta charset="utf-8"><title>Etiket ${orderCode}</title>
 <style>
   @page { size: 100mm 150mm; margin: 4mm; }
@@ -503,6 +514,9 @@ function SellerPanel() {
   .shop { font-weight: 800; font-size: 14pt; }
   .code { font-family: monospace; font-weight: 800; font-size: 12pt; }
   .title { font-size: 13pt; font-weight: 700; margin: 3mm 0; line-height: 1.3; }
+  .customer { border: 2px solid #000; padding: 3mm; margin: 2mm 0 3mm; font-size: 12pt; line-height: 1.45; }
+  .customer .head { font-weight: 900; font-size: 11pt; text-transform: uppercase; margin-bottom: 1mm; }
+  .customer b { font-size: 14pt; }
   .row { display:flex; justify-content:space-between; font-size: 11pt; margin: 2mm 0; }
   .qr { text-align:center; margin-top: auto; }
   .qr img { width: 55mm; height: 55mm; }
@@ -518,10 +532,15 @@ function SellerPanel() {
 </div>
 <div class="label">
   <div class="top">
-    <div class="shop">📦 ${shopName}</div>
+    <div class="shop">📦 ${safeShopName}</div>
     <div class="code">#${orderCode}</div>
   </div>
-  <div class="title">${item.title}</div>
+  <div class="customer">
+    <div class="head">Müştəri məlumatları</div>
+    <div>Ad soyad: <b>${customerName}</b></div>
+    <div>Telefon: <b>${customerPhone}</b></div>
+  </div>
+  <div class="title">${safeTitle}</div>
   <div class="row"><span>Say:</span><b>${item.quantity} ədəd</b></div>
   <div class="row"><span>Cəmi:</span><span class="price">${(Number(item.price) * item.quantity).toFixed(2)} ₼</span></div>
   <div class="qr">
