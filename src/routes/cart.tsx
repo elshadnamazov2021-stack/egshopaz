@@ -252,9 +252,39 @@ function CartPage() {
               <span>{t("cart.total")}</span>
               <span>{formatAZN(finalTotal)}</span>
             </div>
-            <textarea value={address} onChange={(e) => setAddress(e.target.value)} maxLength={500}
-              placeholder={t("cart.addressPlaceholder")}
-              className="w-full border border-input rounded-lg p-3 text-sm min-h-20 focus:outline-none focus:ring-2 focus:ring-ring" />
+            <div className="border-t border-border pt-3 space-y-2">
+              <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" /> PVZ punkt seçin
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input value={pvzSearch} onChange={(e) => setPvzSearch(e.target.value)}
+                  placeholder="Şəhər, ünvan və ya nömrə..."
+                  className="w-full pl-9 pr-3 h-9 rounded-lg border border-input bg-background text-sm" />
+              </div>
+              <div className="max-h-56 overflow-y-auto space-y-1 border border-border rounded-lg p-1">
+                {pvzList
+                  .filter((p) => {
+                    const q = pvzSearch.toLowerCase().trim();
+                    if (!q) return true;
+                    return p.city.toLowerCase().includes(q)
+                      || p.address.toLowerCase().includes(q)
+                      || p.name.toLowerCase().includes(q)
+                      || String(p.point_number ?? "").includes(q);
+                  })
+                  .map((p) => (
+                    <button key={p.id} type="button" onClick={() => setPvzId(p.id)}
+                      className={`w-full text-left p-2 rounded-md text-xs hover:bg-secondary transition ${pvzId === p.id ? "bg-primary/10 ring-2 ring-primary" : ""}`}>
+                      <div className="font-bold">#{p.point_number ?? "-"} · {p.name}</div>
+                      <div className="text-muted-foreground">{p.city} — {p.address}</div>
+                      <div className="text-muted-foreground">{p.working_hours}{p.phone ? ` · ${p.phone}` : ""}</div>
+                    </button>
+                  ))}
+                {pvzList.length === 0 && (
+                  <div className="text-xs text-muted-foreground p-3 text-center">PVZ punkt mövcud deyil</div>
+                )}
+              </div>
+            </div>
             <button onClick={checkout} disabled={placing}
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl py-3 font-bold disabled:opacity-60">
               {placing ? t("cart.placing") : t("cart.checkout")}
