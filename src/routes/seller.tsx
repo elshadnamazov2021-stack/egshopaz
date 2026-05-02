@@ -35,6 +35,10 @@ interface OrderItem {
   id: string; title: string; price: number; quantity: number;
   image_url: string | null; order_id: string; status: string; product_id: string;
   pickup_code: string | null;
+  customer_name: string | null;
+  customer_phone: string | null;
+  accepted_at: string | null;
+  delivered_at: string | null;
   pickup_point_id: string | null;
   pickup_point: { id: string; name: string; city: string; address: string; point_number: number | null; phone: string | null; working_hours: string } | null;
 }
@@ -91,7 +95,11 @@ function SellerPanel() {
     const [{ data: ps }, { data: cs }, { data: ois }, { data: pr }] = await Promise.all([
       supabase.from("products").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("categories").select("id,name").order("sort_order"),
-      supabase.from("order_items").select("*,pickup_point:pickup_points(id,name,city,address,point_number,phone,working_hours)").eq("seller_id", user.id).order("id", { ascending: false }).limit(100),
+      supabase.from("order_items")
+        .select("id,title,price,quantity,image_url,order_id,status,product_id,pickup_code,customer_name,customer_phone,accepted_at,delivered_at,pickup_point_id,pickup_point:pickup_points(id,name,city,address,point_number,phone,working_hours)")
+        .eq("seller_id", user.id)
+        .order("id", { ascending: false })
+        .limit(100),
       supabase.from("profiles").select("full_name,shop_name,phone,avatar_url,shop_description,shop_logo_url,shop_banner_url,shop_address,shop_city,shop_email").eq("id", user.id).maybeSingle(),
     ]);
     setProducts((ps ?? []) as unknown as Product[]);
@@ -104,6 +112,14 @@ function SellerPanel() {
     });
   };
   useEffect(() => { if (user && isSeller) load(); }, [user, isSeller]);
+
+  useEffect(() => {
+    if (!user || !isSeller) return;
+    const ch = supabase.channel(`seller-orders-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "order_items", filter: `seller_id=eq.${user.id}` }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user, isSeller]);
 
   // Unread messages counter (with realtime)
   useEffect(() => {
@@ -240,8 +256,12 @@ function SellerPanel() {
     load();
   };
 
-  const updateOrderStatus = async (id: string, status: string) => {
-    const { error } = await supabase.from("order_items").update({ status }).eq("id", id);
+  const updateOrderStatus = async (item: OrderItem, status: string) => {
+    if (item.accepted_at || item.delivered_at) {
+      toast.error("PVZ qəbulundan sonra statusu yalnız PVZ dəyişə bilər");
+      return;
+    }
+    const { error } = await supabase.from("order_items").update({ status }).eq("id", item.id);
     if (error) toast.error(error.message);
     else { toast.success("Status yeniləndi"); load(); }
   };
