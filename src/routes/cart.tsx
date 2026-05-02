@@ -200,7 +200,7 @@ function CartPage() {
       .select()
       .single();
     if (error || !order) {
-      toast.error(t("cart.orderError"));
+      toast.error(`Sifariş yaradıla bilmədi: ${error?.message ?? t("cart.orderError")}`);
       setPlacing(false);
       return;
     }

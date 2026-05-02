@@ -9,25 +9,30 @@ export function useFavorite(productId: string) {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!user) { setIsFav(false); return; }
+    if (!user?.id) { setIsFav(false); return; }
     let active = true;
     supabase.from("favorites").select("id").eq("user_id", user.id).eq("product_id", productId).maybeSingle()
-      .then(({ data }) => { if (active) setIsFav(!!data); });
+      .then(({ data, error }) => { if (active && !error) setIsFav(!!data); });
     return () => { active = false; };
-  }, [user, productId]);
+  }, [user?.id, productId]);
 
   const toggle = async (e?: React.MouseEvent) => {
     e?.preventDefault();
     e?.stopPropagation();
     if (!user) { toast.error("Sevimlilər üçün daxil olun"); return; }
     if (isSeller || isPvz) { toast.error("Sevimli yalnız müştəri hesabı üçündür"); return; }
+    if (busy) return;
     setBusy(true);
     if (isFav) {
-      await supabase.from("favorites").delete().eq("user_id", user.id).eq("product_id", productId);
+      const { error } = await supabase.from("favorites").delete().eq("user_id", user.id).eq("product_id", productId);
+      if (error) { toast.error(`Sevimlilər yenilənmədi: ${error.message}`); setBusy(false); return; }
       setIsFav(false);
       toast.success("Sevimlilərdən çıxarıldı");
     } else {
-      await supabase.from("favorites").insert({ user_id: user.id, product_id: productId });
+      const { error } = await supabase
+        .from("favorites")
+        .upsert({ user_id: user.id, product_id: productId }, { onConflict: "user_id,product_id" });
+      if (error) { toast.error(`Sevimlilərə əlavə olunmadı: ${error.message}`); setBusy(false); return; }
       setIsFav(true);
       toast.success("Sevimlilərə əlavə olundu");
     }
