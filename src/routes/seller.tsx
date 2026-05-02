@@ -209,7 +209,7 @@ function SellerPanel() {
           .from("orders")
           .select("id,pickup_point_id,recipient_name,recipient_phone,created_at")
           .in("id", orderIds)
-      : { data: [] };
+      : { data: [], error: null };
     if (ordersError) {
       toast.error(`Sifariş məlumatı yüklənmədi: ${ordersError.message}`);
       return;
@@ -227,7 +227,7 @@ function SellerPanel() {
           .from("pickup_points")
           .select("id,name,city,address,point_number,phone,working_hours")
           .in("id", pickupIds)
-      : { data: [] };
+      : { data: [], error: null };
     if (pickupError) {
       toast.error(`PVZ məlumatı yüklənmədi: ${pickupError.message}`);
       return;
