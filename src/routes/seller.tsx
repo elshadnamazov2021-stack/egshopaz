@@ -505,13 +505,13 @@ function SellerPanel() {
                     <div className="text-xs text-muted-foreground">№ {i.order_id.slice(0, 8).toUpperCase()} · {i.quantity} ədəd · Kod: <b className="font-mono">{i.pickup_code ?? "—"}</b></div>
                   </div>
                   <div className="font-extrabold whitespace-nowrap">{formatAZN(Number(i.price) * i.quantity)}</div>
-                  <select value={i.status} onChange={(e) => updateOrderStatus(i.id, e.target.value)}
+                  <select value={i.status} onChange={(e) => updateOrderStatus(i, e.target.value)}
                           className={`text-xs px-3 py-2 rounded-lg font-semibold border-0 ${st.c} cursor-pointer`}>
                     {ORDER_STATUSES.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}
                   </select>
                   <div className="flex gap-1">
                     {canPack && (
-                      <button onClick={() => updateOrderStatus(i.id, "packed")}
+                      <button onClick={() => updateOrderStatus(i, "packed")}
                               className="px-3 py-2 rounded-lg bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white text-xs font-bold inline-flex items-center gap-1"
                               title="Paketləndi olaraq qeyd et">
                         <Package className="h-3.5 w-3.5" /> Paketlə
