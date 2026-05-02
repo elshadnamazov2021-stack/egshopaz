@@ -19,7 +19,7 @@ export const Route = createFileRoute("/orders")({
 });
 
 interface OrderItem { id: string; title: string; price: number; quantity: number; image_url: string | null; status: string; seller_id: string; product_id: string; pickup_code: string | null; accepted_at: string | null; delivered_at: string | null; pickup_point_id: string | null }
-interface Order { id: string; total: number; status: string; created_at: string; shipping_address: string | null; payment_method: string; pickup_point_id: string | null; pickup_points: { name: string; address: string; city: string } | null; order_items: OrderItem[] }
+interface Order { id: string; total: number; status: string; created_at: string; shipping_address: string | null; payment_method: string; pickup_point_id: string | null; recipient_name: string | null; recipient_phone: string | null; pickup_points: { name: string; address: string; city: string } | null; order_items: OrderItem[] }
 
 const statusColor: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -246,6 +246,8 @@ function OrdersPage() {
           subtitle={`${t("orders.orderNumber")}${qrOrder?.id.slice(0, 8).toUpperCase()}`}
           pvzName={qrOrder?.pickup_points?.name ?? null}
           pvzAddress={qrOrder?.pickup_points ? `${qrOrder.pickup_points.city}, ${qrOrder.pickup_points.address}` : null}
+          customerName={qrOrder?.recipient_name ?? null}
+          customerPhone={qrOrder?.recipient_phone ?? null}
           mode="buyer"
         />
       )}
