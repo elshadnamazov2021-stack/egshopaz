@@ -344,8 +344,12 @@ function AuthPage() {
                   <div className="text-xs font-semibold text-primary">Yeni PVZ PUNKT məlumatları</div>
                   <input value={newPvzName} onChange={(e) => setNewPvzName(e.target.value)}
                     placeholder="PVZ PUNKT adı (məs. Mərkəz-1)" maxLength={80} className={inputCls} />
-                  <input value={newPvzCity} onChange={(e) => setNewPvzCity(e.target.value)}
-                    placeholder="Şəhər (məs. Bakı)" maxLength={50} className={inputCls} />
+                  <select value={newPvzCity} onChange={(e) => setNewPvzCity(e.target.value)} className={inputCls}>
+                    <option value="">Şəhər seçin</option>
+                    {AZ_CITIES.map((c) => (
+                      <option key={c.name} value={c.name}>{c.name}</option>
+                    ))}
+                  </select>
                   <input value={newPvzAddress} onChange={(e) => setNewPvzAddress(e.target.value)}
                     placeholder="Tam ünvan (küçə, bina, mənzil)" maxLength={200} className={inputCls} />
                 </div>
