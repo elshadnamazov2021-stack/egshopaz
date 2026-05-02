@@ -585,10 +585,14 @@ function Intake({ scan, setScan }: { scan: string; setScan: (v: string) => void 
   );
 }
 
+type ConfirmStep = "found" | "ready" | "delivering";
+
 function Delivery({ search, setSearch }: { search: string; setSearch: (v: string) => void }) {
   const [scannerOpen, setScannerOpen] = useState(false);
   const [list, setList] = useState<DBOrderItem[]>([]);
   const [busy, setBusy] = useState(false);
+  const [confirmItem, setConfirmItem] = useState<DBOrderItem | null>(null);
+  const [step, setStep] = useState<ConfirmStep>("found");
 
   const load = () => {
     supabase
@@ -613,39 +617,45 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
     };
   }, []);
 
-  const deliverByCode = async (code: string) => {
+  const openConfirm = async (code: string) => {
     setBusy(true);
     const q = code.trim();
     const fromList = list.find(
       (o) => o.pickup_code === q.toUpperCase() || o.orders?.recipient_phone?.includes(q),
     );
     const item = fromList ?? (await findItemByCode(code));
+    setBusy(false);
     if (!item) {
       toast.error("Bu kod tapılmadı");
-      setBusy(false);
       return;
     }
     if (!item.accepted_at) {
       toast.error("Bu məhsul hələ PVZ-yə qəbul edilməyib");
-      setBusy(false);
       return;
     }
     if (item.delivered_at) {
       toast.info("Artıq təhvil verilib");
-      setBusy(false);
       return;
     }
+    setConfirmItem(item);
+    setStep("found");
+  };
+
+  const confirmDeliver = async () => {
+    if (!confirmItem) return;
+    setBusy(true);
     const { error } = await supabase
       .from("order_items")
       .update({ status: "delivered", delivered_at: new Date().toISOString() })
-      .eq("id", item.id);
+      .eq("id", confirmItem.id);
     setBusy(false);
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success(`✓ ${item.title.slice(0, 30)} müştəriyə təhvil verildi`);
+    toast.success(`✓ ${confirmItem.title.slice(0, 30)} müştəriyə təhvil verildi`);
     setSearch("");
+    setConfirmItem(null);
     load();
   };
 
