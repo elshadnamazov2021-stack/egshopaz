@@ -98,6 +98,9 @@ function AuthPage() {
   const [pvzList, setPvzList] = useState<{ id: string; name: string; city: string }[]>([]);
   const [pickupPointId, setPickupPointId] = useState<string>("");
   const [position, setPosition] = useState("operator");
+  const [newPvzName, setNewPvzName] = useState("");
+  const [newPvzCity, setNewPvzCity] = useState("");
+  const [newPvzAddress, setNewPvzAddress] = useState("");
 
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
