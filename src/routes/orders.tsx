@@ -44,6 +44,8 @@ function OrdersPage() {
   const [qrItem, setQrItem] = useState<OrderItem | null>(null);
   const [trackOrder, setTrackOrder] = useState<Order | null>(null);
   const [returnItem, setReturnItem] = useState<{ item: OrderItem; orderId: string } | null>(null);
+  const [myReturns, setMyReturns] = useState<MyReturn[]>([]);
+  const [returnQR, setReturnQR] = useState<MyReturn | null>(null);
   const qrOrder = qrItem ? orders.find((o) => o.order_items?.some((i) => i.id === qrItem.id)) : null;
 
   const statusLabel: Record<string, string> = {
