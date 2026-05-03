@@ -929,6 +929,25 @@ function Returns() {
     void load();
   };
 
+  const stageOf = (r: ReturnRow): number => {
+    if (r.status === "completed") return 4;
+    if (r.status === "approved" && r.pvz_received_at) return 3;
+    if (r.pvz_received_at) return 2;
+    return 1;
+  };
+  const STAGES = ["Müştəri açdı", "PVZ qəbul etdi", "Satıcıya göndərildi", "Satıcı təsdiqlədi", "Tamamlandı"];
+
+  const Stepper = ({ stage }: { stage: number }) => (
+    <div className="flex items-center gap-1 mt-2">
+      {STAGES.map((s, i) => (
+        <div key={s} className="flex-1">
+          <div className={`h-1.5 rounded-full ${i <= stage ? "bg-primary" : "bg-muted"}`} />
+          <div className={`text-[9px] mt-1 text-center ${i <= stage ? "text-primary font-semibold" : "text-muted-foreground"}`}>{s}</div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -939,6 +958,16 @@ function Returns() {
           <ScanLine className="h-4 w-4 mr-1" /> QR ilə qəbul et
         </Button>
       </div>
+
+      <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-xs space-y-1">
+        <div className="font-bold text-primary">ℹ️ Qaytarma prosesi necə işləyir?</div>
+        <div>1️⃣ Müştəri öz hesabından məhsulu qaytarma istəyini açır (şəkil + səbəb yükləyir) və PVZ kodu alır.</div>
+        <div>2️⃣ Müştəri məhsulu PVZ-ə gətirir → PVZ operatoru <b>QR ilə qəbul et</b> düyməsi ilə kodu skan edir və paketi qəbul edir.</div>
+        <div>3️⃣ Sistem avtomatik satıcıya bildiriş göndərir, məhsul satıcıya geri qaytarılır.</div>
+        <div>4️⃣ Satıcı paketi yoxlayır → təsdiq və ya rədd edir. Pul/bonus müştəriyə qaytarılır.</div>
+        <div className="text-muted-foreground">⚠️ Qaytarma xərci səbəbə görə müəyyənləşir: qüsurlu məhsul → satıcı; fikir dəyişməsi → müştəri.</div>
+      </div>
+
       <div className="bg-card border border-border rounded-2xl p-4">
         <div className="font-bold mb-3">Bu PVZ-yə aid qaytarmalar ({list.length})</div>
         {list.length === 0 ? (
