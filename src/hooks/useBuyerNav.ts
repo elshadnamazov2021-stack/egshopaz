@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   User as UserIcon, Package, MapPin, CreditCard, Star,
   Gift, Bell, MessageCircle, Coins, AlertTriangle,
-  Heart, ShoppingCart,
+  Heart, ShoppingCart, Undo2,
 } from "lucide-react";
 import type { PanelNavItem } from "@/components/PanelLayout";
 
