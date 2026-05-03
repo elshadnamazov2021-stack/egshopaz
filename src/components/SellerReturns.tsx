@@ -268,6 +268,31 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
           )}
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!rejectFor} onOpenChange={(v) => { if (!v) { setRejectFor(null); setRejectReason(""); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Qaytarmanı rədd et</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            <div className="text-muted-foreground text-xs">
+              Səbəbi yazın — müştəriyə bildiriş şəklində göndəriləcək.
+            </div>
+            <Textarea
+              placeholder="Məs: Məhsul istifadə edilib, geri qəbul mümkün deyil..."
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              rows={4}
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => { setRejectFor(null); setRejectReason(""); }}>İmtina</Button>
+              <Button variant="destructive" onClick={() => rejectFor && reject(rejectFor, rejectReason)}>
+                <XCircle className="h-4 w-4 mr-1" /> Rədd et və göndər
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
