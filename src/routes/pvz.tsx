@@ -999,10 +999,11 @@ function Returns() {
                       {r.cost_paid_by === "seller" ? "Satıcı" : "Müştəri"}
                     </span>
                   </TableCell>
-                  <TableCell>
-                    {r.pvz_received_at
-                      ? <span className="text-emerald-600 text-xs font-semibold">Qəbul edildi</span>
-                      : <Button size="sm" variant="outline" onClick={() => acceptReturn(r)}>Əl ilə qəbul et</Button>}
+                  <TableCell className="min-w-[220px]">
+                    <Stepper stage={stageOf(r)} />
+                    {!r.pvz_received_at && (
+                      <Button size="sm" variant="outline" className="mt-2 w-full" onClick={() => acceptReturn(r)}>Əl ilə qəbul et</Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
