@@ -886,8 +886,44 @@ interface ReturnRow {
   shipped_to_seller_at: string | null;
   created_at: string;
   buyer_id: string;
+  order_id: string;
   order_item_id: string;
-  order_items: { title: string; orders: { recipient_name: string | null; recipient_phone: string | null } | null } | null;
+  order_items: {
+    title: string;
+    orders: { recipient_name: string | null; recipient_phone: string | null } | null;
+  } | null;
+}
+
+type ReturnBaseRow = Omit<ReturnRow, "order_items">;
+
+async function attachReturnDetails(rows: ReturnBaseRow[]): Promise<ReturnRow[]> {
+  const itemIds = [...new Set(rows.map((r) => r.order_item_id).filter(Boolean))];
+  const orderIds = [...new Set(rows.map((r) => r.order_id).filter(Boolean))];
+
+  const [{ data: itemRows, error: itemError }, { data: orderRows, error: orderError }] =
+    await Promise.all([
+      itemIds.length
+        ? supabase.from("order_items").select("id,title").in("id", itemIds)
+        : Promise.resolve({ data: [], error: null }),
+      orderIds.length
+        ? supabase.from("orders").select("id,recipient_name,recipient_phone").in("id", orderIds)
+        : Promise.resolve({ data: [], error: null }),
+    ]);
+
+  if (itemError || orderError) {
+    toast.error(`Qaytarma detalları yüklənmədi: ${(itemError ?? orderError)?.message}`);
+  }
+
+  const itemMap = new Map((itemRows ?? []).map((item) => [item.id, item]));
+  const orderMap = new Map((orderRows ?? []).map((order) => [order.id, order]));
+
+  return rows.map((row) => ({
+    ...row,
+    order_items: {
+      title: itemMap.get(row.order_item_id)?.title ?? "—",
+      orders: orderMap.get(row.order_id) ?? null,
+    },
+  }));
 }
 
 function Returns() {
@@ -899,23 +935,37 @@ function Returns() {
 
   const getPickupPointId = async () => {
     if (!user) return null;
-    const { data: staff } = await supabase.from("pvz_staff").select("pickup_point_id").eq("user_id", user.id).maybeSingle();
+    const { data: staff } = await supabase
+      .from("pvz_staff")
+      .select("pickup_point_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
     return (staff as { pickup_point_id: string } | null)?.pickup_point_id ?? null;
   };
 
   const load = async () => {
     if (!user) return;
     const ppId = await getPickupPointId();
-    if (!ppId) { setList([]); return; }
-    const { data } = await supabase
+    if (!ppId) {
+      setList([]);
+      return;
+    }
+    const { data, error } = await supabase
       .from("returns")
-      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
+      .select(
+        "id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,buyer_id,order_id,order_item_id",
+      )
       .eq("pickup_point_id", ppId)
       .not("seller_approved_at", "is", null)
       .neq("status", "rejected")
       .order("created_at", { ascending: false })
       .limit(100);
-    setList((data ?? []) as unknown as ReturnRow[]);
+    if (error) {
+      toast.error(`Qaytarmalar yüklənmədi: ${error.message}`);
+      setList([]);
+      return;
+    }
+    setList(await attachReturnDetails((data ?? []) as unknown as ReturnBaseRow[]));
   };
   useEffect(() => {
     void load();
@@ -923,7 +973,9 @@ function Returns() {
       .channel(`pvz-returns-${user?.id ?? "guest"}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "returns" }, load)
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [user]);
 
   const findReturnByCode = async (code: string) => {
@@ -933,15 +985,23 @@ function Returns() {
     if (fromList) return fromList;
     const ppId = await getPickupPointId();
     if (!ppId) return null;
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("returns")
-      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
+      .select(
+        "id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,buyer_id,order_id,order_item_id",
+      )
       .eq("pickup_point_id", ppId)
       .eq("pickup_code", trimmed)
       .not("seller_approved_at", "is", null)
       .neq("status", "rejected")
       .maybeSingle();
-    return (data as unknown as ReturnRow | null) ?? null;
+    if (error) {
+      toast.error(`Qaytarma yoxlanmadı: ${error.message}`);
+      return null;
+    }
+    if (!data) return null;
+    const [row] = await attachReturnDetails([data as unknown as ReturnBaseRow]);
+    return row ?? null;
   };
 
   const previewScan = async (code: string) => {
@@ -962,12 +1022,18 @@ function Returns() {
       toast.info("Bu qaytarma artıq PVZ-də qəbul edilib");
       return;
     }
-    const { error } = await supabase.from("returns").update({
-      pvz_received_at: new Date().toISOString(),
-      pvz_received_by: user.id,
-      status: "approved",
-    }).eq("id", r.id);
-    if (error) { toast.error(error.message); return; }
+    const { error } = await supabase
+      .from("returns")
+      .update({
+        pvz_received_at: new Date().toISOString(),
+        pvz_received_by: user.id,
+        status: "approved",
+      })
+      .eq("id", r.id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Qaytarma qəbul edildi və satıcıya bildiriş göndərildi");
     void load();
   };
@@ -982,12 +1048,18 @@ function Returns() {
       toast.info("Bu məhsul artıq satıcıya göndərilib");
       return;
     }
-    const { error } = await supabase.from("returns").update({
-      shipped_to_seller_at: new Date().toISOString(),
-      shipped_by: user.id,
-      status: "approved",
-    }).eq("id", r.id);
-    if (error) { toast.error(error.message); return; }
+    const { error } = await supabase
+      .from("returns")
+      .update({
+        shipped_to_seller_at: new Date().toISOString(),
+        shipped_by: user.id,
+        status: "approved",
+      })
+      .eq("id", r.id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Məhsul satıcıya göndərildi kimi qeyd olundu");
     void load();
   };
@@ -999,14 +1071,24 @@ function Returns() {
     if (r.seller_approved_at) return 1;
     return 0;
   };
-  const STAGES = ["Satıcı təsdiqlədi", "QR aktivdir", "PVZ qəbul etdi", "Satıcıya göndərildi", "Tamamlandı"];
+  const STAGES = [
+    "Satıcı təsdiqlədi",
+    "QR aktivdir",
+    "PVZ qəbul etdi",
+    "Satıcıya göndərildi",
+    "Tamamlandı",
+  ];
 
   const Stepper = ({ stage }: { stage: number }) => (
     <div className="flex items-center gap-1 mt-2">
       {STAGES.map((s, i) => (
         <div key={s} className="flex-1">
           <div className={`h-1.5 rounded-full ${i <= stage ? "bg-primary" : "bg-muted"}`} />
-          <div className={`text-[9px] mt-1 text-center ${i <= stage ? "text-primary font-semibold" : "text-muted-foreground"}`}>{s}</div>
+          <div
+            className={`text-[9px] mt-1 text-center ${i <= stage ? "text-primary font-semibold" : "text-muted-foreground"}`}
+          >
+            {s}
+          </div>
         </div>
       ))}
     </div>
@@ -1025,11 +1107,22 @@ function Returns() {
 
       <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-xs space-y-1">
         <div className="font-bold text-primary">ℹ️ Qaytarma prosesi necə işləyir?</div>
-        <div>1️⃣ Müştəri istək açır → satıcı paneldə <b>Təsdiqlə</b> edir.</div>
+        <div>
+          1️⃣ Müştəri istək açır → satıcı paneldə <b>Təsdiqlə</b> edir.
+        </div>
         <div>2️⃣ Təsdiqdən sonra QR/kod avtomatik müştəriyə göndərilir və bu paneldə görünür.</div>
-        <div>3️⃣ Müştəri PVZ-ə gələndə <b>QR ilə qəbul et</b> düyməsi ilə kodu skan edin və malı təhvil alın.</div>
-        <div>4️⃣ Kuryer götürəndə <b>Satıcıya göndərildi</b> qeyd edin; satıcı malı alanda öz panelində tamamlayır.</div>
-        <div className="text-muted-foreground">⚠️ Qaytarma xərci səbəbə görə müəyyənləşir: qüsurlu məhsul → satıcı; fikir dəyişməsi → müştəri.</div>
+        <div>
+          3️⃣ Müştəri PVZ-ə gələndə <b>QR ilə qəbul et</b> düyməsi ilə kodu skan edin və malı təhvil
+          alın.
+        </div>
+        <div>
+          4️⃣ Kuryer götürəndə <b>Satıcıya göndərildi</b> qeyd edin; satıcı malı alanda öz panelində
+          tamamlayır.
+        </div>
+        <div className="text-muted-foreground">
+          ⚠️ Qaytarma xərci səbəbə görə müəyyənləşir: qüsurlu məhsul → satıcı; fikir dəyişməsi →
+          müştəri.
+        </div>
       </div>
 
       <div className="bg-card border border-border rounded-2xl p-4">
@@ -1054,25 +1147,40 @@ function Returns() {
                   <TableCell className="font-mono text-xs">{r.pickup_code}</TableCell>
                   <TableCell>
                     <div className="text-xs">{r.order_items?.orders?.recipient_name ?? "—"}</div>
-                    <div className="text-[10px] text-muted-foreground">{r.order_items?.orders?.recipient_phone ?? ""}</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      {r.order_items?.orders?.recipient_phone ?? ""}
+                    </div>
                   </TableCell>
                   <TableCell className="text-xs">{r.order_items?.title ?? "—"}</TableCell>
                   <TableCell className="text-xs">{r.reason}</TableCell>
                   <TableCell>
-                    <span className={`text-[10px] px-2 py-0.5 rounded ${r.cost_paid_by === "seller" ? "bg-primary/10 text-primary" : "bg-warning/20"}`}>
+                    <span
+                      className={`text-[10px] px-2 py-0.5 rounded ${r.cost_paid_by === "seller" ? "bg-primary/10 text-primary" : "bg-warning/20"}`}
+                    >
                       {r.cost_paid_by === "seller" ? "Satıcı" : "Müştəri"}
                     </span>
                   </TableCell>
                   <TableCell className="min-w-[220px]">
                     <Stepper stage={stageOf(r)} />
                     {!r.pvz_received_at && (
-                      <Button size="sm" variant="outline" className="mt-2 w-full" onClick={() => acceptReturn(r)}>PVZ qəbul etdi</Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="mt-2 w-full"
+                        onClick={() => acceptReturn(r)}
+                      >
+                        PVZ qəbul etdi
+                      </Button>
                     )}
                     {r.pvz_received_at && !r.shipped_to_seller_at && r.status !== "completed" && (
-                      <Button size="sm" className="mt-2 w-full" onClick={() => shipToSeller(r)}>Satıcıya göndərildi</Button>
+                      <Button size="sm" className="mt-2 w-full" onClick={() => shipToSeller(r)}>
+                        Satıcıya göndərildi
+                      </Button>
                     )}
                     {r.shipped_to_seller_at && r.status !== "completed" && (
-                      <div className="text-[10px] text-primary font-semibold mt-2 text-center">🚚 Satıcıya yoldadır</div>
+                      <div className="text-[10px] text-primary font-semibold mt-2 text-center">
+                        🚚 Satıcıya yoldadır
+                      </div>
                     )}
                   </TableCell>
                 </TableRow>
@@ -1094,20 +1202,33 @@ function Returns() {
             else toast.error("Bu kod üzrə qaytarma tapılmadı");
           });
         }}
-        resultDetails={() => scanLookup ? (
-          <div className="text-xs text-muted-foreground">Qaytarma məlumatları yoxlanılır...</div>
-        ) : scanned ? (
-          <div className="text-left text-xs space-y-2 bg-secondary/30 p-3 rounded">
-            <div>👤 <b>{scanned.order_items?.orders?.recipient_name ?? "—"}</b></div>
-            <div>📞 {scanned.order_items?.orders?.recipient_phone ?? "—"}</div>
-            <div>📦 {scanned.order_items?.title ?? "—"}</div>
-            <div>⚠️ Səbəb: {scanned.reason}</div>
-            {scanned.buyer_explanation && <div>📝 İzah: {scanned.buyer_explanation}</div>}
-            <div>💰 Xərc: <b>{scanned.cost_paid_by === "seller" ? "Satıcı ödəyir" : "Müştəri ödəyir"}</b></div>
-            <Stepper stage={stageOf(scanned)} />
-            {scanned.pvz_received_at && <div className="text-emerald-600 font-semibold text-center">✅ Artıq qəbul edilib</div>}
-          </div>
-        ) : <div className="text-xs text-destructive">Qaytarma tapılmadı</div>}
+        resultDetails={() =>
+          scanLookup ? (
+            <div className="text-xs text-muted-foreground">Qaytarma məlumatları yoxlanılır...</div>
+          ) : scanned ? (
+            <div className="text-left text-xs space-y-2 bg-secondary/30 p-3 rounded">
+              <div>
+                👤 <b>{scanned.order_items?.orders?.recipient_name ?? "—"}</b>
+              </div>
+              <div>📞 {scanned.order_items?.orders?.recipient_phone ?? "—"}</div>
+              <div>📦 {scanned.order_items?.title ?? "—"}</div>
+              <div>⚠️ Səbəb: {scanned.reason}</div>
+              {scanned.buyer_explanation && <div>📝 İzah: {scanned.buyer_explanation}</div>}
+              <div>
+                💰 Xərc:{" "}
+                <b>{scanned.cost_paid_by === "seller" ? "Satıcı ödəyir" : "Müştəri ödəyir"}</b>
+              </div>
+              <Stepper stage={stageOf(scanned)} />
+              {scanned.pvz_received_at && (
+                <div className="text-emerald-600 font-semibold text-center">
+                  ✅ Artıq qəbul edilib
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-xs text-destructive">Qaytarma tapılmadı</div>
+          )
+        }
       />
     </div>
   );
