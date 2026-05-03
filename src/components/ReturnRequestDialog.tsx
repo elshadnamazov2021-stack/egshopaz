@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Undo2, Upload, X } from "lucide-react";
-import { OrderQRDialog } from "@/components/OrderQRDialog";
 
 interface Props {
   open: boolean;
@@ -37,7 +36,6 @@ export function ReturnRequestDialog({
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [createdCode, setCreatedCode] = useState<string | null>(null);
 
   const reason = REASONS[reasonIdx];
 
@@ -73,7 +71,7 @@ export function ReturnRequestDialog({
     if (description.trim().length < 5) { toast.error("Qaytarma səbəbini ətraflı izah edin"); return; }
     if (images.length < 1) { toast.error("Ən azı 1 şəkil yükləyin (sübut)"); return; }
     setBusy(true);
-    const { data, error } = await supabase.from("returns").insert({
+    const { error } = await supabase.from("returns").insert({
       order_id: orderId,
       order_item_id: orderItemId,
       buyer_id: buyerId,
@@ -85,16 +83,15 @@ export function ReturnRequestDialog({
       pickup_point_id: pickupPointId,
       cost_paid_by: reason.cost,
       status: "pending",
-    }).select("pickup_code").single();
+    });
     setBusy(false);
     if (error) { toast.error(error.message); return; }
-    toast.success("Qaytarma istəyi göndərildi. PVZ-də QR/kod göstərin.");
-    setCreatedCode(data?.pickup_code ?? null);
+    toast.success("İstək göndərildi. Satıcı təsdiqlədikdən sonra QR kodunuz aktivləşəcək.");
     onDone?.();
+    onOpenChange(false);
   };
 
   return (
-    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -104,6 +101,11 @@ export function ReturnRequestDialog({
         </DialogHeader>
         <div className="space-y-3">
           <div className="text-sm font-semibold">{productTitle}</div>
+
+          <div className="text-[11px] bg-primary/5 border border-primary/20 rounded p-2 space-y-0.5">
+            <div className="font-bold text-primary">📋 Qaytarma prosesi:</div>
+            <div>1. İstək göndərirsiniz → 2. Satıcı təsdiqləyir → 3. QR kod sizə gəlir → 4. PVZ-ə aparıb skan etdirin → 5. Satıcı qəbul edir → pul qaytarılır.</div>
+          </div>
 
           {expired ? (
             <div className="text-sm text-destructive bg-destructive/10 border border-destructive/30 rounded-lg p-3">
@@ -175,16 +177,5 @@ export function ReturnRequestDialog({
         </div>
       </DialogContent>
     </Dialog>
-    {createdCode && (
-      <OrderQRDialog
-        open={!!createdCode}
-        onOpenChange={(v) => { if (!v) { setCreatedCode(null); onOpenChange(false); } }}
-        pickupCode={createdCode}
-        title="Qaytarma QR kodu"
-        subtitle={productTitle}
-        mode="buyer"
-      />
-    )}
-    </>
   );
 }

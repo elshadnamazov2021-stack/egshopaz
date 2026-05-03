@@ -20,6 +20,7 @@ export const Route = createFileRoute("/orders")({
 
 interface OrderItem { id: string; title: string; price: number; quantity: number; image_url: string | null; status: string; seller_id: string; product_id: string; pickup_code: string | null; accepted_at: string | null; delivered_at: string | null; pickup_point_id: string | null }
 interface Order { id: string; total: number; status: string; created_at: string; shipping_address: string | null; payment_method: string; pickup_point_id: string | null; recipient_name: string | null; recipient_phone: string | null; pickup_points: { name: string; address: string; city: string } | null; order_items: OrderItem[] }
+interface MyReturn { id: string; pickup_code: string | null; reason: string; status: string; cost_paid_by: string; seller_approved_at: string | null; pvz_received_at: string | null; shipped_to_seller_at: string | null; created_at: string; order_item_id: string; pickup_point_id: string | null; product_title?: string | null; pvz_name?: string | null; pvz_address?: string | null }
 
 const statusColor: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -44,6 +45,8 @@ function OrdersPage() {
   const [qrItem, setQrItem] = useState<OrderItem | null>(null);
   const [trackOrder, setTrackOrder] = useState<Order | null>(null);
   const [returnItem, setReturnItem] = useState<{ item: OrderItem; orderId: string } | null>(null);
+  const [myReturns, setMyReturns] = useState<MyReturn[]>([]);
+  const [returnQR, setReturnQR] = useState<MyReturn | null>(null);
   const qrOrder = qrItem ? orders.find((o) => o.order_items?.some((i) => i.id === qrItem.id)) : null;
 
   const statusLabel: Record<string, string> = {
@@ -111,7 +114,21 @@ function OrdersPage() {
       pickup_points: order.pickup_point_id ? (pickupMap.get(order.pickup_point_id) ?? null) : null,
     })));
   };
-  useEffect(() => { void load(); }, [user]);
+  const loadReturns = async () => {
+    if (!user) return;
+    const { data } = await supabase.from("returns")
+      .select("id,pickup_code,reason,status,cost_paid_by,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,order_item_id,pickup_point_id,order_items(title),pickup_points(name,address,city)")
+      .eq("buyer_id", user.id)
+      .order("created_at", { ascending: false });
+    type Row = { id: string; pickup_code: string | null; reason: string; status: string; cost_paid_by: string; seller_approved_at: string | null; pvz_received_at: string | null; shipped_to_seller_at: string | null; created_at: string; order_item_id: string; pickup_point_id: string | null; order_items: { title: string } | null; pickup_points: { name: string; address: string; city: string } | null };
+    setMyReturns(((data ?? []) as unknown as Row[]).map((r) => ({
+      ...r,
+      product_title: r.order_items?.title ?? null,
+      pvz_name: r.pickup_points?.name ?? null,
+      pvz_address: r.pickup_points ? `${r.pickup_points.city}, ${r.pickup_points.address}` : null,
+    })));
+  };
+  useEffect(() => { void load(); void loadReturns(); }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -121,7 +138,10 @@ function OrdersPage() {
     const itemsCh = supabase.channel(`buyer-order-items-${user.id}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "order_items" }, load)
       .subscribe();
-    return () => { supabase.removeChannel(ordersCh); supabase.removeChannel(itemsCh); };
+    const retCh = supabase.channel(`buyer-returns-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "returns", filter: `buyer_id=eq.${user.id}` }, loadReturns)
+      .subscribe();
+    return () => { supabase.removeChannel(ordersCh); supabase.removeChannel(itemsCh); supabase.removeChannel(retCh); };
   }, [user]);
 
   const cancel = async (id: string) => {
@@ -235,6 +255,56 @@ function OrdersPage() {
             ))}
           </div>
         )}
+
+        {myReturns.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-xl font-extrabold mb-3 flex items-center gap-2">
+              <Undo2 className="h-5 w-5 text-primary" /> Qaytarmalarım ({myReturns.length})
+            </h2>
+            <div className="space-y-2">
+              {myReturns.map((r) => {
+                const stage = r.status === "completed" ? 4
+                  : r.shipped_to_seller_at ? 3
+                  : r.pvz_received_at ? 2
+                  : r.seller_approved_at ? 1
+                  : 0;
+                const STAGES = ["Satıcı təsdiqini gözləyir", "QR hazırdır — PVZ-ə apar", "PVZ qəbul etdi", "Satıcıya göndərildi", "Tamamlandı"];
+                const stageLabel = r.status === "rejected" ? "❌ Rədd edildi" : STAGES[stage];
+                return (
+                  <div key={r.id} className="bg-card border border-border rounded-2xl p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold truncate">{r.product_title ?? "—"}</div>
+                        <div className="text-xs text-muted-foreground">Səbəb: {r.reason}</div>
+                        <div className="text-xs mt-1">
+                          <span className={`inline-block px-2 py-0.5 rounded ${r.status === "rejected" ? "bg-destructive/10 text-destructive" : r.status === "completed" ? "bg-success/10 text-success" : "bg-primary/10 text-primary"}`}>
+                            {stageLabel}
+                          </span>
+                        </div>
+                      </div>
+                      {r.seller_approved_at && r.pickup_code && r.status !== "completed" && r.status !== "rejected" && !r.pvz_received_at && (
+                        <button
+                          onClick={() => setReturnQR(r)}
+                          className="text-xs px-3 py-2 rounded-lg bg-primary text-primary-foreground font-bold inline-flex items-center gap-1 shrink-0"
+                        >
+                          <QrCode className="h-4 w-4" /> QR göstər
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 mt-3">
+                      {STAGES.map((s, i) => (
+                        <div key={s} className="flex-1">
+                          <div className={`h-1.5 rounded-full ${i <= stage && r.status !== "rejected" ? "bg-primary" : "bg-muted"}`} />
+                          <div className={`text-[9px] mt-1 text-center ${i <= stage && r.status !== "rejected" ? "text-primary font-semibold" : "text-muted-foreground"}`}>{s}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {qrItem?.pickup_code && (
@@ -302,7 +372,20 @@ function OrdersPage() {
           productTitle={returnItem.item.title}
           deliveredAt={returnItem.item.delivered_at}
           pickupPointId={returnItem.item.pickup_point_id}
-          onDone={load}
+          onDone={() => { void load(); void loadReturns(); }}
+        />
+      )}
+
+      {returnQR?.pickup_code && (
+        <OrderQRDialog
+          open={!!returnQR}
+          onOpenChange={(v) => !v && setReturnQR(null)}
+          pickupCode={returnQR.pickup_code}
+          title={`Qaytarma — ${returnQR.product_title ?? ""}`}
+          subtitle="PVZ-də göstərin"
+          pvzName={returnQR.pvz_name ?? null}
+          pvzAddress={returnQR.pvz_address ?? null}
+          mode="buyer"
         />
       )}
     </PanelLayout>
