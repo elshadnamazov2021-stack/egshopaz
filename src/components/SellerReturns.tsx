@@ -40,7 +40,7 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
   useEffect(() => { void load(); }, [sellerId]);
 
   const update = async (r: ReturnRow, status: "approved" | "rejected" | "completed") => {
-    const patch: Record<string, unknown> = { status };
+    const patch: { status: string; seller_received_at?: string; resolved_at?: string } = { status };
     if (status === "completed") {
       patch.seller_received_at = new Date().toISOString();
       patch.resolved_at = new Date().toISOString();
