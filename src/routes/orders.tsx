@@ -372,7 +372,20 @@ function OrdersPage() {
           productTitle={returnItem.item.title}
           deliveredAt={returnItem.item.delivered_at}
           pickupPointId={returnItem.item.pickup_point_id}
-          onDone={load}
+          onDone={() => { void load(); void loadReturns(); }}
+        />
+      )}
+
+      {returnQR?.pickup_code && (
+        <OrderQRDialog
+          open={!!returnQR}
+          onOpenChange={(v) => !v && setReturnQR(null)}
+          pickupCode={returnQR.pickup_code}
+          title={`Qaytarma — ${returnQR.product_title ?? ""}`}
+          subtitle="PVZ-də göstərin"
+          pvzName={returnQR.pvz_name ?? null}
+          pvzAddress={returnQR.pvz_address ?? null}
+          mode="buyer"
         />
       )}
     </PanelLayout>
