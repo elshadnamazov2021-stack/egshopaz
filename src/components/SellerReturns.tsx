@@ -163,22 +163,22 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1 flex-wrap">
-                      <Button size="sm" variant="ghost" onClick={() => setView(r)}>
+                      <Button size="sm" variant="ghost" onClick={() => setView(r)} title="Bax">
                         <Eye className="h-4 w-4" />
                       </Button>
                       {r.status === "pending" && (
                         <>
-                          <Button size="sm" onClick={() => approve(r)}>
-                            <CheckCircle2 className="h-4 w-4" />
+                          <Button size="sm" onClick={() => approve(r)} className="bg-green-600 hover:bg-green-700 text-white">
+                            <CheckCircle2 className="h-4 w-4 mr-1" /> Təsdiqlə
                           </Button>
-                          <Button size="sm" variant="outline" onClick={() => { setRejectFor(r); setRejectReason(""); }}>
-                            <XCircle className="h-4 w-4" />
+                          <Button size="sm" variant="destructive" onClick={() => { setRejectFor(r); setRejectReason(""); }}>
+                            <XCircle className="h-4 w-4 mr-1" /> Rədd et
                           </Button>
                         </>
                       )}
                       {r.shipped_to_seller_at && r.status !== "completed" && (
                         <Button size="sm" variant="secondary" onClick={() => complete(r)}>
-                          <PackageCheck className="h-4 w-4" />
+                          <PackageCheck className="h-4 w-4 mr-1" /> Tamamla
                         </Button>
                       )}
                     </div>
