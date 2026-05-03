@@ -23,27 +23,7 @@ export function SiteHeader() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
-  const [cartCount, setCartCount] = useState(0);
-  const [favCount, setFavCount] = useState(0);
   const [visualOpen, setVisualOpen] = useState(false);
-
-  useEffect(() => {
-    if (!user) { setCartCount(0); setFavCount(0); return; }
-    let active = true;
-    const load = async () => {
-      const [{ count: c }, { count: f }] = await Promise.all([
-        supabase.from("cart_items").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-        supabase.from("favorites").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-      ]);
-      if (active) { setCartCount(c ?? 0); setFavCount(f ?? 0); }
-    };
-    load();
-    const ch = supabase.channel("hdr-counts")
-      .on("postgres_changes", { event: "*", schema: "public", table: "cart_items", filter: `user_id=eq.${user.id}` }, load)
-      .on("postgres_changes", { event: "*", schema: "public", table: "favorites", filter: `user_id=eq.${user.id}` }, load)
-      .subscribe();
-    return () => { active = false; supabase.removeChannel(ch); };
-  }, [user]);
 
   const onSearch = (e: React.FormEvent) => {
     e.preventDefault();
