@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Undo2, Eye, CheckCircle2, XCircle, PackageCheck } from "lucide-react";
@@ -12,6 +13,7 @@ interface ReturnRow {
   reason: string;
   description: string | null;
   buyer_explanation: string | null;
+  rejection_reason: string | null;
   status: string;
   cost_paid_by: string;
   images: string[];
