@@ -255,6 +255,56 @@ function OrdersPage() {
             ))}
           </div>
         )}
+
+        {myReturns.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-xl font-extrabold mb-3 flex items-center gap-2">
+              <Undo2 className="h-5 w-5 text-primary" /> Qaytarmalarım ({myReturns.length})
+            </h2>
+            <div className="space-y-2">
+              {myReturns.map((r) => {
+                const stage = r.status === "completed" ? 4
+                  : r.shipped_to_seller_at ? 3
+                  : r.pvz_received_at ? 2
+                  : r.seller_approved_at ? 1
+                  : 0;
+                const STAGES = ["Satıcı təsdiqini gözləyir", "QR hazırdır — PVZ-ə apar", "PVZ qəbul etdi", "Satıcıya göndərildi", "Tamamlandı"];
+                const stageLabel = r.status === "rejected" ? "❌ Rədd edildi" : STAGES[stage];
+                return (
+                  <div key={r.id} className="bg-card border border-border rounded-2xl p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold truncate">{r.product_title ?? "—"}</div>
+                        <div className="text-xs text-muted-foreground">Səbəb: {r.reason}</div>
+                        <div className="text-xs mt-1">
+                          <span className={`inline-block px-2 py-0.5 rounded ${r.status === "rejected" ? "bg-destructive/10 text-destructive" : r.status === "completed" ? "bg-success/10 text-success" : "bg-primary/10 text-primary"}`}>
+                            {stageLabel}
+                          </span>
+                        </div>
+                      </div>
+                      {r.seller_approved_at && r.pickup_code && r.status !== "completed" && r.status !== "rejected" && !r.pvz_received_at && (
+                        <button
+                          onClick={() => setReturnQR(r)}
+                          className="text-xs px-3 py-2 rounded-lg bg-primary text-primary-foreground font-bold inline-flex items-center gap-1 shrink-0"
+                        >
+                          <QrCode className="h-4 w-4" /> QR göstər
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 mt-3">
+                      {STAGES.map((s, i) => (
+                        <div key={s} className="flex-1">
+                          <div className={`h-1.5 rounded-full ${i <= stage && r.status !== "rejected" ? "bg-primary" : "bg-muted"}`} />
+                          <div className={`text-[9px] mt-1 text-center ${i <= stage && r.status !== "rejected" ? "text-primary font-semibold" : "text-muted-foreground"}`}>{s}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {qrItem?.pickup_code && (
