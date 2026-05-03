@@ -971,15 +971,21 @@ function Returns() {
     if (fromList) return fromList;
     const ppId = await getPickupPointId();
     if (!ppId) return null;
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("returns")
-      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
+      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,buyer_id,order_id,order_item_id")
       .eq("pickup_point_id", ppId)
       .eq("pickup_code", trimmed)
       .not("seller_approved_at", "is", null)
       .neq("status", "rejected")
       .maybeSingle();
-    return (data as unknown as ReturnRow | null) ?? null;
+    if (error) {
+      toast.error(`Qaytarma yoxlanmadı: ${error.message}`);
+      return null;
+    }
+    if (!data) return null;
+    const [row] = await attachReturnDetails([data as unknown as ReturnBaseRow]);
+    return row ?? null;
   };
 
   const previewScan = async (code: string) => {
