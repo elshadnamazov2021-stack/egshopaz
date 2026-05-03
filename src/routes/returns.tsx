@@ -44,17 +44,29 @@ function ReturnsPage() {
 
   const load = async () => {
     if (!user) return;
-    const { data } = await supabase.from("returns")
-      .select("id,pickup_code,reason,status,rejection_reason,cost_paid_by,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,order_item_id,pickup_point_id,order_items(title),pickup_points(name,address,city)")
+    const { data, error } = await supabase.from("returns")
+      .select("id,pickup_code,reason,status,rejection_reason,cost_paid_by,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,order_item_id,pickup_point_id")
       .eq("buyer_id", user.id)
       .order("created_at", { ascending: false });
-    type Row = MyReturn & { order_items: { title: string } | null; pickup_points: { name: string; address: string; city: string } | null };
-    setReturns(((data ?? []) as unknown as Row[]).map((r) => ({
-      ...r,
-      product_title: r.order_items?.title ?? null,
-      pvz_name: r.pickup_points?.name ?? null,
-      pvz_address: r.pickup_points ? `${r.pickup_points.city}, ${r.pickup_points.address}` : null,
-    })));
+    if (error) { console.error(error); return; }
+    const rows = (data ?? []) as MyReturn[];
+    const itemIds = [...new Set(rows.map((r) => r.order_item_id).filter(Boolean))];
+    const pvzIds = [...new Set(rows.map((r) => r.pickup_point_id).filter((x): x is string => !!x))];
+    const [{ data: items }, { data: pvz }] = await Promise.all([
+      itemIds.length ? supabase.from("order_items").select("id,title").in("id", itemIds) : Promise.resolve({ data: [] as { id: string; title: string }[] }),
+      pvzIds.length ? supabase.from("pickup_points").select("id,name,address,city").in("id", pvzIds) : Promise.resolve({ data: [] as { id: string; name: string; address: string; city: string }[] }),
+    ]);
+    const itemMap = new Map((items ?? []).map((i) => [i.id, i]));
+    const pvzMap = new Map((pvz ?? []).map((p) => [p.id, p]));
+    setReturns(rows.map((r) => {
+      const p = r.pickup_point_id ? pvzMap.get(r.pickup_point_id) : null;
+      return {
+        ...r,
+        product_title: itemMap.get(r.order_item_id)?.title ?? null,
+        pvz_name: p?.name ?? null,
+        pvz_address: p ? `${p.city}, ${p.address}` : null,
+      };
+    }));
   };
 
   useEffect(() => { void load(); }, [user]);
