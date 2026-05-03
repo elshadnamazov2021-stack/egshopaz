@@ -895,6 +895,7 @@ function Returns() {
   const [list, setList] = useState<ReturnRow[]>([]);
   const [scanOpen, setScanOpen] = useState(false);
   const [scanned, setScanned] = useState<ReturnRow | null>(null);
+  const [scanLookup, setScanLookup] = useState(false);
 
   const getPickupPointId = async () => {
     if (!user) return null;
@@ -944,8 +945,10 @@ function Returns() {
   };
 
   const previewScan = async (code: string) => {
+    setScanLookup(true);
     const found = await findReturnByCode(code);
     setScanned(found ?? null);
+    setScanLookup(false);
     if (!found) toast.error("Bu kod üzrə qaytarma tapılmadı");
   };
 
@@ -1091,7 +1094,9 @@ function Returns() {
             else toast.error("Bu kod üzrə qaytarma tapılmadı");
           });
         }}
-        resultDetails={() => scanned ? (
+        resultDetails={() => scanLookup ? (
+          <div className="text-xs text-muted-foreground">Qaytarma məlumatları yoxlanılır...</div>
+        ) : scanned ? (
           <div className="text-left text-xs space-y-2 bg-secondary/30 p-3 rounded">
             <div>👤 <b>{scanned.order_items?.orders?.recipient_name ?? "—"}</b></div>
             <div>📞 {scanned.order_items?.orders?.recipient_phone ?? "—"}</div>
