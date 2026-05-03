@@ -1028,6 +1028,8 @@ function SellerPanel() {
         </div>
       )}
 
+      {tab === "returns" && <SellerReturns sellerId={user.id} />}
+
       {tab === "messages" && <SellerMessages sellerId={user.id} />}
 
       {tab === "analytics" && <SellerAnalytics sellerId={user.id} />}
