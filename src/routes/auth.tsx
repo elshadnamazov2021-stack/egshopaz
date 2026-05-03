@@ -194,7 +194,6 @@ function AuthPage() {
 
     if (role === "seller") {
       if (shopName.trim().length < 2) { toast.error("Mağaza adı daxil edin"); return; }
-      if (shopCity.trim().length < 2) { toast.error("Şəhər daxil edin"); return; }
     }
     if (role === "pvz") {
       if (!pickupPointId) {
