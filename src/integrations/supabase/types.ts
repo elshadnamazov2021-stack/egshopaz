@@ -1281,8 +1281,11 @@ export type Database = {
           reason: string
           refund_amount: number | null
           resolved_at: string | null
+          seller_approved_at: string | null
           seller_id: string
           seller_received_at: string | null
+          shipped_by: string | null
+          shipped_to_seller_at: string | null
           status: string
           updated_at: string
         }
@@ -1303,8 +1306,11 @@ export type Database = {
           reason: string
           refund_amount?: number | null
           resolved_at?: string | null
+          seller_approved_at?: string | null
           seller_id: string
           seller_received_at?: string | null
+          shipped_by?: string | null
+          shipped_to_seller_at?: string | null
           status?: string
           updated_at?: string
         }
@@ -1325,8 +1331,11 @@ export type Database = {
           reason?: string
           refund_amount?: number | null
           resolved_at?: string | null
+          seller_approved_at?: string | null
           seller_id?: string
           seller_received_at?: string | null
+          shipped_by?: string | null
+          shipped_to_seller_at?: string | null
           status?: string
           updated_at?: string
         }
