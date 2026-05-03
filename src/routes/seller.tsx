@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { SellerReturns } from "@/components/SellerReturns";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN } from "@/lib/format";
 import {
