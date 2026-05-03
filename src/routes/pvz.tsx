@@ -1025,12 +1025,15 @@ function Returns() {
           else toast.error("Bu kod üzrə qaytarma tapılmadı");
         }}
         resultDetails={() => scanned ? (
-          <div className="text-left text-xs space-y-1 bg-secondary/30 p-2 rounded">
+          <div className="text-left text-xs space-y-2 bg-secondary/30 p-3 rounded">
             <div>👤 <b>{scanned.order_items?.orders?.recipient_name ?? "—"}</b></div>
             <div>📞 {scanned.order_items?.orders?.recipient_phone ?? "—"}</div>
             <div>📦 {scanned.order_items?.title ?? "—"}</div>
             <div>⚠️ Səbəb: {scanned.reason}</div>
-            <div>💰 Xərc: {scanned.cost_paid_by === "seller" ? "Satıcı" : "Müştəri"}</div>
+            {scanned.buyer_explanation && <div>📝 İzah: {scanned.buyer_explanation}</div>}
+            <div>💰 Xərc: <b>{scanned.cost_paid_by === "seller" ? "Satıcı ödəyir" : "Müştəri ödəyir"}</b></div>
+            <Stepper stage={stageOf(scanned)} />
+            {scanned.pvz_received_at && <div className="text-emerald-600 font-semibold text-center">✅ Artıq qəbul edilib</div>}
           </div>
         ) : <div className="text-xs text-destructive">Qaytarma tapılmadı</div>}
       />
