@@ -625,6 +625,7 @@ export type Database = {
         Row: {
           accepted_at: string | null
           courier_id: string | null
+          customer_email: string | null
           customer_name: string | null
           customer_phone: string | null
           delivered_at: string | null
@@ -645,6 +646,7 @@ export type Database = {
         Insert: {
           accepted_at?: string | null
           courier_id?: string | null
+          customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
           delivered_at?: string | null
@@ -665,6 +667,7 @@ export type Database = {
         Update: {
           accepted_at?: string | null
           courier_id?: string | null
+          customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
           delivered_at?: string | null
@@ -717,6 +720,7 @@ export type Database = {
           payment_method: string
           pickup_point_id: string | null
           promo_code: string | null
+          recipient_email: string | null
           recipient_name: string | null
           recipient_phone: string | null
           shipping_address: string | null
@@ -733,6 +737,7 @@ export type Database = {
           payment_method?: string
           pickup_point_id?: string | null
           promo_code?: string | null
+          recipient_email?: string | null
           recipient_name?: string | null
           recipient_phone?: string | null
           shipping_address?: string | null
@@ -749,6 +754,7 @@ export type Database = {
           payment_method?: string
           pickup_point_id?: string | null
           promo_code?: string | null
+          recipient_email?: string | null
           recipient_name?: string | null
           recipient_phone?: string | null
           shipping_address?: string | null
