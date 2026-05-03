@@ -1368,11 +1368,13 @@ function SellerPanel() {
                     <label className="text-xs font-semibold text-muted-foreground">Min gün</label>
                     <input
                       type="number"
+                      inputMode="numeric"
                       min={0}
-                      value={editing.delivery_days_min ?? 1}
+                      value={editing.delivery_days_min ? String(editing.delivery_days_min) : ""}
                       onChange={(e) =>
-                        setEditing({ ...editing, delivery_days_min: parseInt(e.target.value) || 0 })
+                        setEditing({ ...editing, delivery_days_min: e.target.value === "" ? 1 : parseInt(e.target.value) || 0 })
                       }
+                      placeholder="1"
                       className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background"
                     />
                   </div>
@@ -1380,11 +1382,13 @@ function SellerPanel() {
                     <label className="text-xs font-semibold text-muted-foreground">Max gün</label>
                     <input
                       type="number"
+                      inputMode="numeric"
                       min={0}
-                      value={editing.delivery_days_max ?? 3}
+                      value={editing.delivery_days_max ? String(editing.delivery_days_max) : ""}
                       onChange={(e) =>
-                        setEditing({ ...editing, delivery_days_max: parseInt(e.target.value) || 0 })
+                        setEditing({ ...editing, delivery_days_max: e.target.value === "" ? 3 : parseInt(e.target.value) || 0 })
                       }
+                      placeholder="3"
                       className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background"
                     />
                   </div>
