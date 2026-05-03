@@ -881,7 +881,9 @@ interface ReturnRow {
   status: string;
   cost_paid_by: string;
   images: string[];
+  seller_approved_at: string | null;
   pvz_received_at: string | null;
+  shipped_to_seller_at: string | null;
   created_at: string;
   buyer_id: string;
   order_item_id: string;
@@ -893,32 +895,73 @@ function Returns() {
   const [list, setList] = useState<ReturnRow[]>([]);
   const [scanOpen, setScanOpen] = useState(false);
   const [scanned, setScanned] = useState<ReturnRow | null>(null);
+  const [scanLookup, setScanLookup] = useState(false);
+
+  const getPickupPointId = async () => {
+    if (!user) return null;
+    const { data: staff } = await supabase.from("pvz_staff").select("pickup_point_id").eq("user_id", user.id).maybeSingle();
+    return (staff as { pickup_point_id: string } | null)?.pickup_point_id ?? null;
+  };
 
   const load = async () => {
     if (!user) return;
-    // Find pickup point of this PVZ staff
-    const { data: staff } = await supabase.from("pvz_staff").select("pickup_point_id").eq("user_id", user.id).maybeSingle();
-    const ppId = (staff as { pickup_point_id: string } | null)?.pickup_point_id;
+    const ppId = await getPickupPointId();
     if (!ppId) { setList([]); return; }
     const { data } = await supabase
       .from("returns")
-      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,pvz_received_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
+      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
       .eq("pickup_point_id", ppId)
+      .not("seller_approved_at", "is", null)
+      .neq("status", "rejected")
       .order("created_at", { ascending: false })
       .limit(100);
     setList((data ?? []) as unknown as ReturnRow[]);
   };
-  useEffect(() => { void load(); }, [user]);
+  useEffect(() => {
+    void load();
+    const ch = supabase
+      .channel(`pvz-returns-${user?.id ?? "guest"}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "returns" }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user]);
+
+  const findReturnByCode = async (code: string) => {
+    const trimmed = code.trim().toUpperCase();
+    if (!trimmed) return null;
+    const fromList = list.find((r) => (r.pickup_code ?? "").toUpperCase() === trimmed);
+    if (fromList) return fromList;
+    const ppId = await getPickupPointId();
+    if (!ppId) return null;
+    const { data } = await supabase
+      .from("returns")
+      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
+      .eq("pickup_point_id", ppId)
+      .eq("pickup_code", trimmed)
+      .not("seller_approved_at", "is", null)
+      .neq("status", "rejected")
+      .maybeSingle();
+    return (data as unknown as ReturnRow | null) ?? null;
+  };
 
   const previewScan = async (code: string) => {
-    const trimmed = code.trim().toUpperCase();
-    const found = list.find((r) => (r.pickup_code ?? "").toUpperCase() === trimmed);
+    setScanLookup(true);
+    const found = await findReturnByCode(code);
     setScanned(found ?? null);
+    setScanLookup(false);
     if (!found) toast.error("Bu kod üzrə qaytarma tapılmadı");
   };
 
   const acceptReturn = async (r: ReturnRow) => {
     if (!user) return;
+    if (!r.seller_approved_at || r.status !== "approved") {
+      toast.error("Bu qaytarma hələ satıcı tərəfindən təsdiqlənməyib");
+      return;
+    }
+    if (r.pvz_received_at) {
+      toast.info("Bu qaytarma artıq PVZ-də qəbul edilib");
+      return;
+    }
     const { error } = await supabase.from("returns").update({
       pvz_received_at: new Date().toISOString(),
       pvz_received_by: user.id,
@@ -929,13 +972,34 @@ function Returns() {
     void load();
   };
 
+  const shipToSeller = async (r: ReturnRow) => {
+    if (!user) return;
+    if (!r.pvz_received_at) {
+      toast.error("Əvvəlcə məhsulu müştəridən PVZ-də qəbul edin");
+      return;
+    }
+    if (r.shipped_to_seller_at) {
+      toast.info("Bu məhsul artıq satıcıya göndərilib");
+      return;
+    }
+    const { error } = await supabase.from("returns").update({
+      shipped_to_seller_at: new Date().toISOString(),
+      shipped_by: user.id,
+      status: "approved",
+    }).eq("id", r.id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Məhsul satıcıya göndərildi kimi qeyd olundu");
+    void load();
+  };
+
   const stageOf = (r: ReturnRow): number => {
     if (r.status === "completed") return 4;
-    if (r.status === "approved" && r.pvz_received_at) return 3;
+    if (r.shipped_to_seller_at) return 3;
     if (r.pvz_received_at) return 2;
-    return 1;
+    if (r.seller_approved_at) return 1;
+    return 0;
   };
-  const STAGES = ["Müştəri açdı", "PVZ qəbul etdi", "Satıcıya göndərildi", "Satıcı təsdiqlədi", "Tamamlandı"];
+  const STAGES = ["Satıcı təsdiqlədi", "QR aktivdir", "PVZ qəbul etdi", "Satıcıya göndərildi", "Tamamlandı"];
 
   const Stepper = ({ stage }: { stage: number }) => (
     <div className="flex items-center gap-1 mt-2">
@@ -961,10 +1025,10 @@ function Returns() {
 
       <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-xs space-y-1">
         <div className="font-bold text-primary">ℹ️ Qaytarma prosesi necə işləyir?</div>
-        <div>1️⃣ Müştəri öz hesabından məhsulu qaytarma istəyini açır (şəkil + səbəb yükləyir) və PVZ kodu alır.</div>
-        <div>2️⃣ Müştəri məhsulu PVZ-ə gətirir → PVZ operatoru <b>QR ilə qəbul et</b> düyməsi ilə kodu skan edir və paketi qəbul edir.</div>
-        <div>3️⃣ Sistem avtomatik satıcıya bildiriş göndərir, məhsul satıcıya geri qaytarılır.</div>
-        <div>4️⃣ Satıcı paketi yoxlayır → təsdiq və ya rədd edir. Pul/bonus müştəriyə qaytarılır.</div>
+        <div>1️⃣ Müştəri istək açır → satıcı paneldə <b>Təsdiqlə</b> edir.</div>
+        <div>2️⃣ Təsdiqdən sonra QR/kod avtomatik müştəriyə göndərilir və bu paneldə görünür.</div>
+        <div>3️⃣ Müştəri PVZ-ə gələndə <b>QR ilə qəbul et</b> düyməsi ilə kodu skan edin və malı təhvil alın.</div>
+        <div>4️⃣ Kuryer götürəndə <b>Satıcıya göndərildi</b> qeyd edin; satıcı malı alanda öz panelində tamamlayır.</div>
         <div className="text-muted-foreground">⚠️ Qaytarma xərci səbəbə görə müəyyənləşir: qüsurlu məhsul → satıcı; fikir dəyişməsi → müştəri.</div>
       </div>
 
@@ -1002,7 +1066,13 @@ function Returns() {
                   <TableCell className="min-w-[220px]">
                     <Stepper stage={stageOf(r)} />
                     {!r.pvz_received_at && (
-                      <Button size="sm" variant="outline" className="mt-2 w-full" onClick={() => acceptReturn(r)}>Əl ilə qəbul et</Button>
+                      <Button size="sm" variant="outline" className="mt-2 w-full" onClick={() => acceptReturn(r)}>PVZ qəbul etdi</Button>
+                    )}
+                    {r.pvz_received_at && !r.shipped_to_seller_at && r.status !== "completed" && (
+                      <Button size="sm" className="mt-2 w-full" onClick={() => shipToSeller(r)}>Satıcıya göndərildi</Button>
+                    )}
+                    {r.shipped_to_seller_at && r.status !== "completed" && (
+                      <div className="text-[10px] text-primary font-semibold mt-2 text-center">🚚 Satıcıya yoldadır</div>
                     )}
                   </TableCell>
                 </TableRow>
@@ -1019,12 +1089,14 @@ function Returns() {
         acceptLabel="Qəbul et"
         onResult={(v) => void previewScan(v)}
         onScan={(v) => {
-          const trimmed = v.trim().toUpperCase();
-          const found = list.find((r) => (r.pickup_code ?? "").toUpperCase() === trimmed);
-          if (found) void acceptReturn(found);
-          else toast.error("Bu kod üzrə qaytarma tapılmadı");
+          void findReturnByCode(v).then((found) => {
+            if (found) void acceptReturn(found);
+            else toast.error("Bu kod üzrə qaytarma tapılmadı");
+          });
         }}
-        resultDetails={() => scanned ? (
+        resultDetails={() => scanLookup ? (
+          <div className="text-xs text-muted-foreground">Qaytarma məlumatları yoxlanılır...</div>
+        ) : scanned ? (
           <div className="text-left text-xs space-y-2 bg-secondary/30 p-3 rounded">
             <div>👤 <b>{scanned.order_items?.orders?.recipient_name ?? "—"}</b></div>
             <div>📞 {scanned.order_items?.orders?.recipient_phone ?? "—"}</div>
