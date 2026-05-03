@@ -37,6 +37,7 @@ import { SellerAnalytics } from "@/components/SellerAnalytics";
 import { BulkProductUpload } from "@/components/BulkProductUpload";
 import { AISupportChat } from "@/components/AISupportChat";
 import { CitySelect } from "@/components/CitySelect";
+import { CategoryCombobox } from "@/components/CategoryCombobox";
 import { findCity } from "@/lib/azCities";
 
 export const Route = createFileRoute("/seller")({
