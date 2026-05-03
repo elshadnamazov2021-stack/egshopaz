@@ -155,12 +155,33 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
                   </TableCell>
                   <TableCell>
                     <Stepper stage={stageOf(r)} rejected={r.status === "rejected"} />
-                    {r.status === "rejected" && <div className="text-[10px] text-destructive font-semibold mt-1 text-center">❌ Rədd edildi</div>}
+                    {r.status === "rejected" && (
+                      <div className="text-[10px] text-destructive font-semibold mt-1 text-center">
+                        ❌ Rədd edildi{r.rejection_reason ? ` — ${r.rejection_reason}` : ""}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>
-                    <Button size="sm" variant="ghost" onClick={() => setView(r)}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-1 flex-wrap">
+                      <Button size="sm" variant="ghost" onClick={() => setView(r)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      {r.status === "pending" && (
+                        <>
+                          <Button size="sm" onClick={() => approve(r)}>
+                            <CheckCircle2 className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => { setRejectFor(r); setRejectReason(""); }}>
+                            <XCircle className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                      {r.shipped_to_seller_at && r.status !== "completed" && (
+                        <Button size="sm" variant="secondary" onClick={() => complete(r)}>
+                          <PackageCheck className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
