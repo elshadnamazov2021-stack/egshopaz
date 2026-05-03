@@ -84,11 +84,17 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
     setView(null); void load();
   };
 
-  const reject = async (r: ReturnRow) => {
-    const { error } = await supabase.from("returns").update({ status: "rejected" }).eq("id", r.id);
+  const reject = async (r: ReturnRow, reason: string) => {
+    const trimmed = reason.trim();
+    if (trimmed.length < 3) { toast.error("Rədd etmə səbəbini yazın (ən azı 3 simvol)"); return; }
+    const { error } = await supabase.from("returns").update({
+      status: "rejected",
+      rejection_reason: trimmed,
+      resolved_at: new Date().toISOString(),
+    }).eq("id", r.id);
     if (error) { toast.error(error.message); return; }
-    toast.success("Rədd edildi");
-    setView(null); void load();
+    toast.success("Rədd edildi və müştəriyə bildirildi");
+    setRejectFor(null); setRejectReason(""); setView(null); void load();
   };
 
   const complete = async (r: ReturnRow) => {
