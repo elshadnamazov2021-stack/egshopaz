@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Undo2, Upload, X } from "lucide-react";
+import { OrderQRDialog } from "@/components/OrderQRDialog";
 
 interface Props {
   open: boolean;
