@@ -241,9 +241,6 @@ function AuthPage() {
     if (role === "seller") {
       const { error: e2 } = await supabase.rpc("register_seller", {
         _shop_name: shopName.trim().slice(0, 100),
-        _shop_city: shopCity.trim(),
-        _phone: phone.trim(),
-        _voen: voen.trim() || undefined,
       });
       if (e2) { setBusy(false); toast.error(e2.message); return; }
       toast.success("Satıcı qeydiyyatınız tamamlandı");
