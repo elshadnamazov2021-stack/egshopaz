@@ -53,6 +53,8 @@ function Stepper({ stage, rejected }: { stage: number; rejected?: boolean }) {
 export function SellerReturns({ sellerId }: { sellerId: string }) {
   const [list, setList] = useState<ReturnRow[]>([]);
   const [view, setView] = useState<ReturnRow | null>(null);
+  const [rejectFor, setRejectFor] = useState<ReturnRow | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
 
   const load = async () => {
     const { data } = await supabase
