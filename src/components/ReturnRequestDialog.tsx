@@ -174,5 +174,16 @@ export function ReturnRequestDialog({
         </div>
       </DialogContent>
     </Dialog>
+    {createdCode && (
+      <OrderQRDialog
+        open={!!createdCode}
+        onOpenChange={(v) => { if (!v) { setCreatedCode(null); onOpenChange(false); } }}
+        pickupCode={createdCode}
+        title="Qaytarma QR kodu"
+        subtitle={productTitle}
+        mode="buyer"
+      />
+    )}
+    </>
   );
 }
