@@ -350,6 +350,7 @@ function AdminPanel() {
     { key: "warehouses", label: "Anbarlar", icon: Warehouse, active: tab === "warehouses", onClick: () => setTab("warehouses") },
     { key: "pickup_points", label: "PVZ nöqtələri", icon: Warehouse, active: tab === "pickup_points", onClick: () => setTab("pickup_points") },
     { key: "orders", label: "Sifarişlər", icon: ShoppingBag, badge: orders.filter((o) => o.status === "pending").length, active: tab === "orders", onClick: () => setTab("orders") },
+    { key: "returns", label: "Qaytarmalar", icon: Undo2, active: tab === "returns", onClick: () => setTab("returns") },
     { key: "finance", label: "Maliyyə", icon: DollarSign, active: tab === "finance", onClick: () => setTab("finance") },
     { key: "marketing", label: "Marketinq", icon: Megaphone, active: tab === "marketing", onClick: () => setTab("marketing") },
     { key: "banners", label: "Bannerlər", icon: Megaphone, active: tab === "banners", onClick: () => setTab("banners") },
