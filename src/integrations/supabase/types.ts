@@ -1683,8 +1683,8 @@ export type Database = {
       }
       register_seller: {
         Args: {
-          _phone: string
-          _shop_city: string
+          _phone?: string
+          _shop_city?: string
           _shop_name: string
           _voen?: string
         }
