@@ -1280,6 +1280,7 @@ export type Database = {
           pvz_received_by: string | null
           reason: string
           refund_amount: number | null
+          rejection_reason: string | null
           resolved_at: string | null
           seller_approved_at: string | null
           seller_id: string
@@ -1305,6 +1306,7 @@ export type Database = {
           pvz_received_by?: string | null
           reason: string
           refund_amount?: number | null
+          rejection_reason?: string | null
           resolved_at?: string | null
           seller_approved_at?: string | null
           seller_id: string
@@ -1330,6 +1332,7 @@ export type Database = {
           pvz_received_by?: string | null
           reason?: string
           refund_amount?: number | null
+          rejection_reason?: string | null
           resolved_at?: string | null
           seller_approved_at?: string | null
           seller_id?: string

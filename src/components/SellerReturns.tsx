@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Undo2, Eye, CheckCircle2, XCircle, PackageCheck } from "lucide-react";
@@ -12,6 +13,7 @@ interface ReturnRow {
   reason: string;
   description: string | null;
   buyer_explanation: string | null;
+  rejection_reason: string | null;
   status: string;
   cost_paid_by: string;
   images: string[];
@@ -51,11 +53,13 @@ function Stepper({ stage, rejected }: { stage: number; rejected?: boolean }) {
 export function SellerReturns({ sellerId }: { sellerId: string }) {
   const [list, setList] = useState<ReturnRow[]>([]);
   const [view, setView] = useState<ReturnRow | null>(null);
+  const [rejectFor, setRejectFor] = useState<ReturnRow | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
 
   const load = async () => {
     const { data } = await supabase
       .from("returns")
-      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,pvz_received_at,seller_approved_at,shipped_to_seller_at,seller_received_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
+      .select("id,pickup_code,reason,description,buyer_explanation,rejection_reason,status,cost_paid_by,images,pvz_received_at,seller_approved_at,shipped_to_seller_at,seller_received_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
       .eq("seller_id", sellerId)
       .order("created_at", { ascending: false })
       .limit(200);
@@ -80,11 +84,17 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
     setView(null); void load();
   };
 
-  const reject = async (r: ReturnRow) => {
-    const { error } = await supabase.from("returns").update({ status: "rejected" }).eq("id", r.id);
+  const reject = async (r: ReturnRow, reason: string) => {
+    const trimmed = reason.trim();
+    if (trimmed.length < 3) { toast.error("Rədd etmə səbəbini yazın (ən azı 3 simvol)"); return; }
+    const { error } = await supabase.from("returns").update({
+      status: "rejected",
+      rejection_reason: trimmed,
+      resolved_at: new Date().toISOString(),
+    }).eq("id", r.id);
     if (error) { toast.error(error.message); return; }
-    toast.success("Rədd edildi");
-    setView(null); void load();
+    toast.success("Rədd edildi və müştəriyə bildirildi");
+    setRejectFor(null); setRejectReason(""); setView(null); void load();
   };
 
   const complete = async (r: ReturnRow) => {
@@ -145,12 +155,33 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
                   </TableCell>
                   <TableCell>
                     <Stepper stage={stageOf(r)} rejected={r.status === "rejected"} />
-                    {r.status === "rejected" && <div className="text-[10px] text-destructive font-semibold mt-1 text-center">❌ Rədd edildi</div>}
+                    {r.status === "rejected" && (
+                      <div className="text-[10px] text-destructive font-semibold mt-1 text-center">
+                        ❌ Rədd edildi{r.rejection_reason ? ` — ${r.rejection_reason}` : ""}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>
-                    <Button size="sm" variant="ghost" onClick={() => setView(r)}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-1 flex-wrap">
+                      <Button size="sm" variant="ghost" onClick={() => setView(r)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      {r.status === "pending" && (
+                        <>
+                          <Button size="sm" onClick={() => approve(r)}>
+                            <CheckCircle2 className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => { setRejectFor(r); setRejectReason(""); }}>
+                            <XCircle className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                      {r.shipped_to_seller_at && r.status !== "completed" && (
+                        <Button size="sm" variant="secondary" onClick={() => complete(r)}>
+                          <PackageCheck className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -204,10 +235,16 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
                   </div>
                 </div>
               )}
+              {view.rejection_reason && (
+                <div>
+                  <div className="text-xs text-muted-foreground">Rədd səbəbi</div>
+                  <div className="bg-destructive/10 text-destructive p-2 rounded text-xs">{view.rejection_reason}</div>
+                </div>
+              )}
               <div className="flex gap-2 justify-end pt-2 flex-wrap">
                 {view.status === "pending" && (
                   <>
-                    <Button variant="outline" onClick={() => reject(view)}>
+                    <Button variant="outline" onClick={() => { setRejectFor(view); setRejectReason(""); }}>
                       <XCircle className="h-4 w-4 mr-1" /> Rədd et
                     </Button>
                     <Button onClick={() => approve(view)}>
@@ -229,6 +266,31 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!rejectFor} onOpenChange={(v) => { if (!v) { setRejectFor(null); setRejectReason(""); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Qaytarmanı rədd et</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            <div className="text-muted-foreground text-xs">
+              Səbəbi yazın — müştəriyə bildiriş şəklində göndəriləcək.
+            </div>
+            <Textarea
+              placeholder="Məs: Məhsul istifadə edilib, geri qəbul mümkün deyil..."
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              rows={4}
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => { setRejectFor(null); setRejectReason(""); }}>İmtina</Button>
+              <Button variant="destructive" onClick={() => rejectFor && reject(rejectFor, rejectReason)}>
+                <XCircle className="h-4 w-4 mr-1" /> Rədd et və göndər
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
