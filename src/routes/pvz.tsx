@@ -1063,7 +1063,13 @@ function Returns() {
                   <TableCell className="min-w-[220px]">
                     <Stepper stage={stageOf(r)} />
                     {!r.pvz_received_at && (
-                      <Button size="sm" variant="outline" className="mt-2 w-full" onClick={() => acceptReturn(r)}>Əl ilə qəbul et</Button>
+                      <Button size="sm" variant="outline" className="mt-2 w-full" onClick={() => acceptReturn(r)}>PVZ qəbul etdi</Button>
+                    )}
+                    {r.pvz_received_at && !r.shipped_to_seller_at && r.status !== "completed" && (
+                      <Button size="sm" className="mt-2 w-full" onClick={() => shipToSeller(r)}>Satıcıya göndərildi</Button>
+                    )}
+                    {r.shipped_to_seller_at && r.status !== "completed" && (
+                      <div className="text-[10px] text-primary font-semibold mt-2 text-center">🚚 Satıcıya yoldadır</div>
                     )}
                   </TableCell>
                 </TableRow>
@@ -1080,10 +1086,10 @@ function Returns() {
         acceptLabel="Qəbul et"
         onResult={(v) => void previewScan(v)}
         onScan={(v) => {
-          const trimmed = v.trim().toUpperCase();
-          const found = list.find((r) => (r.pickup_code ?? "").toUpperCase() === trimmed);
-          if (found) void acceptReturn(found);
-          else toast.error("Bu kod üzrə qaytarma tapılmadı");
+          void findReturnByCode(v).then((found) => {
+            if (found) void acceptReturn(found);
+            else toast.error("Bu kod üzrə qaytarma tapılmadı");
+          });
         }}
         resultDetails={() => scanned ? (
           <div className="text-left text-xs space-y-2 bg-secondary/30 p-3 rounded">
