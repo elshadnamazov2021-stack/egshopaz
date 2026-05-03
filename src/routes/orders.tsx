@@ -301,6 +301,7 @@ function OrdersPage() {
           sellerId={returnItem.item.seller_id}
           productTitle={returnItem.item.title}
           deliveredAt={returnItem.item.delivered_at}
+          pickupPointId={returnItem.item.pickup_point_id}
           onDone={load}
         />
       )}
