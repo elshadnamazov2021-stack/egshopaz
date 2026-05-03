@@ -114,7 +114,21 @@ function OrdersPage() {
       pickup_points: order.pickup_point_id ? (pickupMap.get(order.pickup_point_id) ?? null) : null,
     })));
   };
-  useEffect(() => { void load(); }, [user]);
+  const loadReturns = async () => {
+    if (!user) return;
+    const { data } = await supabase.from("returns")
+      .select("id,pickup_code,reason,status,cost_paid_by,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,order_item_id,pickup_point_id,order_items(title),pickup_points(name,address,city)")
+      .eq("buyer_id", user.id)
+      .order("created_at", { ascending: false });
+    type Row = { id: string; pickup_code: string | null; reason: string; status: string; cost_paid_by: string; seller_approved_at: string | null; pvz_received_at: string | null; shipped_to_seller_at: string | null; created_at: string; order_item_id: string; pickup_point_id: string | null; order_items: { title: string } | null; pickup_points: { name: string; address: string; city: string } | null };
+    setMyReturns(((data ?? []) as unknown as Row[]).map((r) => ({
+      ...r,
+      product_title: r.order_items?.title ?? null,
+      pvz_name: r.pickup_points?.name ?? null,
+      pvz_address: r.pickup_points ? `${r.pickup_points.city}, ${r.pickup_points.address}` : null,
+    })));
+  };
+  useEffect(() => { void load(); void loadReturns(); }, [user]);
 
   useEffect(() => {
     if (!user) return;
