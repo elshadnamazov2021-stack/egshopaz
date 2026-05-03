@@ -235,10 +235,16 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
                   </div>
                 </div>
               )}
+              {view.rejection_reason && (
+                <div>
+                  <div className="text-xs text-muted-foreground">Rədd səbəbi</div>
+                  <div className="bg-destructive/10 text-destructive p-2 rounded text-xs">{view.rejection_reason}</div>
+                </div>
+              )}
               <div className="flex gap-2 justify-end pt-2 flex-wrap">
                 {view.status === "pending" && (
                   <>
-                    <Button variant="outline" onClick={() => reject(view)}>
+                    <Button variant="outline" onClick={() => { setRejectFor(view); setRejectReason(""); }}>
                       <XCircle className="h-4 w-4 mr-1" /> Rədd et
                     </Button>
                     <Button onClick={() => approve(view)}>
