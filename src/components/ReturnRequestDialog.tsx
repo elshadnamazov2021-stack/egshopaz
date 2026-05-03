@@ -37,6 +37,7 @@ export function ReturnRequestDialog({
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [createdCode, setCreatedCode] = useState<string | null>(null);
 
   const reason = REASONS[reasonIdx];
 
