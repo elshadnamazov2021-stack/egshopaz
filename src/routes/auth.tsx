@@ -194,7 +194,6 @@ function AuthPage() {
 
     if (role === "seller") {
       if (shopName.trim().length < 2) { toast.error("Mağaza adı daxil edin"); return; }
-      if (shopCity.trim().length < 2) { toast.error("Şəhər daxil edin"); return; }
     }
     if (role === "pvz") {
       if (!pickupPointId) {
@@ -242,9 +241,6 @@ function AuthPage() {
     if (role === "seller") {
       const { error: e2 } = await supabase.rpc("register_seller", {
         _shop_name: shopName.trim().slice(0, 100),
-        _shop_city: shopCity.trim(),
-        _phone: phone.trim(),
-        _voen: voen.trim() || undefined,
       });
       if (e2) { setBusy(false); toast.error(e2.message); return; }
       toast.success("Satıcı qeydiyyatınız tamamlandı");
@@ -341,18 +337,8 @@ function AuthPage() {
             </button>
           </div>
           {mode === "signup" && role === "seller" && (
-            <>
-              <input value={shopName} onChange={(e) => setShopName(e.target.value)}
-                placeholder="Mağaza adı" maxLength={100} className={inputCls} />
-              <select value={shopCity} onChange={(e) => setShopCity(e.target.value)} className={inputCls}>
-                <option value="">Şəhər seçin</option>
-                {AZ_CITIES.map((c) => (
-                  <option key={c.name} value={c.name}>{c.name}</option>
-                ))}
-              </select>
-              <input value={voen} onChange={(e) => setVoen(e.target.value)}
-                placeholder="VÖEN (ixtiyari)" maxLength={20} className={inputCls} />
-            </>
+            <input value={shopName} onChange={(e) => setShopName(e.target.value)}
+              placeholder="Mağaza adı" maxLength={100} className={inputCls} />
           )}
 
           {mode === "signup" && role === "pvz" && (
