@@ -51,6 +51,7 @@ function CartPage() {
   const [homeApartment, setHomeApartment] = useState("");
   const [homeNotes, setHomeNotes] = useState("");
   const [recipientName, setRecipientName] = useState("");
+  const [recipientEmail, setRecipientEmail] = useState("");
   const [recipientPhone, setRecipientPhone] = useState("");
   const [promo, setPromo] = useState("");
   const [promoInfo, setPromoInfo] = useState<{ code: string; discount: number } | null>(null);
@@ -101,6 +102,7 @@ function CartPage() {
     setBonusBalance(prof.data?.bonus_balance ?? 0);
     setProfile({ full_name: prof.data?.full_name ?? null, phone: prof.data?.phone ?? null });
     setRecipientName((prev) => prev || prof.data?.full_name || "");
+    setRecipientEmail((prev) => prev || user.email || "");
     setRecipientPhone((prev) => prev || prof.data?.phone || "");
     setBonusToAzn(Number(settings.data?.bonus_to_azn ?? 0.01));
     setPvzList((pps.data ?? []) as never);
@@ -182,7 +184,8 @@ function CartPage() {
 
   const checkout = async () => {
     if (!user || items.length === 0) return;
-    const finalRecipientName = recipientName.trim() || profile?.full_name || user.email || "";
+    const finalRecipientName = recipientName.trim() || profile?.full_name || "";
+    const finalRecipientEmail = recipientEmail.trim() || user.email || "";
     const finalRecipientPhone = recipientPhone.trim() || profile?.phone || "";
     if (!finalRecipientName || !finalRecipientPhone) {
       toast.error("Ad və telefon nömrəsi daxil edin");
@@ -220,6 +223,7 @@ function CartPage() {
         shipping_address: shippingAddress,
         pickup_point_id: chosenPvzId,
         recipient_name: finalRecipientName,
+        recipient_email: finalRecipientEmail,
         recipient_phone: finalRecipientPhone,
         status: "pending",
         promo_code: promoInfo?.code ?? null,
@@ -244,6 +248,7 @@ function CartPage() {
         image_url: i.products!.image_url,
         pickup_point_id: chosenPvzId,
         customer_name: finalRecipientName,
+        customer_email: finalRecipientEmail,
         customer_phone: finalRecipientPhone,
       }));
     const { error: itemError } = await supabase.from("order_items").insert(orderItems);
@@ -525,6 +530,14 @@ function CartPage() {
                 className="w-full h-9 rounded-lg border border-input bg-background px-3 text-sm"
               />
               <input
+                type="email"
+                value={recipientEmail}
+                onChange={(e) => setRecipientEmail(e.target.value)}
+                placeholder="Email"
+                className="w-full h-9 rounded-lg border border-input bg-background px-3 text-sm"
+              />
+              <input
+                type="tel"
                 value={recipientPhone}
                 onChange={(e) => setRecipientPhone(e.target.value)}
                 placeholder="Telefon (+994...)"
