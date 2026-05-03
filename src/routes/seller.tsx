@@ -641,6 +641,13 @@ function SellerPanel() {
       onClick: () => setTab("orders"),
     },
     {
+      key: "returns",
+      label: "Qaytarmalar",
+      icon: Undo2,
+      active: tab === "returns",
+      onClick: () => setTab("returns"),
+    },
+    {
       key: "notifications",
       label: "Bildirişlər",
       icon: Bell,
