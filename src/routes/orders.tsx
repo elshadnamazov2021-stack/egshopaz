@@ -138,7 +138,10 @@ function OrdersPage() {
     const itemsCh = supabase.channel(`buyer-order-items-${user.id}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "order_items" }, load)
       .subscribe();
-    return () => { supabase.removeChannel(ordersCh); supabase.removeChannel(itemsCh); };
+    const retCh = supabase.channel(`buyer-returns-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "returns", filter: `buyer_id=eq.${user.id}` }, loadReturns)
+      .subscribe();
+    return () => { supabase.removeChannel(ordersCh); supabase.removeChannel(itemsCh); supabase.removeChannel(retCh); };
   }, [user]);
 
   const cancel = async (id: string) => {
