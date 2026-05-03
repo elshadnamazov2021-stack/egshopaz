@@ -73,7 +73,7 @@ export function ReturnRequestDialog({
     if (description.trim().length < 5) { toast.error("Qaytarma səbəbini ətraflı izah edin"); return; }
     if (images.length < 1) { toast.error("Ən azı 1 şəkil yükləyin (sübut)"); return; }
     setBusy(true);
-    const { error } = await supabase.from("returns").insert({
+    const { data, error } = await supabase.from("returns").insert({
       order_id: orderId,
       order_item_id: orderItemId,
       buyer_id: buyerId,
@@ -85,11 +85,11 @@ export function ReturnRequestDialog({
       pickup_point_id: pickupPointId,
       cost_paid_by: reason.cost,
       status: "pending",
-    });
+    }).select("pickup_code").single();
     setBusy(false);
     if (error) { toast.error(error.message); return; }
-    toast.success("Qaytarma istəyi göndərildi. Məhsulu PVZ-yə təhvil verin.");
-    onOpenChange(false);
+    toast.success("Qaytarma istəyi göndərildi. PVZ-də QR/kod göstərin.");
+    setCreatedCode(data?.pickup_code ?? null);
     onDone?.();
   };
 
