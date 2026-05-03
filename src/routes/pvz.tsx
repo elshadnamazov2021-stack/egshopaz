@@ -951,6 +951,14 @@ function Returns() {
 
   const acceptReturn = async (r: ReturnRow) => {
     if (!user) return;
+    if (!r.seller_approved_at || r.status !== "approved") {
+      toast.error("Bu qaytarma hələ satıcı tərəfindən təsdiqlənməyib");
+      return;
+    }
+    if (r.pvz_received_at) {
+      toast.info("Bu qaytarma artıq PVZ-də qəbul edilib");
+      return;
+    }
     const { error } = await supabase.from("returns").update({
       pvz_received_at: new Date().toISOString(),
       pvz_received_by: user.id,
@@ -961,13 +969,34 @@ function Returns() {
     void load();
   };
 
+  const shipToSeller = async (r: ReturnRow) => {
+    if (!user) return;
+    if (!r.pvz_received_at) {
+      toast.error("Əvvəlcə məhsulu müştəridən PVZ-də qəbul edin");
+      return;
+    }
+    if (r.shipped_to_seller_at) {
+      toast.info("Bu məhsul artıq satıcıya göndərilib");
+      return;
+    }
+    const { error } = await supabase.from("returns").update({
+      shipped_to_seller_at: new Date().toISOString(),
+      shipped_by: user.id,
+      status: "approved",
+    }).eq("id", r.id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Məhsul satıcıya göndərildi kimi qeyd olundu");
+    void load();
+  };
+
   const stageOf = (r: ReturnRow): number => {
     if (r.status === "completed") return 4;
-    if (r.status === "approved" && r.pvz_received_at) return 3;
+    if (r.shipped_to_seller_at) return 3;
     if (r.pvz_received_at) return 2;
-    return 1;
+    if (r.seller_approved_at) return 1;
+    return 0;
   };
-  const STAGES = ["Müştəri açdı", "PVZ qəbul etdi", "Satıcıya göndərildi", "Satıcı təsdiqlədi", "Tamamlandı"];
+  const STAGES = ["Satıcı təsdiqlədi", "QR aktivdir", "PVZ qəbul etdi", "Satıcıya göndərildi", "Tamamlandı"];
 
   const Stepper = ({ stage }: { stage: number }) => (
     <div className="flex items-center gap-1 mt-2">
@@ -993,10 +1022,10 @@ function Returns() {
 
       <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-xs space-y-1">
         <div className="font-bold text-primary">ℹ️ Qaytarma prosesi necə işləyir?</div>
-        <div>1️⃣ Müştəri öz hesabından məhsulu qaytarma istəyini açır (şəkil + səbəb yükləyir) və PVZ kodu alır.</div>
-        <div>2️⃣ Müştəri məhsulu PVZ-ə gətirir → PVZ operatoru <b>QR ilə qəbul et</b> düyməsi ilə kodu skan edir və paketi qəbul edir.</div>
-        <div>3️⃣ Sistem avtomatik satıcıya bildiriş göndərir, məhsul satıcıya geri qaytarılır.</div>
-        <div>4️⃣ Satıcı paketi yoxlayır → təsdiq və ya rədd edir. Pul/bonus müştəriyə qaytarılır.</div>
+        <div>1️⃣ Müştəri istək açır → satıcı paneldə <b>Təsdiqlə</b> edir.</div>
+        <div>2️⃣ Təsdiqdən sonra QR/kod avtomatik müştəriyə göndərilir və bu paneldə görünür.</div>
+        <div>3️⃣ Müştəri PVZ-ə gələndə <b>QR ilə qəbul et</b> düyməsi ilə kodu skan edin və malı təhvil alın.</div>
+        <div>4️⃣ Kuryer götürəndə <b>Satıcıya göndərildi</b> qeyd edin; satıcı malı alanda öz panelində tamamlayır.</div>
         <div className="text-muted-foreground">⚠️ Qaytarma xərci səbəbə görə müəyyənləşir: qüsurlu məhsul → satıcı; fikir dəyişməsi → müştəri.</div>
       </div>
 
