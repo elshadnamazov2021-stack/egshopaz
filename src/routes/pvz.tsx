@@ -169,6 +169,7 @@ function PvzPanel() {
       icon: Undo2,
       active: tab === "returns",
       onClick: () => setTab("returns"),
+        badge: list.length,
     },
     {
       key: "storage",
