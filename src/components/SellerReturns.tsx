@@ -23,6 +23,7 @@ interface ReturnRow {
   seller_received_at: string | null;
   created_at: string;
   buyer_id: string;
+  order_id: string;
   order_item_id: string;
   order_items: { title: string; orders: { recipient_name: string | null; recipient_phone: string | null } | null } | null;
 }
@@ -57,13 +58,37 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
   const [rejectReason, setRejectReason] = useState("");
 
   const load = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("returns")
-      .select("id,pickup_code,reason,description,buyer_explanation,rejection_reason,status,cost_paid_by,images,pvz_received_at,seller_approved_at,shipped_to_seller_at,seller_received_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
+      .select("id,pickup_code,reason,description,buyer_explanation,rejection_reason,status,cost_paid_by,images,pvz_received_at,seller_approved_at,shipped_to_seller_at,seller_received_at,created_at,buyer_id,order_id,order_item_id")
       .eq("seller_id", sellerId)
       .order("created_at", { ascending: false })
       .limit(200);
-    setList((data ?? []) as unknown as ReturnRow[]);
+    if (error) { toast.error(`Qaytarmalar yüklənmədi: ${error.message}`); return; }
+
+    const rows = (data ?? []) as unknown as Omit<ReturnRow, "order_items">[];
+    const itemIds = [...new Set(rows.map((r) => r.order_item_id))];
+    const orderIds = [...new Set(rows.map((r) => r.order_id))];
+    const [{ data: itemRows, error: itemsError }, { data: orderRows, error: ordersError }] = await Promise.all([
+      itemIds.length
+        ? supabase.from("order_items").select("id,title").in("id", itemIds)
+        : Promise.resolve({ data: [], error: null }),
+      orderIds.length
+        ? supabase.from("orders").select("id,recipient_name,recipient_phone").in("id", orderIds)
+        : Promise.resolve({ data: [], error: null }),
+    ]);
+    const firstError = itemsError ?? ordersError;
+    if (firstError) { toast.error(`Qaytarma detalları yüklənmədi: ${firstError.message}`); return; }
+
+    const itemMap = new Map((itemRows ?? []).map((i) => [i.id, i]));
+    const orderMap = new Map((orderRows ?? []).map((o) => [o.id, o]));
+    setList(rows.map((r) => ({
+      ...r,
+      order_items: {
+        title: itemMap.get(r.order_item_id)?.title ?? "—",
+        orders: orderMap.get(r.order_id) ?? null,
+      },
+    })) as ReturnRow[]);
   };
 
   useEffect(() => {
