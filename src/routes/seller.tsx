@@ -1266,11 +1266,13 @@ function SellerPanel() {
                   <label className="text-sm font-semibold">Qiymət (₼) *</label>
                   <input
                     type="number"
+                    inputMode="decimal"
                     step="0.01"
-                    value={editing.price ?? 0}
+                    value={editing.price ? String(editing.price) : ""}
                     onChange={(e) =>
-                      setEditing({ ...editing, price: parseFloat(e.target.value) || 0 })
+                      setEditing({ ...editing, price: e.target.value === "" ? 0 : parseFloat(e.target.value) || 0 })
                     }
+                    placeholder="0"
                     className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
                   />
                 </div>
@@ -1278,6 +1280,7 @@ function SellerPanel() {
                   <label className="text-sm font-semibold">Köhnə qiymət (₼)</label>
                   <input
                     type="number"
+                    inputMode="decimal"
                     step="0.01"
                     value={editing.old_price ?? ""}
                     onChange={(e) =>
@@ -1297,10 +1300,12 @@ function SellerPanel() {
                   <label className="text-sm font-semibold">Stok *</label>
                   <input
                     type="number"
-                    value={editing.stock ?? 0}
+                    inputMode="numeric"
+                    value={editing.stock ? String(editing.stock) : ""}
                     onChange={(e) =>
-                      setEditing({ ...editing, stock: parseInt(e.target.value) || 0 })
+                      setEditing({ ...editing, stock: e.target.value === "" ? 0 : parseInt(e.target.value) || 0 })
                     }
+                    placeholder="0"
                     className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
                   />
                 </div>
@@ -1330,6 +1335,7 @@ function SellerPanel() {
                   <label className="text-sm font-semibold">Çəki (kq)</label>
                   <input
                     type="number"
+                    inputMode="decimal"
                     step="0.01"
                     value={editing.weight ?? ""}
                     onChange={(e) =>
@@ -1338,6 +1344,7 @@ function SellerPanel() {
                         weight: e.target.value ? parseFloat(e.target.value) : null,
                       })
                     }
+                    placeholder="0"
                     className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
                   />
                 </div>
@@ -1345,18 +1352,11 @@ function SellerPanel() {
 
               <div>
                 <label className="text-sm font-semibold">Kateqoriya</label>
-                <select
-                  value={editing.category_id ?? ""}
-                  onChange={(e) => setEditing({ ...editing, category_id: e.target.value || null })}
-                  className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
-                >
-                  <option value="">Seçin...</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+                <CategoryCombobox
+                  categories={categories}
+                  value={editing.category_id ?? null}
+                  onChange={(id) => setEditing({ ...editing, category_id: id })}
+                />
               </div>
 
               <div className="border-t border-border pt-4">
