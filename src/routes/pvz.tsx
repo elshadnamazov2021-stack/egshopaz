@@ -940,15 +940,20 @@ function Returns() {
     if (!user) return;
     const ppId = await getPickupPointId();
     if (!ppId) { setList([]); return; }
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("returns")
-      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
+      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,buyer_id,order_id,order_item_id")
       .eq("pickup_point_id", ppId)
       .not("seller_approved_at", "is", null)
       .neq("status", "rejected")
       .order("created_at", { ascending: false })
       .limit(100);
-    setList((data ?? []) as unknown as ReturnRow[]);
+    if (error) {
+      toast.error(`Qaytarmalar yüklənmədi: ${error.message}`);
+      setList([]);
+      return;
+    }
+    setList(await attachReturnDetails((data ?? []) as unknown as ReturnBaseRow[]));
   };
   useEffect(() => {
     void load();
