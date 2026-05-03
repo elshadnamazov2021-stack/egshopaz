@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Undo2, Eye, CheckCircle2, XCircle } from "lucide-react";
+import { Undo2, Eye, CheckCircle2, XCircle, PackageCheck } from "lucide-react";
 import { toast } from "sonner";
 
 interface ReturnRow {
@@ -16,11 +16,36 @@ interface ReturnRow {
   cost_paid_by: string;
   images: string[];
   pvz_received_at: string | null;
+  seller_approved_at: string | null;
+  shipped_to_seller_at: string | null;
   seller_received_at: string | null;
   created_at: string;
   buyer_id: string;
   order_item_id: string;
   order_items: { title: string; orders: { recipient_name: string | null; recipient_phone: string | null } | null } | null;
+}
+
+const STAGES = ["İstək gəldi", "Siz təsdiqlədiniz", "PVZ qəbul etdi", "Sizə göndərildi", "Tamamlandı"];
+
+function stageOf(r: ReturnRow): number {
+  if (r.status === "completed") return 4;
+  if (r.shipped_to_seller_at) return 3;
+  if (r.pvz_received_at) return 2;
+  if (r.seller_approved_at) return 1;
+  return 0;
+}
+
+function Stepper({ stage, rejected }: { stage: number; rejected?: boolean }) {
+  return (
+    <div className="flex items-center gap-1">
+      {STAGES.map((s, i) => (
+        <div key={s} className="flex-1">
+          <div className={`h-1.5 rounded-full ${i <= stage && !rejected ? "bg-primary" : "bg-muted"}`} />
+          <div className={`text-[9px] mt-1 text-center ${i <= stage && !rejected ? "text-primary font-semibold" : "text-muted-foreground"}`}>{s}</div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export function SellerReturns({ sellerId }: { sellerId: string }) {
@@ -30,26 +55,47 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
   const load = async () => {
     const { data } = await supabase
       .from("returns")
-      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,pvz_received_at,seller_received_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
+      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,pvz_received_at,seller_approved_at,shipped_to_seller_at,seller_received_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
       .eq("seller_id", sellerId)
       .order("created_at", { ascending: false })
       .limit(200);
     setList((data ?? []) as unknown as ReturnRow[]);
   };
 
-  useEffect(() => { void load(); }, [sellerId]);
-
-  const update = async (r: ReturnRow, status: "approved" | "rejected" | "completed") => {
-    const patch: { status: string; seller_received_at?: string; resolved_at?: string } = { status };
-    if (status === "completed") {
-      patch.seller_received_at = new Date().toISOString();
-      patch.resolved_at = new Date().toISOString();
-    }
-    const { error } = await supabase.from("returns").update(patch).eq("id", r.id);
-    if (error) { toast.error(error.message); return; }
-    toast.success("Yeniləndi");
-    setView(null);
+  useEffect(() => {
     void load();
+    const ch = supabase.channel(`seller-returns-${sellerId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "returns", filter: `seller_id=eq.${sellerId}` }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [sellerId]);
+
+  const approve = async (r: ReturnRow) => {
+    const { error } = await supabase.from("returns").update({
+      status: "approved",
+      seller_approved_at: new Date().toISOString(),
+    }).eq("id", r.id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Təsdiqləndi. Müştəriyə QR kod göndərildi.");
+    setView(null); void load();
+  };
+
+  const reject = async (r: ReturnRow) => {
+    const { error } = await supabase.from("returns").update({ status: "rejected" }).eq("id", r.id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Rədd edildi");
+    setView(null); void load();
+  };
+
+  const complete = async (r: ReturnRow) => {
+    const { error } = await supabase.from("returns").update({
+      status: "completed",
+      seller_received_at: new Date().toISOString(),
+      resolved_at: new Date().toISOString(),
+    }).eq("id", r.id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Qaytarma tamamlandı. Pul/bonus müştəriyə qaytarılır.");
+    setView(null); void load();
   };
 
   return (
@@ -57,6 +103,15 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
       <h1 className="text-2xl font-extrabold flex items-center gap-2">
         <Undo2 className="h-6 w-6 text-primary" /> Qaytarmalar ({list.length})
       </h1>
+
+      <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-xs space-y-1">
+        <div className="font-bold text-primary">📋 Sizin addımlarınız:</div>
+        <div>1️⃣ Müştərinin istəyini yoxlayın → <b>Təsdiqlə</b> və ya <b>Rədd et</b>.</div>
+        <div>2️⃣ Təsdiqdən sonra müştəriyə QR avtomatik göndərilir, PVZ-ə bildiriş gedir.</div>
+        <div>3️⃣ Müştəri PVZ-ə aparır → PVZ qəbul edir → kuryer ilə sizə göndərir.</div>
+        <div>4️⃣ Məhsul sizə çatanda → <b>"Məhsul gəldi — tamamla"</b> düyməsinə basın. Pul/bonus müştəriyə qaytarılır.</div>
+      </div>
+
       <div className="bg-card border border-border rounded-2xl p-4 overflow-x-auto">
         {list.length === 0 ? (
           <div className="text-sm text-muted-foreground text-center py-8">Qaytarma yoxdur</div>
@@ -69,8 +124,7 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
                 <TableHead>Məhsul</TableHead>
                 <TableHead>Səbəb</TableHead>
                 <TableHead>Xərc</TableHead>
-                <TableHead>PVZ</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="min-w-[260px]">Vəziyyət</TableHead>
                 <TableHead>Bax</TableHead>
               </TableRow>
             </TableHeader>
@@ -89,11 +143,9 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
                       {r.cost_paid_by === "seller" ? "Sizin" : "Müştəri"}
                     </span>
                   </TableCell>
-                  <TableCell className="text-xs">
-                    {r.pvz_received_at ? <span className="text-emerald-600">✓ Qəbul</span> : <span className="text-muted-foreground">Gözləyir</span>}
-                  </TableCell>
                   <TableCell>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-secondary">{r.status}</span>
+                    <Stepper stage={stageOf(r)} rejected={r.status === "rejected"} />
+                    {r.status === "rejected" && <div className="text-[10px] text-destructive font-semibold mt-1 text-center">❌ Rədd edildi</div>}
                   </TableCell>
                   <TableCell>
                     <Button size="sm" variant="ghost" onClick={() => setView(r)}>
@@ -114,6 +166,7 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
           </DialogHeader>
           {view && (
             <div className="space-y-3 text-sm">
+              <Stepper stage={stageOf(view)} rejected={view.status === "rejected"} />
               <div>
                 <div className="text-xs text-muted-foreground">Məhsul</div>
                 <div className="font-semibold">{view.order_items?.title}</div>
@@ -154,18 +207,24 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
               <div className="flex gap-2 justify-end pt-2 flex-wrap">
                 {view.status === "pending" && (
                   <>
-                    <Button variant="outline" onClick={() => update(view, "rejected")}>
+                    <Button variant="outline" onClick={() => reject(view)}>
                       <XCircle className="h-4 w-4 mr-1" /> Rədd et
                     </Button>
-                    <Button onClick={() => update(view, "approved")}>
-                      <CheckCircle2 className="h-4 w-4 mr-1" /> Təsdiqlə
+                    <Button onClick={() => approve(view)}>
+                      <CheckCircle2 className="h-4 w-4 mr-1" /> Təsdiqlə (QR-ı müştəriyə göndər)
                     </Button>
                   </>
                 )}
-                {(view.status === "approved" && view.pvz_received_at) && (
-                  <Button onClick={() => update(view, "completed")}>
-                    <CheckCircle2 className="h-4 w-4 mr-1" /> Məhsul gəldi — tamamla
+                {view.status === "approved" && !view.pvz_received_at && (
+                  <div className="text-xs text-muted-foreground">Müştəri PVZ-ə gələnə qədər gözləyirik...</div>
+                )}
+                {view.shipped_to_seller_at && view.status !== "completed" && (
+                  <Button onClick={() => complete(view)}>
+                    <PackageCheck className="h-4 w-4 mr-1" /> Məhsul gəldi — tamamla
                   </Button>
+                )}
+                {view.status === "approved" && view.pvz_received_at && !view.shipped_to_seller_at && (
+                  <div className="text-xs text-muted-foreground">PVZ paketi sizə göndərənə qədər gözləyirik...</div>
                 )}
               </div>
             </div>
