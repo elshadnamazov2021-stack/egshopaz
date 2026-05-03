@@ -881,7 +881,9 @@ interface ReturnRow {
   status: string;
   cost_paid_by: string;
   images: string[];
+  seller_approved_at: string | null;
   pvz_received_at: string | null;
+  shipped_to_seller_at: string | null;
   created_at: string;
   buyer_id: string;
   order_item_id: string;
@@ -894,25 +896,55 @@ function Returns() {
   const [scanOpen, setScanOpen] = useState(false);
   const [scanned, setScanned] = useState<ReturnRow | null>(null);
 
+  const getPickupPointId = async () => {
+    if (!user) return null;
+    const { data: staff } = await supabase.from("pvz_staff").select("pickup_point_id").eq("user_id", user.id).maybeSingle();
+    return (staff as { pickup_point_id: string } | null)?.pickup_point_id ?? null;
+  };
+
   const load = async () => {
     if (!user) return;
-    // Find pickup point of this PVZ staff
-    const { data: staff } = await supabase.from("pvz_staff").select("pickup_point_id").eq("user_id", user.id).maybeSingle();
-    const ppId = (staff as { pickup_point_id: string } | null)?.pickup_point_id;
+    const ppId = await getPickupPointId();
     if (!ppId) { setList([]); return; }
     const { data } = await supabase
       .from("returns")
-      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,pvz_received_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
+      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
       .eq("pickup_point_id", ppId)
+      .not("seller_approved_at", "is", null)
+      .neq("status", "rejected")
       .order("created_at", { ascending: false })
       .limit(100);
     setList((data ?? []) as unknown as ReturnRow[]);
   };
-  useEffect(() => { void load(); }, [user]);
+  useEffect(() => {
+    void load();
+    const ch = supabase
+      .channel(`pvz-returns-${user?.id ?? "guest"}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "returns" }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user]);
+
+  const findReturnByCode = async (code: string) => {
+    const trimmed = code.trim().toUpperCase();
+    if (!trimmed) return null;
+    const fromList = list.find((r) => (r.pickup_code ?? "").toUpperCase() === trimmed);
+    if (fromList) return fromList;
+    const ppId = await getPickupPointId();
+    if (!ppId) return null;
+    const { data } = await supabase
+      .from("returns")
+      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,seller_approved_at,pvz_received_at,shipped_to_seller_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
+      .eq("pickup_point_id", ppId)
+      .eq("pickup_code", trimmed)
+      .not("seller_approved_at", "is", null)
+      .neq("status", "rejected")
+      .maybeSingle();
+    return (data as unknown as ReturnRow | null) ?? null;
+  };
 
   const previewScan = async (code: string) => {
-    const trimmed = code.trim().toUpperCase();
-    const found = list.find((r) => (r.pickup_code ?? "").toUpperCase() === trimmed);
+    const found = await findReturnByCode(code);
     setScanned(found ?? null);
     if (!found) toast.error("Bu kod üzrə qaytarma tapılmadı");
   };
