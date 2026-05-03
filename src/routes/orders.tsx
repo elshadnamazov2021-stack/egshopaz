@@ -20,6 +20,7 @@ export const Route = createFileRoute("/orders")({
 
 interface OrderItem { id: string; title: string; price: number; quantity: number; image_url: string | null; status: string; seller_id: string; product_id: string; pickup_code: string | null; accepted_at: string | null; delivered_at: string | null; pickup_point_id: string | null }
 interface Order { id: string; total: number; status: string; created_at: string; shipping_address: string | null; payment_method: string; pickup_point_id: string | null; recipient_name: string | null; recipient_phone: string | null; pickup_points: { name: string; address: string; city: string } | null; order_items: OrderItem[] }
+interface MyReturn { id: string; pickup_code: string | null; reason: string; status: string; cost_paid_by: string; seller_approved_at: string | null; pvz_received_at: string | null; shipped_to_seller_at: string | null; created_at: string; order_item_id: string; pickup_point_id: string | null; product_title?: string | null; pvz_name?: string | null; pvz_address?: string | null }
 
 const statusColor: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
