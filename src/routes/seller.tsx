@@ -154,6 +154,7 @@ function SellerPanel() {
     | "bulk"
     | "shop"
     | "support"
+    | "returns"
   >("dashboard");
   const [unreadMsgs, setUnreadMsgs] = useState(0);
   const [sellerNotifs, setSellerNotifs] = useState<SellerNotif[]>([]);
