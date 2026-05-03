@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Undo2, Upload, X } from "lucide-react";
+import { OrderQRDialog } from "@/components/OrderQRDialog";
 
 interface Props {
   open: boolean;
@@ -36,6 +37,7 @@ export function ReturnRequestDialog({
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [createdCode, setCreatedCode] = useState<string | null>(null);
 
   const reason = REASONS[reasonIdx];
 
@@ -71,7 +73,7 @@ export function ReturnRequestDialog({
     if (description.trim().length < 5) { toast.error("Qaytarma səbəbini ətraflı izah edin"); return; }
     if (images.length < 1) { toast.error("Ən azı 1 şəkil yükləyin (sübut)"); return; }
     setBusy(true);
-    const { error } = await supabase.from("returns").insert({
+    const { data, error } = await supabase.from("returns").insert({
       order_id: orderId,
       order_item_id: orderItemId,
       buyer_id: buyerId,
@@ -83,15 +85,16 @@ export function ReturnRequestDialog({
       pickup_point_id: pickupPointId,
       cost_paid_by: reason.cost,
       status: "pending",
-    });
+    }).select("pickup_code").single();
     setBusy(false);
     if (error) { toast.error(error.message); return; }
-    toast.success("Qaytarma istəyi göndərildi. Məhsulu PVZ-yə təhvil verin.");
-    onOpenChange(false);
+    toast.success("Qaytarma istəyi göndərildi. PVZ-də QR/kod göstərin.");
+    setCreatedCode(data?.pickup_code ?? null);
     onDone?.();
   };
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -172,5 +175,16 @@ export function ReturnRequestDialog({
         </div>
       </DialogContent>
     </Dialog>
+    {createdCode && (
+      <OrderQRDialog
+        open={!!createdCode}
+        onOpenChange={(v) => { if (!v) { setCreatedCode(null); onOpenChange(false); } }}
+        pickupCode={createdCode}
+        title="Qaytarma QR kodu"
+        subtitle={productTitle}
+        mode="buyer"
+      />
+    )}
+    </>
   );
 }
