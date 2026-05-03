@@ -1510,3 +1510,43 @@ function AIBotSection() {
     </div>
   );
 }
+
+interface AdminReturnRow {
+  id: string; pickup_code: string | null; reason: string; status: string;
+  cost_paid_by: string; images: string[]; pvz_received_at: string | null;
+  created_at: string; buyer_id: string; seller_id: string; buyer_explanation: string | null;
+  order_items: { title: string } | null;
+}
+
+function AdminReturnsSection() {
+  const [list, setList] = useState<AdminReturnRow[]>([]);
+  useEffect(() => {
+    supabase.from("returns")
+      .select("id,pickup_code,reason,status,cost_paid_by,images,pvz_received_at,created_at,buyer_id,seller_id,buyer_explanation,order_items(title)")
+      .order("created_at", { ascending: false }).limit(200)
+      .then(({ data }) => setList((data ?? []) as unknown as AdminReturnRow[]));
+  }, []);
+  return (
+    <div className="bg-card border border-border rounded-2xl p-4 overflow-x-auto">
+      <div className="font-bold mb-3">Bütün qaytarmalar ({list.length})</div>
+      {list.length === 0 ? <div className="text-sm text-muted-foreground text-center py-8">Qaytarma yoxdur</div> : (
+        <table className="w-full text-sm">
+          <thead><tr className="text-left text-xs text-muted-foreground border-b">
+            <th className="p-2">Kod</th><th>Məhsul</th><th>Səbəb</th><th>Xərc</th><th>PVZ</th><th>Status</th><th>Tarix</th>
+          </tr></thead>
+          <tbody>{list.map((r) => (
+            <tr key={r.id} className="border-b">
+              <td className="p-2 font-mono text-xs">{r.pickup_code}</td>
+              <td className="text-xs">{r.order_items?.title ?? "—"}</td>
+              <td className="text-xs">{r.reason}</td>
+              <td className="text-xs">{r.cost_paid_by === "seller" ? "Satıcı" : "Müştəri"}</td>
+              <td className="text-xs">{r.pvz_received_at ? "✓" : "—"}</td>
+              <td><span className="text-[10px] px-2 py-0.5 rounded bg-secondary">{r.status}</span></td>
+              <td className="text-[10px]">{new Date(r.created_at).toLocaleDateString("az-AZ")}</td>
+            </tr>
+          ))}</tbody>
+        </table>
+      )}
+    </div>
+  );
+}
