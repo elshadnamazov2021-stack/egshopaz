@@ -40,6 +40,7 @@ export function useBuyerNav(): { items: PanelNavItem[]; bonusBalance: number } {
   const items: PanelNavItem[] = [
     { to: "/profile", label: t("sidebar.profile"), icon: UserIcon },
     { to: "/orders", label: t("sidebar.orders"), icon: Package, badge: orderCount },
+    { to: "/returns", label: "Qaytarmalarım", icon: Undo2 },
     { to: "/favorites", label: t("sidebar.favorites"), icon: Heart },
     { to: "/cart", label: t("sidebar.cart"), icon: ShoppingCart },
     { to: "/messages", label: t("sidebar.messages"), icon: MessageCircle, badge: unreadMsgs },
