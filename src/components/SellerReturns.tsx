@@ -59,7 +59,7 @@ export function SellerReturns({ sellerId }: { sellerId: string }) {
   const load = async () => {
     const { data } = await supabase
       .from("returns")
-      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,pvz_received_at,seller_approved_at,shipped_to_seller_at,seller_received_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
+      .select("id,pickup_code,reason,description,buyer_explanation,rejection_reason,status,cost_paid_by,images,pvz_received_at,seller_approved_at,shipped_to_seller_at,seller_received_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
       .eq("seller_id", sellerId)
       .order("created_at", { ascending: false })
       .limit(200);
