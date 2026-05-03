@@ -1265,41 +1265,68 @@ export type Database = {
       }
       returns: {
         Row: {
+          buyer_explanation: string | null
           buyer_id: string
+          cost_paid_by: string
           created_at: string
           description: string | null
           id: string
+          images: string[]
           order_id: string
           order_item_id: string
+          pickup_code: string | null
+          pickup_point_id: string | null
+          pvz_received_at: string | null
+          pvz_received_by: string | null
           reason: string
+          refund_amount: number | null
           resolved_at: string | null
           seller_id: string
+          seller_received_at: string | null
           status: string
           updated_at: string
         }
         Insert: {
+          buyer_explanation?: string | null
           buyer_id: string
+          cost_paid_by?: string
           created_at?: string
           description?: string | null
           id?: string
+          images?: string[]
           order_id: string
           order_item_id: string
+          pickup_code?: string | null
+          pickup_point_id?: string | null
+          pvz_received_at?: string | null
+          pvz_received_by?: string | null
           reason: string
+          refund_amount?: number | null
           resolved_at?: string | null
           seller_id: string
+          seller_received_at?: string | null
           status?: string
           updated_at?: string
         }
         Update: {
+          buyer_explanation?: string | null
           buyer_id?: string
+          cost_paid_by?: string
           created_at?: string
           description?: string | null
           id?: string
+          images?: string[]
           order_id?: string
           order_item_id?: string
+          pickup_code?: string | null
+          pickup_point_id?: string | null
+          pvz_received_at?: string | null
+          pvz_received_by?: string | null
           reason?: string
+          refund_amount?: number | null
           resolved_at?: string | null
           seller_id?: string
+          seller_received_at?: string | null
           status?: string
           updated_at?: string
         }

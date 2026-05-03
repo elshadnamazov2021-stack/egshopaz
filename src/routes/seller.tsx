@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { SellerReturns } from "@/components/SellerReturns";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN } from "@/lib/format";
 import {
@@ -26,6 +27,7 @@ import {
   FileSpreadsheet,
   Bell,
   Check,
+  Undo2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -154,6 +156,7 @@ function SellerPanel() {
     | "bulk"
     | "shop"
     | "support"
+    | "returns"
   >("dashboard");
   const [unreadMsgs, setUnreadMsgs] = useState(0);
   const [sellerNotifs, setSellerNotifs] = useState<SellerNotif[]>([]);
@@ -639,6 +642,13 @@ function SellerPanel() {
       onClick: () => setTab("orders"),
     },
     {
+      key: "returns",
+      label: "Qaytarmalar",
+      icon: Undo2,
+      active: tab === "returns",
+      onClick: () => setTab("returns"),
+    },
+    {
       key: "notifications",
       label: "Bildirişlər",
       icon: Bell,
@@ -1018,6 +1028,8 @@ function SellerPanel() {
           )}
         </div>
       )}
+
+      {tab === "returns" && <SellerReturns sellerId={user.id} />}
 
       {tab === "messages" && <SellerMessages sellerId={user.id} />}
 

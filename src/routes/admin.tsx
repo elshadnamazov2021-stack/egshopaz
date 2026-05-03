@@ -7,7 +7,7 @@ import {
   Users, Package, ShoppingBag, DollarSign, Shield, LayoutDashboard,
   Truck, Warehouse, Store, Megaphone, BarChart3, Lock, Scale,
   FileText, Settings, LifeBuoy, AlertTriangle, TrendingUp, Plus, Trash2,
-  CheckCircle2, XCircle, Power, Ban, Edit3, Bell, Tag, Crown, Gem, Star, Award, Bot, Sparkles,
+  CheckCircle2, XCircle, Power, Ban, Edit3, Bell, Tag, Crown, Gem, Star, Award, Bot, Sparkles, Undo2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/admin")({
 type TabKey =
   | "dashboard" | "customers" | "sellers" | "couriers" | "pvz_staff"
   | "categories" | "products" | "shops" | "warehouses" | "pickup_points"
-  | "orders" | "finance" | "marketing" | "banners" | "packages" | "promo" | "analytics"
+  | "orders" | "returns" | "finance" | "marketing" | "banners" | "packages" | "promo" | "analytics"
   | "security" | "disputes" | "content" | "settings" | "support" | "ai_bot";
 
 interface Stat { users: number; products: number; orders: number; revenue: number; sellers: number }
@@ -350,6 +350,7 @@ function AdminPanel() {
     { key: "warehouses", label: "Anbarlar", icon: Warehouse, active: tab === "warehouses", onClick: () => setTab("warehouses") },
     { key: "pickup_points", label: "PVZ nöqtələri", icon: Warehouse, active: tab === "pickup_points", onClick: () => setTab("pickup_points") },
     { key: "orders", label: "Sifarişlər", icon: ShoppingBag, badge: orders.filter((o) => o.status === "pending").length, active: tab === "orders", onClick: () => setTab("orders") },
+    { key: "returns", label: "Qaytarmalar", icon: Undo2, active: tab === "returns", onClick: () => setTab("returns") },
     { key: "finance", label: "Maliyyə", icon: DollarSign, active: tab === "finance", onClick: () => setTab("finance") },
     { key: "marketing", label: "Marketinq", icon: Megaphone, active: tab === "marketing", onClick: () => setTab("marketing") },
     { key: "banners", label: "Bannerlər", icon: Megaphone, active: tab === "banners", onClick: () => setTab("banners") },
@@ -384,6 +385,7 @@ function AdminPanel() {
       {tab === "warehouses" && <WarehousesSection warehouses={warehouses} addWarehouse={addWarehouse} />}
       {tab === "pickup_points" && <PickupSection pickups={pickups} addPickup={addPickup} togglePickup={togglePickup} editPickup={editPickup} deletePickup={deletePickup} />}
       {tab === "orders" && <OrdersSection orders={orders} updateOrderStatus={updateOrderStatus} />}
+      {tab === "returns" && <AdminReturnsSection />}
       {tab === "finance" && <FinanceSection stats={stats} orders={orders} settings={settings} />}
       {tab === "marketing" && <MarketingSection />}
       {tab === "banners" && <BannersSection banners={banners} addBanner={addBanner} toggleBanner={toggleBanner} deleteBanner={deleteBanner} />}
@@ -1505,6 +1507,46 @@ function AIBotSection() {
           {faqs.length === 0 && <div className="text-center py-8 text-muted-foreground text-sm">FAQ əlavə edin</div>}
         </div>
       </div>
+    </div>
+  );
+}
+
+interface AdminReturnRow {
+  id: string; pickup_code: string | null; reason: string; status: string;
+  cost_paid_by: string; images: string[]; pvz_received_at: string | null;
+  created_at: string; buyer_id: string; seller_id: string; buyer_explanation: string | null;
+  order_items: { title: string } | null;
+}
+
+function AdminReturnsSection() {
+  const [list, setList] = useState<AdminReturnRow[]>([]);
+  useEffect(() => {
+    supabase.from("returns")
+      .select("id,pickup_code,reason,status,cost_paid_by,images,pvz_received_at,created_at,buyer_id,seller_id,buyer_explanation,order_items(title)")
+      .order("created_at", { ascending: false }).limit(200)
+      .then(({ data }) => setList((data ?? []) as unknown as AdminReturnRow[]));
+  }, []);
+  return (
+    <div className="bg-card border border-border rounded-2xl p-4 overflow-x-auto">
+      <div className="font-bold mb-3">Bütün qaytarmalar ({list.length})</div>
+      {list.length === 0 ? <div className="text-sm text-muted-foreground text-center py-8">Qaytarma yoxdur</div> : (
+        <table className="w-full text-sm">
+          <thead><tr className="text-left text-xs text-muted-foreground border-b">
+            <th className="p-2">Kod</th><th>Məhsul</th><th>Səbəb</th><th>Xərc</th><th>PVZ</th><th>Status</th><th>Tarix</th>
+          </tr></thead>
+          <tbody>{list.map((r) => (
+            <tr key={r.id} className="border-b">
+              <td className="p-2 font-mono text-xs">{r.pickup_code}</td>
+              <td className="text-xs">{r.order_items?.title ?? "—"}</td>
+              <td className="text-xs">{r.reason}</td>
+              <td className="text-xs">{r.cost_paid_by === "seller" ? "Satıcı" : "Müştəri"}</td>
+              <td className="text-xs">{r.pvz_received_at ? "✓" : "—"}</td>
+              <td><span className="text-[10px] px-2 py-0.5 rounded bg-secondary">{r.status}</span></td>
+              <td className="text-[10px]">{new Date(r.created_at).toLocaleDateString("az-AZ")}</td>
+            </tr>
+          ))}</tbody>
+        </table>
+      )}
     </div>
   );
 }

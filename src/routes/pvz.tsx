@@ -872,59 +872,138 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
   );
 }
 
+interface ReturnRow {
+  id: string;
+  pickup_code: string | null;
+  reason: string;
+  description: string | null;
+  buyer_explanation: string | null;
+  status: string;
+  cost_paid_by: string;
+  images: string[];
+  pvz_received_at: string | null;
+  created_at: string;
+  buyer_id: string;
+  order_item_id: string;
+  order_items: { title: string; orders: { recipient_name: string | null; recipient_phone: string | null } | null } | null;
+}
+
 function Returns() {
+  const { user } = useAuth();
+  const [list, setList] = useState<ReturnRow[]>([]);
+  const [scanOpen, setScanOpen] = useState(false);
+  const [scanned, setScanned] = useState<ReturnRow | null>(null);
+
+  const load = async () => {
+    if (!user) return;
+    // Find pickup point of this PVZ staff
+    const { data: staff } = await supabase.from("pvz_staff").select("pickup_point_id").eq("user_id", user.id).maybeSingle();
+    const ppId = (staff as { pickup_point_id: string } | null)?.pickup_point_id;
+    if (!ppId) { setList([]); return; }
+    const { data } = await supabase
+      .from("returns")
+      .select("id,pickup_code,reason,description,buyer_explanation,status,cost_paid_by,images,pvz_received_at,created_at,buyer_id,order_item_id,order_items(title,orders(recipient_name,recipient_phone))")
+      .eq("pickup_point_id", ppId)
+      .order("created_at", { ascending: false })
+      .limit(100);
+    setList((data ?? []) as unknown as ReturnRow[]);
+  };
+  useEffect(() => { void load(); }, [user]);
+
+  const previewScan = async (code: string) => {
+    const trimmed = code.trim().toUpperCase();
+    const found = list.find((r) => (r.pickup_code ?? "").toUpperCase() === trimmed);
+    setScanned(found ?? null);
+    if (!found) toast.error("Bu kod üzrə qaytarma tapılmadı");
+  };
+
+  const acceptReturn = async (r: ReturnRow) => {
+    if (!user) return;
+    const { error } = await supabase.from("returns").update({
+      pvz_received_at: new Date().toISOString(),
+      pvz_received_by: user.id,
+      status: "approved",
+    }).eq("id", r.id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Qaytarma qəbul edildi və satıcıya bildiriş göndərildi");
+    void load();
+  };
+
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-extrabold flex items-center gap-2">
-        <Undo2 className="h-6 w-6 text-primary" /> Qaytarmalar
-      </h1>
-      <div className="bg-card border border-border rounded-2xl p-4">
-        <div className="font-bold mb-3">Qəbul olunmuş qaytarmalar</div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Kod</TableHead>
-              <TableHead>Müştəri</TableHead>
-              <TableHead>Səbəb</TableHead>
-              <TableHead>Vəziyyət</TableHead>
-              <TableHead className="text-right">Əməliyyat</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {mockReturns.map((r) => (
-              <TableRow key={r.id}>
-                <TableCell className="font-mono">{r.id}</TableCell>
-                <TableCell>{r.buyer}</TableCell>
-                <TableCell>{r.reason}</TableCell>
-                <TableCell>
-                  <span
-                    className={
-                      r.state === "zədəli" ? "text-rose-600 font-semibold" : "text-emerald-600"
-                    }
-                  >
-                    {r.state}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right space-x-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => toast.success("Geri göndəriş üçün qablaşdırıldı")}
-                  >
-                    Qablaşdır
-                  </Button>
-                  <Button size="sm" onClick={() => toast.success("Qaytarma akti yaradıldı")}>
-                    <FileText className="h-4 w-4 mr-1" /> Akt
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <Button variant="outline" className="mt-3">
-          <Plus className="h-4 w-4 mr-1" /> Yeni qaytarma qəbul et
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-extrabold flex items-center gap-2">
+          <Undo2 className="h-6 w-6 text-primary" /> Qaytarmalar
+        </h1>
+        <Button onClick={() => setScanOpen(true)}>
+          <ScanLine className="h-4 w-4 mr-1" /> QR ilə qəbul et
         </Button>
       </div>
+      <div className="bg-card border border-border rounded-2xl p-4">
+        <div className="font-bold mb-3">Bu PVZ-yə aid qaytarmalar ({list.length})</div>
+        {list.length === 0 ? (
+          <div className="text-sm text-muted-foreground text-center py-8">Qaytarma yoxdur</div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Kod</TableHead>
+                <TableHead>Müştəri</TableHead>
+                <TableHead>Məhsul</TableHead>
+                <TableHead>Səbəb</TableHead>
+                <TableHead>Xərc</TableHead>
+                <TableHead>Vəziyyət</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {list.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell className="font-mono text-xs">{r.pickup_code}</TableCell>
+                  <TableCell>
+                    <div className="text-xs">{r.order_items?.orders?.recipient_name ?? "—"}</div>
+                    <div className="text-[10px] text-muted-foreground">{r.order_items?.orders?.recipient_phone ?? ""}</div>
+                  </TableCell>
+                  <TableCell className="text-xs">{r.order_items?.title ?? "—"}</TableCell>
+                  <TableCell className="text-xs">{r.reason}</TableCell>
+                  <TableCell>
+                    <span className={`text-[10px] px-2 py-0.5 rounded ${r.cost_paid_by === "seller" ? "bg-primary/10 text-primary" : "bg-warning/20"}`}>
+                      {r.cost_paid_by === "seller" ? "Satıcı" : "Müştəri"}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    {r.pvz_received_at
+                      ? <span className="text-emerald-600 text-xs font-semibold">Qəbul edildi</span>
+                      : <Button size="sm" variant="outline" onClick={() => acceptReturn(r)}>Əl ilə qəbul et</Button>}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </div>
+
+      <QRScannerDialog
+        open={scanOpen}
+        onOpenChange={setScanOpen}
+        title="Qaytarma QR skan"
+        acceptLabel="Qəbul et"
+        onResult={(v) => void previewScan(v)}
+        onScan={(v) => {
+          const trimmed = v.trim().toUpperCase();
+          const found = list.find((r) => (r.pickup_code ?? "").toUpperCase() === trimmed);
+          if (found) void acceptReturn(found);
+          else toast.error("Bu kod üzrə qaytarma tapılmadı");
+        }}
+        resultDetails={() => scanned ? (
+          <div className="text-left text-xs space-y-1 bg-secondary/30 p-2 rounded">
+            <div>👤 <b>{scanned.order_items?.orders?.recipient_name ?? "—"}</b></div>
+            <div>📞 {scanned.order_items?.orders?.recipient_phone ?? "—"}</div>
+            <div>📦 {scanned.order_items?.title ?? "—"}</div>
+            <div>⚠️ Səbəb: {scanned.reason}</div>
+            <div>💰 Xərc: {scanned.cost_paid_by === "seller" ? "Satıcı" : "Müştəri"}</div>
+          </div>
+        ) : <div className="text-xs text-destructive">Qaytarma tapılmadı</div>}
+      />
     </div>
   );
 }
