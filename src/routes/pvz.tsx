@@ -886,8 +886,41 @@ interface ReturnRow {
   shipped_to_seller_at: string | null;
   created_at: string;
   buyer_id: string;
+  order_id: string;
   order_item_id: string;
   order_items: { title: string; orders: { recipient_name: string | null; recipient_phone: string | null } | null } | null;
+}
+
+type ReturnBaseRow = Omit<ReturnRow, "order_items">;
+
+async function attachReturnDetails(rows: ReturnBaseRow[]): Promise<ReturnRow[]> {
+  const itemIds = [...new Set(rows.map((r) => r.order_item_id).filter(Boolean))];
+  const orderIds = [...new Set(rows.map((r) => r.order_id).filter(Boolean))];
+
+  const [{ data: itemRows, error: itemError }, { data: orderRows, error: orderError }] =
+    await Promise.all([
+      itemIds.length
+        ? supabase.from("order_items").select("id,title").in("id", itemIds)
+        : Promise.resolve({ data: [], error: null }),
+      orderIds.length
+        ? supabase.from("orders").select("id,recipient_name,recipient_phone").in("id", orderIds)
+        : Promise.resolve({ data: [], error: null }),
+    ]);
+
+  if (itemError || orderError) {
+    toast.error(`Qaytarma detalları yüklənmədi: ${(itemError ?? orderError)?.message}`);
+  }
+
+  const itemMap = new Map((itemRows ?? []).map((item) => [item.id, item]));
+  const orderMap = new Map((orderRows ?? []).map((order) => [order.id, order]));
+
+  return rows.map((row) => ({
+    ...row,
+    order_items: {
+      title: itemMap.get(row.order_item_id)?.title ?? "—",
+      orders: orderMap.get(row.order_id) ?? null,
+    },
+  }));
 }
 
 function Returns() {
