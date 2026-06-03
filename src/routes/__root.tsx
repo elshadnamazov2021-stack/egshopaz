@@ -6,8 +6,9 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { CategoryBar } from "@/components/CategoryBar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { MainSidebar } from "@/components/MainSidebar";
-import { LogOut } from "lucide-react";
+import { LogOut, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 import "@/i18n";
 
 import appCss from "../styles.css?url";
