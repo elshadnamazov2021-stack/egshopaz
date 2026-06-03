@@ -3,6 +3,7 @@ import { Search, ShoppingCart, User, Heart, LogOut, Store, Camera } from "lucide
 import { lazy, Suspense, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { NotificationsBell } from "@/components/NotificationsBell";
+import { LiveClock } from "@/components/LiveClock";
 
 const VisualSearchDialog = lazy(() =>
   import("@/components/VisualSearchDialog").then((m) => ({ default: m.VisualSearchDialog }))
@@ -34,12 +35,13 @@ export function SiteHeader() {
       <div className="container mx-auto px-4 h-32 sm:h-36 flex items-center gap-4">
         <SidebarTrigger className="shrink-0" />
 
-        <Link to="/" className="flex items-center gap-3 shrink-0 hover:scale-105 transition-transform" aria-label="Elzan Shop">
-          <img src={elzanLogo} alt="Elzan Shop logo" width={1024} height={1024} className="h-14 sm:h-16 md:h-20 w-14 sm:w-16 md:w-20 rounded-full object-cover ring-2 ring-primary/30 shadow-lg" />
-          <span className="text-2xl md:text-3xl font-black tracking-tight text-primary">
+        <Link to="/" className="flex items-center gap-2 sm:gap-3 shrink-0 hover:scale-105 transition-transform" aria-label="Elzan Shop">
+          <img src={elzanLogo} alt="Elzan Shop logo" width={1024} height={1024} className="h-12 sm:h-16 md:h-20 w-12 sm:w-16 md:w-20 rounded-full object-cover ring-2 ring-primary/30 shadow-lg" />
+          <span className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-primary">
             Elzan Shop
           </span>
         </Link>
+        <LiveClock />
 
         <form onSubmit={onSearch} className="flex-1 max-w-2xl hidden md:flex">
           <div className="relative w-full">

@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Link } from "@tanstack/react-router";
 
 export function SiteFooter() {
   const { t } = useTranslation();
@@ -8,16 +9,16 @@ export function SiteFooter() {
         <div>
           <h4 className="font-bold mb-3">{t("footer.about")}</h4>
           <ul className="space-y-2 text-muted-foreground">
-            <li>{t("footer.contact")}</li>
-            <li>{t("footer.terms")}</li>
-            <li>{t("footer.privacy")}</li>
+            <li><Link to="/contact" className="hover:text-primary transition">{t("footer.contact")}</Link></li>
+            <li><Link to="/terms" className="hover:text-primary transition">{t("footer.terms")}</Link></li>
+            <li><Link to="/privacy" className="hover:text-primary transition">{t("footer.privacy")}</Link></li>
           </ul>
         </div>
         <div>
           <h4 className="font-bold mb-3">{t("header.sellerPanel")}</h4>
           <ul className="space-y-2 text-muted-foreground">
-            <li>{t("header.openShop")}</li>
-            <li>{t("sidebar.support")}</li>
+            <li><Link to="/become-seller" className="hover:text-primary transition">{t("header.openShop")}</Link></li>
+            <li><Link to="/support" className="hover:text-primary transition">{t("sidebar.support")}</Link></li>
           </ul>
         </div>
         <div>
