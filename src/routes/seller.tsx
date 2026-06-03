@@ -436,14 +436,16 @@ function SellerPanel() {
     if (editing.id) {
       const { error } = await supabase.from("products").update(data).eq("id", editing.id);
       if (error) {
-        toast.error("Məhsul yadda saxlanmadı. Satıcı icazənizi və məlumatları yoxlayın.");
+        console.error("Product update error:", error);
+        toast.error("Yadda saxlanmadı: " + (error.message || "naməlum xəta"));
         return;
       }
       toast.success("Yeniləndi");
     } else {
       const { error } = await supabase.from("products").insert(data);
       if (error) {
-        toast.error("Məhsul əlavə olunmadı. Satıcı icazənizi və məlumatları yoxlayın.");
+        console.error("Product insert error:", error);
+        toast.error("Əlavə olunmadı: " + (error.message || "naməlum xəta"));
         return;
       }
       toast.success("Məhsul əlavə olundu");
