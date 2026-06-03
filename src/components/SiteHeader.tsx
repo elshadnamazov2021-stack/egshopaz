@@ -4,6 +4,7 @@ import { lazy, Suspense, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { LiveClock } from "@/components/LiveClock";
+import { DesktopViewToggle } from "@/components/DesktopViewToggle";
 
 const VisualSearchDialog = lazy(() =>
   import("@/components/VisualSearchDialog").then((m) => ({ default: m.VisualSearchDialog }))
