@@ -1,26 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
-import { Clock } from "lucide-react";
-
-function LiveClock() {
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
-  const time = now.toLocaleTimeString("az-AZ", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
-  const date = now.toLocaleDateString("az-AZ", { weekday: "short", day: "2-digit", month: "short" });
-  return (
-    <div className="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg bg-gradient-soft border border-border">
-      <Clock className="h-4 w-4 text-primary shrink-0" />
-      <div className="min-w-0">
-        <div className="font-mono font-bold text-sm tabular-nums leading-tight">{time}</div>
-        <div className="text-[10px] text-muted-foreground capitalize leading-tight">{date}</div>
-      </div>
-    </div>
-  );
-}
+import type { ReactNode } from "react";
 
 export interface PanelNavItem {
   to?: string;
@@ -49,7 +29,6 @@ export function PanelLayout({ title, subtitle, items, children }: Props) {
           <div className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">{title}</div>
           {subtitle && <div className="text-sm font-bold mt-0.5 line-clamp-1">{subtitle}</div>}
         </div>
-        <LiveClock />
         <nav className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-0.5 lg:overflow-visible lg:pb-0">
           {items.map((it) => {
             const isActive = it.active ?? (it.to ? pathname === it.to : false);
