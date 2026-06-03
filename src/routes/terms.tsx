@@ -1,0 +1,21 @@
+import { createFileRoute } from "@tanstack/react-router";
+
+export const Route = createFileRoute("/terms")({
+  head: () => ({ meta: [{ title: "Şərtlər və qaydalar — Elzan Shop" }, { name: "description", content: "İstifadə şərtləri və qaydaları" }] }),
+  component: TermsPage,
+});
+
+function TermsPage() {
+  return (
+    <div className="container mx-auto px-4 py-10 max-w-3xl prose prose-slate">
+      <h1 className="text-3xl font-black mb-6">Şərtlər və qaydalar</h1>
+      <p className="text-muted-foreground">Elzan Shop platformasından istifadə edərək aşağıdakı şərtləri qəbul etmiş olursunuz.</p>
+      <h2 className="text-xl font-bold mt-6 mb-2">1. Ümumi müddəalar</h2>
+      <p className="text-muted-foreground">Platforma alıcılar və satıcılar arasında vasitəçi rolunu oynayır.</p>
+      <h2 className="text-xl font-bold mt-6 mb-2">2. Sifariş və çatdırılma</h2>
+      <p className="text-muted-foreground">Sifarişlər seçilmiş PVZ punktları və ya kuryer vasitəsilə çatdırılır.</p>
+      <h2 className="text-xl font-bold mt-6 mb-2">3. Geri qaytarma</h2>
+      <p className="text-muted-foreground">Məhsulların geri qaytarılması qaydalarına uyğun aparılır.</p>
+    </div>
+  );
+}
