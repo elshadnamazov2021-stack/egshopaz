@@ -59,6 +59,25 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+function LiveClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const time = now.toLocaleTimeString("az-AZ", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+  const date = now.toLocaleDateString("az-AZ", { weekday: "short", day: "2-digit", month: "short" });
+  return (
+    <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/80 border border-border">
+      <Clock className="h-4 w-4 text-primary shrink-0" />
+      <div className="min-w-0 text-right">
+        <div className="font-mono font-bold text-sm tabular-nums leading-tight">{time}</div>
+        <div className="text-[10px] text-muted-foreground capitalize leading-tight">{date}</div>
+      </div>
+    </div>
+  );
+}
+
 function WorkHeader({ label }: { label: string }) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -66,9 +85,10 @@ function WorkHeader({ label }: { label: string }) {
     <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
       <div className="container mx-auto px-4 h-14 flex items-center gap-3">
         <div className="font-extrabold text-primary tracking-tight">Elzan Shop · {label}</div>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-3">
+          <LiveClock />
           {user && (
-            <span className="hidden sm:inline text-xs text-muted-foreground truncate max-w-[180px]">{user.email}</span>
+            <span className="hidden md:inline text-xs text-muted-foreground truncate max-w-[180px]">{user.email}</span>
           )}
           {user && (
             <Button variant="ghost" size="sm" onClick={async () => { await signOut(); navigate({ to: "/auth" }); }}>
