@@ -29,7 +29,6 @@ export function PanelLayout({ title, subtitle, items, children }: Props) {
           <div className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">{title}</div>
           {subtitle && <div className="text-sm font-bold mt-0.5 line-clamp-1">{subtitle}</div>}
         </div>
-        <LiveClock />
         <nav className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-0.5 lg:overflow-visible lg:pb-0">
           {items.map((it) => {
             const isActive = it.active ?? (it.to ? pathname === it.to : false);
