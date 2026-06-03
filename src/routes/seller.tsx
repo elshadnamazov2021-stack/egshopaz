@@ -346,7 +346,7 @@ function SellerPanel() {
     };
   }, [user, isSeller]);
 
-  if (!user || !isSeller) return null;
+  if (!mounted || authLoading || !user || !isSeller) return null;
 
   const totalRevenue = orderItems.reduce((s, i) => s + Number(i.price) * i.quantity, 0);
   const totalOrders = new Set(orderItems.map((i) => i.order_id)).size;
