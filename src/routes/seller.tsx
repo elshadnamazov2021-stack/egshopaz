@@ -169,12 +169,16 @@ function SellerPanel() {
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const [savingShop, setSavingShop] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/auth" });
     if (!authLoading && user && !isSeller) navigate({ to: "/become-seller" });
   }, [user, isSeller, authLoading, navigate]);
+
 
   const load = async () => {
     if (!user) return;
@@ -342,7 +346,7 @@ function SellerPanel() {
     };
   }, [user, isSeller]);
 
-  if (!user || !isSeller) return null;
+  if (!mounted || authLoading || !user || !isSeller) return null;
 
   const totalRevenue = orderItems.reduce((s, i) => s + Number(i.price) * i.quantity, 0);
   const totalOrders = new Set(orderItems.map((i) => i.order_id)).size;
