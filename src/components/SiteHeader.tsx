@@ -4,6 +4,7 @@ import { lazy, Suspense, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { LiveClock } from "@/components/LiveClock";
+import { DesktopViewToggle } from "@/components/DesktopViewToggle";
 
 const VisualSearchDialog = lazy(() =>
   import("@/components/VisualSearchDialog").then((m) => ({ default: m.VisualSearchDialog }))
@@ -64,6 +65,7 @@ export function SiteHeader() {
         </form>
 
         <nav className="ml-auto flex items-center gap-1 sm:gap-2">
+          <DesktopViewToggle />
           <LanguageSwitcher />
           <Link to="/discover" className="hidden md:flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
             <span className="h-5 w-5 mb-0.5 text-base">🔥</span>
