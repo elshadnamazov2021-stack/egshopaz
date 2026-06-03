@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as SellerRouteImport } from './routes/seller'
 import { Route as ReturnsRouteImport } from './routes/returns'
@@ -17,6 +18,7 @@ import { Route as ReferralRouteImport } from './routes/referral'
 import { Route as PvzRouteImport } from './routes/pvz'
 import { Route as PromotionsRouteImport } from './routes/promotions'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PickupPointsRouteImport } from './routes/pickup-points'
 import { Route as PaymentMethodsRouteImport } from './routes/payment-methods'
 import { Route as OrdersRouteImport } from './routes/orders'
@@ -28,6 +30,7 @@ import { Route as MapRouteImport } from './routes/map'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as DisputesRouteImport } from './routes/disputes'
 import { Route as DiscoverRouteImport } from './routes/discover'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as CartRouteImport } from './routes/cart'
@@ -40,6 +43,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopIdRouteImport } from './routes/shop.$id'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
   path: '/support',
@@ -78,6 +86,11 @@ const PromotionsRoute = PromotionsRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PickupPointsRoute = PickupPointsRouteImport.update({
@@ -133,6 +146,11 @@ const DisputesRoute = DisputesRouteImport.update({
 const DiscoverRoute = DiscoverRouteImport.update({
   id: '/discover',
   path: '/discover',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompareRoute = CompareRouteImport.update({
@@ -201,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
   '/compare': typeof CompareRoute
+  '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
   '/disputes': typeof DisputesRoute
   '/favorites': typeof FavoritesRoute
@@ -212,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/orders': typeof OrdersRoute
   '/payment-methods': typeof PaymentMethodsRoute
   '/pickup-points': typeof PickupPointsRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
   '/pvz': typeof PvzRoute
@@ -220,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/returns': typeof ReturnsRoute
   '/seller': typeof SellerRoute
   '/support': typeof SupportRoute
+  '/terms': typeof TermsRoute
   '/product/$id': typeof ProductIdRoute
   '/shop/$id': typeof ShopIdRoute
 }
@@ -233,6 +254,7 @@ export interface FileRoutesByTo {
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
   '/compare': typeof CompareRoute
+  '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
   '/disputes': typeof DisputesRoute
   '/favorites': typeof FavoritesRoute
@@ -244,6 +266,7 @@ export interface FileRoutesByTo {
   '/orders': typeof OrdersRoute
   '/payment-methods': typeof PaymentMethodsRoute
   '/pickup-points': typeof PickupPointsRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
   '/pvz': typeof PvzRoute
@@ -252,6 +275,7 @@ export interface FileRoutesByTo {
   '/returns': typeof ReturnsRoute
   '/seller': typeof SellerRoute
   '/support': typeof SupportRoute
+  '/terms': typeof TermsRoute
   '/product/$id': typeof ProductIdRoute
   '/shop/$id': typeof ShopIdRoute
 }
@@ -266,6 +290,7 @@ export interface FileRoutesById {
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
   '/compare': typeof CompareRoute
+  '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
   '/disputes': typeof DisputesRoute
   '/favorites': typeof FavoritesRoute
@@ -277,6 +302,7 @@ export interface FileRoutesById {
   '/orders': typeof OrdersRoute
   '/payment-methods': typeof PaymentMethodsRoute
   '/pickup-points': typeof PickupPointsRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
   '/pvz': typeof PvzRoute
@@ -285,6 +311,7 @@ export interface FileRoutesById {
   '/returns': typeof ReturnsRoute
   '/seller': typeof SellerRoute
   '/support': typeof SupportRoute
+  '/terms': typeof TermsRoute
   '/product/$id': typeof ProductIdRoute
   '/shop/$id': typeof ShopIdRoute
 }
@@ -300,6 +327,7 @@ export interface FileRouteTypes {
     | '/cart'
     | '/catalog'
     | '/compare'
+    | '/contact'
     | '/discover'
     | '/disputes'
     | '/favorites'
@@ -311,6 +339,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/payment-methods'
     | '/pickup-points'
+    | '/privacy'
     | '/profile'
     | '/promotions'
     | '/pvz'
@@ -319,6 +348,7 @@ export interface FileRouteTypes {
     | '/returns'
     | '/seller'
     | '/support'
+    | '/terms'
     | '/product/$id'
     | '/shop/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -332,6 +362,7 @@ export interface FileRouteTypes {
     | '/cart'
     | '/catalog'
     | '/compare'
+    | '/contact'
     | '/discover'
     | '/disputes'
     | '/favorites'
@@ -343,6 +374,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/payment-methods'
     | '/pickup-points'
+    | '/privacy'
     | '/profile'
     | '/promotions'
     | '/pvz'
@@ -351,6 +383,7 @@ export interface FileRouteTypes {
     | '/returns'
     | '/seller'
     | '/support'
+    | '/terms'
     | '/product/$id'
     | '/shop/$id'
   id:
@@ -364,6 +397,7 @@ export interface FileRouteTypes {
     | '/cart'
     | '/catalog'
     | '/compare'
+    | '/contact'
     | '/discover'
     | '/disputes'
     | '/favorites'
@@ -375,6 +409,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/payment-methods'
     | '/pickup-points'
+    | '/privacy'
     | '/profile'
     | '/promotions'
     | '/pvz'
@@ -383,6 +418,7 @@ export interface FileRouteTypes {
     | '/returns'
     | '/seller'
     | '/support'
+    | '/terms'
     | '/product/$id'
     | '/shop/$id'
   fileRoutesById: FileRoutesById
@@ -397,6 +433,7 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   CatalogRoute: typeof CatalogRoute
   CompareRoute: typeof CompareRoute
+  ContactRoute: typeof ContactRoute
   DiscoverRoute: typeof DiscoverRoute
   DisputesRoute: typeof DisputesRoute
   FavoritesRoute: typeof FavoritesRoute
@@ -408,6 +445,7 @@ export interface RootRouteChildren {
   OrdersRoute: typeof OrdersRoute
   PaymentMethodsRoute: typeof PaymentMethodsRoute
   PickupPointsRoute: typeof PickupPointsRoute
+  PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   PromotionsRoute: typeof PromotionsRoute
   PvzRoute: typeof PvzRoute
@@ -416,12 +454,20 @@ export interface RootRouteChildren {
   ReturnsRoute: typeof ReturnsRoute
   SellerRoute: typeof SellerRoute
   SupportRoute: typeof SupportRoute
+  TermsRoute: typeof TermsRoute
   ProductIdRoute: typeof ProductIdRoute
   ShopIdRoute: typeof ShopIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/support': {
       id: '/support'
       path: '/support'
@@ -476,6 +522,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pickup-points': {
@@ -553,6 +606,13 @@ declare module '@tanstack/react-router' {
       path: '/discover'
       fullPath: '/discover'
       preLoaderRoute: typeof DiscoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compare': {
@@ -645,6 +705,7 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   CatalogRoute: CatalogRoute,
   CompareRoute: CompareRoute,
+  ContactRoute: ContactRoute,
   DiscoverRoute: DiscoverRoute,
   DisputesRoute: DisputesRoute,
   FavoritesRoute: FavoritesRoute,
@@ -656,6 +717,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrdersRoute: OrdersRoute,
   PaymentMethodsRoute: PaymentMethodsRoute,
   PickupPointsRoute: PickupPointsRoute,
+  PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   PromotionsRoute: PromotionsRoute,
   PvzRoute: PvzRoute,
@@ -664,18 +726,10 @@ const rootRouteChildren: RootRouteChildren = {
   ReturnsRoute: ReturnsRoute,
   SellerRoute: SellerRoute,
   SupportRoute: SupportRoute,
+  TermsRoute: TermsRoute,
   ProductIdRoute: ProductIdRoute,
   ShopIdRoute: ShopIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
