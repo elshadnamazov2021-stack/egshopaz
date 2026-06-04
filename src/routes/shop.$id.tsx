@@ -88,11 +88,23 @@ function ShopPage() {
             : <Store className="h-10 w-10 text-muted-foreground" />}
         </div>
         <div className="flex-1 pt-2 md:pt-16">
-          <h1 className="text-2xl md:text-3xl font-black">{name}</h1>
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <h1 className="text-2xl md:text-3xl font-black">{name}</h1>
+            {user?.id !== id && (
+              <button
+                onClick={toggleFollow}
+                className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition ${following ? "bg-primary/10 text-primary border border-primary/30" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
+              >
+                <Heart className={`h-4 w-4 ${following ? "fill-primary" : ""}`} />
+                {following ? "İzlənilir" : "İzlə"}
+              </button>
+            )}
+          </div>
           {profile.shop_description && <p className="text-muted-foreground mt-1 max-w-2xl">{profile.shop_description}</p>}
           <div className="flex flex-wrap gap-4 mt-3 text-sm">
             <div className="flex items-center gap-1.5"><Package className="h-4 w-4 text-primary" /> {t("shop.productsCount", { count: stats.count })}</div>
             <div className="flex items-center gap-1.5"><Star className="h-4 w-4 text-warning fill-warning" /> <b>{stats.avg.toFixed(1)}</b> {t("shop.reviewsCount", { count: stats.reviews })}</div>
+            <div className="flex items-center gap-1.5"><Heart className="h-4 w-4 text-primary" /> <b>{followers}</b> izləyici</div>
             {profile.shop_city && <div className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-primary" /> {profile.shop_city}</div>}
             {profile.shop_email && <div className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-primary" /> {profile.shop_email}</div>}
           </div>
