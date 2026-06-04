@@ -172,6 +172,10 @@ function OrdersPage() {
       <div>
         <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2"><Package className="h-6 w-6 text-primary" /> {t("orders.title")}</h1>
         <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
+        <div className="mb-3">
+          <DateRangeFilter value={dateRange} onChange={setDateRange} />
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
           {filterTabs.map(([k, l]) => (
             <button key={k} onClick={() => setFilter(k)}
                     className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap border ${filter === k ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-secondary"}`}>
