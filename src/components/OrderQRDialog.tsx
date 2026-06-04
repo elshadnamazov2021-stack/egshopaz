@@ -14,11 +14,13 @@ interface Props {
   pvzAddress?: string | null;
   customerName?: string | null;
   customerPhone?: string | null;
+  orderDate?: string | null;
   mode?: "buyer" | "seller";
 }
 
-export function OrderQRDialog({ open, onOpenChange, pickupCode, title, subtitle, pvzName, pvzAddress, customerName, customerPhone, mode = "buyer" }: Props) {
+export function OrderQRDialog({ open, onOpenChange, pickupCode, title, subtitle, pvzName, pvzAddress, customerName, customerPhone, orderDate, mode = "buyer" }: Props) {
   const [qr, setQr] = useState("");
+  const orderDateStr = orderDate ? new Date(orderDate).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : null;
 
   useEffect(() => {
     if (!open || !pickupCode) return;
@@ -46,6 +48,7 @@ export function OrderQRDialog({ open, onOpenChange, pickupCode, title, subtitle,
       </head><body>
       <h2>${title}</h2>
       ${subtitle ? `<div class="sub">${subtitle}</div>` : ""}
+      ${orderDateStr ? `<div class="sub">📅 Sifariş: ${orderDateStr}</div>` : ""}
       <img src="${qr}"/>
       <div class="code">${pickupCode}</div>
       ${(customerName || customerPhone) ? `<div class="cust"><b>👤 Müştəri</b>${customerName ? customerName : ""}${customerPhone ? `<br/>📞 ${customerPhone}` : ""}</div>` : ""}
@@ -65,6 +68,7 @@ export function OrderQRDialog({ open, onOpenChange, pickupCode, title, subtitle,
         <div className="text-center space-y-3">
           <div className="text-sm font-semibold line-clamp-2">{title}</div>
           {subtitle && <div className="text-xs text-muted-foreground">{subtitle}</div>}
+          {orderDateStr && <div className="text-xs font-semibold text-primary">📅 Sifariş tarixi: {orderDateStr}</div>}
           <div className="bg-white rounded-xl p-3 inline-block border">
             {qr ? <img src={qr} alt="QR" className="w-56 h-56" /> : <div className="w-56 h-56 bg-muted animate-pulse rounded" />}
           </div>

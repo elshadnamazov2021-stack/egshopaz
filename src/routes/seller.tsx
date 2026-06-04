@@ -91,6 +91,7 @@ interface OrderItem {
   accepted_at: string | null;
   delivered_at: string | null;
   pickup_point_id: string | null;
+  order_created_at?: string | null;
   pickup_point: {
     id: string;
     name: string;
@@ -251,6 +252,7 @@ function SellerPanel() {
           ...item,
           customer_name: item.customer_name ?? order?.recipient_name ?? null,
           customer_phone: item.customer_phone ?? order?.recipient_phone ?? null,
+          order_created_at: order?.created_at ?? null,
           pickup_point: pickupPointId
             ? ((pickupMap.get(pickupPointId) as OrderItem["pickup_point"]) ?? null)
             : null,
@@ -952,17 +954,22 @@ function SellerPanel() {
                         № {i.order_id.slice(0, 8).toUpperCase()} · {i.quantity} ədəd · Kod:{" "}
                         <b className="font-mono">{i.pickup_code ?? "—"}</b>
                       </div>
+                      {i.order_created_at && (
+                        <div className="text-[10px] text-muted-foreground mt-0.5">
+                          📅 Sifariş: {new Date(i.order_created_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        </div>
+                      )}
                       <div className="text-xs text-muted-foreground mt-0.5">
                         Müştəri: {i.customer_name ?? "—"}
                         {i.customer_phone ? ` · ${i.customer_phone}` : ""}
                       </div>
                       {i.delivered_at ? (
                         <div className="text-[10px] text-success font-bold mt-1">
-                          PVZ müştəriyə təhvil verib
+                          ✅ Müştəriyə təhvil verildi · {new Date(i.delivered_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                         </div>
                       ) : i.accepted_at ? (
                         <div className="text-[10px] text-primary font-bold mt-1">
-                          PVZ paketi qəbul edib
+                          📦 PVZ paketi qəbul etdi · {new Date(i.accepted_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                         </div>
                       ) : null}
                     </div>

@@ -183,7 +183,7 @@ function OrdersPage() {
               <div key={o.id} className="bg-card border border-border rounded-2xl p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <div>
-                    <div className="text-xs text-muted-foreground">№ {o.id.slice(0, 8).toUpperCase()} · {new Date(o.created_at).toLocaleDateString()}</div>
+                    <div className="text-xs text-muted-foreground">№ {o.id.slice(0, 8).toUpperCase()} · 📅 {new Date(o.created_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</div>
                     {o.shipping_address && <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1"><MapPin className="h-3 w-3" /> {o.shipping_address}</div>}
                   </div>
                   <div className="flex items-center gap-3">
@@ -202,9 +202,13 @@ function OrdersPage() {
                         <div className="truncate">{it.title}</div>
                         <div className="text-xs text-muted-foreground">{it.quantity} × {formatAZN(it.price)}</div>
                         {it.delivered_at ? (
-                          <div className="text-[10px] text-success font-semibold mt-0.5">{t("orders.received")}</div>
+                          <div className="text-[10px] text-success font-semibold mt-0.5">
+                            {t("orders.received")} · {new Date(it.delivered_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          </div>
                         ) : it.accepted_at ? (
-                          <div className="text-[10px] text-primary font-semibold mt-0.5">{t("orders.atPvz")}</div>
+                          <div className="text-[10px] text-primary font-semibold mt-0.5">
+                            {t("orders.atPvz")} · {new Date(it.accepted_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          </div>
                         ) : null}
                       </div>
                       <div className="flex flex-col gap-1 shrink-0">
@@ -318,6 +322,7 @@ function OrdersPage() {
           pvzAddress={qrOrder?.pickup_points ? `${qrOrder.pickup_points.city}, ${qrOrder.pickup_points.address}` : null}
           customerName={qrOrder?.recipient_name ?? null}
           customerPhone={qrOrder?.recipient_phone ?? null}
+          orderDate={qrOrder?.created_at ?? null}
           mode="buyer"
         />
       )}

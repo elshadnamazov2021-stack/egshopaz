@@ -793,6 +793,11 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
               <div className="text-xs text-muted-foreground">
                 Say: {confirmItem.quantity} · {formatAZN(confirmItem.price * confirmItem.quantity)}
               </div>
+              {confirmItem.accepted_at && (
+                <div className="text-[11px] text-primary font-semibold">
+                  📦 PVZ-yə gəldi: {new Date(confirmItem.accepted_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                </div>
+              )}
               <div className="font-mono text-sm font-bold text-primary mt-1">
                 Kod: {confirmItem.pickup_code}
               </div>
@@ -845,6 +850,7 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
                 <TableHead>Məhsul</TableHead>
                 <TableHead>Müştəri</TableHead>
                 <TableHead>Telefon</TableHead>
+                <TableHead>PVZ-yə gəldi</TableHead>
                 <TableHead className="text-right">Əməliyyat</TableHead>
               </TableRow>
             </TableHeader>
@@ -857,6 +863,9 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
                   <TableCell className="max-w-xs truncate">{o.title}</TableCell>
                   <TableCell className="text-xs">{o.orders?.recipient_name ?? "—"}</TableCell>
                   <TableCell className="text-xs">{o.orders?.recipient_phone ?? "—"}</TableCell>
+                  <TableCell className="text-xs whitespace-nowrap">
+                    {o.accepted_at ? new Date(o.accepted_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "—"}
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button size="sm" disabled={busy} onClick={() => openConfirm(o.pickup_code)}>
                       <CheckCircle2 className="h-4 w-4 mr-1" /> Yoxla
