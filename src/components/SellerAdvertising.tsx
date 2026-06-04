@@ -117,9 +117,11 @@ export function SellerAdvertising() {
   const activeSub = subs.find((s) => s.is_active && new Date(s.ends_at) > new Date());
   const activeBanners = banners.filter((b) => b.is_active && (!b.ends_at || new Date(b.ends_at) > new Date()));
   const activeSponsored = sponsored.filter((s) => s.is_active && new Date(s.ends_at) > new Date());
+  const activeShopPromos = sponsoredShops.filter((s) => s.is_active && new Date(s.ends_at) > new Date());
 
   const bannersLeft = (activeSub?.ad_packages?.banner_slots ?? 0) - activeBanners.length;
   const sponsoredLeft = (activeSub?.ad_packages?.sponsored_product_slots ?? 0) - activeSponsored.length;
+  const shopPromoLeft = (activeSub?.ad_packages?.shop_promo_slots ?? 0) - activeShopPromos.length;
 
   const purchase = async () => {
     if (!user || !checkout) return;
