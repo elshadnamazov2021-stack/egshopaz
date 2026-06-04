@@ -402,6 +402,7 @@ interface DBOrderItem {
     recipient_name: string | null;
     recipient_phone: string | null;
     pickup_point_id: string | null;
+    created_at: string | null;
   } | null;
 }
 
@@ -410,6 +411,7 @@ type OrderInfo = {
   recipient_name: string | null;
   recipient_phone: string | null;
   pickup_point_id: string | null;
+  created_at: string | null;
 };
 
 async function attachOrderInfo(rows: DBOrderItem[]): Promise<DBOrderItem[]> {
