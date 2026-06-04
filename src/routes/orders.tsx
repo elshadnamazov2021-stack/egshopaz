@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
-import { formatAZN } from "@/lib/format";
+import { formatAZN, formatDateTime } from "@/lib/format";
 import { Package, MapPin, X, MessageCircle, Send, QrCode, Map as MapIcon, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { OrderTimeline } from "@/components/OrderTimeline";
@@ -183,7 +183,7 @@ function OrdersPage() {
               <div key={o.id} className="bg-card border border-border rounded-2xl p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <div>
-                    <div className="text-xs text-muted-foreground">№ {o.id.slice(0, 8).toUpperCase()} · 📅 {new Date(o.created_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</div>
+                    <div className="text-xs text-muted-foreground">№ {o.id.slice(0, 8).toUpperCase()} · 📅 {formatDateTime(o.created_at)}</div>
                     {o.shipping_address && <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1"><MapPin className="h-3 w-3" /> {o.shipping_address}</div>}
                   </div>
                   <div className="flex items-center gap-3">
@@ -203,11 +203,11 @@ function OrdersPage() {
                         <div className="text-xs text-muted-foreground">{it.quantity} × {formatAZN(it.price)}</div>
                         {it.delivered_at ? (
                           <div className="text-[10px] text-success font-semibold mt-0.5">
-                            {t("orders.received")} · {new Date(it.delivered_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                            {t("orders.received")} · {formatDateTime(it.delivered_at)}
                           </div>
                         ) : it.accepted_at ? (
                           <div className="text-[10px] text-primary font-semibold mt-0.5">
-                            {t("orders.atPvz")} · {new Date(it.accepted_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                            {t("orders.atPvz")} · {formatDateTime(it.accepted_at)}
                           </div>
                         ) : null}
                       </div>

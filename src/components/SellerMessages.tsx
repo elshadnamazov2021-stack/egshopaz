@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MessageCircle, Send, Search } from "lucide-react";
 import { toast } from "sonner";
+import { formatDateTime } from "@/lib/format";
 
 interface Msg {
   id: string;
@@ -201,7 +202,7 @@ export function SellerMessages({ sellerId }: { sellerId: string }) {
                     <div className={`max-w-[75%] rounded-2xl px-3.5 py-2 ${mine ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-card border border-border rounded-bl-sm"}`}>
                       <div className="text-sm whitespace-pre-wrap break-words">{m.body}</div>
                       <div className={`text-[10px] mt-1 opacity-70 ${mine ? "text-primary-foreground" : "text-muted-foreground"}`}>
-                        {new Date(m.created_at).toLocaleString("az-AZ", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })}
+                        {formatDateTime(m.created_at)}
                       </div>
                     </div>
                   </div>

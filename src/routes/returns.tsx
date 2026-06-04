@@ -6,6 +6,7 @@ import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { Undo2, QrCode } from "lucide-react";
 import { OrderQRDialog } from "@/components/OrderQRDialog";
+import { formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/returns")({
   head: () => ({ meta: [{ title: "Qaytarmalarım — Elzan Shop" }] }),
@@ -133,7 +134,7 @@ function ReturnsPage() {
                     <div className="min-w-0 flex-1">
                       <div className="font-semibold truncate">{r.product_title ?? "—"}</div>
                       <div className="text-xs text-muted-foreground mt-0.5">Səbəb: {r.reason}</div>
-                      <div className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString()}</div>
+                      <div className="text-xs text-muted-foreground">{formatDateTime(r.created_at)}</div>
                       <div className="text-xs mt-2">
                         <span className={`inline-block px-2 py-0.5 rounded ${r.status === "rejected" ? "bg-destructive/10 text-destructive" : r.status === "completed" ? "bg-success/10 text-success" : "bg-primary/10 text-primary"}`}>
                           {stageLabel}

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { formatAZN } from "@/lib/format";
+import { formatAZN, formatDate } from "@/lib/format";
 import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { toast } from "sonner";
@@ -293,7 +293,7 @@ function Profile() {
                   >
                     <div className="min-w-0">
                       <div className="text-xs text-muted-foreground">№ {order.id.slice(0, 8).toUpperCase()}</div>
-                      <div className="text-sm font-semibold">{new Date(order.created_at).toLocaleDateString()}</div>
+                      <div className="text-sm font-semibold">{formatDate(order.created_at)}</div>
                     </div>
                     <div className="text-right">
                       <div className="text-sm font-extrabold">{formatAZN(order.total)}</div>

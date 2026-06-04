@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { formatAZN } from "@/lib/format";
+import { formatAZN, formatDateTime, formatDate } from "@/lib/format";
 import {
   Check, Crown, Sparkles, Star, CreditCard, Calendar, TrendingUp,
   Receipt, Loader2, X, Image as ImageIcon, Plus, Trash2, Megaphone, Package,
@@ -255,7 +255,7 @@ export function SellerAdvertising() {
               <div className="text-xs text-muted-foreground">Bitir</div>
               <div className="font-bold flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                {new Date(activeSub.ends_at).toLocaleDateString("az-AZ")}
+                {formatDate(activeSub.ends_at)}
               </div>
             </div>
           </div>
@@ -296,7 +296,7 @@ export function SellerAdvertising() {
                   <div className="p-3 flex items-center justify-between gap-2">
                     <div className="min-w-0">
                       <div className="font-semibold text-sm line-clamp-1">{b.title}</div>
-                      <div className="text-xs text-muted-foreground">{b.is_active ? "Aktiv" : "Pasiv"} • {b.ends_at ? new Date(b.ends_at).toLocaleDateString("az-AZ") : "—"}</div>
+                      <div className="text-xs text-muted-foreground">{b.is_active ? "Aktiv" : "Pasiv"} • {b.ends_at ? formatDate(b.ends_at) : "—"}</div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       <button onClick={() => toggleBanner(b)} className="text-xs px-2 py-1 rounded bg-secondary hover:bg-secondary/70">{b.is_active ? "Söndür" : "Yandır"}</button>
@@ -340,7 +340,7 @@ export function SellerAdvertising() {
                   <div className="p-2">
                     <div className="text-xs line-clamp-2">{s.products.title}</div>
                     <div className="font-bold text-sm">{formatAZN(s.products.price)}</div>
-                    <div className="text-[10px] text-muted-foreground">Bitir: {new Date(s.ends_at).toLocaleDateString("az-AZ")}</div>
+                    <div className="text-[10px] text-muted-foreground">Bitir: {formatDate(s.ends_at)}</div>
                   </div>
                 </div>
               ))}
@@ -406,7 +406,7 @@ export function SellerAdvertising() {
               <div key={t.id} className="flex items-center justify-between py-3">
                 <div>
                   <div className="font-semibold text-sm">{t.description ?? "Ödəniş"}</div>
-                  <div className="text-xs text-muted-foreground">{new Date(t.created_at).toLocaleString("az-AZ")} • {t.method}</div>
+                  <div className="text-xs text-muted-foreground">{formatDateTime(t.created_at)} • {t.method}</div>
                 </div>
                 <div className="text-right">
                   <div className="font-bold">{formatAZN(t.amount)}</div>

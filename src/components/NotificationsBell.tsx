@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Bell, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { formatDateTime } from "@/lib/format";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -120,7 +121,7 @@ export function NotificationsBell() {
                     </div>
                   )}
                   <div className="text-[10px] text-muted-foreground mt-1">
-                    {new Date(n.created_at).toLocaleString("az-AZ")}
+                    {formatDateTime(n.created_at)}
                   </div>
                 </div>
               </div>
