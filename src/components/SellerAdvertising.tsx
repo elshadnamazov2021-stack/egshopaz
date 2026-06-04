@@ -374,15 +374,7 @@ export function SellerAdvertising() {
   const promoteShop = async () => {
     if (!user || !activeSub) return;
     if (shopPromoLeft <= 0) { toast.error("Mağaza reklamı limiti dolub"); return; }
-    const { error } = await supabase.from("sponsored_shops").insert({
-      seller_id: user.id,
-      subscription_id: activeSub.id,
-      ends_at: activeSub.ends_at,
-      is_active: true,
-    });
-    if (error) { toast.error(error.message); return; }
-    toast.success("Mağazanız ana səhifədə önə çəkildi! 🎉");
-    await load();
+    setCheckout({ kind: "slot_shop", price: SLOT_SHOP_FEE });
   };
 
   const removeShopPromo = async (id: string) => {
