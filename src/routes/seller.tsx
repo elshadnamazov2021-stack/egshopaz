@@ -39,7 +39,7 @@ import { SellerAnalytics } from "@/components/SellerAnalytics";
 import { BulkProductUpload } from "@/components/BulkProductUpload";
 import { AISupportChat } from "@/components/AISupportChat";
 import { CitySelect } from "@/components/CitySelect";
-import { CategoryCombobox } from "@/components/CategoryCombobox";
+import { CategoryCascade } from "@/components/CategoryCascade";
 import { findCity } from "@/lib/azCities";
 import { DateRangeFilter, emptyRange, inRange, type DateRange } from "@/components/DateRangeFilter";
 
