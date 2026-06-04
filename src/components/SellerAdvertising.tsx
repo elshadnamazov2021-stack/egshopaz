@@ -313,21 +313,7 @@ export function SellerAdvertising() {
     if (!bannerForm.title.trim()) { toast.error("Başlıq daxil edin"); return; }
     if (!bannerForm.image_url) { toast.error("Şəkil yükləyin"); return; }
     if (bannersLeft <= 0) { toast.error("Banner limiti dolub. Yeni paket alın."); return; }
-
-    const { error } = await supabase.from("banners").insert({
-      seller_id: user.id,
-      subscription_id: activeSub.id,
-      title: bannerForm.title.trim().slice(0, 200),
-      image_url: bannerForm.image_url,
-      link_url: bannerForm.link_url.trim().slice(0, 500) || null,
-      position: "home_top",
-      is_active: true,
-      ends_at: activeSub.ends_at,
-    });
-    if (error) { toast.error(error.message); return; }
-    toast.success("Banner əlavə olundu");
-    setBannerForm(null);
-    await load();
+    setCheckout({ kind: "slot_banner", price: SLOT_BANNER_FEE, form: { ...bannerForm } });
   };
 
   const deleteBanner = async (id: string) => {
@@ -348,20 +334,12 @@ export function SellerAdvertising() {
     if (sponsoredLeft <= 0) { toast.error("Sponsor məhsul limiti dolub"); return; }
     const exists = activeSponsored.find((s) => s.product_id === productId);
     if (exists) { toast.error("Bu məhsul artıq önə çəkilib"); return; }
-
-    const { error } = await supabase.from("sponsored_products").insert({
-      seller_id: user.id,
-      subscription_id: activeSub.id,
-      product_id: productId,
-      position: "catalog_top",
-      is_active: true,
-      ends_at: activeSub.ends_at,
-    });
-    if (error) { toast.error(error.message); return; }
-    toast.success("Məhsul önə çəkildi");
+    const product = myProducts.find((p) => p.id === productId);
+    if (!product) return;
     setPickProduct(false);
-    await load();
+    setCheckout({ kind: "slot_product", productId, productTitle: product.title, price: SLOT_PRODUCT_FEE });
   };
+
 
   const removeSponsored = async (id: string) => {
     if (!confirm("Bu məhsul sponsorluqdan çıxarılsın?")) return;
