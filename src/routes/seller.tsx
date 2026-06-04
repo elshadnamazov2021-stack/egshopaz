@@ -925,6 +925,13 @@ function SellerPanel() {
                             <Edit className="h-4 w-4" />
                           </button>
                           <button
+                            onClick={() => promote(p)}
+                            className="p-2 bg-warning/10 text-warning hover:bg-warning hover:text-warning-foreground rounded"
+                            title="İrəli çək (Reklam)"
+                          >
+                            <Rocket className="h-4 w-4" />
+                          </button>
+                          <button
                             onClick={() => openQR(p)}
                             className="p-2 hover:bg-primary/10 hover:text-primary rounded"
                             title="QR kod"
