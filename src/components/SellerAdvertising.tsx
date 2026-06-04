@@ -627,7 +627,7 @@ export function SellerAdvertising() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold flex items-center gap-2">
                 <CreditCard className="h-5 w-5" />
-                Ödəniş — {checkout.name}
+                Ödəniş — {checkoutMeta?.label}
               </h3>
               <button onClick={() => !paying && setCheckout(null)} className="p-1 hover:bg-secondary rounded"><X className="h-5 w-5" /></button>
             </div>
