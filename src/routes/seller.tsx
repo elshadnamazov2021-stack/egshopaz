@@ -165,6 +165,7 @@ function SellerPanel() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [ordersDateRange, setOrdersDateRange] = useState<DateRange>(emptyRange);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [editing, setEditing] = useState<Partial<Product> | null>(null);
   const [qrProduct, setQrProduct] = useState<Product | null>(null);
