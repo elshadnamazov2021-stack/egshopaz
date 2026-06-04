@@ -657,9 +657,12 @@ export function SellerAdvertising() {
             <div className="flex items-center justify-between mt-5 pt-4 border-t border-border">
               <div>
                 <div className="text-xs text-muted-foreground">Ödənilən məbləğ</div>
-                <div className="text-2xl font-extrabold" style={{ color: checkout.color }}>{formatAZN(checkout.price)}</div>
+                <div className="text-2xl font-extrabold" style={{ color: checkoutMeta?.color }}>{formatAZN(checkoutMeta?.price ?? 0)}</div>
+                {promoSettings?.promo_terms_text && checkout.kind !== "pkg" && (
+                  <div className="text-[11px] text-muted-foreground mt-2 max-w-xs">{promoSettings.promo_terms_text}</div>
+                )}
               </div>
-              <button onClick={purchase} disabled={!!paying} className="px-6 py-3 rounded-xl font-bold text-white disabled:opacity-60" style={{ background: checkout.color }}>
+              <button onClick={purchase} disabled={paying} className="px-6 py-3 rounded-xl font-bold text-white disabled:opacity-60" style={{ background: checkoutMeta?.color }}>
                 {paying ? <Loader2 className="h-5 w-5 animate-spin" /> : "Ödə"}
               </button>
             </div>
