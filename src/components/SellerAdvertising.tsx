@@ -497,7 +497,7 @@ export function SellerAdvertising() {
                   </ul>
                   <button
                     disabled={isActive}
-                    onClick={() => setCheckout(p)}
+                    onClick={() => setCheckout({ kind: "pkg", pkg: p })}
                     className="w-full py-2.5 rounded-xl font-bold text-white disabled:opacity-50 disabled:cursor-not-allowed transition hover:opacity-90"
                     style={{ background: p.color }}
                   >
