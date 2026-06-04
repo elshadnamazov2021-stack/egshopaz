@@ -1647,6 +1647,11 @@ export type Database = {
           id: string
           maintenance_mode: boolean
           min_payout: number
+          promo_terms_text: string
+          single_product_promo_days: number
+          single_product_promo_price: number
+          single_shop_promo_days: number
+          single_shop_promo_price: number
           storage_fee_per_day: number
           updated_at: string
         }
@@ -1658,6 +1663,11 @@ export type Database = {
           id?: string
           maintenance_mode?: boolean
           min_payout?: number
+          promo_terms_text?: string
+          single_product_promo_days?: number
+          single_product_promo_price?: number
+          single_shop_promo_days?: number
+          single_shop_promo_price?: number
           storage_fee_per_day?: number
           updated_at?: string
         }
@@ -1669,6 +1679,11 @@ export type Database = {
           id?: string
           maintenance_mode?: boolean
           min_payout?: number
+          promo_terms_text?: string
+          single_product_promo_days?: number
+          single_product_promo_price?: number
+          single_shop_promo_days?: number
+          single_shop_promo_price?: number
           storage_fee_per_day?: number
           updated_at?: string
         }
