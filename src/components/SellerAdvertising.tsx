@@ -76,6 +76,7 @@ export function SellerAdvertising() {
   const [txs, setTxs] = useState<Tx[]>([]);
   const [banners, setBanners] = useState<Banner[]>([]);
   const [sponsored, setSponsored] = useState<Sponsored[]>([]);
+  const [sponsoredShops, setSponsoredShops] = useState<{ id: string; ends_at: string; is_active: boolean }[]>([]);
   const [myProducts, setMyProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState<string | null>(null);
@@ -92,12 +93,13 @@ export function SellerAdvertising() {
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const [pk, sb, tx, bn, sp, pr] = await Promise.all([
+    const [pk, sb, tx, bn, sp, ss, pr] = await Promise.all([
       supabase.from("ad_packages").select("*").eq("is_active", true).order("sort_order"),
       supabase.from("seller_subscriptions").select("*, ad_packages(*)").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("payment_transactions").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }).limit(20),
       supabase.from("banners").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("sponsored_products").select("*, products(id,title,image_url,price)").eq("seller_id", user.id).order("created_at", { ascending: false }),
+      supabase.from("sponsored_shops").select("id,ends_at,is_active").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("products").select("id,title,image_url,price").eq("seller_id", user.id).eq("is_active", true).order("created_at", { ascending: false }),
     ]);
     setPackages((pk.data ?? []) as unknown as Pkg[]);
@@ -105,6 +107,7 @@ export function SellerAdvertising() {
     setTxs((tx.data ?? []) as unknown as Tx[]);
     setBanners((bn.data ?? []) as unknown as Banner[]);
     setSponsored((sp.data ?? []) as unknown as Sponsored[]);
+    setSponsoredShops((ss.data ?? []) as { id: string; ends_at: string; is_active: boolean }[]);
     setMyProducts((pr.data ?? []) as unknown as Product[]);
     setLoading(false);
   };
