@@ -12,6 +12,7 @@ import { OrderTimeline } from "@/components/OrderTimeline";
 import { OrderQRDialog } from "@/components/OrderQRDialog";
 import { OrderTrackDialog } from "@/components/OrderTrackDialog";
 import { ReturnRequestDialog } from "@/components/ReturnRequestDialog";
+import { DateRangeFilter, emptyRange, inRange, type DateRange } from "@/components/DateRangeFilter";
 
 export const Route = createFileRoute("/orders")({
   head: () => ({ meta: [{ title: "Sifarişlərim — Elzan Shop" }] }),
@@ -38,6 +39,7 @@ function OrdersPage() {
   const { items } = useBuyerNav();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filter, setFilter] = useState<string>("all");
+  const [dateRange, setDateRange] = useState<DateRange>(emptyRange);
   const [msgItem, setMsgItem] = useState<OrderItem | null>(null);
   const [msgOrderId, setMsgOrderId] = useState<string | null>(null);
   const [msgBody, setMsgBody] = useState("");
@@ -151,7 +153,9 @@ function OrdersPage() {
   };
 
   if (!user) return null;
-  const filtered = filter === "all" ? orders : orders.filter((o) => o.status === filter);
+  const filtered = orders
+    .filter((o) => (filter === "all" ? true : o.status === filter))
+    .filter((o) => inRange(o.created_at, dateRange));
 
   const filterTabs: [string, string][] = [
     ["all", t("orders.all")],
@@ -167,6 +171,9 @@ function OrdersPage() {
     <PanelLayout title={t("sidebar.buyerPanelTitle")} subtitle={user.email ?? undefined} items={items}>
       <div>
         <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2"><Package className="h-6 w-6 text-primary" /> {t("orders.title")}</h1>
+        <div className="mb-3">
+          <DateRangeFilter value={dateRange} onChange={setDateRange} />
+        </div>
         <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
           {filterTabs.map(([k, l]) => (
             <button key={k} onClick={() => setFilter(k)}
