@@ -72,6 +72,7 @@ interface Product {
   condition?: string | null;
   color?: string | null;
   size?: string | null;
+  is_giveaway?: boolean | null;
 }
 interface Category {
   id: string;
@@ -437,6 +438,7 @@ function SellerPanel() {
       free_shipping: !!editing.free_shipping,
       fast_delivery: !!editing.fast_delivery,
       condition: editing.condition || "new",
+      is_giveaway: !!editing.is_giveaway,
     };
 
     if (editing.id) {
@@ -1469,7 +1471,17 @@ function SellerPanel() {
                     <option value="used">İşlənmiş</option>
                   </select>
                 </div>
+                <label className="mt-3 flex items-center gap-2 cursor-pointer p-3 rounded-lg border-2 border-warning/40 bg-warning/5 hover:border-warning">
+                  <input
+                    type="checkbox"
+                    checked={!!editing.is_giveaway}
+                    onChange={(e) => setEditing({ ...editing, is_giveaway: e.target.checked })}
+                    className="w-4 h-4 accent-warning"
+                  />
+                  <span className="text-sm font-bold">🎁 Uduşlu məhsul (ön səhifədə xüsusi bölmədə görünsün)</span>
+                </label>
               </div>
+
 
               <label className="flex items-center gap-2 cursor-pointer">
                 <input

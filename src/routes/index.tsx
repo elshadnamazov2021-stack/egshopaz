@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { SponsoredProducts } from "@/components/SponsoredProducts";
 import { SellerBanners } from "@/components/SellerBanners";
-import { Tag, Flame, Heart, TicketPercent, TrendingUp, Sparkles, Copy, Camera, Truck, ShieldCheck, Clock } from "lucide-react";
+import { Tag, Flame, Heart, TicketPercent, TrendingUp, Sparkles, Copy, Camera, Truck, ShieldCheck, Clock, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { HomeCategoryBrowser } from "@/components/HomeCategoryBrowser";
 
@@ -34,6 +34,7 @@ function Index() {
   const [discounted, setDiscounted] = useState<ProductCardData[]>([]);
   const [trending, setTrending] = useState<ProductCardData[]>([]);
   const [topFav, setTopFav] = useState<ProductCardData[]>([]);
+  const [giveaways, setGiveaways] = useState<ProductCardData[]>([]);
   const [promos, setPromos] = useState<PromoCode[]>([]);
   const [visualOpen, setVisualOpen] = useState(false);
 
@@ -63,6 +64,12 @@ function Index() {
 
       supabase.from("promo_codes").select("id,code,discount_percent,discount_amount,min_order,expires_at").eq("is_active", true).limit(6)
         .then(({ data }) => setPromos((data ?? []) as PromoCode[]));
+
+      supabase.from("products")
+        .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
+        .eq("is_active", true).eq("is_giveaway", true)
+        .order("created_at", { ascending: false }).limit(10)
+        .then(({ data }) => setGiveaways((data ?? []) as ProductCardData[]));
 
       // Favoritlər — RPC olmadığı üçün məhdudlaşdırılmış
       supabase.from("favorites").select("product_id").limit(200).then(async ({ data }) => {
@@ -120,6 +127,25 @@ function Index() {
           </button>
         </div>
       </section>
+      {giveaways.length > 0 && (
+        <section className="rounded-3xl bg-gradient-to-br from-amber-400 via-orange-500 to-pink-500 p-6 md:p-8 text-white shadow-elegant relative overflow-hidden">
+          <div className="absolute -right-12 -top-12 w-48 h-48 bg-white/20 rounded-full blur-3xl" />
+          <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-yellow-200/30 rounded-full blur-2xl" />
+          <div className="relative z-10 flex items-end justify-between mb-5">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-bold mb-2">
+                <Gift className="h-3.5 w-3.5" /> UDUŞ
+              </div>
+              <h2 className="text-2xl md:text-4xl font-black">🎁 Uduşlu Məhsullar</h2>
+              <p className="text-sm opacity-95 mt-1">Bu məhsulları al və uduşda iştirak et!</p>
+            </div>
+          </div>
+          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 bg-white rounded-2xl p-3">
+            {giveaways.slice(0, 5).map((p) => <ProductCard key={p.id} p={p} />)}
+          </div>
+        </section>
+      )}
+
       {discounted.length > 0 && (
         <section className="rounded-3xl bg-gradient-to-br from-discount via-discount to-rose-700 p-6 md:p-8 text-white shadow-elegant">
           <div className="flex items-center justify-between mb-5">
