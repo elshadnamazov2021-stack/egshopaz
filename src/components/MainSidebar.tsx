@@ -10,7 +10,7 @@ import {
 import {
   Home, LayoutGrid, Heart, ShoppingCart, MessageCircle, Package,
   Bell, Tag, Gift, Store, User, HelpCircle, Shield, PackageOpen, Flame, Map as MapIcon,
-  GitCompare, Users,
+  GitCompare, Users, Megaphone,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { catName } from "@/lib/catName";
