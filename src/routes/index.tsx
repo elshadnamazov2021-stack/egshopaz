@@ -100,10 +100,13 @@ function Index() {
 
   return (
     <div className="container mx-auto px-3 md:px-4 py-4 space-y-6 md:space-y-8">
-      {/* 1) Tablar + Banner + Kateqoriyalar + Markalar (Trendyol-style hub) */}
+      {/* 1) Kateqoriya tablar + kompakt alt kateqoriyalar + banner */}
       <HomeCategoryBrowser />
 
-      {/* Visual Search Banner — bold AI-powered */}
+      {/* 2) REKLAM — Satıcı bannerləri (birinci prioritet) */}
+      <SellerBanners />
+
+      {/* Visual Search Banner */}
       <section className="rounded-3xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-500 p-6 md:p-8 text-white shadow-elegant relative overflow-hidden">
         <div className="absolute -right-10 -top-10 w-48 h-48 bg-white/20 rounded-full blur-3xl" />
         <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-yellow-300/30 rounded-full blur-2xl" />
@@ -127,6 +130,7 @@ function Index() {
           </button>
         </div>
       </section>
+
       {giveaways.length > 0 && (
         <section className="rounded-3xl bg-gradient-to-br from-amber-400 via-orange-500 to-pink-500 p-6 md:p-8 text-white shadow-elegant relative overflow-hidden">
           <div className="absolute -right-12 -top-12 w-48 h-48 bg-white/20 rounded-full blur-3xl" />
@@ -196,9 +200,6 @@ function Index() {
         </section>
       )}
 
-      {/* Seller banners — paid ad zone */}
-      <SellerBanners />
-
       {/* Trending */}
       {trending.length > 0 && (
         <section>
@@ -220,7 +221,7 @@ function Index() {
         </section>
       )}
 
-      {/* Sponsored placement */}
+      {/* REKLAM — Sponsored placement (ikinci prioritet) */}
       <SponsoredProducts limit={6} />
 
       {/* Most favorited */}
