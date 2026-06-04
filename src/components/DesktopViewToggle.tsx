@@ -2,8 +2,7 @@ import { Monitor, Smartphone } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "elzan-desktop-view";
-// Smaller virtual width = larger, more readable text on mobile devices
-const DESKTOP_WIDTH = 980;
+const DESKTOP_WIDTH = 1100;
 
 function isTouchDevice() {
   if (typeof window === "undefined") return false;
@@ -22,11 +21,15 @@ function applyViewport(desktop: boolean) {
     document.head.appendChild(meta);
   }
   if (desktop) {
-    // Let the browser fit the desktop layout into the device width — keeps text legible
-    meta.content = `width=${DESKTOP_WIDTH}, initial-scale=${(window.screen.width / DESKTOP_WIDTH).toFixed(3)}, maximum-scale=5.0, user-scalable=yes`;
+    // Render desktop layout at 1:1 — text is fully readable, user can pan/zoom freely
+    meta.content = `width=${DESKTOP_WIDTH}, initial-scale=1, maximum-scale=5.0, user-scalable=yes`;
   } else {
-    meta.content = "width=device-width, initial-scale=1, maximum-scale=5.0, user-scalable=yes";
+    // Mobile: device-width but force a slightly larger initial scale for readability
+    meta.content = "width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes";
   }
+  // Force text-size-adjust so iOS/Android don't auto-shrink content
+  document.documentElement.style.setProperty("-webkit-text-size-adjust", "100%");
+  document.documentElement.style.setProperty("text-size-adjust", "100%");
 }
 
 export function DesktopViewToggle() {
