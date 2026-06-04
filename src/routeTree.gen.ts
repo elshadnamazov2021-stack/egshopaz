@@ -27,6 +27,7 @@ import { Route as MyReviewsRouteImport } from './routes/my-reviews'
 import { Route as MessagesPvzRouteImport } from './routes/messages-pvz'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as MapRouteImport } from './routes/map'
+import { Route as FollowedShopsRouteImport } from './routes/followed-shops'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as DisputesRouteImport } from './routes/disputes'
 import { Route as DiscoverRouteImport } from './routes/discover'
@@ -133,6 +134,11 @@ const MapRoute = MapRouteImport.update({
   path: '/map',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FollowedShopsRoute = FollowedShopsRouteImport.update({
+  id: '/followed-shops',
+  path: '/followed-shops',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FavoritesRoute = FavoritesRouteImport.update({
   id: '/favorites',
   path: '/favorites',
@@ -223,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/discover': typeof DiscoverRoute
   '/disputes': typeof DisputesRoute
   '/favorites': typeof FavoritesRoute
+  '/followed-shops': typeof FollowedShopsRoute
   '/map': typeof MapRoute
   '/messages': typeof MessagesRoute
   '/messages-pvz': typeof MessagesPvzRoute
@@ -258,6 +265,7 @@ export interface FileRoutesByTo {
   '/discover': typeof DiscoverRoute
   '/disputes': typeof DisputesRoute
   '/favorites': typeof FavoritesRoute
+  '/followed-shops': typeof FollowedShopsRoute
   '/map': typeof MapRoute
   '/messages': typeof MessagesRoute
   '/messages-pvz': typeof MessagesPvzRoute
@@ -294,6 +302,7 @@ export interface FileRoutesById {
   '/discover': typeof DiscoverRoute
   '/disputes': typeof DisputesRoute
   '/favorites': typeof FavoritesRoute
+  '/followed-shops': typeof FollowedShopsRoute
   '/map': typeof MapRoute
   '/messages': typeof MessagesRoute
   '/messages-pvz': typeof MessagesPvzRoute
@@ -331,6 +340,7 @@ export interface FileRouteTypes {
     | '/discover'
     | '/disputes'
     | '/favorites'
+    | '/followed-shops'
     | '/map'
     | '/messages'
     | '/messages-pvz'
@@ -366,6 +376,7 @@ export interface FileRouteTypes {
     | '/discover'
     | '/disputes'
     | '/favorites'
+    | '/followed-shops'
     | '/map'
     | '/messages'
     | '/messages-pvz'
@@ -401,6 +412,7 @@ export interface FileRouteTypes {
     | '/discover'
     | '/disputes'
     | '/favorites'
+    | '/followed-shops'
     | '/map'
     | '/messages'
     | '/messages-pvz'
@@ -437,6 +449,7 @@ export interface RootRouteChildren {
   DiscoverRoute: typeof DiscoverRoute
   DisputesRoute: typeof DisputesRoute
   FavoritesRoute: typeof FavoritesRoute
+  FollowedShopsRoute: typeof FollowedShopsRoute
   MapRoute: typeof MapRoute
   MessagesRoute: typeof MessagesRoute
   MessagesPvzRoute: typeof MessagesPvzRoute
@@ -587,6 +600,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/followed-shops': {
+      id: '/followed-shops'
+      path: '/followed-shops'
+      fullPath: '/followed-shops'
+      preLoaderRoute: typeof FollowedShopsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/favorites': {
       id: '/favorites'
       path: '/favorites'
@@ -709,6 +729,7 @@ const rootRouteChildren: RootRouteChildren = {
   DiscoverRoute: DiscoverRoute,
   DisputesRoute: DisputesRoute,
   FavoritesRoute: FavoritesRoute,
+  FollowedShopsRoute: FollowedShopsRoute,
   MapRoute: MapRoute,
   MessagesRoute: MessagesRoute,
   MessagesPvzRoute: MessagesPvzRoute,

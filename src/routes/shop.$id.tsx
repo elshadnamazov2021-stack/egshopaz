@@ -2,8 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
-import { Store, MapPin, Mail, Star, Package } from "lucide-react";
+import { Store, MapPin, Mail, Star, Package, Heart } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/shop/$id")({
   head: ({ params }) => ({ meta: [{ title: `Shop — Elzan Shop` }, { name: "description", content: `Seller shop ${params.id}` }] }),
