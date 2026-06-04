@@ -63,6 +63,7 @@ interface Sponsored {
 }
 
 const TIER_ICONS: Record<string, typeof Crown> = {
+  silver: Star,
   premium: Sparkles,
   gold: Star,
   vip: Crown,
