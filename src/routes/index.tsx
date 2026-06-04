@@ -93,6 +93,10 @@ function Index() {
       {/* 2) REKLAM — Satıcı bannerləri (birinci prioritet) */}
       <SellerBanners />
 
+      {/* Featured (sponsored) shops */}
+      <FeaturedShops />
+
+
       {/* Visual Search Banner */}
       <section className="rounded-3xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-500 p-6 md:p-8 text-white shadow-elegant relative overflow-hidden">
         <div className="absolute -right-10 -top-10 w-48 h-48 bg-white/20 rounded-full blur-3xl" />
