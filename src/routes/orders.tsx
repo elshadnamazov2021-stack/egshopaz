@@ -202,9 +202,13 @@ function OrdersPage() {
                         <div className="truncate">{it.title}</div>
                         <div className="text-xs text-muted-foreground">{it.quantity} × {formatAZN(it.price)}</div>
                         {it.delivered_at ? (
-                          <div className="text-[10px] text-success font-semibold mt-0.5">{t("orders.received")}</div>
+                          <div className="text-[10px] text-success font-semibold mt-0.5">
+                            {t("orders.received")} · {new Date(it.delivered_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          </div>
                         ) : it.accepted_at ? (
-                          <div className="text-[10px] text-primary font-semibold mt-0.5">{t("orders.atPvz")}</div>
+                          <div className="text-[10px] text-primary font-semibold mt-0.5">
+                            {t("orders.atPvz")} · {new Date(it.accepted_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          </div>
                         ) : null}
                       </div>
                       <div className="flex flex-col gap-1 shrink-0">
