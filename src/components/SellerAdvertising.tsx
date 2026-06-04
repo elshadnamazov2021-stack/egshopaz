@@ -288,9 +288,10 @@ export function SellerAdvertising() {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
             <div className="bg-card/60 rounded-xl p-3"><div className="text-xs text-muted-foreground">Banner (qalır / cəmi)</div><div className="font-bold text-lg">{Math.max(0, bannersLeft)} / {activeSub.ad_packages.banner_slots}</div></div>
-            <div className="bg-card/60 rounded-xl p-3"><div className="text-xs text-muted-foreground">Sponsor (qalır / cəmi)</div><div className="font-bold text-lg">{Math.max(0, sponsoredLeft)} / {activeSub.ad_packages.sponsored_product_slots}</div></div>
+            <div className="bg-card/60 rounded-xl p-3"><div className="text-xs text-muted-foreground">Sponsor məhsul</div><div className="font-bold text-lg">{Math.max(0, sponsoredLeft)} / {activeSub.ad_packages.sponsored_product_slots}</div></div>
+            <div className="bg-card/60 rounded-xl p-3"><div className="text-xs text-muted-foreground">Mağaza reklamı</div><div className="font-bold text-lg">{Math.max(0, shopPromoLeft)} / {activeSub.ad_packages.shop_promo_slots ?? 0}</div></div>
             <div className="bg-card/60 rounded-xl p-3"><div className="text-xs text-muted-foreground">Müddət</div><div className="font-bold text-lg">{activeSub.ad_packages.duration_days} gün</div></div>
           </div>
         </div>
