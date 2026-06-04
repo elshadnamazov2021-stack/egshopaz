@@ -69,6 +69,19 @@ const TIER_ICONS: Record<string, typeof Crown> = {
   vip: Crown,
 };
 
+interface PromoSettings {
+  single_product_promo_price: number;
+  single_product_promo_days: number;
+  single_shop_promo_price: number;
+  single_shop_promo_days: number;
+  promo_terms_text: string;
+}
+
+type CheckoutTarget =
+  | { kind: "pkg"; pkg: Pkg }
+  | { kind: "one_product"; productId: string; productTitle: string; price: number; days: number }
+  | { kind: "one_shop"; price: number; days: number };
+
 export function SellerAdvertising() {
   const { user } = useAuth();
   const [packages, setPackages] = useState<Pkg[]>([]);
@@ -78,22 +91,25 @@ export function SellerAdvertising() {
   const [sponsored, setSponsored] = useState<Sponsored[]>([]);
   const [sponsoredShops, setSponsoredShops] = useState<{ id: string; ends_at: string; is_active: boolean }[]>([]);
   const [myProducts, setMyProducts] = useState<Product[]>([]);
+  const [promoSettings, setPromoSettings] = useState<PromoSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [paying, setPaying] = useState<string | null>(null);
-  const [checkout, setCheckout] = useState<Pkg | null>(null);
+  const [paying, setPaying] = useState(false);
+  const [checkout, setCheckout] = useState<CheckoutTarget | null>(null);
   const [card, setCard] = useState({ number: "", name: "", expiry: "", cvc: "" });
+  const [postPay, setPostPay] = useState(false); // post-package chooser
+  const [oneOffPickProduct, setOneOffPickProduct] = useState(false); // paid one-off product picker
 
   // Banner form
   const [bannerForm, setBannerForm] = useState<{ title: string; link_url: string; image_url: string } | null>(null);
   const [uploadingBanner, setUploadingBanner] = useState(false);
 
-  // Sponsored form
+  // Sponsored (slot-based) form
   const [pickProduct, setPickProduct] = useState(false);
 
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const [pk, sb, tx, bn, sp, ss, pr] = await Promise.all([
+    const [pk, sb, tx, bn, sp, ss, pr, st] = await Promise.all([
       supabase.from("ad_packages").select("*").eq("is_active", true).order("sort_order"),
       supabase.from("seller_subscriptions").select("*, ad_packages(*)").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("payment_transactions").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }).limit(20),
@@ -101,6 +117,7 @@ export function SellerAdvertising() {
       supabase.from("sponsored_products").select("*, products(id,title,image_url,price)").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("sponsored_shops").select("id,ends_at,is_active").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("products").select("id,title,image_url,price").eq("seller_id", user.id).eq("is_active", true).order("created_at", { ascending: false }),
+      supabase.from("system_settings").select("single_product_promo_price,single_product_promo_days,single_shop_promo_price,single_shop_promo_days,promo_terms_text").limit(1).maybeSingle(),
     ]);
     setPackages((pk.data ?? []) as unknown as Pkg[]);
     setSubs((sb.data ?? []) as unknown as Sub[]);
@@ -109,8 +126,10 @@ export function SellerAdvertising() {
     setSponsored((sp.data ?? []) as unknown as Sponsored[]);
     setSponsoredShops((ss.data ?? []) as { id: string; ends_at: string; is_active: boolean }[]);
     setMyProducts((pr.data ?? []) as unknown as Product[]);
+    setPromoSettings((st.data as PromoSettings | null) ?? null);
     setLoading(false);
   };
+
 
   useEffect(() => { void load(); }, [user]);
 
