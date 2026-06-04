@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SupportRouteImport } from './routes/support'
+import { Route as ShopsRouteImport } from './routes/shops'
 import { Route as SellerRouteImport } from './routes/seller'
 import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -52,6 +53,11 @@ const TermsRoute = TermsRouteImport.update({
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
   path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsRoute = ShopsRouteImport.update({
+  id: '/shops',
+  path: '/shops',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SellerRoute = SellerRouteImport.update({
@@ -246,6 +252,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
   '/seller': typeof SellerRoute
+  '/shops': typeof ShopsRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/product/$id': typeof ProductIdRoute
@@ -282,6 +289,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
   '/seller': typeof SellerRoute
+  '/shops': typeof ShopsRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/product/$id': typeof ProductIdRoute
@@ -319,6 +327,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
   '/seller': typeof SellerRoute
+  '/shops': typeof ShopsRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/product/$id': typeof ProductIdRoute
@@ -357,6 +366,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/returns'
     | '/seller'
+    | '/shops'
     | '/support'
     | '/terms'
     | '/product/$id'
@@ -393,6 +403,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/returns'
     | '/seller'
+    | '/shops'
     | '/support'
     | '/terms'
     | '/product/$id'
@@ -429,6 +440,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/returns'
     | '/seller'
+    | '/shops'
     | '/support'
     | '/terms'
     | '/product/$id'
@@ -466,6 +478,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   ReturnsRoute: typeof ReturnsRoute
   SellerRoute: typeof SellerRoute
+  ShopsRoute: typeof ShopsRoute
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
   ProductIdRoute: typeof ProductIdRoute
@@ -486,6 +499,13 @@ declare module '@tanstack/react-router' {
       path: '/support'
       fullPath: '/support'
       preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops': {
+      id: '/shops'
+      path: '/shops'
+      fullPath: '/shops'
+      preLoaderRoute: typeof ShopsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/seller': {
@@ -746,6 +766,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   ReturnsRoute: ReturnsRoute,
   SellerRoute: SellerRoute,
+  ShopsRoute: ShopsRoute,
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
   ProductIdRoute: ProductIdRoute,
@@ -754,12 +775,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

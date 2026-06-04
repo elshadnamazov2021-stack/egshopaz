@@ -10,7 +10,7 @@ import {
 import {
   Home, LayoutGrid, Heart, ShoppingCart, MessageCircle, Package,
   Bell, Tag, Gift, Store, User, HelpCircle, Shield, PackageOpen, Flame, Map as MapIcon,
-  GitCompare, Users,
+  GitCompare, Users, Megaphone,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { catName } from "@/lib/catName";
@@ -38,9 +38,13 @@ export function MainSidebar() {
 
   const parents = cats.filter((c) => !c.parent_id);
 
-  const mainLinks = [
+  const mainLinks = isSeller ? [
+    { to: "/", label: t("sidebar.home"), icon: Home },
+    { to: "/seller", label: "Satıcı panelim", icon: Store },
+  ] : [
     { to: "/", label: t("sidebar.home"), icon: Home },
     { to: "/catalog", label: t("sidebar.catalog"), icon: LayoutGrid, search: { q: undefined, cat: undefined } as never },
+    { to: "/shops", label: "Mağazalar", icon: Store },
     { to: "/discover", label: t("sidebar.discover"), icon: Flame },
     { to: "/compare", label: "Müqayisə", icon: GitCompare },
     { to: "/map", label: "Xəritə", icon: MapIcon },
@@ -48,15 +52,20 @@ export function MainSidebar() {
     { to: "/bonus", label: t("sidebar.bonuses"), icon: Gift },
   ];
 
-  const userLinks = user ? [
+  const userLinks = user ? (isSeller ? [
+    { to: "/profile", label: t("sidebar.profile"), icon: User },
+    { to: "/seller", label: "Satıcı panelim", icon: Store },
+    { to: "/notifications", label: t("sidebar.notifications"), icon: Bell },
+  ] : [
     { to: "/profile", label: t("sidebar.profile"), icon: User },
     { to: "/orders", label: t("sidebar.orders"), icon: Package },
     { to: "/favorites", label: t("sidebar.favorites"), icon: Heart },
+    { to: "/followed-shops", label: "İzlədiyim mağazalar", icon: Heart },
     { to: "/cart", label: t("sidebar.cart"), icon: ShoppingCart },
     { to: "/messages", label: t("sidebar.messages"), icon: MessageCircle },
     { to: "/notifications", label: t("sidebar.notifications"), icon: Bell },
     { to: "/referral", label: "Referral proqramı", icon: Users },
-  ] : [];
+  ]) : [];
 
   return (
     <Sidebar collapsible="offcanvas">

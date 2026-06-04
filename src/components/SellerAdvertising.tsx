@@ -80,7 +80,17 @@ interface PromoSettings {
 type CheckoutTarget =
   | { kind: "pkg"; pkg: Pkg }
   | { kind: "one_product"; productId: string; productTitle: string; price: number; days: number }
-  | { kind: "one_shop"; price: number; days: number };
+  | { kind: "one_shop"; price: number; days: number }
+  | { kind: "slot_product"; productId: string; productTitle: string; price: number }
+  | { kind: "slot_shop"; price: number }
+  | { kind: "slot_banner"; price: number; form: { title: string; link_url: string; image_url: string } };
+
+// Fixed prices for slot activations (kept low because seller already paid for package)
+const SLOT_PRODUCT_FEE = 1;
+const SLOT_SHOP_FEE = 1;
+const SLOT_BANNER_FEE = 1;
+
+const CARD_STORAGE_KEY = "elzan_saved_card_v1";
 
 export function SellerAdvertising() {
   const { user } = useAuth();
@@ -96,6 +106,7 @@ export function SellerAdvertising() {
   const [paying, setPaying] = useState(false);
   const [checkout, setCheckout] = useState<CheckoutTarget | null>(null);
   const [card, setCard] = useState({ number: "", name: "", expiry: "", cvc: "" });
+  const [saveCard, setSaveCard] = useState(false);
   const [postPay, setPostPay] = useState(false); // post-package chooser
   const [oneOffPickProduct, setOneOffPickProduct] = useState(false); // paid one-off product picker
 
@@ -146,8 +157,24 @@ export function SellerAdvertising() {
     if (!checkout) return null;
     if (checkout.kind === "pkg") return { label: `${checkout.pkg.name} paketi`, price: checkout.pkg.price, color: checkout.pkg.color, days: checkout.pkg.duration_days };
     if (checkout.kind === "one_product") return { label: `Məhsul reklamı: ${checkout.productTitle}`, price: checkout.price, color: "#f59e0b", days: checkout.days };
-    return { label: "Mağaza reklamı (ana səhifə)", price: checkout.price, color: "#3b82f6", days: checkout.days };
+    if (checkout.kind === "one_shop") return { label: "Mağaza reklamı (ana səhifə)", price: checkout.price, color: "#3b82f6", days: checkout.days };
+    if (checkout.kind === "slot_product") return { label: `Slot aktivasiyası: ${checkout.productTitle}`, price: checkout.price, color: "#f59e0b", days: 0 };
+    if (checkout.kind === "slot_shop") return { label: "Slot aktivasiyası: Mağaza", price: checkout.price, color: "#3b82f6", days: 0 };
+    return { label: "Slot aktivasiyası: Banner", price: checkout.price, color: "#3b82f6", days: 0 };
   })();
+
+  // Prefill saved card when opening checkout
+  useEffect(() => {
+    if (!checkout) return;
+    try {
+      const raw = localStorage.getItem(CARD_STORAGE_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as typeof card;
+        setCard(saved);
+        setSaveCard(true);
+      }
+    } catch { /* ignore */ }
+  }, [checkout]);
 
   const purchase = async () => {
     if (!user || !checkout || !checkoutMeta) return;
@@ -157,10 +184,14 @@ export function SellerAdvertising() {
     }
     setPaying(true);
     try {
-      const ends = new Date();
-      ends.setDate(ends.getDate() + checkoutMeta.days);
+      // Persist/clear saved card
+      try {
+        if (saveCard) localStorage.setItem(CARD_STORAGE_KEY, JSON.stringify(card));
+        else localStorage.removeItem(CARD_STORAGE_KEY);
+      } catch { /* ignore */ }
 
       if (checkout.kind === "pkg") {
+        const ends = new Date(); ends.setDate(ends.getDate() + checkoutMeta.days);
         const { data: sub, error: subErr } = await supabase.from("seller_subscriptions").insert({
           seller_id: user.id,
           package_id: checkout.pkg.id,
@@ -178,13 +209,14 @@ export function SellerAdvertising() {
         });
         toast.success(`${checkout.pkg.name} paketi aktiv edildi! 🎉`);
         setCheckout(null);
-        setCard({ number: "", name: "", expiry: "", cvc: "" });
+        if (!saveCard) setCard({ number: "", name: "", expiry: "", cvc: "" });
         await load();
-        setPostPay(true); // open chooser
+        setPostPay(true);
         return;
       }
 
       if (checkout.kind === "one_product") {
+        const ends = new Date(); ends.setDate(ends.getDate() + checkout.days);
         const { error } = await supabase.from("sponsored_products").insert({
           seller_id: user.id, product_id: checkout.productId,
           position: "catalog_top", is_active: true, ends_at: ends.toISOString(),
@@ -195,7 +227,8 @@ export function SellerAdvertising() {
           description: `Tək məhsul reklamı: ${checkout.productTitle} (${checkout.days} gün)`,
         });
         toast.success("Məhsul ana səhifədə önə çəkildi! 🎉");
-      } else {
+      } else if (checkout.kind === "one_shop") {
+        const ends = new Date(); ends.setDate(ends.getDate() + checkout.days);
         const { error } = await supabase.from("sponsored_shops").insert({
           seller_id: user.id, ends_at: ends.toISOString(), is_active: true,
         });
@@ -205,9 +238,55 @@ export function SellerAdvertising() {
           description: `Mağaza reklamı (${checkout.days} gün)`,
         });
         toast.success("Mağazanız ana səhifədə önə çəkildi! 🎉");
+      } else if (checkout.kind === "slot_product") {
+        if (!activeSub) throw new Error("Aktiv paket yoxdur");
+        const { error } = await supabase.from("sponsored_products").insert({
+          seller_id: user.id, subscription_id: activeSub.id, product_id: checkout.productId,
+          position: "catalog_top", is_active: true, ends_at: activeSub.ends_at,
+        });
+        if (error) throw error;
+        await supabase.from("payment_transactions").insert({
+          seller_id: user.id, subscription_id: activeSub.id, amount: checkout.price,
+          status: "completed", method: "mock_card",
+          description: `Slot aktivasiyası — Məhsul: ${checkout.productTitle}`,
+        });
+        toast.success("Məhsul önə çəkildi 🎉");
+        setPickProduct(false);
+      } else if (checkout.kind === "slot_shop") {
+        if (!activeSub) throw new Error("Aktiv paket yoxdur");
+        const { error } = await supabase.from("sponsored_shops").insert({
+          seller_id: user.id, subscription_id: activeSub.id, ends_at: activeSub.ends_at, is_active: true,
+        });
+        if (error) throw error;
+        await supabase.from("payment_transactions").insert({
+          seller_id: user.id, subscription_id: activeSub.id, amount: checkout.price,
+          status: "completed", method: "mock_card",
+          description: "Slot aktivasiyası — Mağaza reklamı",
+        });
+        toast.success("Mağazanız önə çəkildi 🎉");
+      } else if (checkout.kind === "slot_banner") {
+        if (!activeSub) throw new Error("Aktiv paket yoxdur");
+        const { error } = await supabase.from("banners").insert({
+          seller_id: user.id,
+          subscription_id: activeSub.id,
+          title: checkout.form.title.trim().slice(0, 200),
+          image_url: checkout.form.image_url,
+          link_url: checkout.form.link_url.trim().slice(0, 500) || null,
+          position: "home_top",
+          is_active: true,
+          ends_at: activeSub.ends_at,
+        });
+        if (error) throw error;
+        await supabase.from("payment_transactions").insert({
+          seller_id: user.id, subscription_id: activeSub.id, amount: checkout.price,
+          status: "completed", method: "mock_card",
+          description: `Slot aktivasiyası — Banner: ${checkout.form.title}`,
+        });
+        toast.success("Banner əlavə olundu 🎉");
+        setBannerForm(null);
       }
       setCheckout(null);
-      setCard({ number: "", name: "", expiry: "", cvc: "" });
+      if (!saveCard) setCard({ number: "", name: "", expiry: "", cvc: "" });
       await load();
     } catch (e) {
       toast.error("Ödəniş alınmadı: " + (e as Error).message);
@@ -234,21 +313,7 @@ export function SellerAdvertising() {
     if (!bannerForm.title.trim()) { toast.error("Başlıq daxil edin"); return; }
     if (!bannerForm.image_url) { toast.error("Şəkil yükləyin"); return; }
     if (bannersLeft <= 0) { toast.error("Banner limiti dolub. Yeni paket alın."); return; }
-
-    const { error } = await supabase.from("banners").insert({
-      seller_id: user.id,
-      subscription_id: activeSub.id,
-      title: bannerForm.title.trim().slice(0, 200),
-      image_url: bannerForm.image_url,
-      link_url: bannerForm.link_url.trim().slice(0, 500) || null,
-      position: "home_top",
-      is_active: true,
-      ends_at: activeSub.ends_at,
-    });
-    if (error) { toast.error(error.message); return; }
-    toast.success("Banner əlavə olundu");
-    setBannerForm(null);
-    await load();
+    setCheckout({ kind: "slot_banner", price: SLOT_BANNER_FEE, form: { ...bannerForm } });
   };
 
   const deleteBanner = async (id: string) => {
@@ -269,20 +334,12 @@ export function SellerAdvertising() {
     if (sponsoredLeft <= 0) { toast.error("Sponsor məhsul limiti dolub"); return; }
     const exists = activeSponsored.find((s) => s.product_id === productId);
     if (exists) { toast.error("Bu məhsul artıq önə çəkilib"); return; }
-
-    const { error } = await supabase.from("sponsored_products").insert({
-      seller_id: user.id,
-      subscription_id: activeSub.id,
-      product_id: productId,
-      position: "catalog_top",
-      is_active: true,
-      ends_at: activeSub.ends_at,
-    });
-    if (error) { toast.error(error.message); return; }
-    toast.success("Məhsul önə çəkildi");
+    const product = myProducts.find((p) => p.id === productId);
+    if (!product) return;
     setPickProduct(false);
-    await load();
+    setCheckout({ kind: "slot_product", productId, productTitle: product.title, price: SLOT_PRODUCT_FEE });
   };
+
 
   const removeSponsored = async (id: string) => {
     if (!confirm("Bu məhsul sponsorluqdan çıxarılsın?")) return;
@@ -295,15 +352,7 @@ export function SellerAdvertising() {
   const promoteShop = async () => {
     if (!user || !activeSub) return;
     if (shopPromoLeft <= 0) { toast.error("Mağaza reklamı limiti dolub"); return; }
-    const { error } = await supabase.from("sponsored_shops").insert({
-      seller_id: user.id,
-      subscription_id: activeSub.id,
-      ends_at: activeSub.ends_at,
-      is_active: true,
-    });
-    if (error) { toast.error(error.message); return; }
-    toast.success("Mağazanız ana səhifədə önə çəkildi! 🎉");
-    await load();
+    setCheckout({ kind: "slot_shop", price: SLOT_SHOP_FEE });
   };
 
   const removeShopPromo = async (id: string) => {
@@ -682,6 +731,10 @@ export function SellerAdvertising() {
                   <input value={card.cvc} onChange={(e) => setCard({ ...card, cvc: e.target.value })} placeholder="123" maxLength={4} className="w-full mt-1 px-3 py-2 rounded-lg bg-secondary border border-border focus:border-primary outline-none" />
                 </div>
               </div>
+              <label className="flex items-center gap-2 mt-3 cursor-pointer select-none">
+                <input type="checkbox" checked={saveCard} onChange={(e) => setSaveCard(e.target.checked)} className="h-4 w-4 rounded border-border" />
+                <span className="text-sm">Kart məlumatlarını yadda saxla (növbəti ödənişdə avtomatik dolacaq)</span>
+              </label>
             </div>
             <div className="flex items-center justify-between mt-5 pt-4 border-t border-border">
               <div>
