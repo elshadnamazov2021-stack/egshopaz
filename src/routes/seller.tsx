@@ -39,7 +39,7 @@ import { SellerAnalytics } from "@/components/SellerAnalytics";
 import { BulkProductUpload } from "@/components/BulkProductUpload";
 import { AISupportChat } from "@/components/AISupportChat";
 import { CitySelect } from "@/components/CitySelect";
-import { CategoryCombobox } from "@/components/CategoryCombobox";
+import { CategoryCascade } from "@/components/CategoryCascade";
 import { findCity } from "@/lib/azCities";
 import { DateRangeFilter, emptyRange, inRange, type DateRange } from "@/components/DateRangeFilter";
 
@@ -76,6 +76,8 @@ interface Product {
 interface Category {
   id: string;
   name: string;
+  parent_id: string | null;
+  icon?: string | null;
 }
 interface OrderItem {
   id: string;
@@ -191,7 +193,7 @@ function SellerPanel() {
         .select("*")
         .eq("seller_id", user.id)
         .order("created_at", { ascending: false }),
-      supabase.from("categories").select("id,name").order("sort_order"),
+      supabase.from("categories").select("id,name,parent_id,icon").order("sort_order"),
       supabase
         .from("order_items")
         .select(
@@ -1385,10 +1387,10 @@ function SellerPanel() {
 
               <div>
                 <label className="text-sm font-semibold">Kateqoriya</label>
-                <CategoryCombobox
+                <CategoryCascade
                   categories={categories}
                   value={editing.category_id ?? null}
-                  onChange={(id) => setEditing({ ...editing, category_id: id })}
+                  onChange={(id: string | null) => setEditing({ ...editing, category_id: id })}
                 />
               </div>
 
