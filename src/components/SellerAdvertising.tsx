@@ -467,6 +467,35 @@ export function SellerAdvertising() {
         </div>
       ) : null}
 
+      {/* === ONE-OFF PAID PROMOTION (paketsiz, admin qiymətli) === */}
+      {promoSettings && (
+        <div className="bg-card border-2 border-dashed border-primary/30 rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-bold">Ayrıca ödənişli reklam (paketsiz)</h2>
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">{promoSettings.promo_terms_text}</p>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <button
+              onClick={() => setOneOffPickProduct(true)}
+              className="border border-border rounded-xl p-4 text-left hover:border-warning hover:bg-warning/5 transition"
+            >
+              <div className="flex items-center gap-2 mb-1"><Package className="h-5 w-5 text-warning" /> <span className="font-bold">Tək məhsulu önə çək</span></div>
+              <div className="text-xs text-muted-foreground">{promoSettings.single_product_promo_days} gün</div>
+              <div className="text-xl font-extrabold text-warning mt-1">{formatAZN(promoSettings.single_product_promo_price)}</div>
+            </button>
+            <button
+              onClick={() => setCheckout({ kind: "one_shop", price: promoSettings.single_shop_promo_price, days: promoSettings.single_shop_promo_days })}
+              className="border border-border rounded-xl p-4 text-left hover:border-primary hover:bg-primary/5 transition"
+            >
+              <div className="flex items-center gap-2 mb-1"><Store className="h-5 w-5 text-primary" /> <span className="font-bold">Mağazamı önə çək</span></div>
+              <div className="text-xs text-muted-foreground">{promoSettings.single_shop_promo_days} gün</div>
+              <div className="text-xl font-extrabold text-primary mt-1">{formatAZN(promoSettings.single_shop_promo_price)}</div>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Packages */}
       <div>
         <div className="flex items-center gap-2 mb-4">
