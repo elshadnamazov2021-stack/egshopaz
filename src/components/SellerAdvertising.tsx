@@ -297,6 +297,43 @@ export function SellerAdvertising() {
         </div>
       )}
 
+      {/* === SHOP PROMOTION === */}
+      {activeSub ? (
+        <div className="bg-card border border-border rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <Store className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-bold">Mağaza reklamı (ana səhifədə)</h2>
+              <span className="text-xs bg-secondary px-2 py-0.5 rounded-full">{activeShopPromos.length}/{activeSub.ad_packages?.shop_promo_slots ?? 0}</span>
+            </div>
+            <button
+              onClick={promoteShop}
+              disabled={shopPromoLeft <= 0}
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              <Plus className="h-4 w-4" /> Mağazamı önə çək
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground mb-3">Mağazanız ana səhifədə "Önə çıxan mağazalar" bölməsində görünəcək. Müştərilər mağazanızı izləyə bilərlər.</p>
+          {activeShopPromos.length === 0 ? (
+            <div className="text-center text-muted-foreground py-6 text-sm">Hələ aktiv mağaza reklamı yoxdur.</div>
+          ) : (
+            <div className="space-y-2">
+              {activeShopPromos.map((s) => (
+                <div key={s.id} className="flex items-center justify-between border border-border rounded-xl p-3">
+                  <div className="text-sm">
+                    <div className="font-semibold">Aktiv mağaza reklamı</div>
+                    <div className="text-xs text-muted-foreground">Bitir: {formatDate(s.ends_at)}</div>
+                  </div>
+                  <button onClick={() => removeShopPromo(s.id)} className="p-1.5 text-destructive hover:bg-destructive/10 rounded"><Trash2 className="h-4 w-4" /></button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null}
+
+
       {/* === BANNER MANAGER === */}
       {activeSub ? (
         <div className="bg-card border border-border rounded-2xl p-6">
