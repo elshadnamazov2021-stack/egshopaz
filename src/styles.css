@@ -58,10 +58,10 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.02 290);
 
-  /* Brand: classic violet (#7C3AED) */
-  --primary: oklch(0.53 0.24 290);
+  /* Brand: Trendyol orange (#F27A1A) */
+  --primary: oklch(0.72 0.18 55);
   --primary-foreground: oklch(0.99 0 0);
-  --primary-glow: oklch(0.66 0.22 295);
+  --primary-glow: oklch(0.78 0.17 60);
 
   --secondary: oklch(0.97 0.015 290);
   --secondary-foreground: oklch(0.25 0.05 290);
