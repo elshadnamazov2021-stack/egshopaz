@@ -698,6 +698,65 @@ export function SellerAdvertising() {
           </div>
         </div>
       )}
+
+      {/* Post-payment chooser */}
+      {postPay && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setPostPay(false)}>
+          <div className="bg-card rounded-2xl max-w-md w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold">🎉 Paket aktivləşdi — növbəti addım?</h3>
+              <button onClick={() => setPostPay(false)} className="p-1 hover:bg-secondary rounded"><X className="h-5 w-5" /></button>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">Reklamınızı necə yerləşdirək?</p>
+            <div className="grid gap-3">
+              <button onClick={() => { setPostPay(false); setPickProduct(true); }} disabled={sponsoredLeft <= 0}
+                className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-warning hover:bg-warning/5 disabled:opacity-50 disabled:cursor-not-allowed text-left transition">
+                <Package className="h-6 w-6 text-warning shrink-0" />
+                <div><div className="font-bold">Məhsulu önə çək</div><div className="text-xs text-muted-foreground">Konkret bir məhsulu kataloqun başına çıxar ({Math.max(0, sponsoredLeft)} slot qalır)</div></div>
+              </button>
+              <button onClick={() => { setPostPay(false); void promoteShop(); }} disabled={shopPromoLeft <= 0}
+                className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-primary hover:bg-primary/5 disabled:opacity-50 disabled:cursor-not-allowed text-left transition">
+                <Store className="h-6 w-6 text-primary shrink-0" />
+                <div><div className="font-bold">Mağazanı önə çək</div><div className="text-xs text-muted-foreground">Bütün mağazanız "Önə çıxan mağazalar" bölməsində ({Math.max(0, shopPromoLeft)} slot qalır)</div></div>
+              </button>
+              <button onClick={() => { setPostPay(false); setBannerForm({ title: "", link_url: "", image_url: "" }); }} disabled={bannersLeft <= 0}
+                className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-primary hover:bg-primary/5 disabled:opacity-50 disabled:cursor-not-allowed text-left transition">
+                <Megaphone className="h-6 w-6 text-primary shrink-0" />
+                <div><div className="font-bold">Banner əlavə et</div><div className="text-xs text-muted-foreground">Ana səhifənin üstündə böyük banner ({Math.max(0, bannersLeft)} slot qalır)</div></div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* One-off paid product picker */}
+      {oneOffPickProduct && promoSettings && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setOneOffPickProduct(false)}>
+          <div className="bg-card rounded-2xl max-w-2xl w-full p-6 shadow-2xl max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xl font-bold flex items-center gap-2"><Package className="h-5 w-5 text-warning" /> Ödənişli reklam — məhsul seç</h3>
+              <button onClick={() => setOneOffPickProduct(false)} className="p-1 hover:bg-secondary rounded"><X className="h-5 w-5" /></button>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4">Qiymət: <b>{formatAZN(promoSettings.single_product_promo_price)}</b> • Müddət: <b>{promoSettings.single_product_promo_days} gün</b></p>
+            {myProducts.length === 0 ? (
+              <div className="text-center py-10 text-muted-foreground"><Package className="h-10 w-10 mx-auto mb-2" /><p>Aktiv məhsul yoxdur.</p></div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {myProducts.map((p) => (
+                  <button key={p.id}
+                    onClick={() => { setOneOffPickProduct(false); setCheckout({ kind: "one_product", productId: p.id, productTitle: p.title, price: promoSettings.single_product_promo_price, days: promoSettings.single_product_promo_days }); }}
+                    className="border border-border rounded-xl overflow-hidden text-left hover:border-warning transition">
+                    <div className="aspect-square bg-secondary">
+                      {p.image_url && <img src={p.image_url} alt={p.title} className="w-full h-full object-cover" />}
+                    </div>
+                    <div className="p-2"><div className="text-xs line-clamp-2">{p.title}</div><div className="font-bold text-sm">{formatAZN(p.price)}</div></div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
