@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { SellerReturns } from "@/components/SellerReturns";
 import { supabase } from "@/integrations/supabase/client";
-import { formatAZN } from "@/lib/format";
+import { formatAZN, formatDateTime, formatDate } from "@/lib/format";
 import {
   Package,
   ShoppingBag,
@@ -560,7 +560,7 @@ function SellerPanel() {
     <div class="pickup">${pickupCode}</div>
     <div class="qr-cap">PVZ qəbul kodu</div>
   </div>
-  <div class="footer">Elzan Shop · ${new Date().toLocaleDateString("az-AZ")}</div>
+  <div class="footer">Elzan Shop · ${formatDate(new Date())}</div>
 </div>
 <script>setTimeout(()=>window.print(),300);</script>
 </body></html>`;
@@ -772,7 +772,7 @@ function SellerPanel() {
                       </div>
                     )}
                     <div className="text-[10px] text-muted-foreground mt-1">
-                      {new Date(n.created_at).toLocaleString("az-AZ")}
+                      {formatDateTime(n.created_at)}
                     </div>
                   </div>
                 ))}
@@ -956,7 +956,7 @@ function SellerPanel() {
                       </div>
                       {i.order_created_at && (
                         <div className="text-[10px] text-muted-foreground mt-0.5">
-                          📅 Sifariş: {new Date(i.order_created_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          📅 Sifariş: {formatDateTime(i.order_created_at)}
                         </div>
                       )}
                       <div className="text-xs text-muted-foreground mt-0.5">
@@ -965,11 +965,11 @@ function SellerPanel() {
                       </div>
                       {i.delivered_at ? (
                         <div className="text-[10px] text-success font-bold mt-1">
-                          ✅ Müştəriyə təhvil verildi · {new Date(i.delivered_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          ✅ Müştəriyə təhvil verildi · {formatDateTime(i.delivered_at)}
                         </div>
                       ) : i.accepted_at ? (
                         <div className="text-[10px] text-primary font-bold mt-1">
-                          📦 PVZ paketi qəbul etdi · {new Date(i.accepted_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          📦 PVZ paketi qəbul etdi · {formatDateTime(i.accepted_at)}
                         </div>
                       ) : null}
                     </div>

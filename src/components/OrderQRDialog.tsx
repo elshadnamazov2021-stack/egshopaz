@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Download, Printer, QrCode } from "lucide-react";
+import { formatDateTime } from "@/lib/format";
 
 interface Props {
   open: boolean;
@@ -20,7 +21,7 @@ interface Props {
 
 export function OrderQRDialog({ open, onOpenChange, pickupCode, title, subtitle, pvzName, pvzAddress, customerName, customerPhone, orderDate, mode = "buyer" }: Props) {
   const [qr, setQr] = useState("");
-  const orderDateStr = orderDate ? new Date(orderDate).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : null;
+  const orderDateStr = orderDate ? formatDateTime(orderDate) : null;
 
   useEffect(() => {
     if (!open || !pickupCode) return;

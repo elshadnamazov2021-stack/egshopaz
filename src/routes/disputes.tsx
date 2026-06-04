@@ -8,6 +8,7 @@ import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { DisputeChat, type DisputeRow } from "@/components/DisputeChat";
 import { AlertTriangle, Plus, X } from "lucide-react";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/disputes")({
   head: () => ({ meta: [{ title: "Mübahisələr — Elzan Shop" }] }),
@@ -62,7 +63,7 @@ function DisputesPage() {
                   className={`w-full text-left p-3 rounded-xl border ${activeId === d.id ? "border-primary bg-primary/5" : "border-border bg-card"}`}>
                   <div className="font-semibold text-sm line-clamp-1">{d.reason}</div>
                   <div className="text-[10px] text-muted-foreground mt-1">
-                    {new Date(d.created_at).toLocaleDateString("az-AZ")}
+                    {formatDate(d.created_at)}
                   </div>
                   <span className={`text-[10px] mt-1 inline-block px-1.5 py-0.5 rounded font-bold ${
                     d.status === "resolved" ? "bg-emerald-100 text-emerald-700" :
@@ -123,7 +124,7 @@ function NewDisputeDialog({ buyerId, onClose, onCreated }: { buyerId: string; on
             <option value="">— Sifariş seçməmisiniz —</option>
             {orders.map((o) => (
               <option key={o.id} value={o.id}>
-                #{o.id.slice(0, 8).toUpperCase()} — {new Date(o.created_at).toLocaleDateString("az-AZ")}
+                #{o.id.slice(0, 8).toUpperCase()} — {formatDate(o.created_at)}
               </option>
             ))}
           </select>

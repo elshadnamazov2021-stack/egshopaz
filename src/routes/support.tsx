@@ -8,6 +8,7 @@ import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { MessageCircle, Plus, Send, Bot } from "lucide-react";
 import { toast } from "sonner";
 import { AISupportChat } from "@/components/AISupportChat";
+import { formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/support")({
   head: () => ({ meta: [{ title: "Dəstək — Elzan Shop" }] }),
@@ -120,7 +121,7 @@ function SupportPage() {
                       <div>
                         <div className="font-bold">{t.subject}</div>
                         <div className="text-xs text-muted-foreground">
-                          {categoryLabel[t.category] ?? t.category} · {new Date(t.created_at).toLocaleString("az-AZ")}
+                          {categoryLabel[t.category] ?? t.category} · {formatDateTime(t.created_at)}
                         </div>
                       </div>
                       <span className={`text-xs px-2 py-1 rounded-full font-semibold ${

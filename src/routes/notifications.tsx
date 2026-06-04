@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { Bell, Trash2, Check, Package } from "lucide-react";
-import { formatAZN } from "@/lib/format";
+import { formatAZN, formatDateTime } from "@/lib/format";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/notifications")({
@@ -95,7 +95,7 @@ function NotificationsPage() {
                       </div>
                     )}
                     <div className="text-[10px] text-muted-foreground mt-1">
-                      {new Date(n.created_at).toLocaleString("az-AZ")}
+                      {formatDateTime(n.created_at)}
                     </div>
                   </div>
                 </div>

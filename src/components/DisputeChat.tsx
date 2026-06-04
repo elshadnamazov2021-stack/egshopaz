@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Send, AlertCircle, Shield } from "lucide-react";
 import { toast } from "sonner";
+import { formatDateTime } from "@/lib/format";
 
 export interface DisputeMsg {
   id: string;
@@ -129,7 +130,7 @@ export function DisputeChat({
                 </div>
                 <div className="text-sm whitespace-pre-wrap break-words">{m.body}</div>
                 <div className={`text-[10px] mt-1 opacity-70 ${mine ? "text-primary-foreground" : "text-muted-foreground"}`}>
-                  {new Date(m.created_at).toLocaleString("az-AZ", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })}
+                  {formatDateTime(m.created_at)}
                 </div>
               </div>
             </div>

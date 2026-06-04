@@ -7,6 +7,7 @@ import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/my-reviews")({
   head: () => ({ meta: [{ title: "Rəylərim — Elzan Shop" }] }),
@@ -66,7 +67,7 @@ function MyReviewsPage() {
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star key={i} className={`h-4 w-4 ${i < r.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`} />
                       ))}
-                      <span className="text-xs text-muted-foreground ml-2">{new Date(r.created_at).toLocaleDateString("az-AZ")}</span>
+                      <span className="text-xs text-muted-foreground ml-2">{formatDate(r.created_at)}</span>
                     </div>
                     {r.comment && <p className="text-sm mt-2 text-foreground/80">{r.comment}</p>}
                   </div>

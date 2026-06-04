@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { Coins, TrendingUp, TrendingDown } from "lucide-react";
+import { formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/bonus")({
   head: () => ({ meta: [{ title: "Bonus xallar — Elzan Shop" }] }),
@@ -67,7 +68,7 @@ function BonusPage() {
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-medium">{t.reason}</div>
-                  <div className="text-xs text-muted-foreground">{new Date(t.created_at).toLocaleString("az-AZ")}</div>
+                  <div className="text-xs text-muted-foreground">{formatDateTime(t.created_at)}</div>
                 </div>
                 <div className={`font-bold ${t.amount > 0 ? "text-green-600" : "text-red-600"}`}>
                   {t.amount > 0 ? "+" : ""}{t.amount}

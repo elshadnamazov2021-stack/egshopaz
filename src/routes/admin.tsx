@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { formatAZN } from "@/lib/format";
+import { formatAZN, formatDate } from "@/lib/format";
 import {
   Users, Package, ShoppingBag, DollarSign, Shield, LayoutDashboard,
   Truck, Warehouse, Store, Megaphone, BarChart3, Lock, Scale,
@@ -481,7 +481,7 @@ function CustomersSection({ profiles }: { profiles: ProfileRow[] }) {
         <tr key={p.id} className="border-t border-border">
           <td className="p-3">{p.full_name ?? "—"}</td>
           <td className="p-3 text-muted-foreground">{p.phone ?? "—"}</td>
-          <td className="p-3 text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString("az-AZ")}</td>
+          <td className="p-3 text-xs text-muted-foreground">{formatDate(p.created_at)}</td>
           <td className="p-3">
             <button onClick={() => toast.info("Bloklama tezliklə əlavə olunacaq")} className="text-xs px-3 py-1.5 rounded-lg border border-border hover:bg-secondary font-semibold">
               <Ban className="h-3 w-3 inline mr-1" /> Blokla
@@ -600,7 +600,7 @@ function PvzStaffSection() {
                 {s.is_active ? "Aktiv" : "Deaktiv"}
               </span>
             </td>
-            <td className="p-3 text-xs text-muted-foreground">{new Date(s.created_at).toLocaleDateString("az-AZ")}</td>
+            <td className="p-3 text-xs text-muted-foreground">{formatDate(s.created_at)}</td>
           </tr>
         ))}
       </Table>
@@ -750,7 +750,7 @@ function OrdersSection({ orders, updateOrderStatus }: { orders: OrderRow[]; upda
       {orders.length === 0 ? <EmptyRow cols={4} /> : orders.map((o) => (
         <tr key={o.id} className="border-t border-border">
           <td className="p-3 font-mono text-xs">{o.id.slice(0, 8).toUpperCase()}</td>
-          <td className="p-3">{new Date(o.created_at).toLocaleDateString("az-AZ")}</td>
+          <td className="p-3">{formatDate(o.created_at)}</td>
           <td className="p-3 font-semibold">{formatAZN(o.total)}</td>
           <td className="p-3">
             <select value={o.status} onChange={(e) => updateOrderStatus(o.id, e.target.value)} className="text-xs px-2 py-1 rounded border border-input bg-background">
@@ -962,7 +962,7 @@ function DisputesSection({ disputes, resolveDispute }: { disputes: DisputeRow[];
     <Table headers={["Tarix", "Sifariş", "Səbəb", "Status", "Kompensasiya", "Qərar"]}>
       {disputes.length === 0 ? <EmptyRow cols={6} text="Mübahisə yoxdur" /> : disputes.map((d) => (
         <tr key={d.id} className="border-t border-border">
-          <td className="p-3 text-xs">{new Date(d.created_at).toLocaleDateString("az-AZ")}</td>
+          <td className="p-3 text-xs">{formatDate(d.created_at)}</td>
           <td className="p-3 font-mono text-xs">{d.order_id?.slice(0, 8).toUpperCase() ?? "—"}</td>
           <td className="p-3">{d.reason}</td>
           <td className="p-3">
@@ -1060,7 +1060,7 @@ function SupportSection({ tickets, replyTicket }: { tickets: TicketRow[]; replyT
           <tr key={t.id} className="border-t border-border">
             <td className="p-3 font-semibold">{t.subject}</td>
             <td className="p-3 text-xs">{t.category}</td>
-            <td className="p-3 text-xs text-muted-foreground">{new Date(t.created_at).toLocaleDateString("az-AZ")}</td>
+            <td className="p-3 text-xs text-muted-foreground">{formatDate(t.created_at)}</td>
             <td className="p-3">
               <span className={`text-xs px-2 py-1 rounded-full font-semibold ${t.status === "open" ? "bg-warning/10 text-warning" : "bg-success/10 text-success"}`}>{t.status}</span>
             </td>
@@ -1542,7 +1542,7 @@ function AdminReturnsSection() {
               <td className="text-xs">{r.cost_paid_by === "seller" ? "Satıcı" : "Müştəri"}</td>
               <td className="text-xs">{r.pvz_received_at ? "✓" : "—"}</td>
               <td><span className="text-[10px] px-2 py-0.5 rounded bg-secondary">{r.status}</span></td>
-              <td className="text-[10px]">{new Date(r.created_at).toLocaleDateString("az-AZ")}</td>
+              <td className="text-[10px]">{formatDate(r.created_at)}</td>
             </tr>
           ))}</tbody>
         </table>

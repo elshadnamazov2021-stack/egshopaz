@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Send, MessageCircle, Search, Package } from "lucide-react";
 import { toast } from "sonner";
+import { formatDateTime } from "@/lib/format";
 
 export interface PvzMsg {
   id: string;
@@ -223,7 +224,7 @@ export function PvzOrderChat({ mode, currentUserId }: { mode: "buyer" | "pvz"; c
                       <div className="max-w-[85%] bg-primary/10 border border-primary/20 text-primary-foreground/90 rounded-xl px-3 py-2 text-xs text-center">
                         <div className="text-foreground/90 whitespace-pre-wrap">{m.body}</div>
                         <div className="text-[10px] mt-1 opacity-60">
-                          {new Date(m.created_at).toLocaleString("az-AZ", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })}
+                          {formatDateTime(m.created_at)}
                         </div>
                       </div>
                     </div>
@@ -235,7 +236,7 @@ export function PvzOrderChat({ mode, currentUserId }: { mode: "buyer" | "pvz"; c
                     <div className={`max-w-[75%] rounded-2xl px-3.5 py-2 ${mine ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-card border border-border rounded-bl-sm"}`}>
                       <div className="text-sm whitespace-pre-wrap break-words">{m.body}</div>
                       <div className={`text-[10px] mt-1 opacity-70 ${mine ? "text-primary-foreground" : "text-muted-foreground"}`}>
-                        {new Date(m.created_at).toLocaleString("az-AZ", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })}
+                        {formatDateTime(m.created_at)}
                       </div>
                     </div>
                   </div>

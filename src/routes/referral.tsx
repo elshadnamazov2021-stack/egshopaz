@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Gift, Copy, Users, Award, Share2 } from "lucide-react";
 import { toast } from "sonner";
-import { formatAZN } from "@/lib/format";
+import { formatAZN, formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/referral")({
   head: () => ({ meta: [{ title: "Dostunu dəvət et — Elzan Shop" }] }),
@@ -109,7 +109,7 @@ function ReferralPage() {
               <div key={r.id} className="flex items-center justify-between border-b border-border last:border-0 pb-2">
                 <div>
                   <div className="font-medium">{r.profile?.full_name ?? "Anonim istifadəçi"}</div>
-                  <div className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString("az-AZ")}</div>
+                  <div className="text-xs text-muted-foreground">{formatDate(r.created_at)}</div>
                 </div>
                 <div className="text-success font-bold">+{r.bonus_awarded} bonus</div>
               </div>

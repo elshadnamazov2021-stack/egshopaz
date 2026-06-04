@@ -6,7 +6,7 @@ import { AISupportChat } from "@/components/AISupportChat";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
-import { formatAZN } from "@/lib/format";
+import { formatAZN, formatDateTime } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Home,
@@ -372,7 +372,7 @@ function Dashboard() {
                       </div>
                     )}
                     <div className="text-[10px] text-muted-foreground mt-1">
-                      {new Date(n.created_at).toLocaleString("az-AZ")}
+                      {formatDateTime(n.created_at)}
                     </div>
                   </div>
                 </div>
@@ -795,7 +795,7 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
               </div>
               {confirmItem.accepted_at && (
                 <div className="text-[11px] text-primary font-semibold">
-                  📦 PVZ-yə gəldi: {new Date(confirmItem.accepted_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                  📦 PVZ-yə gəldi: {formatDateTime(confirmItem.accepted_at)}
                 </div>
               )}
               <div className="font-mono text-sm font-bold text-primary mt-1">
@@ -864,7 +864,7 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
                   <TableCell className="text-xs">{o.orders?.recipient_name ?? "—"}</TableCell>
                   <TableCell className="text-xs">{o.orders?.recipient_phone ?? "—"}</TableCell>
                   <TableCell className="text-xs whitespace-nowrap">
-                    {o.accepted_at ? new Date(o.accepted_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "—"}
+                    {o.accepted_at ? formatDateTime(o.accepted_at) : "—"}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button size="sm" disabled={busy} onClick={() => openConfirm(o.pickup_code)}>

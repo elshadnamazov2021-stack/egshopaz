@@ -7,6 +7,7 @@ import { PanelLayout } from "@/components/PanelLayout";
 import { useBuyerNav } from "@/hooks/useBuyerNav";
 import { Gift, Copy, Check, Tag, Flame } from "lucide-react";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/promotions")({
   head: () => ({ meta: [{ title: "Aksiyalar — Elzan Shop" }] }),
@@ -69,7 +70,7 @@ function PromotionsPage() {
                     {p.discount_percent ? `-${p.discount_percent}%` : p.discount_amount ? `-${p.discount_amount} ₼` : ""}
                     {p.min_order > 0 && <span className="text-muted-foreground"> · min {p.min_order} ₼</span>}
                   </div>
-                  {p.expires_at && <div className="text-xs text-muted-foreground mt-1">Son: {new Date(p.expires_at).toLocaleDateString("az-AZ")}</div>}
+                  {p.expires_at && <div className="text-xs text-muted-foreground mt-1">Son: {formatDate(p.expires_at)}</div>}
                 </div>
                 <button onClick={() => copy(p.code)} className="p-2.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">
                   {copied === p.code ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}

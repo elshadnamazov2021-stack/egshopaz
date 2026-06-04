@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Star, Send } from "lucide-react";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/format";
 
 interface Review {
   id: string;
@@ -123,7 +124,7 @@ export function ProductReviews({ productId }: { productId: string }) {
                 </div>
                 <div className="flex-1">
                   <div className="font-bold text-sm">{prof?.full_name ?? "İstifadəçi"}</div>
-                  <div className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString("az-AZ")}</div>
+                  <div className="text-xs text-muted-foreground">{formatDate(r.created_at)}</div>
                 </div>
                 <div className="flex gap-0.5">
                   {[1,2,3,4,5].map((n) => (
