@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { SponsoredProducts } from "@/components/SponsoredProducts";
 import { SellerBanners } from "@/components/SellerBanners";
-import { Tag, Flame, Heart, TicketPercent, TrendingUp, Sparkles, Copy, Camera, Truck, ShieldCheck, Clock, Gift } from "lucide-react";
+import { Tag, Flame, TicketPercent, TrendingUp, Sparkles, Copy, Camera, Truck, ShieldCheck, Clock, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { HomeCategoryBrowser } from "@/components/HomeCategoryBrowser";
 
@@ -33,7 +33,6 @@ function Index() {
   const [allProducts, setAllProducts] = useState<ProductCardData[]>([]);
   const [discounted, setDiscounted] = useState<ProductCardData[]>([]);
   const [trending, setTrending] = useState<ProductCardData[]>([]);
-  const [topFav, setTopFav] = useState<ProductCardData[]>([]);
   const [giveaways, setGiveaways] = useState<ProductCardData[]>([]);
   const [promos, setPromos] = useState<PromoCode[]>([]);
   const [visualOpen, setVisualOpen] = useState(false);
@@ -59,7 +58,7 @@ function Index() {
       supabase.from("products")
         .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
         .eq("is_active", true)
-        .order("reviews_count", { ascending: false }).limit(10)
+        .order("reviews_count", { ascending: false }).limit(6)
         .then(({ data }) => setTrending((data ?? []) as ProductCardData[]));
 
       supabase.from("promo_codes").select("id,code,discount_percent,discount_amount,min_order,expires_at").eq("is_active", true).limit(6)
@@ -68,21 +67,8 @@ function Index() {
       supabase.from("products")
         .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
         .eq("is_active", true).eq("is_giveaway", true)
-        .order("created_at", { ascending: false }).limit(10)
+        .order("created_at", { ascending: false }).limit(4)
         .then(({ data }) => setGiveaways((data ?? []) as ProductCardData[]));
-
-      // Favoritlər — RPC olmadığı üçün məhdudlaşdırılmış
-      supabase.from("favorites").select("product_id").limit(200).then(async ({ data }) => {
-        const counts = new Map<string, number>();
-        (data ?? []).forEach((f: { product_id: string }) => counts.set(f.product_id, (counts.get(f.product_id) ?? 0) + 1));
-        const ids = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([id]) => id);
-        if (ids.length === 0) return;
-        const { data: prod } = await supabase.from("products")
-          .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
-          .in("id", ids).eq("is_active", true);
-        const sorted = (prod ?? []).sort((a, b) => (counts.get(b.id) ?? 0) - (counts.get(a.id) ?? 0));
-        setTopFav(sorted as ProductCardData[]);
-      });
     };
 
     const w = typeof window !== "undefined" ? window : null;
@@ -145,7 +131,7 @@ function Index() {
             </div>
           </div>
           <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 bg-white rounded-2xl p-3">
-            {giveaways.slice(0, 5).map((p) => <ProductCard key={p.id} p={p} />)}
+            {giveaways.slice(0, 4).map((p) => <ProductCard key={p.id} p={p} enableFavorite={false} />)}
           </div>
         </section>
       )}
@@ -162,7 +148,7 @@ function Index() {
             <Link to="/discover" className="text-sm font-bold hover:underline whitespace-nowrap">{t("home.viewAllArrow")}</Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 bg-white rounded-2xl p-3">
-            {discounted.slice(0, 5).map((p) => <ProductCard key={p.id} p={p} />)}
+            {discounted.slice(0, 5).map((p) => <ProductCard key={p.id} p={p} enableFavorite={false} />)}
           </div>
         </section>
       )}
@@ -216,33 +202,13 @@ function Index() {
             <Link to="/discover" className="text-sm text-primary font-bold hover:underline">{t("home.viewAllArrow")}</Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
-            {trending.slice(0, 10).map((p) => <ProductCard key={p.id} p={p} />)}
+            {trending.slice(0, 6).map((p) => <ProductCard key={p.id} p={p} enableFavorite={false} />)}
           </div>
         </section>
       )}
 
       {/* REKLAM — Sponsored placement (ikinci prioritet) */}
       <SponsoredProducts limit={6} />
-
-      {/* Most favorited */}
-      {topFav.length > 0 && (
-        <section>
-          <div className="flex items-end justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-fuchsia-500 flex items-center justify-center shadow-card">
-                <Heart className="h-6 w-6 text-white fill-white" />
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground font-bold uppercase">{t("home.favoritesSubtitle")}</div>
-                <h2 className="text-2xl md:text-3xl font-black">{t("home.favoritesTitle")}</h2>
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
-            {topFav.slice(0, 10).map((p) => <ProductCard key={p.id} p={p} />)}
-          </div>
-        </section>
-      )}
 
       {/* Benefits */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
@@ -284,7 +250,7 @@ function Index() {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
-            {allProducts.map((p) => <ProductCard key={p.id} p={p} />)}
+            {allProducts.map((p) => <ProductCard key={p.id} p={p} enableFavorite={false} />)}
           </div>
         )}
       </section>

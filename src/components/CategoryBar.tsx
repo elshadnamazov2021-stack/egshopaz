@@ -10,18 +10,20 @@ export function CategoryBar() {
   const { t } = useTranslation();
   const location = useLocation();
   const [cats, setCats] = useState<Category[]>([]);
+  const isHome = location.pathname === "/";
 
   useEffect(() => {
+    if (isHome) return;
     supabase
       .from("categories")
       .select("id,name,name_ru,name_en,slug,icon")
       .is("parent_id", null)
       .order("sort_order")
       .then(({ data }) => setCats((data ?? []) as Category[]));
-  }, []);
+  }, [isHome]);
 
   // Ana səhifədə HomeCategoryBrowser göstərilir, bu bar yalnız digər səhifələrdə görünür
-  if (location.pathname === "/") return null;
+  if (isHome) return null;
   if (cats.length === 0) return null;
 
   return (

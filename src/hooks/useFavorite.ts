@@ -3,22 +3,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
-export function useFavorite(productId: string) {
+export function useFavorite(productId: string, enabled = true) {
   const { user } = useAuth();
   const [isFav, setIsFav] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    if (!enabled) { setIsFav(false); return; }
     if (!user?.id) { setIsFav(false); return; }
     let active = true;
     supabase.from("favorites").select("id").eq("user_id", user.id).eq("product_id", productId).maybeSingle()
       .then(({ data, error }) => { if (active && !error) setIsFav(!!data); });
     return () => { active = false; };
-  }, [user?.id, productId]);
+  }, [enabled, user?.id, productId]);
 
   const toggle = async (e?: React.MouseEvent) => {
     e?.preventDefault();
     e?.stopPropagation();
+    if (!enabled) return;
     if (!user) { toast.error("Sevimlilər üçün daxil olun"); return; }
     if (busy) return;
     setBusy(true);
