@@ -133,11 +133,6 @@ export function HomeCategoryBrowser() {
     : lang.startsWith("en")
       ? "Featured Brands"
       : "Öne Çıxan Markalar";
-  const needsTitle = lang.startsWith("ru")
-    ? "Ваши потребности"
-    : lang.startsWith("en")
-      ? "Your needs"
-      : "Sizin ehtiyaclarınız";
   const seeAll = lang.startsWith("ru") ? "Все" : lang.startsWith("en") ? "See all" : "Hamısı";
   const backLabel = lang.startsWith("ru") ? "Назад" : lang.startsWith("en") ? "Back" : "Geri";
 
