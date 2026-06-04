@@ -241,6 +241,28 @@ export function SellerAdvertising() {
     await load();
   };
 
+  const promoteShop = async () => {
+    if (!user || !activeSub) return;
+    if (shopPromoLeft <= 0) { toast.error("Mağaza reklamı limiti dolub"); return; }
+    const { error } = await supabase.from("sponsored_shops").insert({
+      seller_id: user.id,
+      subscription_id: activeSub.id,
+      ends_at: activeSub.ends_at,
+      is_active: true,
+    });
+    if (error) { toast.error(error.message); return; }
+    toast.success("Mağazanız ana səhifədə önə çəkildi! 🎉");
+    await load();
+  };
+
+  const removeShopPromo = async (id: string) => {
+    if (!confirm("Mağaza reklamı dayandırılsın?")) return;
+    const { error } = await supabase.from("sponsored_shops").delete().eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Çıxarıldı");
+    await load();
+  };
+
   if (loading) {
     return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
