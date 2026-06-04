@@ -793,6 +793,11 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
               <div className="text-xs text-muted-foreground">
                 Say: {confirmItem.quantity} · {formatAZN(confirmItem.price * confirmItem.quantity)}
               </div>
+              {confirmItem.accepted_at && (
+                <div className="text-[11px] text-primary font-semibold">
+                  📦 PVZ-yə gəldi: {new Date(confirmItem.accepted_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                </div>
+              )}
               <div className="font-mono text-sm font-bold text-primary mt-1">
                 Kod: {confirmItem.pickup_code}
               </div>
