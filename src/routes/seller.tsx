@@ -1044,8 +1044,8 @@ function SellerPanel() {
                   )}
                 </div>
               );
-            })
-          )}
+            });
+          })()}
         </div>
       )}
 
