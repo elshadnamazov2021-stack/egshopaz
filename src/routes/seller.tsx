@@ -252,6 +252,7 @@ function SellerPanel() {
           ...item,
           customer_name: item.customer_name ?? order?.recipient_name ?? null,
           customer_phone: item.customer_phone ?? order?.recipient_phone ?? null,
+          order_created_at: order?.created_at ?? null,
           pickup_point: pickupPointId
             ? ((pickupMap.get(pickupPointId) as OrderItem["pickup_point"]) ?? null)
             : null,
