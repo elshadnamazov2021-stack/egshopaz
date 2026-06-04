@@ -236,11 +236,11 @@ export function HomeCategoryBrowser() {
             </div>
           )}
 
-          {/* SƏVIYYƏ 2: Öne Çıxan Kateqoriyalar */}
+          {/* SƏVIYYƏ 2: Öne Çıxan Kateqoriyalar — Yalnız 1 cərgə, kompakt */}
           {!activeSub && (
             <div>
-              <div className="flex items-end justify-between mb-3 px-1">
-                <h3 className="text-lg md:text-xl font-black text-foreground">
+              <div className="flex items-end justify-between mb-2 px-1">
+                <h3 className="text-sm md:text-base font-bold text-foreground">
                   {featuredTitle}
                 </h3>
                 <Link
@@ -256,35 +256,34 @@ export function HomeCategoryBrowser() {
                 <Link
                   to="/catalog"
                   search={{ cat: activeRoot.slug, q: undefined } as never}
-                  className="block rounded-2xl bg-card border border-border p-6 text-center font-bold hover:shadow-elegant transition"
+                  className="block rounded-xl bg-card border border-border px-4 py-2 text-center text-sm font-bold hover:shadow-elegant transition"
                 >
-                  <span className="text-4xl block mb-2">{activeRoot.icon}</span>
                   {catName(activeRoot)} — {seeAll}
                 </Link>
               ) : (
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 md:gap-3">
-                  {subCats.slice(0, 10).map((s) => {
+                <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1">
+                  {subCats.slice(0, 12).map((s) => {
                     const hasChildren = cats.some((c) => c.parent_id === s.id);
-                    const cardCls =
-                      "w-full aspect-square rounded-2xl bg-card border border-border hover:border-primary/50 hover:shadow-elegant flex items-center justify-center text-5xl md:text-6xl transition";
                     return (
-                      <div key={s.id} className="flex flex-col items-center gap-2">
+                      <div key={s.id} className="shrink-0">
                         {hasChildren ? (
-                          <button onClick={() => setActiveSubId(s.id)} className={cardCls + " hover:scale-[1.02]"}>
-                            {s.icon || activeRoot.icon || "🛍️"}
+                          <button
+                            onClick={() => setActiveSubId(s.id)}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition whitespace-nowrap"
+                          >
+                            <span className="text-base">{s.icon || activeRoot.icon || "🛍️"}</span>
+                            <span>{catName(s)}</span>
                           </button>
                         ) : (
                           <Link
                             to="/catalog"
                             search={{ cat: s.slug, q: undefined } as never}
-                            className={cardCls + " hover:scale-[1.02]"}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition whitespace-nowrap"
                           >
-                            {s.icon || activeRoot.icon || "🛍️"}
+                            <span className="text-base">{s.icon || activeRoot.icon || "🛍️"}</span>
+                            <span>{catName(s)}</span>
                           </Link>
                         )}
-                        <span className="text-[11px] md:text-xs text-center font-bold leading-tight line-clamp-2 text-foreground">
-                          {catName(s)}
-                        </span>
                       </div>
                     );
                   })}
