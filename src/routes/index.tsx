@@ -34,6 +34,7 @@ function Index() {
   const [discounted, setDiscounted] = useState<ProductCardData[]>([]);
   const [trending, setTrending] = useState<ProductCardData[]>([]);
   const [topFav, setTopFav] = useState<ProductCardData[]>([]);
+  const [giveaways, setGiveaways] = useState<ProductCardData[]>([]);
   const [promos, setPromos] = useState<PromoCode[]>([]);
   const [visualOpen, setVisualOpen] = useState(false);
 
