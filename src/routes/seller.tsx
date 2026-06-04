@@ -76,6 +76,8 @@ interface Product {
 interface Category {
   id: string;
   name: string;
+  parent_id: string | null;
+  icon?: string | null;
 }
 interface OrderItem {
   id: string;
