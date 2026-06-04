@@ -142,45 +142,77 @@ export function SellerAdvertising() {
   const sponsoredLeft = (activeSub?.ad_packages?.sponsored_product_slots ?? 0) - activeSponsored.length;
   const shopPromoLeft = (activeSub?.ad_packages?.shop_promo_slots ?? 0) - activeShopPromos.length;
 
+  const checkoutMeta = (() => {
+    if (!checkout) return null;
+    if (checkout.kind === "pkg") return { label: `${checkout.pkg.name} paketi`, price: checkout.pkg.price, color: checkout.pkg.color, days: checkout.pkg.duration_days };
+    if (checkout.kind === "one_product") return { label: `Məhsul reklamı: ${checkout.productTitle}`, price: checkout.price, color: "#f59e0b", days: checkout.days };
+    return { label: "Mağaza reklamı (ana səhifə)", price: checkout.price, color: "#3b82f6", days: checkout.days };
+  })();
+
   const purchase = async () => {
-    if (!user || !checkout) return;
+    if (!user || !checkout || !checkoutMeta) return;
     if (!card.number || !card.name || !card.expiry || !card.cvc) {
       toast.error("Bütün kart məlumatlarını doldurun");
       return;
     }
-    setPaying(checkout.id);
+    setPaying(true);
     try {
       const ends = new Date();
-      ends.setDate(ends.getDate() + checkout.duration_days);
+      ends.setDate(ends.getDate() + checkoutMeta.days);
 
-      const { data: sub, error: subErr } = await supabase.from("seller_subscriptions").insert({
-        seller_id: user.id,
-        package_id: checkout.id,
-        ends_at: ends.toISOString(),
-        amount: checkout.price,
-        payment_status: "completed",
-        payment_method: "mock_card",
-        is_active: true,
-      }).select().single();
-      if (subErr) throw subErr;
+      if (checkout.kind === "pkg") {
+        const { data: sub, error: subErr } = await supabase.from("seller_subscriptions").insert({
+          seller_id: user.id,
+          package_id: checkout.pkg.id,
+          ends_at: ends.toISOString(),
+          amount: checkout.pkg.price,
+          payment_status: "completed",
+          payment_method: "mock_card",
+          is_active: true,
+        }).select().single();
+        if (subErr) throw subErr;
+        await supabase.from("payment_transactions").insert({
+          seller_id: user.id, subscription_id: sub.id, amount: checkout.pkg.price,
+          status: "completed", method: "mock_card",
+          description: `${checkout.pkg.name} paketi (${checkout.pkg.duration_days} gün)`,
+        });
+        toast.success(`${checkout.pkg.name} paketi aktiv edildi! 🎉`);
+        setCheckout(null);
+        setCard({ number: "", name: "", expiry: "", cvc: "" });
+        await load();
+        setPostPay(true); // open chooser
+        return;
+      }
 
-      await supabase.from("payment_transactions").insert({
-        seller_id: user.id,
-        subscription_id: sub.id,
-        amount: checkout.price,
-        status: "completed",
-        method: "mock_card",
-        description: `${checkout.name} paketi (${checkout.duration_days} gün)`,
-      });
-
-      toast.success(`${checkout.name} paketi aktiv edildi! 🎉`);
+      if (checkout.kind === "one_product") {
+        const { error } = await supabase.from("sponsored_products").insert({
+          seller_id: user.id, product_id: checkout.productId,
+          position: "catalog_top", is_active: true, ends_at: ends.toISOString(),
+        });
+        if (error) throw error;
+        await supabase.from("payment_transactions").insert({
+          seller_id: user.id, amount: checkout.price, status: "completed", method: "mock_card",
+          description: `Tək məhsul reklamı: ${checkout.productTitle} (${checkout.days} gün)`,
+        });
+        toast.success("Məhsul ana səhifədə önə çəkildi! 🎉");
+      } else {
+        const { error } = await supabase.from("sponsored_shops").insert({
+          seller_id: user.id, ends_at: ends.toISOString(), is_active: true,
+        });
+        if (error) throw error;
+        await supabase.from("payment_transactions").insert({
+          seller_id: user.id, amount: checkout.price, status: "completed", method: "mock_card",
+          description: `Mağaza reklamı (${checkout.days} gün)`,
+        });
+        toast.success("Mağazanız ana səhifədə önə çəkildi! 🎉");
+      }
       setCheckout(null);
       setCard({ number: "", name: "", expiry: "", cvc: "" });
       await load();
     } catch (e) {
       toast.error("Ödəniş alınmadı: " + (e as Error).message);
     } finally {
-      setPaying(null);
+      setPaying(false);
     }
   };
 
