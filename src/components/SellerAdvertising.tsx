@@ -16,6 +16,7 @@ interface Pkg {
   duration_days: number;
   banner_slots: number;
   sponsored_product_slots: number;
+  shop_promo_slots: number;
   features: string[];
   color: string;
 }
