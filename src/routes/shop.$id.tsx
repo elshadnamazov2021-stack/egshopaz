@@ -21,26 +21,52 @@ interface Profile {
 function ShopPage() {
   const { id } = Route.useParams();
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [products, setProducts] = useState<ProductCardData[]>([]);
   const [stats, setStats] = useState({ count: 0, avg: 0, reviews: 0 });
   const [loading, setLoading] = useState(true);
+  const [following, setFollowing] = useState(false);
+  const [followers, setFollowers] = useState(0);
 
   useEffect(() => {
     setLoading(true);
     Promise.all([
       supabase.from("profiles").select("id,shop_name,full_name,shop_description,shop_city,shop_email,shop_logo_url,shop_banner_url").eq("id", id).maybeSingle(),
       supabase.from("products").select("id,title,price,old_price,image_url,rating,reviews_count,brand").eq("seller_id", id).eq("is_active", true).order("created_at", { ascending: false }),
-    ]).then(([{ data: prof }, { data: prods }]) => {
+      supabase.from("shop_followers").select("id", { count: "exact", head: true }).eq("seller_id", id),
+    ]).then(([{ data: prof }, { data: prods }, { count }]) => {
       setProfile(prof as Profile | null);
       const list = (prods ?? []) as ProductCardData[];
       setProducts(list);
       const totalReviews = list.reduce((s, p) => s + (p.reviews_count || 0), 0);
       const weightedSum = list.reduce((s, p) => s + (Number(p.rating) || 0) * (p.reviews_count || 0), 0);
       setStats({ count: list.length, avg: totalReviews > 0 ? weightedSum / totalReviews : 0, reviews: totalReviews });
+      setFollowers(count ?? 0);
       setLoading(false);
     });
   }, [id]);
+
+  useEffect(() => {
+    if (!user) { setFollowing(false); return; }
+    void supabase.from("shop_followers").select("id").eq("user_id", user.id).eq("seller_id", id).maybeSingle()
+      .then(({ data }) => setFollowing(!!data));
+  }, [user, id]);
+
+  const toggleFollow = async () => {
+    if (!user) { toast.error("İzləmək üçün daxil olun"); return; }
+    if (user.id === id) { toast.error("Öz mağazanızı izləyə bilməzsiniz"); return; }
+    if (following) {
+      await supabase.from("shop_followers").delete().eq("user_id", user.id).eq("seller_id", id);
+      setFollowing(false); setFollowers((c) => Math.max(0, c - 1));
+      toast.success("İzləməkdən çıxarıldı");
+    } else {
+      const { error } = await supabase.from("shop_followers").insert({ user_id: user.id, seller_id: id });
+      if (error) { toast.error(error.message); return; }
+      setFollowing(true); setFollowers((c) => c + 1);
+      toast.success("Mağaza izlənildi 💙");
+    }
+  };
 
   if (loading) return <div className="container mx-auto px-4 py-10 text-muted-foreground">{t("common.loading")}</div>;
   if (!profile) return <div className="container mx-auto px-4 py-10">{t("shop.notFound")}. <Link to="/" className="text-primary">{t("product.home")}</Link></div>;
