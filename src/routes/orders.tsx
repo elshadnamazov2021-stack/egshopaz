@@ -171,7 +171,6 @@ function OrdersPage() {
     <PanelLayout title={t("sidebar.buyerPanelTitle")} subtitle={user.email ?? undefined} items={items}>
       <div>
         <h1 className="text-2xl font-extrabold mb-4 flex items-center gap-2"><Package className="h-6 w-6 text-primary" /> {t("orders.title")}</h1>
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
         <div className="mb-3">
           <DateRangeFilter value={dateRange} onChange={setDateRange} />
         </div>
