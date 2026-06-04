@@ -12,6 +12,30 @@ interface Notif {
   is_read: boolean; created_at: string; pickup_code: string | null;
 }
 
+function playNotifSound() {
+  try {
+    const AudioCtx = (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext);
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    // Two-tone "ding-dong"
+    [
+      { f: 880, t: now },
+      { f: 1320, t: now + 0.16 },
+    ].forEach(({ f, t }) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.3, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+      o.connect(g).connect(ctx.destination);
+      o.start(t); o.stop(t + 0.3);
+    });
+    setTimeout(() => ctx.close(), 800);
+  } catch { /* ignore */ }
+}
+
 export function NotificationsBell() {
   const { user } = useAuth();
   const [items, setItems] = useState<Notif[]>([]);
@@ -30,7 +54,14 @@ export function NotificationsBell() {
     load();
     const ch = supabase.channel("notif-bell")
       .on("postgres_changes",
-        { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        (payload) => {
+          playNotifSound();
+          const n = payload.new as Notif;
+          if (active) setItems((prev) => [n, ...prev].slice(0, 20));
+        })
+      .on("postgres_changes",
+        { event: "UPDATE", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
         load)
       .subscribe();
     return () => { active = false; supabase.removeChannel(ch); };
