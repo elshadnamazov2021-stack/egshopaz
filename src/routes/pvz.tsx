@@ -687,13 +687,15 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
     load();
   };
 
-  const filtered = list.filter(
-    (o) =>
-      !search ||
-      o.pickup_code.includes(search.toUpperCase()) ||
-      (o.orders?.recipient_phone ?? "").includes(search) ||
-      (o.orders?.recipient_name ?? "").toLowerCase().includes(search.toLowerCase()),
-  );
+  const filtered = list
+    .filter(
+      (o) =>
+        !search ||
+        o.pickup_code.includes(search.toUpperCase()) ||
+        (o.orders?.recipient_phone ?? "").includes(search) ||
+        (o.orders?.recipient_name ?? "").toLowerCase().includes(search.toLowerCase()),
+    )
+    .filter((o) => inRange(o.accepted_at, dateRange));
 
   return (
     <div className="space-y-4">
