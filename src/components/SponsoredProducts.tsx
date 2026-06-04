@@ -21,15 +21,32 @@ export function SponsoredProducts({ limit = 6 }: { limit?: number }) {
   const [items, setItems] = useState<SponsoredItem[]>([]);
 
   useEffect(() => {
+    let active = true;
     void (async () => {
       const { data } = await supabase
         .from("sponsored_products")
-        .select("id, product_id, products(id, title, price, old_price, image_url, images, rating)")
+        .select("id, product_id")
         .eq("is_active", true)
         .gt("ends_at", new Date().toISOString())
         .limit(limit);
-      setItems((data ?? []) as unknown as SponsoredItem[]);
+      const placements = (data ?? []) as Pick<SponsoredItem, "id" | "product_id">[];
+      const ids = placements.map((p) => p.product_id).filter(Boolean);
+      if (ids.length === 0) {
+        if (active) setItems([]);
+        return;
+      }
+
+      const { data: products } = await supabase
+        .from("products")
+        .select("id,title,price,old_price,image_url,images,rating")
+        .in("id", ids)
+        .eq("is_active", true);
+      const productMap = new Map((products ?? []).map((p) => [p.id, p]));
+      if (active) {
+        setItems(placements.map((p) => ({ ...p, products: productMap.get(p.product_id) ?? null })) as SponsoredItem[]);
+      }
     })();
+    return () => { active = false; };
   }, [limit]);
 
   if (items.length === 0) return null;
@@ -47,7 +64,7 @@ export function SponsoredProducts({ limit = 6 }: { limit?: number }) {
             <span className="absolute top-2 left-2 z-10 bg-warning text-warning-foreground text-[10px] font-bold px-1.5 py-0.5 rounded">AD</span>
             <div className="aspect-square bg-secondary overflow-hidden">
               {(s.products.image_url ?? s.products.images[0]) && (
-                <img src={s.products.image_url ?? s.products.images[0]} alt={s.products.title} className="w-full h-full object-cover group-hover:scale-105 transition" />
+                <img src={s.products.image_url ?? s.products.images[0]} alt={s.products.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition" />
               )}
             </div>
             <div className="p-2">
