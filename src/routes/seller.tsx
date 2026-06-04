@@ -560,7 +560,7 @@ function SellerPanel() {
     <div class="pickup">${pickupCode}</div>
     <div class="qr-cap">PVZ qəbul kodu</div>
   </div>
-  <div class="footer">Elzan Shop · ${formatDate()}</div>
+  <div class="footer">Elzan Shop · ${formatDate(new Date())}</div>
 </div>
 <script>setTimeout(()=>window.print(),300);</script>
 </body></html>`;
