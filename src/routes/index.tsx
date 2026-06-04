@@ -127,6 +127,25 @@ function Index() {
           </button>
         </div>
       </section>
+      {giveaways.length > 0 && (
+        <section className="rounded-3xl bg-gradient-to-br from-amber-400 via-orange-500 to-pink-500 p-6 md:p-8 text-white shadow-elegant relative overflow-hidden">
+          <div className="absolute -right-12 -top-12 w-48 h-48 bg-white/20 rounded-full blur-3xl" />
+          <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-yellow-200/30 rounded-full blur-2xl" />
+          <div className="relative z-10 flex items-end justify-between mb-5">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-bold mb-2">
+                <Gift className="h-3.5 w-3.5" /> UDUŞ
+              </div>
+              <h2 className="text-2xl md:text-4xl font-black">🎁 Uduşlu Məhsullar</h2>
+              <p className="text-sm opacity-95 mt-1">Bu məhsulları al və uduşda iştirak et!</p>
+            </div>
+          </div>
+          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 bg-white rounded-2xl p-3">
+            {giveaways.slice(0, 5).map((p) => <ProductCard key={p.id} p={p} />)}
+          </div>
+        </section>
+      )}
+
       {discounted.length > 0 && (
         <section className="rounded-3xl bg-gradient-to-br from-discount via-discount to-rose-700 p-6 md:p-8 text-white shadow-elegant">
           <div className="flex items-center justify-between mb-5">
