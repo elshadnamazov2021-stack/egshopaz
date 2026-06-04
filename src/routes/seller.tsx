@@ -72,6 +72,7 @@ interface Product {
   condition?: string | null;
   color?: string | null;
   size?: string | null;
+  is_giveaway?: boolean | null;
 }
 interface Category {
   id: string;
