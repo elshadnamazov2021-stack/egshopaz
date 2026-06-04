@@ -133,11 +133,6 @@ export function HomeCategoryBrowser() {
     : lang.startsWith("en")
       ? "Featured Brands"
       : "Öne Çıxan Markalar";
-  const needsTitle = lang.startsWith("ru")
-    ? "Ваши потребности"
-    : lang.startsWith("en")
-      ? "Your needs"
-      : "Sizin ehtiyaclarınız";
   const seeAll = lang.startsWith("ru") ? "Все" : lang.startsWith("en") ? "See all" : "Hamısı";
   const backLabel = lang.startsWith("ru") ? "Назад" : lang.startsWith("en") ? "Back" : "Geri";
 
@@ -375,31 +370,6 @@ export function HomeCategoryBrowser() {
             </div>
           )}
 
-          {/* "Sizin ehtiyaclarınız" — alt kateqoriyaların böyük kart formatında təkrarı (Trendyol "Elektronik İhtiyaçlarınız" bölməsi kimi) */}
-          {!activeSub && subCats.length > 0 && (
-            <div>
-              <h3 className="text-lg md:text-xl font-black mb-3 px-1">
-                {catName(activeRoot)} — {needsTitle}
-              </h3>
-              <div className="flex gap-2.5 md:gap-3 overflow-x-auto scrollbar-none pb-1">
-                {subCats.slice(0, 8).map((s) => (
-                  <Link
-                    key={s.id}
-                    to="/catalog"
-                    search={{ cat: s.slug, q: undefined } as never}
-                    className="shrink-0 w-32 md:w-40 flex flex-col items-center gap-2"
-                  >
-                    <div className="w-full aspect-square rounded-2xl bg-secondary/40 border border-border hover:border-primary/50 hover:shadow-elegant flex items-center justify-center text-6xl md:text-7xl hover:scale-[1.02] transition">
-                      {s.icon || activeRoot.icon || "🛍️"}
-                    </div>
-                    <span className="text-xs md:text-sm font-bold text-center line-clamp-2">
-                      {catName(s)}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
         </>
       )}
     </section>
