@@ -474,6 +474,24 @@ function SellerPanel() {
     load();
   };
 
+  const promote = async (p: Product) => {
+    if (!user) return;
+    const raw = window.prompt(`"${p.title}" məhsulunu neçə gün irəli çəkmək istəyirsiniz? (1-30)`, "7");
+    if (!raw) return;
+    const days = Math.min(30, Math.max(1, parseInt(raw, 10) || 0));
+    if (days < 1) { toast.error("Düzgün gün sayı daxil edin"); return; }
+    const endsAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+    const { error } = await supabase.from("sponsored_products").insert({
+      product_id: p.id,
+      seller_id: user.id,
+      position: "catalog_top",
+      ends_at: endsAt,
+      is_active: true,
+    });
+    if (error) { toast.error("Reklam yaradılmadı: " + error.message); return; }
+    toast.success(`✨ "${p.title}" ${days} gün irəli çəkildi!`);
+  };
+
   const openQR = async (p: Product) => {
     const url = `${window.location.origin}/product/${p.id}`;
     const dataUrl = await QRCode.toDataURL(url, { width: 512, margin: 2 });
