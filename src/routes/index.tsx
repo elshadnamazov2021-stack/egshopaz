@@ -8,6 +8,7 @@ import { SellerBanners } from "@/components/SellerBanners";
 import { Tag, Flame, TicketPercent, TrendingUp, Sparkles, Copy, Camera, Truck, ShieldCheck, Clock, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { HomeCategoryBrowser } from "@/components/HomeCategoryBrowser";
+import { FeaturedShops } from "@/components/FeaturedShops";
 
 const VisualSearchDialog = lazy(() =>
   import("@/components/VisualSearchDialog").then((m) => ({ default: m.VisualSearchDialog }))
@@ -91,6 +92,10 @@ function Index() {
 
       {/* 2) REKLAM — Satıcı bannerləri (birinci prioritet) */}
       <SellerBanners />
+
+      {/* Featured (sponsored) shops */}
+      <FeaturedShops />
+
 
       {/* Visual Search Banner */}
       <section className="rounded-3xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-500 p-6 md:p-8 text-white shadow-elegant relative overflow-hidden">

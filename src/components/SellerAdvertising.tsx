@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { formatAZN, formatDateTime, formatDate } from "@/lib/format";
 import {
   Check, Crown, Sparkles, Star, CreditCard, Calendar, TrendingUp,
-  Receipt, Loader2, X, Image as ImageIcon, Plus, Trash2, Megaphone, Package,
+  Receipt, Loader2, X, Image as ImageIcon, Plus, Trash2, Megaphone, Package, Store,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -16,6 +16,7 @@ interface Pkg {
   duration_days: number;
   banner_slots: number;
   sponsored_product_slots: number;
+  shop_promo_slots: number;
   features: string[];
   color: string;
 }
@@ -62,6 +63,7 @@ interface Sponsored {
 }
 
 const TIER_ICONS: Record<string, typeof Crown> = {
+  silver: Star,
   premium: Sparkles,
   gold: Star,
   vip: Crown,
@@ -74,6 +76,7 @@ export function SellerAdvertising() {
   const [txs, setTxs] = useState<Tx[]>([]);
   const [banners, setBanners] = useState<Banner[]>([]);
   const [sponsored, setSponsored] = useState<Sponsored[]>([]);
+  const [sponsoredShops, setSponsoredShops] = useState<{ id: string; ends_at: string; is_active: boolean }[]>([]);
   const [myProducts, setMyProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState<string | null>(null);
@@ -90,12 +93,13 @@ export function SellerAdvertising() {
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const [pk, sb, tx, bn, sp, pr] = await Promise.all([
+    const [pk, sb, tx, bn, sp, ss, pr] = await Promise.all([
       supabase.from("ad_packages").select("*").eq("is_active", true).order("sort_order"),
       supabase.from("seller_subscriptions").select("*, ad_packages(*)").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("payment_transactions").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }).limit(20),
       supabase.from("banners").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("sponsored_products").select("*, products(id,title,image_url,price)").eq("seller_id", user.id).order("created_at", { ascending: false }),
+      supabase.from("sponsored_shops").select("id,ends_at,is_active").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("products").select("id,title,image_url,price").eq("seller_id", user.id).eq("is_active", true).order("created_at", { ascending: false }),
     ]);
     setPackages((pk.data ?? []) as unknown as Pkg[]);
@@ -103,6 +107,7 @@ export function SellerAdvertising() {
     setTxs((tx.data ?? []) as unknown as Tx[]);
     setBanners((bn.data ?? []) as unknown as Banner[]);
     setSponsored((sp.data ?? []) as unknown as Sponsored[]);
+    setSponsoredShops((ss.data ?? []) as { id: string; ends_at: string; is_active: boolean }[]);
     setMyProducts((pr.data ?? []) as unknown as Product[]);
     setLoading(false);
   };
@@ -112,9 +117,11 @@ export function SellerAdvertising() {
   const activeSub = subs.find((s) => s.is_active && new Date(s.ends_at) > new Date());
   const activeBanners = banners.filter((b) => b.is_active && (!b.ends_at || new Date(b.ends_at) > new Date()));
   const activeSponsored = sponsored.filter((s) => s.is_active && new Date(s.ends_at) > new Date());
+  const activeShopPromos = sponsoredShops.filter((s) => s.is_active && new Date(s.ends_at) > new Date());
 
   const bannersLeft = (activeSub?.ad_packages?.banner_slots ?? 0) - activeBanners.length;
   const sponsoredLeft = (activeSub?.ad_packages?.sponsored_product_slots ?? 0) - activeSponsored.length;
+  const shopPromoLeft = (activeSub?.ad_packages?.shop_promo_slots ?? 0) - activeShopPromos.length;
 
   const purchase = async () => {
     if (!user || !checkout) return;
@@ -234,6 +241,28 @@ export function SellerAdvertising() {
     await load();
   };
 
+  const promoteShop = async () => {
+    if (!user || !activeSub) return;
+    if (shopPromoLeft <= 0) { toast.error("Mağaza reklamı limiti dolub"); return; }
+    const { error } = await supabase.from("sponsored_shops").insert({
+      seller_id: user.id,
+      subscription_id: activeSub.id,
+      ends_at: activeSub.ends_at,
+      is_active: true,
+    });
+    if (error) { toast.error(error.message); return; }
+    toast.success("Mağazanız ana səhifədə önə çəkildi! 🎉");
+    await load();
+  };
+
+  const removeShopPromo = async (id: string) => {
+    if (!confirm("Mağaza reklamı dayandırılsın?")) return;
+    const { error } = await supabase.from("sponsored_shops").delete().eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Çıxarıldı");
+    await load();
+  };
+
   if (loading) {
     return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
@@ -259,13 +288,51 @@ export function SellerAdvertising() {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
             <div className="bg-card/60 rounded-xl p-3"><div className="text-xs text-muted-foreground">Banner (qalır / cəmi)</div><div className="font-bold text-lg">{Math.max(0, bannersLeft)} / {activeSub.ad_packages.banner_slots}</div></div>
-            <div className="bg-card/60 rounded-xl p-3"><div className="text-xs text-muted-foreground">Sponsor (qalır / cəmi)</div><div className="font-bold text-lg">{Math.max(0, sponsoredLeft)} / {activeSub.ad_packages.sponsored_product_slots}</div></div>
+            <div className="bg-card/60 rounded-xl p-3"><div className="text-xs text-muted-foreground">Sponsor məhsul</div><div className="font-bold text-lg">{Math.max(0, sponsoredLeft)} / {activeSub.ad_packages.sponsored_product_slots}</div></div>
+            <div className="bg-card/60 rounded-xl p-3"><div className="text-xs text-muted-foreground">Mağaza reklamı</div><div className="font-bold text-lg">{Math.max(0, shopPromoLeft)} / {activeSub.ad_packages.shop_promo_slots ?? 0}</div></div>
             <div className="bg-card/60 rounded-xl p-3"><div className="text-xs text-muted-foreground">Müddət</div><div className="font-bold text-lg">{activeSub.ad_packages.duration_days} gün</div></div>
           </div>
         </div>
       )}
+
+      {/* === SHOP PROMOTION === */}
+      {activeSub ? (
+        <div className="bg-card border border-border rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <Store className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-bold">Mağaza reklamı (ana səhifədə)</h2>
+              <span className="text-xs bg-secondary px-2 py-0.5 rounded-full">{activeShopPromos.length}/{activeSub.ad_packages?.shop_promo_slots ?? 0}</span>
+            </div>
+            <button
+              onClick={promoteShop}
+              disabled={shopPromoLeft <= 0}
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              <Plus className="h-4 w-4" /> Mağazamı önə çək
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground mb-3">Mağazanız ana səhifədə "Önə çıxan mağazalar" bölməsində görünəcək. Müştərilər mağazanızı izləyə bilərlər.</p>
+          {activeShopPromos.length === 0 ? (
+            <div className="text-center text-muted-foreground py-6 text-sm">Hələ aktiv mağaza reklamı yoxdur.</div>
+          ) : (
+            <div className="space-y-2">
+              {activeShopPromos.map((s) => (
+                <div key={s.id} className="flex items-center justify-between border border-border rounded-xl p-3">
+                  <div className="text-sm">
+                    <div className="font-semibold">Aktiv mağaza reklamı</div>
+                    <div className="text-xs text-muted-foreground">Bitir: {formatDate(s.ends_at)}</div>
+                  </div>
+                  <button onClick={() => removeShopPromo(s.id)} className="p-1.5 text-destructive hover:bg-destructive/10 rounded"><Trash2 className="h-4 w-4" /></button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null}
+
 
       {/* === BANNER MANAGER === */}
       {activeSub ? (

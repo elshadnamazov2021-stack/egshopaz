@@ -2,8 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
-import { Store, MapPin, Mail, Star, Package } from "lucide-react";
+import { Store, MapPin, Mail, Star, Package, Heart } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/shop/$id")({
   head: ({ params }) => ({ meta: [{ title: `Shop — Elzan Shop` }, { name: "description", content: `Seller shop ${params.id}` }] }),
@@ -19,26 +21,52 @@ interface Profile {
 function ShopPage() {
   const { id } = Route.useParams();
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [products, setProducts] = useState<ProductCardData[]>([]);
   const [stats, setStats] = useState({ count: 0, avg: 0, reviews: 0 });
   const [loading, setLoading] = useState(true);
+  const [following, setFollowing] = useState(false);
+  const [followers, setFollowers] = useState(0);
 
   useEffect(() => {
     setLoading(true);
     Promise.all([
       supabase.from("profiles").select("id,shop_name,full_name,shop_description,shop_city,shop_email,shop_logo_url,shop_banner_url").eq("id", id).maybeSingle(),
       supabase.from("products").select("id,title,price,old_price,image_url,rating,reviews_count,brand").eq("seller_id", id).eq("is_active", true).order("created_at", { ascending: false }),
-    ]).then(([{ data: prof }, { data: prods }]) => {
+      supabase.from("shop_followers").select("id", { count: "exact", head: true }).eq("seller_id", id),
+    ]).then(([{ data: prof }, { data: prods }, { count }]) => {
       setProfile(prof as Profile | null);
       const list = (prods ?? []) as ProductCardData[];
       setProducts(list);
       const totalReviews = list.reduce((s, p) => s + (p.reviews_count || 0), 0);
       const weightedSum = list.reduce((s, p) => s + (Number(p.rating) || 0) * (p.reviews_count || 0), 0);
       setStats({ count: list.length, avg: totalReviews > 0 ? weightedSum / totalReviews : 0, reviews: totalReviews });
+      setFollowers(count ?? 0);
       setLoading(false);
     });
   }, [id]);
+
+  useEffect(() => {
+    if (!user) { setFollowing(false); return; }
+    void supabase.from("shop_followers").select("id").eq("user_id", user.id).eq("seller_id", id).maybeSingle()
+      .then(({ data }) => setFollowing(!!data));
+  }, [user, id]);
+
+  const toggleFollow = async () => {
+    if (!user) { toast.error("İzləmək üçün daxil olun"); return; }
+    if (user.id === id) { toast.error("Öz mağazanızı izləyə bilməzsiniz"); return; }
+    if (following) {
+      await supabase.from("shop_followers").delete().eq("user_id", user.id).eq("seller_id", id);
+      setFollowing(false); setFollowers((c) => Math.max(0, c - 1));
+      toast.success("İzləməkdən çıxarıldı");
+    } else {
+      const { error } = await supabase.from("shop_followers").insert({ user_id: user.id, seller_id: id });
+      if (error) { toast.error(error.message); return; }
+      setFollowing(true); setFollowers((c) => c + 1);
+      toast.success("Mağaza izlənildi 💙");
+    }
+  };
 
   if (loading) return <div className="container mx-auto px-4 py-10 text-muted-foreground">{t("common.loading")}</div>;
   if (!profile) return <div className="container mx-auto px-4 py-10">{t("shop.notFound")}. <Link to="/" className="text-primary">{t("product.home")}</Link></div>;
@@ -60,11 +88,23 @@ function ShopPage() {
             : <Store className="h-10 w-10 text-muted-foreground" />}
         </div>
         <div className="flex-1 pt-2 md:pt-16">
-          <h1 className="text-2xl md:text-3xl font-black">{name}</h1>
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <h1 className="text-2xl md:text-3xl font-black">{name}</h1>
+            {user?.id !== id && (
+              <button
+                onClick={toggleFollow}
+                className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition ${following ? "bg-primary/10 text-primary border border-primary/30" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
+              >
+                <Heart className={`h-4 w-4 ${following ? "fill-primary" : ""}`} />
+                {following ? "İzlənilir" : "İzlə"}
+              </button>
+            )}
+          </div>
           {profile.shop_description && <p className="text-muted-foreground mt-1 max-w-2xl">{profile.shop_description}</p>}
           <div className="flex flex-wrap gap-4 mt-3 text-sm">
             <div className="flex items-center gap-1.5"><Package className="h-4 w-4 text-primary" /> {t("shop.productsCount", { count: stats.count })}</div>
             <div className="flex items-center gap-1.5"><Star className="h-4 w-4 text-warning fill-warning" /> <b>{stats.avg.toFixed(1)}</b> {t("shop.reviewsCount", { count: stats.reviews })}</div>
+            <div className="flex items-center gap-1.5"><Heart className="h-4 w-4 text-primary" /> <b>{followers}</b> izləyici</div>
             {profile.shop_city && <div className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-primary" /> {profile.shop_city}</div>}
             {profile.shop_email && <div className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-primary" /> {profile.shop_email}</div>}
           </div>

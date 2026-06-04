@@ -25,6 +25,7 @@ export type Database = {
           is_active: boolean
           name: string
           price: number
+          shop_promo_slots: number
           sort_order: number
           sponsored_product_slots: number
           tier: string
@@ -39,6 +40,7 @@ export type Database = {
           is_active?: boolean
           name: string
           price: number
+          shop_promo_slots?: number
           sort_order?: number
           sponsored_product_slots?: number
           tier: string
@@ -53,6 +55,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           price?: number
+          shop_promo_slots?: number
           sort_order?: number
           sponsored_product_slots?: number
           tier?: string
@@ -1451,6 +1454,27 @@ export type Database = {
           },
         ]
       }
+      shop_followers: {
+        Row: {
+          created_at: string
+          id: string
+          seller_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          seller_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          seller_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       shop_messages: {
         Row: {
           body: string
@@ -1527,6 +1551,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "sponsored_products_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "seller_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sponsored_shops: {
+        Row: {
+          clicks: number
+          created_at: string
+          ends_at: string
+          id: string
+          impressions: number
+          is_active: boolean
+          seller_id: string
+          subscription_id: string | null
+        }
+        Insert: {
+          clicks?: number
+          created_at?: string
+          ends_at: string
+          id?: string
+          impressions?: number
+          is_active?: boolean
+          seller_id: string
+          subscription_id?: string | null
+        }
+        Update: {
+          clicks?: number
+          created_at?: string
+          ends_at?: string
+          id?: string
+          impressions?: number
+          is_active?: boolean
+          seller_id?: string
+          subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sponsored_shops_subscription_id_fkey"
             columns: ["subscription_id"]
             isOneToOne: false
             referencedRelation: "seller_subscriptions"
