@@ -80,7 +80,17 @@ interface PromoSettings {
 type CheckoutTarget =
   | { kind: "pkg"; pkg: Pkg }
   | { kind: "one_product"; productId: string; productTitle: string; price: number; days: number }
-  | { kind: "one_shop"; price: number; days: number };
+  | { kind: "one_shop"; price: number; days: number }
+  | { kind: "slot_product"; productId: string; productTitle: string; price: number }
+  | { kind: "slot_shop"; price: number }
+  | { kind: "slot_banner"; price: number; form: { title: string; link_url: string; image_url: string } };
+
+// Fixed prices for slot activations (kept low because seller already paid for package)
+const SLOT_PRODUCT_FEE = 1;
+const SLOT_SHOP_FEE = 1;
+const SLOT_BANNER_FEE = 1;
+
+const CARD_STORAGE_KEY = "elzan_saved_card_v1";
 
 export function SellerAdvertising() {
   const { user } = useAuth();
@@ -96,6 +106,7 @@ export function SellerAdvertising() {
   const [paying, setPaying] = useState(false);
   const [checkout, setCheckout] = useState<CheckoutTarget | null>(null);
   const [card, setCard] = useState({ number: "", name: "", expiry: "", cvc: "" });
+  const [saveCard, setSaveCard] = useState(false);
   const [postPay, setPostPay] = useState(false); // post-package chooser
   const [oneOffPickProduct, setOneOffPickProduct] = useState(false); // paid one-off product picker
 
