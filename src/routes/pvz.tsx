@@ -610,6 +610,7 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
   const [step, setStep] = useState<ConfirmStep>("found");
   const [scannedItem, setScannedItem] = useState<DBOrderItem | null>(null);
   const [scanLookup, setScanLookup] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange>(emptyRange);
 
   const load = () => {
     supabase
