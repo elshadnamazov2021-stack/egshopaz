@@ -153,7 +153,9 @@ function OrdersPage() {
   };
 
   if (!user) return null;
-  const filtered = filter === "all" ? orders : orders.filter((o) => o.status === filter);
+  const filtered = orders
+    .filter((o) => (filter === "all" ? true : o.status === filter))
+    .filter((o) => inRange(o.created_at, dateRange));
 
   const filterTabs: [string, string][] = [
     ["all", t("orders.all")],
