@@ -1043,6 +1043,38 @@ function SettingsSection({ settings, updateSettings }: { settings: SettingsRow |
           </button>
         </div>
       </div>
+
+      <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+        <div className="font-bold text-base">📢 Ayrıca ödənişli reklam tarifləri</div>
+        <div className="text-xs text-muted-foreground -mt-2">Satıcı paket almadan tək məhsulu və ya mağazasını önə çəkə bilər. Qiymət və müddəti burdan idarə edirsiniz.</div>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-semibold">Tək məhsul reklamı qiyməti (AZN)</label>
+            <input type="number" step="0.5" defaultValue={settings.single_product_promo_price} onBlur={(e) => updateSettings({ single_product_promo_price: Number(e.target.value) })}
+              className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+          </div>
+          <div>
+            <label className="text-sm font-semibold">Tək məhsul reklamı müddəti (gün)</label>
+            <input type="number" defaultValue={settings.single_product_promo_days} onBlur={(e) => updateSettings({ single_product_promo_days: Number(e.target.value) })}
+              className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+          </div>
+          <div>
+            <label className="text-sm font-semibold">Mağaza reklamı qiyməti (AZN)</label>
+            <input type="number" step="0.5" defaultValue={settings.single_shop_promo_price} onBlur={(e) => updateSettings({ single_shop_promo_price: Number(e.target.value) })}
+              className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+          </div>
+          <div>
+            <label className="text-sm font-semibold">Mağaza reklamı müddəti (gün)</label>
+            <input type="number" defaultValue={settings.single_shop_promo_days} onBlur={(e) => updateSettings({ single_shop_promo_days: Number(e.target.value) })}
+              className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+          </div>
+        </div>
+        <div>
+          <label className="text-sm font-semibold">Reklam şərtləri (satıcıya göstərilir)</label>
+          <textarea defaultValue={settings.promo_terms_text} onBlur={(e) => updateSettings({ promo_terms_text: e.target.value })}
+            rows={3} className="mt-1 w-full px-3 py-2 rounded-lg border border-input bg-background text-sm" />
+        </div>
+      </div>
     </div>
   );
 }
