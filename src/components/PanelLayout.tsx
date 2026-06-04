@@ -1,6 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { LiveClock } from "@/components/LiveClock";
 
 export interface PanelNavItem {
   to?: string;
@@ -26,8 +27,13 @@ export function PanelLayout({ title, subtitle, items, children }: Props) {
     <div className="container mx-auto px-4 py-6 grid gap-4 lg:grid-cols-[260px_1fr] lg:gap-6">
       <aside className="bg-card border border-border rounded-2xl p-3 h-fit lg:sticky lg:top-20 lg:self-start">
         <div className="px-3 py-3 border-b border-border mb-3 lg:mb-2">
-          <div className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">{title}</div>
-          {subtitle && <div className="text-sm font-bold mt-0.5 line-clamp-1">{subtitle}</div>}
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">{title}</div>
+              {subtitle && <div className="text-sm font-bold mt-0.5 line-clamp-1">{subtitle}</div>}
+            </div>
+            <LiveClock compact />
+          </div>
         </div>
         <nav className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-0.5 lg:overflow-visible lg:pb-0">
           {items.map((it) => {
