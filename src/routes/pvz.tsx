@@ -849,6 +849,8 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
         </div>
       )}
 
+      <DateRangeFilter value={dateRange} onChange={setDateRange} />
+
       <div className="bg-card border border-border rounded-2xl p-4">
         <div className="font-bold mb-3 flex items-center justify-between">
           <span>PVZ-də gözləyən sifarişlər ({filtered.length})</span>
