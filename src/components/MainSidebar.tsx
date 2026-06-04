@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,15 +20,18 @@ interface Category { id: string; name: string; name_ru?: string | null; name_en?
 export function MainSidebar() {
   const { user, isSeller } = useAuth();
   const { t } = useTranslation();
+  const location = useLocation();
   const { setOpenMobile, isMobile, openMobile } = useSidebar();
   const [cats, setCats] = useState<Category[]>([]);
+  const isHome = location.pathname === "/";
 
   useEffect(() => {
+    if (isHome) return;
     if (isMobile && !openMobile) return;
-    supabase.from("categories").select("*").order("sort_order").then(({ data }) => {
+    supabase.from("categories").select("id,name,name_ru,name_en,slug,icon,parent_id").order("sort_order").then(({ data }) => {
       setCats((data ?? []) as Category[]);
     });
-  }, [isMobile, openMobile]);
+  }, [isHome, isMobile, openMobile]);
 
   const close = () => { if (isMobile) setOpenMobile(false); };
 
@@ -82,6 +85,7 @@ export function MainSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
+        {!isHome && (
         <SidebarGroup>
           <SidebarGroupLabel>{t("sidebar.categories")}</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -103,6 +107,7 @@ export function MainSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        )}
 
         {user && (
           <SidebarGroup>
