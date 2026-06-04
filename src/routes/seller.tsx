@@ -929,13 +929,18 @@ function SellerPanel() {
 
       {tab === "orders" && (
         <div className="space-y-3">
-          {orderItems.length === 0 ? (
-            <div className="bg-secondary/40 rounded-2xl p-10 text-center text-muted-foreground">
-              <ShoppingBag className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              Hələ sifariş yoxdur
-            </div>
-          ) : (
-            orderItems.map((i) => {
+          <DateRangeFilter value={ordersDateRange} onChange={setOrdersDateRange} />
+          {(() => {
+            const visibleOrders = orderItems.filter((i) => inRange(i.order_created_at ?? null, ordersDateRange));
+            if (visibleOrders.length === 0) {
+              return (
+                <div className="bg-secondary/40 rounded-2xl p-10 text-center text-muted-foreground">
+                  <ShoppingBag className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  Hələ sifariş yoxdur
+                </div>
+              );
+            }
+            return visibleOrders.map((i) => {
               const st = ORDER_STATUSES.find((s) => s.v === i.status) ?? ORDER_STATUSES[0];
               const canPack = i.status === "pending";
               const canShip =
