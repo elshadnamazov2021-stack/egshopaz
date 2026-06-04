@@ -69,6 +69,19 @@ const TIER_ICONS: Record<string, typeof Crown> = {
   vip: Crown,
 };
 
+interface PromoSettings {
+  single_product_promo_price: number;
+  single_product_promo_days: number;
+  single_shop_promo_price: number;
+  single_shop_promo_days: number;
+  promo_terms_text: string;
+}
+
+type CheckoutTarget =
+  | { kind: "pkg"; pkg: Pkg }
+  | { kind: "one_product"; productId: string; productTitle: string; price: number; days: number }
+  | { kind: "one_shop"; price: number; days: number };
+
 export function SellerAdvertising() {
   const { user } = useAuth();
   const [packages, setPackages] = useState<Pkg[]>([]);
@@ -78,22 +91,25 @@ export function SellerAdvertising() {
   const [sponsored, setSponsored] = useState<Sponsored[]>([]);
   const [sponsoredShops, setSponsoredShops] = useState<{ id: string; ends_at: string; is_active: boolean }[]>([]);
   const [myProducts, setMyProducts] = useState<Product[]>([]);
+  const [promoSettings, setPromoSettings] = useState<PromoSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [paying, setPaying] = useState<string | null>(null);
-  const [checkout, setCheckout] = useState<Pkg | null>(null);
+  const [paying, setPaying] = useState(false);
+  const [checkout, setCheckout] = useState<CheckoutTarget | null>(null);
   const [card, setCard] = useState({ number: "", name: "", expiry: "", cvc: "" });
+  const [postPay, setPostPay] = useState(false); // post-package chooser
+  const [oneOffPickProduct, setOneOffPickProduct] = useState(false); // paid one-off product picker
 
   // Banner form
   const [bannerForm, setBannerForm] = useState<{ title: string; link_url: string; image_url: string } | null>(null);
   const [uploadingBanner, setUploadingBanner] = useState(false);
 
-  // Sponsored form
+  // Sponsored (slot-based) form
   const [pickProduct, setPickProduct] = useState(false);
 
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const [pk, sb, tx, bn, sp, ss, pr] = await Promise.all([
+    const [pk, sb, tx, bn, sp, ss, pr, st] = await Promise.all([
       supabase.from("ad_packages").select("*").eq("is_active", true).order("sort_order"),
       supabase.from("seller_subscriptions").select("*, ad_packages(*)").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("payment_transactions").select("*").eq("seller_id", user.id).order("created_at", { ascending: false }).limit(20),
@@ -101,6 +117,7 @@ export function SellerAdvertising() {
       supabase.from("sponsored_products").select("*, products(id,title,image_url,price)").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("sponsored_shops").select("id,ends_at,is_active").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("products").select("id,title,image_url,price").eq("seller_id", user.id).eq("is_active", true).order("created_at", { ascending: false }),
+      supabase.from("system_settings").select("single_product_promo_price,single_product_promo_days,single_shop_promo_price,single_shop_promo_days,promo_terms_text").limit(1).maybeSingle(),
     ]);
     setPackages((pk.data ?? []) as unknown as Pkg[]);
     setSubs((sb.data ?? []) as unknown as Sub[]);
@@ -109,8 +126,10 @@ export function SellerAdvertising() {
     setSponsored((sp.data ?? []) as unknown as Sponsored[]);
     setSponsoredShops((ss.data ?? []) as { id: string; ends_at: string; is_active: boolean }[]);
     setMyProducts((pr.data ?? []) as unknown as Product[]);
+    setPromoSettings((st.data as PromoSettings | null) ?? null);
     setLoading(false);
   };
+
 
   useEffect(() => { void load(); }, [user]);
 
@@ -123,45 +142,77 @@ export function SellerAdvertising() {
   const sponsoredLeft = (activeSub?.ad_packages?.sponsored_product_slots ?? 0) - activeSponsored.length;
   const shopPromoLeft = (activeSub?.ad_packages?.shop_promo_slots ?? 0) - activeShopPromos.length;
 
+  const checkoutMeta = (() => {
+    if (!checkout) return null;
+    if (checkout.kind === "pkg") return { label: `${checkout.pkg.name} paketi`, price: checkout.pkg.price, color: checkout.pkg.color, days: checkout.pkg.duration_days };
+    if (checkout.kind === "one_product") return { label: `Məhsul reklamı: ${checkout.productTitle}`, price: checkout.price, color: "#f59e0b", days: checkout.days };
+    return { label: "Mağaza reklamı (ana səhifə)", price: checkout.price, color: "#3b82f6", days: checkout.days };
+  })();
+
   const purchase = async () => {
-    if (!user || !checkout) return;
+    if (!user || !checkout || !checkoutMeta) return;
     if (!card.number || !card.name || !card.expiry || !card.cvc) {
       toast.error("Bütün kart məlumatlarını doldurun");
       return;
     }
-    setPaying(checkout.id);
+    setPaying(true);
     try {
       const ends = new Date();
-      ends.setDate(ends.getDate() + checkout.duration_days);
+      ends.setDate(ends.getDate() + checkoutMeta.days);
 
-      const { data: sub, error: subErr } = await supabase.from("seller_subscriptions").insert({
-        seller_id: user.id,
-        package_id: checkout.id,
-        ends_at: ends.toISOString(),
-        amount: checkout.price,
-        payment_status: "completed",
-        payment_method: "mock_card",
-        is_active: true,
-      }).select().single();
-      if (subErr) throw subErr;
+      if (checkout.kind === "pkg") {
+        const { data: sub, error: subErr } = await supabase.from("seller_subscriptions").insert({
+          seller_id: user.id,
+          package_id: checkout.pkg.id,
+          ends_at: ends.toISOString(),
+          amount: checkout.pkg.price,
+          payment_status: "completed",
+          payment_method: "mock_card",
+          is_active: true,
+        }).select().single();
+        if (subErr) throw subErr;
+        await supabase.from("payment_transactions").insert({
+          seller_id: user.id, subscription_id: sub.id, amount: checkout.pkg.price,
+          status: "completed", method: "mock_card",
+          description: `${checkout.pkg.name} paketi (${checkout.pkg.duration_days} gün)`,
+        });
+        toast.success(`${checkout.pkg.name} paketi aktiv edildi! 🎉`);
+        setCheckout(null);
+        setCard({ number: "", name: "", expiry: "", cvc: "" });
+        await load();
+        setPostPay(true); // open chooser
+        return;
+      }
 
-      await supabase.from("payment_transactions").insert({
-        seller_id: user.id,
-        subscription_id: sub.id,
-        amount: checkout.price,
-        status: "completed",
-        method: "mock_card",
-        description: `${checkout.name} paketi (${checkout.duration_days} gün)`,
-      });
-
-      toast.success(`${checkout.name} paketi aktiv edildi! 🎉`);
+      if (checkout.kind === "one_product") {
+        const { error } = await supabase.from("sponsored_products").insert({
+          seller_id: user.id, product_id: checkout.productId,
+          position: "catalog_top", is_active: true, ends_at: ends.toISOString(),
+        });
+        if (error) throw error;
+        await supabase.from("payment_transactions").insert({
+          seller_id: user.id, amount: checkout.price, status: "completed", method: "mock_card",
+          description: `Tək məhsul reklamı: ${checkout.productTitle} (${checkout.days} gün)`,
+        });
+        toast.success("Məhsul ana səhifədə önə çəkildi! 🎉");
+      } else {
+        const { error } = await supabase.from("sponsored_shops").insert({
+          seller_id: user.id, ends_at: ends.toISOString(), is_active: true,
+        });
+        if (error) throw error;
+        await supabase.from("payment_transactions").insert({
+          seller_id: user.id, amount: checkout.price, status: "completed", method: "mock_card",
+          description: `Mağaza reklamı (${checkout.days} gün)`,
+        });
+        toast.success("Mağazanız ana səhifədə önə çəkildi! 🎉");
+      }
       setCheckout(null);
       setCard({ number: "", name: "", expiry: "", cvc: "" });
       await load();
     } catch (e) {
       toast.error("Ödəniş alınmadı: " + (e as Error).message);
     } finally {
-      setPaying(null);
+      setPaying(false);
     }
   };
 
@@ -416,6 +467,35 @@ export function SellerAdvertising() {
         </div>
       ) : null}
 
+      {/* === ONE-OFF PAID PROMOTION (paketsiz, admin qiymətli) === */}
+      {promoSettings && (
+        <div className="bg-card border-2 border-dashed border-primary/30 rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-bold">Ayrıca ödənişli reklam (paketsiz)</h2>
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">{promoSettings.promo_terms_text}</p>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <button
+              onClick={() => setOneOffPickProduct(true)}
+              className="border border-border rounded-xl p-4 text-left hover:border-warning hover:bg-warning/5 transition"
+            >
+              <div className="flex items-center gap-2 mb-1"><Package className="h-5 w-5 text-warning" /> <span className="font-bold">Tək məhsulu önə çək</span></div>
+              <div className="text-xs text-muted-foreground">{promoSettings.single_product_promo_days} gün</div>
+              <div className="text-xl font-extrabold text-warning mt-1">{formatAZN(promoSettings.single_product_promo_price)}</div>
+            </button>
+            <button
+              onClick={() => setCheckout({ kind: "one_shop", price: promoSettings.single_shop_promo_price, days: promoSettings.single_shop_promo_days })}
+              className="border border-border rounded-xl p-4 text-left hover:border-primary hover:bg-primary/5 transition"
+            >
+              <div className="flex items-center gap-2 mb-1"><Store className="h-5 w-5 text-primary" /> <span className="font-bold">Mağazamı önə çək</span></div>
+              <div className="text-xs text-muted-foreground">{promoSettings.single_shop_promo_days} gün</div>
+              <div className="text-xl font-extrabold text-primary mt-1">{formatAZN(promoSettings.single_shop_promo_price)}</div>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Packages */}
       <div>
         <div className="flex items-center gap-2 mb-4">
@@ -446,7 +526,7 @@ export function SellerAdvertising() {
                   </ul>
                   <button
                     disabled={isActive}
-                    onClick={() => setCheckout(p)}
+                    onClick={() => setCheckout({ kind: "pkg", pkg: p })}
                     className="w-full py-2.5 rounded-xl font-bold text-white disabled:opacity-50 disabled:cursor-not-allowed transition hover:opacity-90"
                     style={{ background: p.color }}
                   >
@@ -576,7 +656,7 @@ export function SellerAdvertising() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold flex items-center gap-2">
                 <CreditCard className="h-5 w-5" />
-                Ödəniş — {checkout.name}
+                Ödəniş — {checkoutMeta?.label}
               </h3>
               <button onClick={() => !paying && setCheckout(null)} className="p-1 hover:bg-secondary rounded"><X className="h-5 w-5" /></button>
             </div>
@@ -606,12 +686,74 @@ export function SellerAdvertising() {
             <div className="flex items-center justify-between mt-5 pt-4 border-t border-border">
               <div>
                 <div className="text-xs text-muted-foreground">Ödənilən məbləğ</div>
-                <div className="text-2xl font-extrabold" style={{ color: checkout.color }}>{formatAZN(checkout.price)}</div>
+                <div className="text-2xl font-extrabold" style={{ color: checkoutMeta?.color }}>{formatAZN(checkoutMeta?.price ?? 0)}</div>
+                {promoSettings?.promo_terms_text && checkout.kind !== "pkg" && (
+                  <div className="text-[11px] text-muted-foreground mt-2 max-w-xs">{promoSettings.promo_terms_text}</div>
+                )}
               </div>
-              <button onClick={purchase} disabled={!!paying} className="px-6 py-3 rounded-xl font-bold text-white disabled:opacity-60" style={{ background: checkout.color }}>
+              <button onClick={purchase} disabled={paying} className="px-6 py-3 rounded-xl font-bold text-white disabled:opacity-60" style={{ background: checkoutMeta?.color }}>
                 {paying ? <Loader2 className="h-5 w-5 animate-spin" /> : "Ödə"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Post-payment chooser */}
+      {postPay && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setPostPay(false)}>
+          <div className="bg-card rounded-2xl max-w-md w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold">🎉 Paket aktivləşdi — növbəti addım?</h3>
+              <button onClick={() => setPostPay(false)} className="p-1 hover:bg-secondary rounded"><X className="h-5 w-5" /></button>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">Reklamınızı necə yerləşdirək?</p>
+            <div className="grid gap-3">
+              <button onClick={() => { setPostPay(false); setPickProduct(true); }} disabled={sponsoredLeft <= 0}
+                className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-warning hover:bg-warning/5 disabled:opacity-50 disabled:cursor-not-allowed text-left transition">
+                <Package className="h-6 w-6 text-warning shrink-0" />
+                <div><div className="font-bold">Məhsulu önə çək</div><div className="text-xs text-muted-foreground">Konkret bir məhsulu kataloqun başına çıxar ({Math.max(0, sponsoredLeft)} slot qalır)</div></div>
+              </button>
+              <button onClick={() => { setPostPay(false); void promoteShop(); }} disabled={shopPromoLeft <= 0}
+                className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-primary hover:bg-primary/5 disabled:opacity-50 disabled:cursor-not-allowed text-left transition">
+                <Store className="h-6 w-6 text-primary shrink-0" />
+                <div><div className="font-bold">Mağazanı önə çək</div><div className="text-xs text-muted-foreground">Bütün mağazanız "Önə çıxan mağazalar" bölməsində ({Math.max(0, shopPromoLeft)} slot qalır)</div></div>
+              </button>
+              <button onClick={() => { setPostPay(false); setBannerForm({ title: "", link_url: "", image_url: "" }); }} disabled={bannersLeft <= 0}
+                className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-primary hover:bg-primary/5 disabled:opacity-50 disabled:cursor-not-allowed text-left transition">
+                <Megaphone className="h-6 w-6 text-primary shrink-0" />
+                <div><div className="font-bold">Banner əlavə et</div><div className="text-xs text-muted-foreground">Ana səhifənin üstündə böyük banner ({Math.max(0, bannersLeft)} slot qalır)</div></div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* One-off paid product picker */}
+      {oneOffPickProduct && promoSettings && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setOneOffPickProduct(false)}>
+          <div className="bg-card rounded-2xl max-w-2xl w-full p-6 shadow-2xl max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xl font-bold flex items-center gap-2"><Package className="h-5 w-5 text-warning" /> Ödənişli reklam — məhsul seç</h3>
+              <button onClick={() => setOneOffPickProduct(false)} className="p-1 hover:bg-secondary rounded"><X className="h-5 w-5" /></button>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4">Qiymət: <b>{formatAZN(promoSettings.single_product_promo_price)}</b> • Müddət: <b>{promoSettings.single_product_promo_days} gün</b></p>
+            {myProducts.length === 0 ? (
+              <div className="text-center py-10 text-muted-foreground"><Package className="h-10 w-10 mx-auto mb-2" /><p>Aktiv məhsul yoxdur.</p></div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {myProducts.map((p) => (
+                  <button key={p.id}
+                    onClick={() => { setOneOffPickProduct(false); setCheckout({ kind: "one_product", productId: p.id, productTitle: p.title, price: promoSettings.single_product_promo_price, days: promoSettings.single_product_promo_days }); }}
+                    className="border border-border rounded-xl overflow-hidden text-left hover:border-warning transition">
+                    <div className="aspect-square bg-secondary">
+                      {p.image_url && <img src={p.image_url} alt={p.title} className="w-full h-full object-cover" />}
+                    </div>
+                    <div className="p-2"><div className="text-xs line-clamp-2">{p.title}</div><div className="font-bold text-sm">{formatAZN(p.price)}</div></div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

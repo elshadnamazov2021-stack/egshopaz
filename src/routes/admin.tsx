@@ -36,7 +36,7 @@ interface PickupRow { id: string; name: string; city: string; address: string; p
 interface BannerRow { id: string; title: string; image_url: string | null; link_url: string | null; position: string; is_active: boolean; clicks: number; impressions: number }
 interface DisputeRow { id: string; order_id: string | null; buyer_id: string; seller_id: string | null; reason: string; status: string; compensation: number | null; created_at: string }
 interface PromoRow { id: string; code: string; discount_percent: number | null; discount_amount: number | null; is_active: boolean; used_count: number; usage_limit: number | null; min_order: number }
-interface SettingsRow { id: string; commission_percent: number; delivery_base_fee: number; storage_fee_per_day: number; maintenance_mode: boolean; min_payout: number }
+interface SettingsRow { id: string; commission_percent: number; delivery_base_fee: number; storage_fee_per_day: number; maintenance_mode: boolean; min_payout: number; single_product_promo_price: number; single_product_promo_days: number; single_shop_promo_price: number; single_shop_promo_days: number; promo_terms_text: string }
 interface TicketRow { id: string; subject: string; category: string; status: string; user_id: string; created_at: string; admin_reply: string | null }
 interface AdPackageRow {
   id: string; name: string; tier: string; price: number; duration_days: number;
@@ -1041,6 +1041,38 @@ function SettingsSection({ settings, updateSettings }: { settings: SettingsRow |
             className={`px-4 py-2 rounded-lg font-bold text-sm ${settings.maintenance_mode ? "bg-destructive text-destructive-foreground" : "bg-secondary"}`}>
             {settings.maintenance_mode ? "Aktiv" : "Deaktiv"}
           </button>
+        </div>
+      </div>
+
+      <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+        <div className="font-bold text-base">📢 Ayrıca ödənişli reklam tarifləri</div>
+        <div className="text-xs text-muted-foreground -mt-2">Satıcı paket almadan tək məhsulu və ya mağazasını önə çəkə bilər. Qiymət və müddəti burdan idarə edirsiniz.</div>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-semibold">Tək məhsul reklamı qiyməti (AZN)</label>
+            <input type="number" step="0.5" defaultValue={settings.single_product_promo_price} onBlur={(e) => updateSettings({ single_product_promo_price: Number(e.target.value) })}
+              className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+          </div>
+          <div>
+            <label className="text-sm font-semibold">Tək məhsul reklamı müddəti (gün)</label>
+            <input type="number" defaultValue={settings.single_product_promo_days} onBlur={(e) => updateSettings({ single_product_promo_days: Number(e.target.value) })}
+              className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+          </div>
+          <div>
+            <label className="text-sm font-semibold">Mağaza reklamı qiyməti (AZN)</label>
+            <input type="number" step="0.5" defaultValue={settings.single_shop_promo_price} onBlur={(e) => updateSettings({ single_shop_promo_price: Number(e.target.value) })}
+              className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+          </div>
+          <div>
+            <label className="text-sm font-semibold">Mağaza reklamı müddəti (gün)</label>
+            <input type="number" defaultValue={settings.single_shop_promo_days} onBlur={(e) => updateSettings({ single_shop_promo_days: Number(e.target.value) })}
+              className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+          </div>
+        </div>
+        <div>
+          <label className="text-sm font-semibold">Reklam şərtləri (satıcıya göstərilir)</label>
+          <textarea defaultValue={settings.promo_terms_text} onBlur={(e) => updateSettings({ promo_terms_text: e.target.value })}
+            rows={3} className="mt-1 w-full px-3 py-2 rounded-lg border border-input bg-background text-sm" />
         </div>
       </div>
     </div>
