@@ -21,17 +21,18 @@ export function MainSidebar() {
   const { user, isSeller } = useAuth();
   const { t } = useTranslation();
   const location = useLocation();
-  const { setOpenMobile, isMobile, openMobile } = useSidebar();
+  const { setOpenMobile, isMobile, openMobile, open } = useSidebar();
   const [cats, setCats] = useState<Category[]>([]);
   const isHome = location.pathname === "/";
 
   useEffect(() => {
     if (isHome) return;
     if (isMobile && !openMobile) return;
+    if (!isMobile && !open) return;
     supabase.from("categories").select("id,name,name_ru,name_en,slug,icon,parent_id").order("sort_order").then(({ data }) => {
       setCats((data ?? []) as Category[]);
     });
-  }, [isHome, isMobile, openMobile]);
+  }, [isHome, isMobile, openMobile, open]);
 
   const close = () => { if (isMobile) setOpenMobile(false); };
 
