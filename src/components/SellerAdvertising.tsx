@@ -731,6 +731,10 @@ export function SellerAdvertising() {
                   <input value={card.cvc} onChange={(e) => setCard({ ...card, cvc: e.target.value })} placeholder="123" maxLength={4} className="w-full mt-1 px-3 py-2 rounded-lg bg-secondary border border-border focus:border-primary outline-none" />
                 </div>
               </div>
+              <label className="flex items-center gap-2 mt-3 cursor-pointer select-none">
+                <input type="checkbox" checked={saveCard} onChange={(e) => setSaveCard(e.target.checked)} className="h-4 w-4 rounded border-border" />
+                <span className="text-sm">Kart məlumatlarını yadda saxla (növbəti ödənişdə avtomatik dolacaq)</span>
+              </label>
             </div>
             <div className="flex items-center justify-between mt-5 pt-4 border-t border-border">
               <div>
