@@ -25,11 +25,11 @@ export interface ProductCardData {
   stock?: number | null;
 }
 
-export function ProductCard({ p }: { p: ProductCardData }) {
+export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; enableFavorite?: boolean }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [adding, setAdding] = useState(false);
-  const { isFav, toggle: toggleFav, busy: favBusy } = useFavorite(p.id);
+  const { isFav, toggle: toggleFav, busy: favBusy } = useFavorite(p.id, enableFavorite);
   const discount = calcDiscount(Number(p.price), p.old_price ? Number(p.old_price) : undefined);
 
   const addToCart = async (e: React.MouseEvent) => {
@@ -73,14 +73,16 @@ export function ProductCard({ p }: { p: ProductCardData }) {
             -{discount}%
           </span>
         )}
-        <button
-          onClick={toggleFav}
-          disabled={favBusy}
-          className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center transition ${isFav ? "text-discount" : "hover:text-primary"}`}
-          aria-label={t("product.addToFavorites")}
-        >
-          <Heart className={`h-4 w-4 ${isFav ? "fill-discount" : ""}`} />
-        </button>
+        {enableFavorite && (
+          <button
+            onClick={toggleFav}
+            disabled={favBusy}
+            className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center transition ${isFav ? "text-discount" : "hover:text-primary"}`}
+            aria-label={t("product.addToFavorites")}
+          >
+            <Heart className={`h-4 w-4 ${isFav ? "fill-discount" : ""}`} />
+          </button>
+        )}
       </div>
       <div className="p-3 flex flex-col gap-1.5 flex-1">
         <div className="flex items-baseline gap-2">
