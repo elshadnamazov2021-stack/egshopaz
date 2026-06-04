@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { catName } from "@/lib/catName";
-import { ChevronRight, ArrowLeft, ChevronLeft } from "lucide-react";
+import { ChevronRight, ArrowLeft } from "lucide-react";
 
 interface Category {
   id: string;
@@ -15,18 +15,11 @@ interface Category {
   parent_id: string | null;
 }
 
-interface BrandRow { brand: string | null }
-interface Banner { id: string; title: string; image_url: string | null; link_url: string | null }
-
 export function HomeCategoryBrowser() {
   const { i18n } = useTranslation();
   const [cats, setCats] = useState<Category[]>([]);
   const [activeRootId, setActiveRootId] = useState<string | null>(null);
   const [activeSubId, setActiveSubId] = useState<string | null>(null);
-  const [brands, setBrands] = useState<string[]>([]);
-  const [loadingBrands, setLoadingBrands] = useState(false);
-  const [banners, setBanners] = useState<Banner[]>([]);
-  const [bannerIdx, setBannerIdx] = useState(0);
 
   useEffect(() => {
     supabase
@@ -39,22 +32,7 @@ export function HomeCategoryBrowser() {
         const firstRoot = list.find((c) => !c.parent_id);
         if (firstRoot) setActiveRootId(firstRoot.id);
       });
-
-    supabase
-      .from("banners")
-      .select("id,title,image_url,link_url")
-      .eq("is_active", true)
-      .eq("position", "home_top")
-      .limit(6)
-      .then(({ data }) => setBanners((data ?? []) as Banner[]));
   }, []);
-
-  // Auto-rotate banner
-  useEffect(() => {
-    if (banners.length < 2) return;
-    const t = setInterval(() => setBannerIdx((i) => (i + 1) % banners.length), 5000);
-    return () => clearInterval(t);
-  }, [banners.length]);
 
   const roots = useMemo(() => cats.filter((c) => !c.parent_id), [cats]);
   const activeRoot = useMemo(
@@ -76,39 +54,6 @@ export function HomeCategoryBrowser() {
   );
 
   const current = activeSub || activeRoot;
-
-  const activeSlugs = useMemo(() => {
-    if (!current) return [];
-    const ids = new Set<string>([current.id]);
-    cats.filter((c) => c.parent_id === current.id).forEach((l2) => {
-      ids.add(l2.id);
-      cats.filter((c) => c.parent_id === l2.id).forEach((l3) => ids.add(l3.id));
-    });
-    return cats.filter((c) => ids.has(c.id)).map((c) => c.slug);
-  }, [cats, current]);
-
-  useEffect(() => {
-    if (activeSlugs.length === 0) {
-      setBrands([]);
-      return;
-    }
-    setLoadingBrands(true);
-    supabase
-      .from("products")
-      .select("brand,categories!inner(slug)")
-      .eq("is_active", true)
-      .in("categories.slug", activeSlugs)
-      .not("brand", "is", null)
-      .limit(500)
-      .then(({ data }) => {
-        const set = new Set<string>();
-        (data as BrandRow[] | null ?? []).forEach((r) => {
-          if (r.brand && r.brand.trim()) set.add(r.brand.trim());
-        });
-        setBrands([...set].sort().slice(0, 12));
-        setLoadingBrands(false);
-      });
-  }, [activeSlugs]);
 
   const selectRoot = (id: string) => {
     setActiveRootId(id);
