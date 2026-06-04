@@ -449,6 +449,7 @@ function Intake({ scan, setScan }: { scan: string; setScan: (v: string) => void 
   const [scannerOpen, setScannerOpen] = useState(false);
   const [pending, setPending] = useState<DBOrderItem[]>([]);
   const [busy, setBusy] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange>(emptyRange);
 
   const load = () => {
     supabase
