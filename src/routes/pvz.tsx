@@ -419,7 +419,7 @@ async function attachOrderInfo(rows: DBOrderItem[]): Promise<DBOrderItem[]> {
   const { data } = ids.length
     ? await supabase
         .from("orders")
-        .select("id,recipient_name,recipient_phone,pickup_point_id")
+        .select("id,recipient_name,recipient_phone,pickup_point_id,created_at")
         .in("id", ids)
     : { data: [] };
   const map = new Map((data ?? []).map((order) => [order.id, order as OrderInfo]));
