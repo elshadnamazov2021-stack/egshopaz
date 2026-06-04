@@ -48,6 +48,7 @@ export function OrderQRDialog({ open, onOpenChange, pickupCode, title, subtitle,
       </head><body>
       <h2>${title}</h2>
       ${subtitle ? `<div class="sub">${subtitle}</div>` : ""}
+      ${orderDateStr ? `<div class="sub">📅 Sifariş: ${orderDateStr}</div>` : ""}
       <img src="${qr}"/>
       <div class="code">${pickupCode}</div>
       ${(customerName || customerPhone) ? `<div class="cust"><b>👤 Müştəri</b>${customerName ? customerName : ""}${customerPhone ? `<br/>📞 ${customerPhone}` : ""}</div>` : ""}
