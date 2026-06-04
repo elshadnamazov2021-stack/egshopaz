@@ -157,8 +157,24 @@ export function SellerAdvertising() {
     if (!checkout) return null;
     if (checkout.kind === "pkg") return { label: `${checkout.pkg.name} paketi`, price: checkout.pkg.price, color: checkout.pkg.color, days: checkout.pkg.duration_days };
     if (checkout.kind === "one_product") return { label: `Məhsul reklamı: ${checkout.productTitle}`, price: checkout.price, color: "#f59e0b", days: checkout.days };
-    return { label: "Mağaza reklamı (ana səhifə)", price: checkout.price, color: "#3b82f6", days: checkout.days };
+    if (checkout.kind === "one_shop") return { label: "Mağaza reklamı (ana səhifə)", price: checkout.price, color: "#3b82f6", days: checkout.days };
+    if (checkout.kind === "slot_product") return { label: `Slot aktivasiyası: ${checkout.productTitle}`, price: checkout.price, color: "#f59e0b", days: 0 };
+    if (checkout.kind === "slot_shop") return { label: "Slot aktivasiyası: Mağaza", price: checkout.price, color: "#3b82f6", days: 0 };
+    return { label: "Slot aktivasiyası: Banner", price: checkout.price, color: "#3b82f6", days: 0 };
   })();
+
+  // Prefill saved card when opening checkout
+  useEffect(() => {
+    if (!checkout) return;
+    try {
+      const raw = localStorage.getItem(CARD_STORAGE_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as typeof card;
+        setCard(saved);
+        setSaveCard(true);
+      }
+    } catch { /* ignore */ }
+  }, [checkout]);
 
   const purchase = async () => {
     if (!user || !checkout || !checkoutMeta) return;
@@ -168,10 +184,14 @@ export function SellerAdvertising() {
     }
     setPaying(true);
     try {
-      const ends = new Date();
-      ends.setDate(ends.getDate() + checkoutMeta.days);
+      // Persist/clear saved card
+      try {
+        if (saveCard) localStorage.setItem(CARD_STORAGE_KEY, JSON.stringify(card));
+        else localStorage.removeItem(CARD_STORAGE_KEY);
+      } catch { /* ignore */ }
 
       if (checkout.kind === "pkg") {
+        const ends = new Date(); ends.setDate(ends.getDate() + checkoutMeta.days);
         const { data: sub, error: subErr } = await supabase.from("seller_subscriptions").insert({
           seller_id: user.id,
           package_id: checkout.pkg.id,
@@ -189,13 +209,14 @@ export function SellerAdvertising() {
         });
         toast.success(`${checkout.pkg.name} paketi aktiv edildi! 🎉`);
         setCheckout(null);
-        setCard({ number: "", name: "", expiry: "", cvc: "" });
+        if (!saveCard) setCard({ number: "", name: "", expiry: "", cvc: "" });
         await load();
-        setPostPay(true); // open chooser
+        setPostPay(true);
         return;
       }
 
       if (checkout.kind === "one_product") {
+        const ends = new Date(); ends.setDate(ends.getDate() + checkout.days);
         const { error } = await supabase.from("sponsored_products").insert({
           seller_id: user.id, product_id: checkout.productId,
           position: "catalog_top", is_active: true, ends_at: ends.toISOString(),
@@ -206,7 +227,8 @@ export function SellerAdvertising() {
           description: `Tək məhsul reklamı: ${checkout.productTitle} (${checkout.days} gün)`,
         });
         toast.success("Məhsul ana səhifədə önə çəkildi! 🎉");
-      } else {
+      } else if (checkout.kind === "one_shop") {
+        const ends = new Date(); ends.setDate(ends.getDate() + checkout.days);
         const { error } = await supabase.from("sponsored_shops").insert({
           seller_id: user.id, ends_at: ends.toISOString(), is_active: true,
         });
@@ -216,9 +238,55 @@ export function SellerAdvertising() {
           description: `Mağaza reklamı (${checkout.days} gün)`,
         });
         toast.success("Mağazanız ana səhifədə önə çəkildi! 🎉");
+      } else if (checkout.kind === "slot_product") {
+        if (!activeSub) throw new Error("Aktiv paket yoxdur");
+        const { error } = await supabase.from("sponsored_products").insert({
+          seller_id: user.id, subscription_id: activeSub.id, product_id: checkout.productId,
+          position: "catalog_top", is_active: true, ends_at: activeSub.ends_at,
+        });
+        if (error) throw error;
+        await supabase.from("payment_transactions").insert({
+          seller_id: user.id, subscription_id: activeSub.id, amount: checkout.price,
+          status: "completed", method: "mock_card",
+          description: `Slot aktivasiyası — Məhsul: ${checkout.productTitle}`,
+        });
+        toast.success("Məhsul önə çəkildi 🎉");
+        setPickProduct(false);
+      } else if (checkout.kind === "slot_shop") {
+        if (!activeSub) throw new Error("Aktiv paket yoxdur");
+        const { error } = await supabase.from("sponsored_shops").insert({
+          seller_id: user.id, subscription_id: activeSub.id, ends_at: activeSub.ends_at, is_active: true,
+        });
+        if (error) throw error;
+        await supabase.from("payment_transactions").insert({
+          seller_id: user.id, subscription_id: activeSub.id, amount: checkout.price,
+          status: "completed", method: "mock_card",
+          description: "Slot aktivasiyası — Mağaza reklamı",
+        });
+        toast.success("Mağazanız önə çəkildi 🎉");
+      } else if (checkout.kind === "slot_banner") {
+        if (!activeSub) throw new Error("Aktiv paket yoxdur");
+        const { error } = await supabase.from("banners").insert({
+          seller_id: user.id,
+          subscription_id: activeSub.id,
+          title: checkout.form.title.trim().slice(0, 200),
+          image_url: checkout.form.image_url,
+          link_url: checkout.form.link_url.trim().slice(0, 500) || null,
+          position: "home_top",
+          is_active: true,
+          ends_at: activeSub.ends_at,
+        });
+        if (error) throw error;
+        await supabase.from("payment_transactions").insert({
+          seller_id: user.id, subscription_id: activeSub.id, amount: checkout.price,
+          status: "completed", method: "mock_card",
+          description: `Slot aktivasiyası — Banner: ${checkout.form.title}`,
+        });
+        toast.success("Banner əlavə olundu 🎉");
+        setBannerForm(null);
       }
       setCheckout(null);
-      setCard({ number: "", name: "", expiry: "", cvc: "" });
+      if (!saveCard) setCard({ number: "", name: "", expiry: "", cvc: "" });
       await load();
     } catch (e) {
       toast.error("Ödəniş alınmadı: " + (e as Error).message);
