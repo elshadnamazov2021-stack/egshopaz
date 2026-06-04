@@ -20,14 +20,15 @@ interface Category { id: string; name: string; name_ru?: string | null; name_en?
 export function MainSidebar() {
   const { user, isSeller } = useAuth();
   const { t } = useTranslation();
-  const { setOpenMobile, isMobile } = useSidebar();
+  const { setOpenMobile, isMobile, openMobile } = useSidebar();
   const [cats, setCats] = useState<Category[]>([]);
 
   useEffect(() => {
+    if (isMobile && !openMobile) return;
     supabase.from("categories").select("*").order("sort_order").then(({ data }) => {
       setCats((data ?? []) as Category[]);
     });
-  }, []);
+  }, [isMobile, openMobile]);
 
   const close = () => { if (isMobile) setOpenMobile(false); };
 
