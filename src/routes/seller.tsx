@@ -438,6 +438,7 @@ function SellerPanel() {
       free_shipping: !!editing.free_shipping,
       fast_delivery: !!editing.fast_delivery,
       condition: editing.condition || "new",
+      is_giveaway: !!editing.is_giveaway,
     };
 
     if (editing.id) {
