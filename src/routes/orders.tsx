@@ -322,6 +322,7 @@ function OrdersPage() {
           pvzAddress={qrOrder?.pickup_points ? `${qrOrder.pickup_points.city}, ${qrOrder.pickup_points.address}` : null}
           customerName={qrOrder?.recipient_name ?? null}
           customerPhone={qrOrder?.recipient_phone ?? null}
+          orderDate={qrOrder?.created_at ?? null}
           mode="buyer"
         />
       )}
