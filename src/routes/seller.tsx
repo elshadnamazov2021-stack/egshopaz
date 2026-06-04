@@ -1387,10 +1387,10 @@ function SellerPanel() {
 
               <div>
                 <label className="text-sm font-semibold">Kateqoriya</label>
-                <CategoryCombobox
+                <CategoryCascade
                   categories={categories}
                   value={editing.category_id ?? null}
-                  onChange={(id) => setEditing({ ...editing, category_id: id })}
+                  onChange={(id: string | null) => setEditing({ ...editing, category_id: id })}
                 />
               </div>
 
