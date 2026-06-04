@@ -39,6 +39,7 @@ function OrdersPage() {
   const { items } = useBuyerNav();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filter, setFilter] = useState<string>("all");
+  const [dateRange, setDateRange] = useState<DateRange>(emptyRange);
   const [msgItem, setMsgItem] = useState<OrderItem | null>(null);
   const [msgOrderId, setMsgOrderId] = useState<string | null>(null);
   const [msgBody, setMsgBody] = useState("");
