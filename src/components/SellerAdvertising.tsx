@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { formatAZN, formatDateTime, formatDate } from "@/lib/format";
 import {
   Check, Crown, Sparkles, Star, CreditCard, Calendar, TrendingUp,
-  Receipt, Loader2, X, Image as ImageIcon, Plus, Trash2, Megaphone, Package,
+  Receipt, Loader2, X, Image as ImageIcon, Plus, Trash2, Megaphone, Package, Store,
 } from "lucide-react";
 import { toast } from "sonner";
 
