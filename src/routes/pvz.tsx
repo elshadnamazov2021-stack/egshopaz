@@ -545,46 +545,57 @@ function Intake({ scan, setScan }: { scan: string; setScan: (v: string) => void 
         }}
       />
 
-      <div className="bg-card border border-border rounded-2xl p-4">
-        <div className="font-bold mb-3 flex items-center justify-between">
-          <span>Gözləyən paketlər ({pending.length})</span>
-          <Button size="sm" variant="ghost" onClick={load}>
-            Yenilə
-          </Button>
-        </div>
-        {pending.length === 0 ? (
-          <div className="text-sm text-muted-foreground text-center py-6">
-            Hazırda gözləyən paket yoxdur
+      <DateRangeFilter value={dateRange} onChange={setDateRange} />
+
+      {(() => {
+        const visible = pending.filter((o) => inRange(o.orders?.created_at ?? null, dateRange));
+        return (
+          <div className="bg-card border border-border rounded-2xl p-4">
+            <div className="font-bold mb-3 flex items-center justify-between">
+              <span>Gözləyən paketlər ({visible.length})</span>
+              <Button size="sm" variant="ghost" onClick={load}>
+                Yenilə
+              </Button>
+            </div>
+            {visible.length === 0 ? (
+              <div className="text-sm text-muted-foreground text-center py-6">
+                Hazırda gözləyən paket yoxdur
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Pickup kodu</TableHead>
+                    <TableHead>Məhsul</TableHead>
+                    <TableHead>Müştəri</TableHead>
+                    <TableHead>Sifariş tarixi</TableHead>
+                    <TableHead className="text-right">Əməliyyat</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {visible.map((o) => (
+                    <TableRow key={o.id}>
+                      <TableCell className="font-mono font-bold text-primary">
+                        {o.pickup_code}
+                      </TableCell>
+                      <TableCell className="max-w-xs truncate">{o.title}</TableCell>
+                      <TableCell className="text-xs">{o.orders?.recipient_name ?? "—"}</TableCell>
+                      <TableCell className="text-xs whitespace-nowrap">
+                        {o.orders?.created_at ? formatDateTime(o.orders.created_at) : "—"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button size="sm" disabled={busy} onClick={() => acceptByCode(o.pickup_code)}>
+                          <CheckCircle2 className="h-4 w-4 mr-1" /> Qəbul et
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Pickup kodu</TableHead>
-                <TableHead>Məhsul</TableHead>
-                <TableHead>Müştəri</TableHead>
-                <TableHead className="text-right">Əməliyyat</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {pending.map((o) => (
-                <TableRow key={o.id}>
-                  <TableCell className="font-mono font-bold text-primary">
-                    {o.pickup_code}
-                  </TableCell>
-                  <TableCell className="max-w-xs truncate">{o.title}</TableCell>
-                  <TableCell className="text-xs">{o.orders?.recipient_name ?? "—"}</TableCell>
-                  <TableCell className="text-right">
-                    <Button size="sm" disabled={busy} onClick={() => acceptByCode(o.pickup_code)}>
-                      <CheckCircle2 className="h-4 w-4 mr-1" /> Qəbul et
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </div>
+        );
+      })()}
     </div>
   );
 }
