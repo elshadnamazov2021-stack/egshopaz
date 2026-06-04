@@ -65,6 +65,12 @@ function Index() {
       supabase.from("promo_codes").select("id,code,discount_percent,discount_amount,min_order,expires_at").eq("is_active", true).limit(6)
         .then(({ data }) => setPromos((data ?? []) as PromoCode[]));
 
+      supabase.from("products")
+        .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
+        .eq("is_active", true).eq("is_giveaway", true)
+        .order("created_at", { ascending: false }).limit(10)
+        .then(({ data }) => setGiveaways((data ?? []) as ProductCardData[]));
+
       // Favoritlər — RPC olmadığı üçün məhdudlaşdırılmış
       supabase.from("favorites").select("product_id").limit(200).then(async ({ data }) => {
         const counts = new Map<string, number>();
