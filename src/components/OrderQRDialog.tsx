@@ -14,11 +14,13 @@ interface Props {
   pvzAddress?: string | null;
   customerName?: string | null;
   customerPhone?: string | null;
+  orderDate?: string | null;
   mode?: "buyer" | "seller";
 }
 
-export function OrderQRDialog({ open, onOpenChange, pickupCode, title, subtitle, pvzName, pvzAddress, customerName, customerPhone, mode = "buyer" }: Props) {
+export function OrderQRDialog({ open, onOpenChange, pickupCode, title, subtitle, pvzName, pvzAddress, customerName, customerPhone, orderDate, mode = "buyer" }: Props) {
   const [qr, setQr] = useState("");
+  const orderDateStr = orderDate ? new Date(orderDate).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : null;
 
   useEffect(() => {
     if (!open || !pickupCode) return;
