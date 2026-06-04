@@ -193,7 +193,7 @@ function SellerPanel() {
         .select("*")
         .eq("seller_id", user.id)
         .order("created_at", { ascending: false }),
-      supabase.from("categories").select("id,name").order("sort_order"),
+      supabase.from("categories").select("id,name,parent_id,icon").order("sort_order"),
       supabase
         .from("order_items")
         .select(
