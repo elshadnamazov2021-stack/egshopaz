@@ -91,6 +91,7 @@ interface OrderItem {
   accepted_at: string | null;
   delivered_at: string | null;
   pickup_point_id: string | null;
+  order_created_at?: string | null;
   pickup_point: {
     id: string;
     name: string;
