@@ -183,7 +183,7 @@ function OrdersPage() {
               <div key={o.id} className="bg-card border border-border rounded-2xl p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <div>
-                    <div className="text-xs text-muted-foreground">№ {o.id.slice(0, 8).toUpperCase()} · {new Date(o.created_at).toLocaleDateString()}</div>
+                    <div className="text-xs text-muted-foreground">№ {o.id.slice(0, 8).toUpperCase()} · 📅 {new Date(o.created_at).toLocaleString("az-AZ", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</div>
                     {o.shipping_address && <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1"><MapPin className="h-3 w-3" /> {o.shipping_address}</div>}
                   </div>
                   <div className="flex items-center gap-3">
