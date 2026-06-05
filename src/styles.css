@@ -161,14 +161,9 @@
     .text-4xl { font-size: 2.2rem !important; line-height: 2.8rem; }
     .text-\[10px\], .text-\[11px\], .text-\[9px\], .text-\[8px\] { font-size: 0.85rem !important; }
 
-    /* Böyük toxunuş hədəfləri */
+    /* Böyük toxunuş hədəfləri — yalnız konkret rol oynayanlara */
     button, [role="button"], input, select, textarea {
-      min-height: 48px;
-    }
-    a {
       min-height: 44px;
-      display: inline-flex;
-      align-items: center;
     }
 
     /* Form elementləri daha böyük */
