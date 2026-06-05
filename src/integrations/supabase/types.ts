@@ -450,6 +450,45 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_cards: {
+        Row: {
+          brand: string
+          created_at: string
+          exp_month: number
+          exp_year: number
+          holder: string
+          id: string
+          is_default: boolean
+          last4: string
+          provider_token: string | null
+          user_id: string
+        }
+        Insert: {
+          brand: string
+          created_at?: string
+          exp_month: number
+          exp_year: number
+          holder: string
+          id?: string
+          is_default?: boolean
+          last4: string
+          provider_token?: string | null
+          user_id: string
+        }
+        Update: {
+          brand?: string
+          created_at?: string
+          exp_month?: number
+          exp_year?: number
+          holder?: string
+          id?: string
+          is_default?: boolean
+          last4?: string
+          provider_token?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       dispute_messages: {
         Row: {
           body: string
@@ -1724,11 +1763,13 @@ export type Database = {
         Row: {
           bonus_earn_percent: number
           bonus_to_azn: number
+          cod_enabled: boolean
           commission_percent: number
           delivery_base_fee: number
           id: string
           maintenance_mode: boolean
           min_payout: number
+          payments_mode: string
           promo_terms_text: string
           single_product_promo_days: number
           single_product_promo_price: number
@@ -1740,11 +1781,13 @@ export type Database = {
         Insert: {
           bonus_earn_percent?: number
           bonus_to_azn?: number
+          cod_enabled?: boolean
           commission_percent?: number
           delivery_base_fee?: number
           id?: string
           maintenance_mode?: boolean
           min_payout?: number
+          payments_mode?: string
           promo_terms_text?: string
           single_product_promo_days?: number
           single_product_promo_price?: number
@@ -1756,11 +1799,13 @@ export type Database = {
         Update: {
           bonus_earn_percent?: number
           bonus_to_azn?: number
+          cod_enabled?: boolean
           commission_percent?: number
           delivery_base_fee?: number
           id?: string
           maintenance_mode?: boolean
           min_payout?: number
+          payments_mode?: string
           promo_terms_text?: string
           single_product_promo_days?: number
           single_product_promo_price?: number
@@ -1965,6 +2010,10 @@ export type Database = {
         Args: { _order_id: string; _user_id: string }
         Returns: boolean
       }
+      process_card_payment: {
+        Args: { _card_id?: string; _new_card?: Json; _order_id: string }
+        Returns: Json
+      }
       recalc_product_review_stats: {
         Args: { p_product_id: string }
         Returns: undefined
@@ -1991,6 +2040,7 @@ export type Database = {
         Returns: undefined
       }
       request_payout: { Args: { _amount: number }; Returns: string }
+      set_default_card: { Args: { _card_id: string }; Returns: undefined }
       sync_order_status_from_items: {
         Args: { _order_id: string }
         Returns: undefined

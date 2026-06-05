@@ -318,7 +318,7 @@ function CartPage() {
     await supabase.from("cart_items").delete().eq("user_id", user.id);
     toast.success(t("cart.orderPlaced"));
     setPlacing(false);
-    navigate({ to: "/orders" });
+    navigate({ to: "/checkout-pay/$orderId", params: { orderId } });
   };
 
   if (!authLoading && !user) {
