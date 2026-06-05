@@ -85,7 +85,7 @@ export function HomeCategoryBrowser() {
               <button
                 key={c.id}
                 onClick={() => selectRoot(c.id)}
-                className={`min-w-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition ${
+                 className={`min-w-0 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-sm font-bold transition ${
                   isActive
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "bg-secondary/50 text-foreground hover:bg-secondary"
@@ -149,7 +149,7 @@ export function HomeCategoryBrowser() {
                         {hasChildren ? (
                           <button
                             onClick={() => setActiveSubId(s.id)}
-                            className="w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition"
+                             className="w-full inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition"
                           >
                             <span className="text-base">{s.icon || activeRoot.icon || "🛍️"}</span>
                             <span>{catName(s)}</span>
@@ -158,7 +158,7 @@ export function HomeCategoryBrowser() {
                           <Link
                             to="/catalog"
                             search={{ cat: s.slug, q: undefined } as never}
-                            className="w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition"
+                             className="w-full inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition"
                           >
                             <span className="text-base">{s.icon || activeRoot.icon || "🛍️"}</span>
                             <span>{catName(s)}</span>
