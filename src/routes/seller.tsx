@@ -716,6 +716,14 @@ function SellerPanel() {
       onClick: () => setTab("advertising"),
     },
     {
+      key: "followers",
+      label: "İzləyicilər",
+      icon: Users,
+      active: tab === "followers",
+      onClick: () => setTab("followers"),
+    },
+
+    {
       key: "shop",
       label: "Mağaza ayarları",
       icon: Settings,
