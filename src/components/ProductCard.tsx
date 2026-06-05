@@ -59,9 +59,9 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
     <Link
       to="/product/$id"
       params={{ id: p.id }}
-      className="group bg-card rounded-xl overflow-hidden border border-border/60 hover:border-border hover:shadow-card transition flex flex-col mobile-readable-card"
+      className="group min-w-0 bg-card rounded-xl overflow-hidden border border-border/60 hover:border-border hover:shadow-card transition flex flex-col mobile-readable-card"
     >
-      <div className="product-image relative aspect-[3/4] bg-secondary overflow-hidden">
+      <div className="product-image relative aspect-square sm:aspect-[3/4] bg-secondary overflow-hidden">
         {p.image_url ? (
           <img src={p.image_url} alt={p.title} loading="lazy"
                className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
@@ -84,15 +84,15 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
           </button>
         )}
       </div>
-      <div className="p-2.5 sm:p-3 flex flex-col gap-1.5 flex-1">
-        <div className="flex items-baseline gap-2">
-          <span className="text-lg sm:text-lg font-extrabold">{formatAZN(p.price)}</span>
+      <div className="p-2 sm:p-3 flex flex-col gap-1 sm:gap-1.5 flex-1">
+        <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 min-w-0">
+          <span className="text-base sm:text-lg font-extrabold leading-tight">{formatAZN(p.price)}</span>
           {p.old_price && Number(p.old_price) > Number(p.price) && (
             <span className="text-xs text-muted-foreground line-through">{formatAZN(p.old_price)}</span>
           )}
         </div>
         {p.brand && <span className="text-xs text-muted-foreground font-semibold uppercase">{p.brand}</span>}
-        <p className="text-sm line-clamp-2 text-foreground/80 leading-snug">{p.title}</p>
+        <p className="text-xs sm:text-sm line-clamp-2 text-foreground/80 leading-snug">{p.title}</p>
         {(p.fast_delivery || p.free_shipping || p.delivery_days_max) && (
           <div className="flex items-center gap-1 flex-wrap">
             {p.fast_delivery && (
@@ -123,9 +123,9 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
         <button
           onClick={addToCart}
           disabled={adding}
-          className="mt-2 w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 rounded-lg py-2.5 sm:py-2 text-sm font-semibold flex items-center justify-center gap-1.5 transition"
+          className="mt-1.5 sm:mt-2 w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 rounded-lg py-2 sm:py-2 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 transition"
         >
-          <ShoppingCart className="h-4 w-4" />
+          <ShoppingCart className="h-4 w-4 shrink-0" />
           {t("product.addToCart")}
         </button>
       </div>
