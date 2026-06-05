@@ -32,104 +32,106 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
-      <div className="container mx-auto px-4 h-32 sm:h-36 flex items-center gap-4">
-        <SidebarTrigger className="shrink-0" />
+    <header className="sticky top-0 z-50 border-b border-border shadow-sm">
+      <div className="w-full px-4 h-32 sm:h-36 flex items-center bg-gradient-brand text-white">
+        <div className="max-w-7xl mx-auto w-full flex items-center gap-4">
+          <SidebarTrigger className="shrink-0 text-white" />
 
-        <Link to="/" className="flex items-center gap-2 sm:gap-3 shrink-0 hover:scale-105 transition-transform" aria-label="EG Shop">
-          <img src={egLogo.url} alt="EG Shop logo" width={256} height={256} className="h-16 sm:h-20 md:h-24 w-16 sm:w-20 md:w-24 rounded-full object-cover ring-2 ring-primary/30 shadow-lg" />
-          <span className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-primary">
-            EG Shop
-          </span>
-        </Link>
-        <LiveClock />
-
-        <form onSubmit={onSearch} className="flex-1 max-w-2xl hidden md:flex">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder={t("common.searchPlaceholder")}
-              className="w-full pl-10 pr-12 h-11 rounded-lg border border-input bg-secondary/50 focus:bg-background focus:outline-none focus:ring-2 focus:ring-ring transition"
-            />
-            <button
-              type="button"
-              onClick={() => setVisualOpen(true)}
-              title={t("home.visualSearchTitle")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-primary/10 text-primary transition"
-            >
-              <Camera className="h-5 w-5" />
-            </button>
-          </div>
-        </form>
-
-        <nav className="ml-auto flex items-center gap-1 sm:gap-2">
-          <DesktopViewToggle />
-          <LanguageSwitcher />
-          <Link to="/discover" className="hidden md:flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
-            <span className="h-5 w-5 mb-0.5 text-base">🔥</span>
-            <span>{t("sidebar.discover")}</span>
+          <Link to="/" className="flex items-center gap-2 sm:gap-3 shrink-0 hover:scale-105 transition-transform" aria-label="EG Shop">
+            <img src={egLogo.url} alt="EG Shop logo" width={256} height={256} className="h-16 sm:h-20 md:h-24 w-16 sm:w-20 md:w-24 rounded-full object-cover ring-2 ring-white/30 shadow-lg" />
+            <span className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white">
+              EG Shop
+            </span>
           </Link>
-          <Link to="/favorites" className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
-            <Heart className="h-5 w-5 mb-0.5" />
-            <span>{t("header.favorites")}</span>
-          </Link>
-          <NotificationsBell />
-          <Link to="/cart" className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
-            <ShoppingCart className="h-5 w-5 mb-0.5" />
-            <span>{t("header.cart")}</span>
-          </Link>
+          <LiveClock />
 
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition outline-none">
-                <User className="h-5 w-5 mb-0.5" />
-                <span>{t("header.cabinet")}</span>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {!isSeller && (
-                  <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
-                    <User className="h-4 w-4 mr-2" /> {t("header.personalCabinet")}
-                  </DropdownMenuItem>
-                )}
-                {isSeller && (
-                  <DropdownMenuItem onClick={() => navigate({ to: "/seller" })}>
-                    <Store className="h-4 w-4 mr-2" /> {t("header.sellerPanel")}
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={async () => { await signOut(); navigate({ to: "/" }); }}>
-                  <LogOut className="h-4 w-4 mr-2" /> {t("header.logout")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Link to="/auth" className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition">
-              <User className="h-5 w-5 mb-0.5" />
-              <span>{t("header.login")}</span>
+          <form onSubmit={onSearch} className="flex-1 max-w-2xl hidden md:flex">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder={t("common.searchPlaceholder")}
+                className="w-full pl-10 pr-12 h-11 rounded-lg border border-white/30 bg-white/20 focus:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 transition text-white placeholder:text-white/70"
+              />
+              <button
+                type="button"
+                onClick={() => setVisualOpen(true)}
+                title={t("home.visualSearchTitle")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-white/20 text-white transition"
+              >
+                <Camera className="h-5 w-5" />
+              </button>
+            </div>
+          </form>
+
+          <nav className="ml-auto flex items-center gap-1 sm:gap-2">
+            <DesktopViewToggle />
+            <LanguageSwitcher />
+            <Link to="/discover" className="hidden md:flex flex-col items-center text-xs px-3 py-1.5 hover:text-white/80 transition text-white">
+              <span className="h-5 w-5 mb-0.5 text-base">🔥</span>
+              <span>{t("sidebar.discover")}</span>
             </Link>
-          )}
-        </nav>
+            <Link to="/favorites" className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-white/80 transition text-white">
+              <Heart className="h-5 w-5 mb-0.5" />
+              <span>{t("header.favorites")}</span>
+            </Link>
+            <NotificationsBell />
+            <Link to="/cart" className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-white/80 transition text-white">
+              <ShoppingCart className="h-5 w-5 mb-0.5" />
+              <span>{t("header.cart")}</span>
+            </Link>
+
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-white/80 transition outline-none text-white">
+                  <User className="h-5 w-5 mb-0.5" />
+                  <span>{t("header.cabinet")}</span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {!isSeller && (
+                    <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
+                      <User className="h-4 w-4 mr-2" /> {t("header.personalCabinet")}
+                    </DropdownMenuItem>
+                  )}
+                  {isSeller && (
+                    <DropdownMenuItem onClick={() => navigate({ to: "/seller" })}>
+                      <Store className="h-4 w-4 mr-2" /> {t("header.sellerPanel")}
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={async () => { await signOut(); navigate({ to: "/" }); }}>
+                    <LogOut className="h-4 w-4 mr-2" /> {t("header.logout")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/auth" className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-white/80 transition text-white">
+                <User className="h-5 w-5 mb-0.5" />
+                <span>{t("header.login")}</span>
+              </Link>
+            )}
+          </nav>
+        </div>
       </div>
 
       {/* mobile search */}
-      <form onSubmit={onSearch} className="md:hidden px-4 pb-3">
+      <form onSubmit={onSearch} className="md:hidden px-4 pb-3 bg-gradient-brand">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={t("common.search")}
-            className="w-full pl-10 pr-11 h-10 rounded-lg border border-input bg-secondary/50 focus:bg-background focus:outline-none focus:ring-2 focus:ring-ring transition text-sm"
+            className="w-full pl-10 pr-11 h-10 rounded-lg border border-white/30 bg-white/20 focus:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 transition text-sm text-white placeholder:text-white/70"
           />
           <button
             type="button"
             onClick={() => setVisualOpen(true)}
             title={t("home.visualSearchTitle")}
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-primary/10 text-primary transition"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-white/20 text-white transition"
           >
             <Camera className="h-4 w-4" />
           </button>
