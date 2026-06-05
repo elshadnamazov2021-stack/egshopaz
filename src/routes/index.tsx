@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { SponsoredProducts } from "@/components/SponsoredProducts";
 import { SellerBanners } from "@/components/SellerBanners";
-import { Tag, Flame, TicketPercent, TrendingUp, Sparkles, Copy, Camera, Truck, ShieldCheck, Clock, Gift, Store, Shield, Package } from "lucide-react";
+import { Tag, Flame, TicketPercent, TrendingUp, Sparkles, Copy, Camera, Truck, ShieldCheck, Clock, Gift, Store, Shield, Package, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
 import { HomeCategoryBrowser } from "@/components/HomeCategoryBrowser";
 import { FeaturedShops } from "@/components/FeaturedShops";
