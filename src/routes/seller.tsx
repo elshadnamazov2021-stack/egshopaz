@@ -181,6 +181,7 @@ function SellerPanel() {
   const [uploading, setUploading] = useState(false);
   const [savingShop, setSavingShop] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [myFollowers, setMyFollowers] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { setMounted(true); }, []);
