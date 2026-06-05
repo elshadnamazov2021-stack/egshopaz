@@ -90,9 +90,11 @@ export function SiteHeader() {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
-                  <User className="h-4 w-4 mr-2" /> {t("header.personalCabinet")}
-                </DropdownMenuItem>
+                {!isSeller && (
+                  <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
+                    <User className="h-4 w-4 mr-2" /> {t("header.personalCabinet")}
+                  </DropdownMenuItem>
+                )}
                 {isSeller && (
                   <DropdownMenuItem onClick={() => navigate({ to: "/seller" })}>
                     <Store className="h-4 w-4 mr-2" /> {t("header.sellerPanel")}
