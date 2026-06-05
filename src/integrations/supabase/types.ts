@@ -717,10 +717,14 @@ export type Database = {
           bonus_earned: number
           bonus_used: number
           buyer_id: string
+          collected_by_pvz_id: string | null
           created_at: string
           discount: number
           id: string
+          paid_at: string | null
           payment_method: string
+          payment_note: string | null
+          payment_status: string
           pickup_point_id: string | null
           promo_code: string | null
           recipient_email: string | null
@@ -734,10 +738,14 @@ export type Database = {
           bonus_earned?: number
           bonus_used?: number
           buyer_id: string
+          collected_by_pvz_id?: string | null
           created_at?: string
           discount?: number
           id?: string
+          paid_at?: string | null
           payment_method?: string
+          payment_note?: string | null
+          payment_status?: string
           pickup_point_id?: string | null
           promo_code?: string | null
           recipient_email?: string | null
@@ -751,10 +759,14 @@ export type Database = {
           bonus_earned?: number
           bonus_used?: number
           buyer_id?: string
+          collected_by_pvz_id?: string | null
           created_at?: string
           discount?: number
           id?: string
+          paid_at?: string | null
           payment_method?: string
+          payment_note?: string | null
+          payment_status?: string
           pickup_point_id?: string | null
           promo_code?: string | null
           recipient_email?: string | null
@@ -765,6 +777,13 @@ export type Database = {
           total?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "orders_collected_by_pvz_id_fkey"
+            columns: ["collected_by_pvz_id"]
+            isOneToOne: false
+            referencedRelation: "pickup_points"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "orders_pickup_point_id_fkey"
             columns: ["pickup_point_id"]
@@ -1752,6 +1771,80 @@ export type Database = {
         }
         Relationships: []
       }
+      treasury_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          direction: string
+          id: string
+          kind: string
+          note: string | null
+          order_id: string | null
+          order_item_id: string | null
+          payout_request_id: string | null
+          pickup_point_id: string | null
+          seller_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          direction: string
+          id?: string
+          kind: string
+          note?: string | null
+          order_id?: string | null
+          order_item_id?: string | null
+          payout_request_id?: string | null
+          pickup_point_id?: string | null
+          seller_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          id?: string
+          kind?: string
+          note?: string | null
+          order_id?: string | null
+          order_item_id?: string | null
+          payout_request_id?: string | null
+          pickup_point_id?: string | null
+          seller_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treasury_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treasury_transactions_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treasury_transactions_payout_request_id_fkey"
+            columns: ["payout_request_id"]
+            isOneToOne: false
+            referencedRelation: "payout_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treasury_transactions_pickup_point_id_fkey"
+            columns: ["pickup_point_id"]
+            isOneToOne: false
+            referencedRelation: "pickup_points"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1820,6 +1913,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_manual_treasury: {
+        Args: { _amount: number; _direction: string; _note: string }
+        Returns: string
+      }
       auto_payout_after_3_days: { Args: never; Returns: number }
       become_seller: { Args: { _shop_name: string }; Returns: undefined }
       call_ai_auto_reply: {
@@ -1860,6 +1957,10 @@ export type Database = {
         Returns: undefined
       }
       is_buyer_only: { Args: { _user_id: string }; Returns: boolean }
+      mark_order_paid: {
+        Args: { _method?: string; _note?: string; _order_id: string }
+        Returns: undefined
+      }
       order_belongs_to_user: {
         Args: { _order_id: string; _user_id: string }
         Returns: boolean
