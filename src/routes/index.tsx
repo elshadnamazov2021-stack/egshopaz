@@ -94,25 +94,25 @@ function Index() {
   return (
     <div className="container mx-auto px-3 md:px-4 py-4 space-y-6 md:space-y-8">
       {/* DEV: Panel keçidləri — domen alana qədər */}
-      <section className="rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 p-4 md:p-5">
+      <section className="rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 p-3 md:p-5">
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Panel keçidləri</span>
           <span className="text-[10px] text-muted-foreground">domen alana qədər</span>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <a href={buyerHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white p-4 hover:scale-[1.02] transition shadow-card">
+          <a href={buyerHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white p-3 sm:p-4 hover:scale-[1.02] transition shadow-card">
             <UserIcon className="h-6 w-6" />
             <span className="text-sm font-black">Müştəri</span>
           </a>
-          <a href={sellerHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-orange-500 to-rose-500 text-white p-4 hover:scale-[1.02] transition shadow-card">
+          <a href={sellerHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-orange-500 to-rose-500 text-white p-3 sm:p-4 hover:scale-[1.02] transition shadow-card">
             <Store className="h-6 w-6" />
             <span className="text-sm font-black">Satıcı</span>
           </a>
-          <a href={adminHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white p-4 hover:scale-[1.02] transition shadow-card">
+          <a href={adminHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white p-3 sm:p-4 hover:scale-[1.02] transition shadow-card">
             <Shield className="h-6 w-6" />
             <span className="text-sm font-black">Admin</span>
           </a>
-          <a href={pvzHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-4 hover:scale-[1.02] transition shadow-card">
+          <a href={pvzHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-3 sm:p-4 hover:scale-[1.02] transition shadow-card">
             <Package className="h-6 w-6" />
             <span className="text-sm font-black">PVZ</span>
           </a>
