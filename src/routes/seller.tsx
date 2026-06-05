@@ -172,6 +172,7 @@ function SellerPanel() {
     | "orders"
     | "messages"
     | "advertising"
+    | "balance"
     | "analytics"
     | "bulk"
     | "shop"
