@@ -82,7 +82,7 @@ export function NotificationsBell() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="relative flex flex-col items-center text-xs px-3 py-1.5 hover:text-primary transition outline-none">
+      <DropdownMenuTrigger className="relative flex flex-col items-center text-xs px-2 sm:px-3 py-1.5 hover:text-white/80 sm:hover:text-primary transition outline-none text-white sm:text-inherit min-w-0">
         <Bell className="h-5 w-5 mb-0.5" />
         {unread > 0 && (
           <span className="absolute top-0 right-1 bg-discount text-discount-foreground text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">

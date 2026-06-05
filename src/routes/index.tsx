@@ -167,7 +167,7 @@ function Index() {
               <p className="text-sm opacity-95 mt-1">Bu məhsulları al və uduşda iştirak et!</p>
             </div>
           </div>
-          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 bg-white rounded-2xl p-3">
+          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3 bg-white rounded-2xl p-3 mobile-product-grid">
             {giveaways.slice(0, 4).map((p) => <ProductCard key={p.id} p={p} enableFavorite={false} />)}
           </div>
         </section>
@@ -184,7 +184,7 @@ function Index() {
             </div>
             <Link to="/discover" className="text-sm font-bold hover:underline whitespace-nowrap">{t("home.viewAllArrow")}</Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 bg-white rounded-2xl p-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3 bg-white rounded-2xl p-3 mobile-product-grid">
             {discounted.slice(0, 5).map((p) => <ProductCard key={p.id} p={p} enableFavorite={false} />)}
           </div>
         </section>
@@ -238,7 +238,7 @@ function Index() {
             </div>
             <Link to="/discover" className="text-sm text-primary font-bold hover:underline">{t("home.viewAllArrow")}</Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 mobile-product-grid">
             {trending.slice(0, 6).map((p) => <ProductCard key={p.id} p={p} enableFavorite={false} />)}
           </div>
         </section>
@@ -248,7 +248,7 @@ function Index() {
       <SponsoredProducts limit={6} />
 
       {/* Benefits */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {[
           { icon: Truck, t: t("home.benefitFreeShipping"), s: t("home.benefitFreeShippingDesc"), color: "from-violet-500 to-purple-500" },
           { icon: ShieldCheck, t: t("home.benefitWarranty"), s: t("home.benefitWarrantyDesc"), color: "from-emerald-500 to-teal-500" },
@@ -286,7 +286,7 @@ function Index() {
             <Link to="/become-seller" className="text-primary font-bold hover:underline">{t("home.becomeFirstSeller")}</Link>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 mobile-product-grid">
             {allProducts.map((p) => <ProductCard key={p.id} p={p} enableFavorite={false} />)}
           </div>
         )}
