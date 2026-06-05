@@ -228,7 +228,7 @@ function SellerPanel() {
       supabase
         .from("profiles")
         .select(
-          "full_name,shop_name,phone,avatar_url,shop_description,shop_logo_url,shop_banner_url,shop_address,shop_city,shop_email,created_at",
+          "full_name,shop_name,phone,avatar_url,shop_description,shop_logo_url,shop_banner_url,shop_address,shop_city,shop_email,iban,bank_name,card_number,account_holder,payout_method,created_at",
         )
         .eq("id", user.id)
         .maybeSingle(),
