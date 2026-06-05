@@ -303,6 +303,11 @@ function SellerPanel() {
         shop_address: "",
         shop_city: "",
         shop_email: "",
+        iban: "",
+        bank_name: "",
+        card_number: "",
+        account_holder: "",
+        payout_method: "iban",
       },
     );
     setMyFollowers(followersCount ?? 0);
