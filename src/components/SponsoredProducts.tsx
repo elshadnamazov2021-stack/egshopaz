@@ -58,7 +58,7 @@ export function SponsoredProducts({ limit = 6 }: { limit?: number }) {
         <h2 className="text-xl md:text-2xl font-bold">Sponsor məhsullar</h2>
         <span className="text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full font-semibold">REKLAM</span>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mobile-product-grid">
         {items.map((s) => s.products && (
           <Link key={s.id} to="/product/$id" params={{ id: s.products.id }} className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition group relative">
             <span className="absolute top-2 left-2 z-10 bg-warning text-warning-foreground text-[10px] font-bold px-1.5 py-0.5 rounded">AD</span>
