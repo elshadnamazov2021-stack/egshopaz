@@ -45,7 +45,7 @@ export function SiteHeader() {
           </Link>
           <LiveClock />
 
-          <form onSubmit={onSearch} className="flex-1 max-w-2xl hidden md:flex">
+          <form onSubmit={onSearch} className="flex-1 max-w-2xl hidden lg:flex">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
               <input
