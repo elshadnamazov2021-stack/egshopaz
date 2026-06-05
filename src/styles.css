@@ -126,8 +126,10 @@
 @layer base {
   * { border-color: var(--color-border); }
   html {
-    /* Mobil versiyada bütün yazıları və ölçüləri böyüt (rem-əsaslı komponentlər avtomatik böyüyür) */
-    font-size: 18px;
+    /* Mobil: baza şriftini böyüt ki hər şey avtomatik miqyaslaşsın */
+    font-size: 20px;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
   @media (min-width: 768px) {
     html { font-size: 16px; }
@@ -136,11 +138,44 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
   }
-  /* Mobil: kiçik mətnləri də oxunaqlı et */
+
+  /* Mobil: hər şeyi daha böyük və toxunaqlı et */
   @media (max-width: 767px) {
-    .text-xs { font-size: 0.85rem; line-height: 1.25rem; }
-    .text-\[10px\], .text-\[11px\], .text-\[9px\] { font-size: 0.8rem !important; }
+    .text-xs { font-size: 0.9rem !important; line-height: 1.35rem; }
+    .text-sm { font-size: 0.95rem !important; line-height: 1.4rem; }
+    .text-base { font-size: 1.05rem !important; line-height: 1.6rem; }
+    .text-lg { font-size: 1.2rem !important; line-height: 1.75rem; }
+    .text-xl { font-size: 1.4rem !important; line-height: 2rem; }
+    .text-2xl { font-size: 1.6rem !important; line-height: 2.2rem; }
+    .text-3xl { font-size: 1.9rem !important; line-height: 2.5rem; }
+    .text-4xl { font-size: 2.2rem !important; line-height: 2.8rem; }
+    .text-\[10px\], .text-\[11px\], .text-\[9px\], .text-\[8px\] { font-size: 0.85rem !important; }
+
+    /* Böyük toxunuş hədəfləri */
+    button, [role="button"], input, select, textarea {
+      min-height: 48px;
+    }
+    a {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    /* Form elementləri daha böyük */
+    input, select, textarea {
+      font-size: 1rem !important;
+    }
+
+    /* Kartlar və qutular daha çox boşluq */
+    .card, [class*="rounded"] {
+      /* padding avtomatik böyüyəcək rem sayəsində */
+    }
+  }
+
+  @media (min-width: 768px) {
+    body { line-height: 1.5; }
   }
 }
 
