@@ -236,7 +236,7 @@ function Catalog() {
               <p className="text-muted-foreground">{t("catalog.noResults")}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 mobile-product-grid">
               {products.map((p) => <ProductCard key={p.id} p={p} />)}
             </div>
           )}
