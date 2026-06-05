@@ -163,7 +163,7 @@ function ShopPage() {
               )}
 
               {/* Stats grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mt-4">
                 <div className="p-3 bg-secondary/50 rounded-xl">
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Package className="h-3.5 w-3.5" /> Məhsul</div>
                   <div className="font-black text-lg mt-0.5">{stats.count}</div>
@@ -182,6 +182,10 @@ function ShopPage() {
                 <div className="p-3 bg-secondary/50 rounded-xl">
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Award className="h-3.5 w-3.5" /> Sifariş</div>
                   <div className="font-black text-lg mt-0.5">{profile.seller_total_orders ?? 0}</div>
+                </div>
+                <div className="p-3 bg-secondary/50 rounded-xl">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Calendar className="h-3.5 w-3.5" /> Fəaliyyət</div>
+                  <div className="font-black text-lg mt-0.5">{stats.years > 0 ? `${stats.years} il` : " < 1 il"}</div>
                 </div>
               </div>
             </div>
