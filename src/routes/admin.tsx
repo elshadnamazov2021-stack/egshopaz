@@ -7,8 +7,9 @@ import {
   Users, Package, ShoppingBag, DollarSign, Shield, LayoutDashboard,
   Truck, Warehouse, Store, Megaphone, BarChart3, Lock, Scale,
   FileText, Settings, LifeBuoy, AlertTriangle, TrendingUp, Plus, Trash2,
-  CheckCircle2, XCircle, Power, Ban, Edit3, Bell, Tag, Crown, Gem, Star, Award, Bot, Sparkles, Undo2,
+  CheckCircle2, XCircle, Power, Ban, Edit3, Bell, Tag, Crown, Gem, Star, Award, Bot, Sparkles, Undo2, Wallet,
 } from "lucide-react";
+import { AdminPayouts } from "@/components/AdminPayouts";
 import { toast } from "sonner";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { AZ_CITY_NAMES, findCity } from "@/lib/azCities";
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/admin")({
 type TabKey =
   | "dashboard" | "customers" | "sellers" | "couriers" | "pvz_staff"
   | "categories" | "products" | "shops" | "warehouses" | "pickup_points"
-  | "orders" | "returns" | "finance" | "marketing" | "banners" | "packages" | "promo" | "analytics"
+  | "orders" | "returns" | "finance" | "payouts" | "marketing" | "banners" | "packages" | "promo" | "analytics"
   | "security" | "disputes" | "content" | "settings" | "support" | "ai_bot";
 
 interface Stat { users: number; products: number; orders: number; revenue: number; sellers: number }
@@ -352,6 +353,7 @@ function AdminPanel() {
     { key: "orders", label: "Sifarişlər", icon: ShoppingBag, badge: orders.filter((o) => o.status === "pending").length, active: tab === "orders", onClick: () => setTab("orders") },
     { key: "returns", label: "Qaytarmalar", icon: Undo2, active: tab === "returns", onClick: () => setTab("returns") },
     { key: "finance", label: "Maliyyə", icon: DollarSign, active: tab === "finance", onClick: () => setTab("finance") },
+    { key: "payouts", label: "Ödənişlər (Payout)", icon: Wallet, active: tab === "payouts", onClick: () => setTab("payouts") },
     { key: "marketing", label: "Marketinq", icon: Megaphone, active: tab === "marketing", onClick: () => setTab("marketing") },
     { key: "banners", label: "Bannerlər", icon: Megaphone, active: tab === "banners", onClick: () => setTab("banners") },
     { key: "packages", label: "Reklam paketləri", icon: Crown, active: tab === "packages", onClick: () => setTab("packages") },
@@ -387,6 +389,7 @@ function AdminPanel() {
       {tab === "orders" && <OrdersSection orders={orders} updateOrderStatus={updateOrderStatus} />}
       {tab === "returns" && <AdminReturnsSection />}
       {tab === "finance" && <FinanceSection stats={stats} orders={orders} settings={settings} />}
+      {tab === "payouts" && <AdminPayouts />}
       {tab === "marketing" && <MarketingSection />}
       {tab === "banners" && <BannersSection banners={banners} addBanner={addBanner} toggleBanner={toggleBanner} deleteBanner={deleteBanner} />}
       {tab === "packages" && <PackagesSection packages={packages} savePackage={savePackage} deletePackage={deletePackage} togglePackage={togglePackage} />}
