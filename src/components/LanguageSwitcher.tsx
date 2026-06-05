@@ -16,14 +16,15 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-1 px-2 py-1.5 rounded-md hover:bg-secondary transition outline-none text-sm">
+      <DropdownMenuTrigger className="flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1 px-2 py-1.5 rounded-md hover:bg-white/15 sm:hover:bg-secondary transition outline-none text-xs sm:text-sm text-white sm:text-inherit">
         <Globe className="h-4 w-4" />
         {compact ? (
           <span className="font-semibold uppercase text-xs">{current.code}</span>
         ) : (
           <>
-            <span>{current.flag}</span>
+            <span className="hidden sm:inline">{current.flag}</span>
             <span className="hidden sm:inline font-medium">{current.code.toUpperCase()}</span>
+            <span className="sm:hidden font-semibold">Dil</span>
           </>
         )}
       </DropdownMenuTrigger>
