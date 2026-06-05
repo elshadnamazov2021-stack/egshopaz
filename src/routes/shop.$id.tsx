@@ -172,7 +172,10 @@ function ShopPage() {
                 </div>
                 <div className="p-3 bg-secondary/50 rounded-xl">
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Heart className="h-3.5 w-3.5" /> İzləyici</div>
-                  <div className="font-black text-lg mt-0.5">{followers}</div>
+                  <div className="font-black text-lg mt-0.5 flex items-center gap-1">
+                    {followers}
+                    {followers >= 100 && <BadgeCheck className="h-4 w-4 text-blue-500 fill-blue-500" />}
+                  </div>
                 </div>
                 <div className="p-3 bg-secondary/50 rounded-xl">
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Award className="h-3.5 w-3.5" /> Sifariş</div>
