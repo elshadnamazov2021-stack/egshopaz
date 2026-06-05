@@ -391,6 +391,7 @@ function AdminPanel() {
       {tab === "orders" && <OrdersSection orders={orders} updateOrderStatus={updateOrderStatus} />}
       {tab === "returns" && <AdminReturnsSection />}
       {tab === "finance" && <FinanceSection stats={stats} orders={orders} settings={settings} />}
+      {tab === "treasury" && <AdminTreasury />}
       {tab === "payouts" && <AdminPayouts />}
       {tab === "marketing" && <MarketingSection />}
       {tab === "banners" && <BannersSection banners={banners} addBanner={addBanner} toggleBanner={toggleBanner} deleteBanner={deleteBanner} />}
