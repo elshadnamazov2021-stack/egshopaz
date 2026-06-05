@@ -258,6 +258,10 @@ function ShopPage() {
                 <div><div className="text-xs text-muted-foreground">Qoşulub</div><div className="font-semibold">{formatDate(profile.created_at)}</div></div>
               </div>
               <div className="flex items-start gap-2.5 text-sm">
+                <Calendar className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <div><div className="text-xs text-muted-foreground">Fəaliyyət ili</div><div className="font-semibold">{stats.years > 0 ? `${stats.years} il` : " < 1 il"}</div></div>
+              </div>
+              <div className="flex items-start gap-2.5 text-sm">
                 <Award className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                 <div><div className="text-xs text-muted-foreground">Səviyyə</div><div className="font-semibold capitalize">{tier.label}</div></div>
               </div>
