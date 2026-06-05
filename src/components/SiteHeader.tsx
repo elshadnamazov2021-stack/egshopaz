@@ -32,17 +32,19 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border shadow-sm">
-      <div className="w-full px-4 h-32 sm:h-36 flex items-center bg-gradient-brand text-white">
-        <div className="max-w-7xl mx-auto w-full flex items-center gap-4">
+      <div className="w-full px-4 py-4 sm:h-36 sm:py-0 flex items-center bg-gradient-brand text-white">
+        <div className="max-w-7xl mx-auto w-full flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4">
           <SidebarTrigger className="shrink-0 text-white" />
 
           <Link to="/" className="flex items-center gap-2 sm:gap-3 shrink-0 hover:scale-105 transition-transform" aria-label="EG Shop">
-            <img src={egLogo.url} alt="EG Shop logo" width={256} height={256} className="h-16 sm:h-20 md:h-24 w-16 sm:w-20 md:w-24 rounded-full object-cover ring-2 ring-white/30 shadow-lg" />
-            <span className="text-2xl sm:text-3xl md:text-4xl uppercase tracking-wide text-white" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+            <img src={egLogo.url} alt="EG Shop logo" width={256} height={256} className="h-14 sm:h-20 md:h-24 w-14 sm:w-20 md:w-24 rounded-full object-cover ring-2 ring-white/30 shadow-lg" />
+            <span className="text-2xl sm:text-3xl md:text-4xl uppercase tracking-wide text-white whitespace-nowrap" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
               EG Shop
             </span>
           </Link>
-          <LiveClock />
+          <div className="hidden md:block">
+            <LiveClock />
+          </div>
 
           <form onSubmit={onSearch} className="flex-1 max-w-2xl hidden lg:flex">
             <div className="relative w-full">
@@ -64,25 +66,25 @@ export function SiteHeader() {
             </div>
           </form>
 
-          <nav className="ml-auto flex items-center gap-1 sm:gap-2">
+          <nav className="order-3 sm:order-none w-full sm:w-auto sm:ml-auto grid grid-cols-4 sm:flex items-center gap-1 sm:gap-2 pt-2 sm:pt-0 border-t border-white/15 sm:border-t-0">
             <LanguageSwitcher />
             <Link to="/discover" className="hidden lg:flex flex-col items-center text-xs px-3 py-1.5 hover:text-white/80 transition text-white">
               <span className="h-5 w-5 mb-0.5 text-base">🔥</span>
               <span>{t("sidebar.discover")}</span>
             </Link>
-            <Link to="/favorites" className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-white/80 transition text-white">
+            <Link to="/favorites" className="flex flex-col items-center text-xs px-2 sm:px-3 py-1.5 hover:text-white/80 transition text-white min-w-0">
               <Heart className="h-5 w-5 mb-0.5" />
               <span>{t("header.favorites")}</span>
             </Link>
             <NotificationsBell />
-            <Link to="/cart" className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-white/80 transition text-white">
+            <Link to="/cart" className="flex flex-col items-center text-xs px-2 sm:px-3 py-1.5 hover:text-white/80 transition text-white min-w-0">
               <ShoppingCart className="h-5 w-5 mb-0.5" />
               <span>{t("header.cart")}</span>
             </Link>
 
             {user ? (
               <DropdownMenu>
-                <DropdownMenuTrigger className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-white/80 transition outline-none text-white">
+                <DropdownMenuTrigger className="flex flex-col items-center text-xs px-2 sm:px-3 py-1.5 hover:text-white/80 transition outline-none text-white min-w-0">
                   <User className="h-5 w-5 mb-0.5" />
                   <span>{t("header.cabinet")}</span>
                 </DropdownMenuTrigger>
@@ -106,7 +108,7 @@ export function SiteHeader() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link to="/auth" search={{ role: "buyer" } as never} className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-white/80 transition text-white">
+              <Link to="/auth" search={{ role: "buyer" } as never} className="flex flex-col items-center text-xs px-2 sm:px-3 py-1.5 hover:text-white/80 transition text-white min-w-0">
                 <User className="h-5 w-5 mb-0.5" />
                 <span>{t("header.login")}</span>
               </Link>
