@@ -75,10 +75,10 @@ export function HomeCategoryBrowser() {
   const backLabel = lang.startsWith("ru") ? "Назад" : lang.startsWith("en") ? "Back" : "Geri";
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-4 min-w-0 max-w-full overflow-hidden">
       {/* TAB BAR — Trendyol stil (narıncı seçilmiş, fon dolu) */}
-      <div className="bg-card rounded-2xl border border-border overflow-hidden">
-        <div className="flex gap-2 px-3 py-3 overflow-x-auto scrollbar-hide">
+      <div className="bg-card rounded-2xl border border-border overflow-hidden min-w-0 max-w-full">
+        <div className="flex w-full max-w-full gap-2 px-3 py-3 overflow-x-auto overscroll-x-contain scrollbar-hide">
           {roots.map((c) => {
             const isActive = c.id === activeRootId;
             return (
@@ -141,7 +141,7 @@ export function HomeCategoryBrowser() {
                   {catName(activeRoot)} — {seeAll}
                 </Link>
               ) : (
-                 <div className="flex gap-2 pb-1 overflow-x-auto scrollbar-hide">
+                 <div className="flex w-full max-w-full gap-2 pb-1 overflow-x-auto overscroll-x-contain scrollbar-hide">
                   {subCats.slice(0, 12).map((s) => {
                     const hasChildren = cats.some((c) => c.parent_id === s.id);
                     return (
