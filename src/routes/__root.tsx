@@ -124,6 +124,17 @@ function AppShell() {
   const isWorkPanel = isSellerPanel || isPvzPanel || isAdminPanel;
   const isAuthRoute = pathname === "/auth" || pathname.startsWith("/auth/") || pathname === "/reset-password";
 
+  // Subdomain-based routing: seller.* / admin.* / pvz.* avtomatik öz panelinə açılır
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sub = window.location.hostname.split(".")[0].toLowerCase();
+    const map: Record<string, string> = { seller: "/seller", satici: "/seller", admin: "/admin", pvz: "/pvz" };
+    const target = map[sub];
+    if (!target || isAuthRoute) return;
+    if (pathname === target || pathname.startsWith(target + "/")) return;
+    navigate({ to: target, replace: true });
+  }, [pathname, isAuthRoute, navigate]);
+
   // Sellers (without admin/pvz) should only use the seller panel — block customer-side pages
   useEffect(() => {
     if (loading) return;
