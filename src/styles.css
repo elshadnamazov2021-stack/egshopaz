@@ -190,11 +190,6 @@
       font-size: 1rem !important;
     }
 
-    .mobile-product-grid {
-      grid-template-columns: 1fr !important;
-      gap: 1rem !important;
-    }
-
     .mobile-readable-card {
       border-radius: 1rem;
       box-shadow: var(--shadow-card);
@@ -212,6 +207,20 @@
 
   @media (min-width: 1024px) {
     body { line-height: 1.5; }
+  }
+
+  @media (max-width: 640px) {
+    .mobile-product-grid {
+      grid-template-columns: 1fr !important;
+      gap: 1rem !important;
+    }
+  }
+
+  @media (min-width: 641px) and (max-width: 1023px) {
+    .mobile-product-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 1rem !important;
+    }
   }
 }
 
