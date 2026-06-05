@@ -1014,11 +1014,16 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_holder: string | null
           avatar_url: string | null
+          bank_name: string | null
           bonus_balance: number
+          card_number: string | null
           created_at: string
           full_name: string | null
+          iban: string | null
           id: string
+          payout_method: string
           phone: string | null
           referral_code: string | null
           referred_by: string | null
@@ -1038,11 +1043,16 @@ export type Database = {
           voen: string | null
         }
         Insert: {
+          account_holder?: string | null
           avatar_url?: string | null
+          bank_name?: string | null
           bonus_balance?: number
+          card_number?: string | null
           created_at?: string
           full_name?: string | null
+          iban?: string | null
           id: string
+          payout_method?: string
           phone?: string | null
           referral_code?: string | null
           referred_by?: string | null
@@ -1062,11 +1072,16 @@ export type Database = {
           voen?: string | null
         }
         Update: {
+          account_holder?: string | null
           avatar_url?: string | null
+          bank_name?: string | null
           bonus_balance?: number
+          card_number?: string | null
           created_at?: string
           full_name?: string | null
+          iban?: string | null
           id?: string
+          payout_method?: string
           phone?: string | null
           referral_code?: string | null
           referred_by?: string | null
