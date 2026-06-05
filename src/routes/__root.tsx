@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import "@/i18n";
 
-import appCss from "../styles.css?url";
+import "../styles.css";
 
 function NotFoundComponent() {
   return (
