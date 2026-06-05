@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { ShopReviews } from "@/components/ShopReviews";
-import { Store, MapPin, Mail, Star, Package, Heart, Calendar, Award, Phone, MessageCircle, Share2 } from "lucide-react";
+import { Store, MapPin, Mail, Star, Package, Heart, Calendar, Award, Phone, MessageCircle, Share2, BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/format";
 
@@ -35,7 +35,7 @@ function ShopPage() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [products, setProducts] = useState<ProductCardData[]>([]);
-  const [stats, setStats] = useState({ count: 0, avg: 0, reviews: 0 });
+  const [stats, setStats] = useState({ count: 0, avg: 0, reviews: 0, years: 0 });
   const [loading, setLoading] = useState(true);
   const [following, setFollowing] = useState(false);
   const [followers, setFollowers] = useState(0);
@@ -53,7 +53,8 @@ function ShopPage() {
       setProducts(list);
       const totalReviews = list.reduce((s, p) => s + (p.reviews_count || 0), 0);
       const weightedSum = list.reduce((s, p) => s + (Number(p.rating) || 0) * (p.reviews_count || 0), 0);
-      setStats({ count: list.length, avg: totalReviews > 0 ? weightedSum / totalReviews : 0, reviews: totalReviews });
+      const years = prof?.created_at ? Math.floor((Date.now() - new Date(prof.created_at).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : 0;
+      setStats({ count: list.length, avg: totalReviews > 0 ? weightedSum / totalReviews : 0, reviews: totalReviews, years });
       setFollowers(count ?? 0);
       setLoading(false);
     });
@@ -127,12 +128,24 @@ function ShopPage() {
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div>
-                  <h1 className="text-2xl md:text-3xl font-black leading-tight">{name}</h1>
-                  {profile.shop_city && (
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
-                      <MapPin className="h-3.5 w-3.5" /> {profile.shop_city}
-                    </div>
-                  )}
+                  <h1 className="text-2xl md:text-3xl font-black leading-tight flex items-center gap-2">
+                    {name}
+                    {followers >= 100 && (
+                      <BadgeCheck className="h-6 w-6 md:h-7 md:w-7 text-blue-500 fill-blue-500" />
+                    )}
+                  </h1>
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mt-1">
+                    {profile.shop_city && (
+                      <span className="inline-flex items-center gap-1">
+                        <MapPin className="h-3.5 w-3.5" /> {profile.shop_city}
+                      </span>
+                    )}
+                    {profile.phone && (
+                      <span className="inline-flex items-center gap-1">
+                        <Phone className="h-3.5 w-3.5" /> {profile.phone}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 {user?.id !== id && (
                   <button
@@ -150,7 +163,7 @@ function ShopPage() {
               )}
 
               {/* Stats grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mt-4">
                 <div className="p-3 bg-secondary/50 rounded-xl">
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Package className="h-3.5 w-3.5" /> Məhsul</div>
                   <div className="font-black text-lg mt-0.5">{stats.count}</div>
@@ -169,6 +182,10 @@ function ShopPage() {
                 <div className="p-3 bg-secondary/50 rounded-xl">
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Award className="h-3.5 w-3.5" /> Sifariş</div>
                   <div className="font-black text-lg mt-0.5">{profile.seller_total_orders ?? 0}</div>
+                </div>
+                <div className="p-3 bg-secondary/50 rounded-xl">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Calendar className="h-3.5 w-3.5" /> Fəaliyyət</div>
+                  <div className="font-black text-lg mt-0.5">{stats.years > 0 ? `${stats.years} il` : " < 1 il"}</div>
                 </div>
               </div>
             </div>
@@ -239,6 +256,10 @@ function ShopPage() {
               <div className="flex items-start gap-2.5 text-sm">
                 <Calendar className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                 <div><div className="text-xs text-muted-foreground">Qoşulub</div><div className="font-semibold">{formatDate(profile.created_at)}</div></div>
+              </div>
+              <div className="flex items-start gap-2.5 text-sm">
+                <Calendar className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <div><div className="text-xs text-muted-foreground">Fəaliyyət ili</div><div className="font-semibold">{stats.years > 0 ? `${stats.years} il` : " < 1 il"}</div></div>
               </div>
               <div className="flex items-start gap-2.5 text-sm">
                 <Award className="h-4 w-4 text-primary mt-0.5 shrink-0" />

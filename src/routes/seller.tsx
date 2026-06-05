@@ -30,6 +30,10 @@ import {
   Undo2,
   Rocket,
   Users,
+  BadgeCheck,
+  Heart,
+  Calendar,
+  Star,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -120,6 +124,7 @@ interface Profile {
   shop_address: string | null;
   shop_city: string | null;
   shop_email: string | null;
+  created_at?: string | null;
 }
 interface SellerNotif {
   id: string;
@@ -181,6 +186,7 @@ function SellerPanel() {
   const [uploading, setUploading] = useState(false);
   const [savingShop, setSavingShop] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [myFollowers, setMyFollowers] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { setMounted(true); }, []);
@@ -193,7 +199,13 @@ function SellerPanel() {
 
   const load = async () => {
     if (!user) return;
-    const [{ data: ps, error: productsError }, { data: cs, error: categoriesError }, { data: ois, error: itemsError }, { data: pr, error: profileError }] = await Promise.all([
+    const [
+      { data: ps, error: productsError },
+      { data: cs, error: categoriesError },
+      { data: ois, error: itemsError },
+      { data: pr, error: profileError },
+      { count: followersCount },
+    ] = await Promise.all([
       supabase
         .from("products")
         .select("*")
@@ -211,10 +223,11 @@ function SellerPanel() {
       supabase
         .from("profiles")
         .select(
-          "full_name,shop_name,phone,avatar_url,shop_description,shop_logo_url,shop_banner_url,shop_address,shop_city,shop_email",
+          "full_name,shop_name,phone,avatar_url,shop_description,shop_logo_url,shop_banner_url,shop_address,shop_city,shop_email,created_at",
         )
         .eq("id", user.id)
         .maybeSingle(),
+      supabase.from("shop_followers").select("id", { count: "exact", head: true }).eq("seller_id", user.id),
     ]);
     const firstError = productsError ?? categoriesError ?? itemsError ?? profileError;
     if (firstError) {
@@ -287,6 +300,7 @@ function SellerPanel() {
         shop_email: "",
       },
     );
+    setMyFollowers(followersCount ?? 0);
   };
   useEffect(() => {
     if (user && isSeller) load();
@@ -1155,6 +1169,58 @@ function SellerPanel() {
                   }
                 />
               </label>
+            </div>
+          </div>
+
+          {/* Stats preview */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="bg-card border border-border rounded-2xl p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Package className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Məhsul</div>
+                <div className="font-black text-lg">{products.length}</div>
+              </div>
+            </div>
+            <div className="bg-card border border-border rounded-2xl p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Heart className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">İzləyici</div>
+                <div className="font-black text-lg flex items-center gap-1">
+                  {myFollowers}
+                  {myFollowers >= 100 && <BadgeCheck className="h-4 w-4 text-blue-500 fill-blue-500" />}
+                </div>
+              </div>
+            </div>
+            <div className="bg-card border border-border rounded-2xl p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Calendar className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Fəaliyyət</div>
+                <div className="font-black text-lg">
+                  {profile.created_at
+                    ? `${Math.floor((Date.now() - new Date(profile.created_at).getTime()) / (365.25 * 24 * 60 * 60 * 1000))} il`
+                    : "—"}
+                </div>
+              </div>
+            </div>
+            <div className="bg-card border border-border rounded-2xl p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Star className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Reytinq</div>
+                <div className="font-black text-lg">
+                  {products.length > 0
+                    ? (products.reduce((s, p) => s + Number(p.rating) * (p.reviews_count || 0), 0) /
+                        Math.max(1, products.reduce((s, p) => s + (p.reviews_count || 0), 0))).toFixed(1)
+                    : "0.0"}
+                </div>
+              </div>
             </div>
           </div>
 
