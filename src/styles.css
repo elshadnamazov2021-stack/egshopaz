@@ -131,7 +131,11 @@
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
-  @media (min-width: 768px) {
+  /* Plonşet: orta ölçü */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    html { font-size: 18px; }
+  }
+  @media (min-width: 1024px) {
     html { font-size: 16px; }
   }
   body {
@@ -141,8 +145,8 @@
     line-height: 1.6;
   }
 
-  /* Mobil: hər şeyi daha böyük və toxunaqlı et */
-  @media (max-width: 767px) {
+  /* Mobil və plonşet: hər şeyi daha böyük və toxunaqlı et */
+  @media (max-width: 1023px) {
     .text-xs { font-size: 0.9rem !important; line-height: 1.35rem; }
     .text-sm { font-size: 0.95rem !important; line-height: 1.4rem; }
     .text-base { font-size: 1.05rem !important; line-height: 1.6rem; }
