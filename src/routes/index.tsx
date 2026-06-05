@@ -93,7 +93,11 @@ function Index() {
           <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Panel keçidləri</span>
           <span className="text-[10px] text-muted-foreground">domen alana qədər</span>
         </div>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Link to="/profile" className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white p-4 hover:scale-[1.02] transition shadow-card">
+            <UserIcon className="h-6 w-6" />
+            <span className="text-sm font-black">Müştəri</span>
+          </Link>
           <Link to="/seller" className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-orange-500 to-rose-500 text-white p-4 hover:scale-[1.02] transition shadow-card">
             <Store className="h-6 w-6" />
             <span className="text-sm font-black">Satıcı</span>
