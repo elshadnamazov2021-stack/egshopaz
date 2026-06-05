@@ -162,6 +162,21 @@
       min-width: 0;
     }
 
+    main,
+    section,
+    header,
+    footer,
+    nav {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .overflow-x-auto {
+      max-width: 100%;
+      min-width: 0;
+      overscroll-behavior-x: contain;
+    }
+
     /* Normal toxunuş hədəfləri */
     button, [role="button"], input, select, textarea {
       min-height: 44px;
