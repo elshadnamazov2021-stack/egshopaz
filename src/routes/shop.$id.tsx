@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { ShopReviews } from "@/components/ShopReviews";
-import { Store, MapPin, Mail, Star, Package, Heart, Calendar, Award, Phone, MessageCircle, Share2 } from "lucide-react";
+import { Store, MapPin, Mail, Star, Package, Heart, Calendar, Award, Phone, MessageCircle, Share2, BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/format";
 
