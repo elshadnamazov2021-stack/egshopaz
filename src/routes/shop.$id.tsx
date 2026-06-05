@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { ShopReviews } from "@/components/ShopReviews";
-import { Store, MapPin, Mail, Star, Package, Heart, Calendar, Award, Phone, MessageCircle, Share2, BadgeCheck } from "lucide-react";
+import { Store, MapPin, Mail, Star, Package, Heart, Calendar, Award, MessageCircle, Share2, BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/format";
 
@@ -140,11 +140,6 @@ function ShopPage() {
                         <MapPin className="h-3.5 w-3.5" /> {profile.shop_city}
                       </span>
                     )}
-                    {profile.phone && (
-                      <span className="inline-flex items-center gap-1">
-                        <Phone className="h-3.5 w-3.5" /> {profile.phone}
-                      </span>
-                    )}
                   </div>
                 </div>
                 {user?.id !== id && (
@@ -177,7 +172,10 @@ function ShopPage() {
                 </div>
                 <div className="p-3 bg-secondary/50 rounded-xl">
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Heart className="h-3.5 w-3.5" /> İzləyici</div>
-                  <div className="font-black text-lg mt-0.5">{followers}</div>
+                  <div className="font-black text-lg mt-0.5 flex items-center gap-1">
+                    {followers}
+                    {followers >= 100 && <BadgeCheck className="h-4 w-4 text-blue-500 fill-blue-500" />}
+                  </div>
                 </div>
                 <div className="p-3 bg-secondary/50 rounded-xl">
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Award className="h-3.5 w-3.5" /> Sifariş</div>
@@ -245,12 +243,6 @@ function ShopPage() {
                 <div className="flex items-start gap-2.5 text-sm">
                   <Mail className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                   <div><div className="text-xs text-muted-foreground">Email</div><div className="font-semibold break-all">{profile.shop_email}</div></div>
-                </div>
-              )}
-              {profile.phone && (
-                <div className="flex items-start gap-2.5 text-sm">
-                  <Phone className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                  <div><div className="text-xs text-muted-foreground">Telefon</div><div className="font-semibold">{profile.phone}</div></div>
                 </div>
               )}
               <div className="flex items-start gap-2.5 text-sm">
