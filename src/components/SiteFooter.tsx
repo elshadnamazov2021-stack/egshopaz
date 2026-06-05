@@ -15,13 +15,6 @@ export function SiteFooter() {
           </ul>
         </div>
         <div>
-          <h4 className="font-bold mb-3">{t("header.sellerPanel")}</h4>
-          <ul className="space-y-2 text-muted-foreground">
-            <li><Link to="/become-seller" className="hover:text-primary transition">{t("header.openShop")}</Link></li>
-            <li><Link to="/support" className="hover:text-primary transition">{t("sidebar.support")}</Link></li>
-          </ul>
-        </div>
-        <div>
           <h4 className="font-bold mb-3">EG Shop</h4>
           <p className="text-muted-foreground">{t("footer.shopBrand")}</p>
         </div>
