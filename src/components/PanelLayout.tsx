@@ -35,7 +35,7 @@ export function PanelLayout({ title, subtitle, items, children }: Props) {
             <LiveClock compact />
           </div>
         </div>
-        <nav className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-0.5 lg:overflow-visible lg:pb-0">
+        <nav className="panel-scroll-row pb-1 lg:block lg:space-y-0.5 lg:overflow-visible lg:pb-0">
           {items.map((it) => {
             const isActive = it.active ?? (it.to ? pathname === it.to : false);
             const cls = `flex shrink-0 items-center gap-2 whitespace-nowrap px-3 py-2.5 rounded-lg text-sm font-medium transition text-left lg:w-full lg:gap-3 ${
