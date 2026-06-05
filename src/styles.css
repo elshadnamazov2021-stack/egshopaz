@@ -126,17 +126,9 @@
 @layer base {
   * { border-color: var(--color-border); }
   html {
-    /* Telefon və plonşet: heç vaxt desktop kimi sıxılıb xırda görünməsin */
-    font-size: 20px;
+    font-size: 16px;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
-  }
-  /* Plonşet: orta ölçü */
-  @media (min-width: 768px) and (max-width: 1023px) {
-    html { font-size: 18px; }
-  }
-  @media (min-width: 1024px) {
-    html { font-size: 16px; }
   }
   html, body {
     overflow-x: hidden;
@@ -147,10 +139,10 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    line-height: 1.6;
+    line-height: 1.5;
   }
 
-  /* Mobil və plonşet: hər şeyi daha böyük və toxunaqlı et */
+  /* Mobil və plonşet: standart, tam enə oturan görünüş */
   @media (max-width: 1023px) {
     body,
     #root,
@@ -170,56 +162,32 @@
       min-width: 0;
     }
 
-    .text-xs { font-size: 0.9rem !important; line-height: 1.35rem; }
-    .text-sm { font-size: 0.95rem !important; line-height: 1.4rem; }
-    .text-base { font-size: 1.05rem !important; line-height: 1.6rem; }
-    .text-lg { font-size: 1.2rem !important; line-height: 1.75rem; }
-    .text-xl { font-size: 1.4rem !important; line-height: 2rem; }
-    .text-2xl { font-size: 1.6rem !important; line-height: 2.2rem; }
-    .text-3xl { font-size: 1.9rem !important; line-height: 2.5rem; }
-    .text-4xl { font-size: 2.2rem !important; line-height: 2.8rem; }
-    .text-\[10px\], .text-\[11px\], .text-\[9px\], .text-\[8px\] { font-size: 0.85rem !important; }
-
-    /* Böyük toxunuş hədəfləri — yalnız konkret rol oynayanlara */
+    /* Normal toxunuş hədəfləri */
     button, [role="button"], input, select, textarea {
       min-height: 44px;
     }
 
-    /* Form elementləri daha böyük */
     input, select, textarea {
-      font-size: 1rem !important;
+      font-size: 16px;
     }
 
     .mobile-readable-card {
-      border-radius: 1rem;
+      border-radius: 0.75rem;
       box-shadow: var(--shadow-card);
     }
-
-    .mobile-readable-card .product-image {
-      aspect-ratio: 1 / 1;
-    }
-
-    /* Kartlar və qutular daha çox boşluq */
-    .card, [class*="rounded"] {
-      /* padding avtomatik böyüyəcək rem sayəsində */
-    }
-  }
-
-  @media (min-width: 1024px) {
-    body { line-height: 1.5; }
   }
 
   @media (max-width: 640px) {
     .mobile-product-grid {
-      grid-template-columns: 1fr !important;
-      gap: 1rem !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
     }
   }
 
   @media (min-width: 641px) and (max-width: 1023px) {
     .mobile-product-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      gap: 1rem !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 0.875rem !important;
     }
   }
 }
