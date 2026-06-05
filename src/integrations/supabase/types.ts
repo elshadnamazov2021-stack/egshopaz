@@ -815,6 +815,54 @@ export type Database = {
           },
         ]
       }
+      payout_requests: {
+        Row: {
+          account_holder: string | null
+          admin_note: string | null
+          amount: number
+          bank_name: string | null
+          card_number: string | null
+          created_at: string
+          iban: string | null
+          id: string
+          method: string
+          paid_at: string | null
+          seller_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          account_holder?: string | null
+          admin_note?: string | null
+          amount: number
+          bank_name?: string | null
+          card_number?: string | null
+          created_at?: string
+          iban?: string | null
+          id?: string
+          method?: string
+          paid_at?: string | null
+          seller_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          account_holder?: string | null
+          admin_note?: string | null
+          amount?: number
+          bank_name?: string | null
+          card_number?: string | null
+          created_at?: string
+          iban?: string | null
+          id?: string
+          method?: string
+          paid_at?: string | null
+          seller_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payouts: {
         Row: {
           amount: number
@@ -1791,6 +1839,10 @@ export type Database = {
         Returns: boolean
       }
       cleanup_ai_chat_messages: { Args: never; Returns: undefined }
+      complete_payout_request: {
+        Args: { _approve: boolean; _id: string; _note?: string }
+        Returns: undefined
+      }
       decrement_stock: {
         Args: { product_id: string; qty: number }
         Returns: undefined
@@ -1837,6 +1889,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      request_payout: { Args: { _amount: number }; Returns: string }
       sync_order_status_from_items: {
         Args: { _order_id: string }
         Returns: undefined
