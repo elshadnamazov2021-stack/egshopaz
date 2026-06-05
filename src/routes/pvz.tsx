@@ -403,6 +403,9 @@ interface DBOrderItem {
     recipient_phone: string | null;
     pickup_point_id: string | null;
     created_at: string | null;
+    total: number | null;
+    payment_method: string | null;
+    payment_status: string | null;
   } | null;
 }
 
@@ -412,6 +415,9 @@ type OrderInfo = {
   recipient_phone: string | null;
   pickup_point_id: string | null;
   created_at: string | null;
+  total: number | null;
+  payment_method: string | null;
+  payment_status: string | null;
 };
 
 async function attachOrderInfo(rows: DBOrderItem[]): Promise<DBOrderItem[]> {
@@ -419,12 +425,13 @@ async function attachOrderInfo(rows: DBOrderItem[]): Promise<DBOrderItem[]> {
   const { data } = ids.length
     ? await supabase
         .from("orders")
-        .select("id,recipient_name,recipient_phone,pickup_point_id,created_at")
+        .select("id,recipient_name,recipient_phone,pickup_point_id,created_at,total,payment_method,payment_status")
         .in("id", ids)
     : { data: [] };
   const map = new Map((data ?? []).map((order) => [order.id, order as OrderInfo]));
   return rows.map((row) => ({ ...row, orders: map.get(row.order_id) ?? null }));
 }
+
 
 async function findItemByCode(code: string): Promise<DBOrderItem | null> {
   const trimmed = code.trim().toUpperCase();
