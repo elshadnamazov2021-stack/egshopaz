@@ -29,6 +29,7 @@ import {
   Check,
   Undo2,
   Rocket,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -36,6 +37,7 @@ import QRCode from "qrcode";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { SellerMessages } from "@/components/SellerMessages";
 import { SellerAdvertising } from "@/components/SellerAdvertising";
+import { SellerFollowers } from "@/components/SellerFollowers";
 import { SellerAnalytics } from "@/components/SellerAnalytics";
 import { BulkProductUpload } from "@/components/BulkProductUpload";
 import { AISupportChat } from "@/components/AISupportChat";
@@ -163,7 +165,9 @@ function SellerPanel() {
     | "shop"
     | "support"
     | "returns"
+    | "followers"
   >("dashboard");
+
   const [unreadMsgs, setUnreadMsgs] = useState(0);
   const [sellerNotifs, setSellerNotifs] = useState<SellerNotif[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -712,6 +716,14 @@ function SellerPanel() {
       onClick: () => setTab("advertising"),
     },
     {
+      key: "followers",
+      label: "İzləyicilər",
+      icon: Users,
+      active: tab === "followers",
+      onClick: () => setTab("followers"),
+    },
+
+    {
       key: "shop",
       label: "Mağaza ayarları",
       icon: Settings,
@@ -1088,6 +1100,8 @@ function SellerPanel() {
       {tab === "bulk" && <BulkProductUpload sellerId={user.id} onDone={load} />}
 
       {tab === "advertising" && <SellerAdvertising />}
+
+      {tab === "followers" && <SellerFollowers sellerId={user.id} />}
 
       {tab === "support" && (
         <div className="space-y-4">
