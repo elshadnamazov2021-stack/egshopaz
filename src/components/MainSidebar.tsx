@@ -53,7 +53,6 @@ export function MainSidebar() {
   ];
 
   const userLinks = user ? (isSeller ? [
-    { to: "/profile", label: t("sidebar.profile"), icon: User },
     { to: "/seller", label: "Satıcı panelim", icon: Store },
     { to: "/notifications", label: t("sidebar.notifications"), icon: Bell },
   ] : [
