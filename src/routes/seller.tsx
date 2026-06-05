@@ -34,7 +34,9 @@ import {
   Heart,
   Calendar,
   Star,
+  Wallet,
 } from "lucide-react";
+import { SellerBalance } from "@/components/SellerBalance";
 import { toast } from "sonner";
 import { z } from "zod";
 import QRCode from "qrcode";
@@ -761,7 +763,13 @@ function SellerPanel() {
       active: tab === "followers",
       onClick: () => setTab("followers"),
     },
-
+    {
+      key: "balance",
+      label: "Balansım",
+      icon: Wallet,
+      active: tab === "balance",
+      onClick: () => setTab("balance"),
+    },
     {
       key: "shop",
       label: "Mağaza ayarları",
@@ -1139,6 +1147,8 @@ function SellerPanel() {
       {tab === "bulk" && <BulkProductUpload sellerId={user.id} onDone={load} />}
 
       {tab === "advertising" && <SellerAdvertising />}
+
+      {tab === "balance" && <SellerBalance sellerId={user.id} />}
 
       {tab === "followers" && <SellerFollowers sellerId={user.id} />}
 
