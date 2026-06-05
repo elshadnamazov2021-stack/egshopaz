@@ -60,11 +60,7 @@ export function ProductReviews({ productId }: { productId: string }) {
       });
       if (error) throw error;
 
-      // Recompute aggregate
-      const { data: all } = await supabase.from("reviews").select("rating").eq("product_id", productId);
-      const arr = (all ?? []) as { rating: number }[];
-      const avg = arr.length ? arr.reduce((s, r) => s + r.rating, 0) / arr.length : 0;
-      await supabase.from("products").update({ rating: Number(avg.toFixed(2)), reviews_count: arr.length }).eq("id", productId);
+      // Aggregate is recomputed automatically by DB trigger
 
       toast.success("Rəyiniz əlavə olundu");
       setComment(""); setFiles([]); setRating(5);
