@@ -1797,6 +1797,10 @@ export type Database = {
         Args: { _order_id: string; _user_id: string }
         Returns: boolean
       }
+      recalc_product_review_stats: {
+        Args: { p_product_id: string }
+        Returns: undefined
+      }
       register_pvz_staff: {
         Args: {
           _full_name: string
