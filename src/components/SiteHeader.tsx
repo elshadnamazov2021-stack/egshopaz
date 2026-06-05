@@ -108,7 +108,7 @@ export function SiteHeader() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link to="/auth" className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-white/80 transition text-white">
+              <Link to="/auth" search={{ role: "buyer" } as never} className="flex flex-col items-center text-xs px-3 py-1.5 hover:text-white/80 transition text-white">
                 <User className="h-5 w-5 mb-0.5" />
                 <span>{t("header.login")}</span>
               </Link>
