@@ -140,11 +140,6 @@ function ShopPage() {
                         <MapPin className="h-3.5 w-3.5" /> {profile.shop_city}
                       </span>
                     )}
-                    {profile.phone && (
-                      <span className="inline-flex items-center gap-1">
-                        <Phone className="h-3.5 w-3.5" /> {profile.phone}
-                      </span>
-                    )}
                   </div>
                 </div>
                 {user?.id !== id && (
