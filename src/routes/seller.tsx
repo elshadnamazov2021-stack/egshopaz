@@ -30,6 +30,10 @@ import {
   Undo2,
   Rocket,
   Users,
+  BadgeCheck,
+  Heart,
+  Calendar,
+  Star,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
