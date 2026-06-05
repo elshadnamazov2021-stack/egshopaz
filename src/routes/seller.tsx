@@ -295,6 +295,7 @@ function SellerPanel() {
         shop_email: "",
       },
     );
+    setMyFollowers(followersCount ?? 0);
   };
   useEffect(() => {
     if (user && isSeller) load();
