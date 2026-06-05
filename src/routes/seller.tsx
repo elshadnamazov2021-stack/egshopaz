@@ -628,6 +628,16 @@ function SellerPanel() {
 
   const saveShop = async () => {
     if (!user || !profile) return;
+    const ibanClean = (profile.iban ?? "").replace(/\s/g, "").toUpperCase();
+    if (ibanClean && !/^AZ\d{2}[A-Z0-9]{20}$/.test(ibanClean)) {
+      toast.error("IBAN formatı yanlışdır (məs: AZ21NABZ00000000137010001944)");
+      return;
+    }
+    const cardClean = (profile.card_number ?? "").replace(/\s/g, "");
+    if (cardClean && !/^\d{13,19}$/.test(cardClean)) {
+      toast.error("Kart nömrəsi yanlışdır");
+      return;
+    }
     setSavingShop(true);
     const c = findCity(profile.shop_city);
     const { error } = await supabase.from("profiles").upsert(
@@ -645,6 +655,11 @@ function SellerPanel() {
         shop_email: profile.shop_email?.slice(0, 200) ?? null,
         shop_lat: c?.lat ?? null,
         shop_lng: c?.lng ?? null,
+        iban: ibanClean || null,
+        bank_name: profile.bank_name?.slice(0, 100) ?? null,
+        card_number: cardClean || null,
+        account_holder: profile.account_holder?.slice(0, 100) ?? null,
+        payout_method: profile.payout_method ?? "iban",
       },
       { onConflict: "id" },
     );
