@@ -299,12 +299,15 @@ function AuthPage() {
             { key: "seller", label: "Satıcı", Icon: Store },
             { key: "pvz", label: "PVZ PUNKT", Icon: Building2 },
             { key: "admin", label: "Admin", Icon: Shield },
-          ] as const).map(({ key, label, Icon }) => (
+          ] as const)
+            .filter(({ key }) => !validLocked || key === validLocked)
+            .map(({ key, label, Icon }) => (
             <button
               key={key}
               type="button"
+              disabled={!!validLocked}
               onClick={() => { setRole(key); if (key === "admin") setMode("login"); }}
-              className={`flex flex-col items-center gap-1 rounded-xl border px-1.5 py-3 text-[11px] font-bold transition ${
+              className={`flex flex-col items-center gap-1 rounded-xl border px-1.5 py-3 text-[11px] font-bold transition ${validLocked ? "col-span-4" : ""} ${
                 role === key
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border bg-background text-muted-foreground hover:border-primary/50"
