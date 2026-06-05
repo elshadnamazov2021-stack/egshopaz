@@ -10,6 +10,7 @@ import {
   CheckCircle2, XCircle, Power, Ban, Edit3, Bell, Tag, Crown, Gem, Star, Award, Bot, Sparkles, Undo2, Wallet,
 } from "lucide-react";
 import { AdminPayouts } from "@/components/AdminPayouts";
+import { AdminTreasury } from "@/components/AdminTreasury";
 import { toast } from "sonner";
 import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { AZ_CITY_NAMES, findCity } from "@/lib/azCities";
