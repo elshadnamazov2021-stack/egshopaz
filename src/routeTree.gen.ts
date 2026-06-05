@@ -44,6 +44,7 @@ import { Route as AddressesRouteImport } from './routes/addresses'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopIdRouteImport } from './routes/shop.$id'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
+import { Route as CheckoutPayOrderIdRouteImport } from './routes/checkout-pay.$orderId'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -220,6 +221,11 @@ const ProductIdRoute = ProductIdRouteImport.update({
   path: '/product/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutPayOrderIdRoute = CheckoutPayOrderIdRouteImport.update({
+  id: '/checkout-pay/$orderId',
+  path: '/checkout-pay/$orderId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -255,6 +261,7 @@ export interface FileRoutesByFullPath {
   '/shops': typeof ShopsRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
+  '/checkout-pay/$orderId': typeof CheckoutPayOrderIdRoute
   '/product/$id': typeof ProductIdRoute
   '/shop/$id': typeof ShopIdRoute
 }
@@ -292,6 +299,7 @@ export interface FileRoutesByTo {
   '/shops': typeof ShopsRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
+  '/checkout-pay/$orderId': typeof CheckoutPayOrderIdRoute
   '/product/$id': typeof ProductIdRoute
   '/shop/$id': typeof ShopIdRoute
 }
@@ -330,6 +338,7 @@ export interface FileRoutesById {
   '/shops': typeof ShopsRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
+  '/checkout-pay/$orderId': typeof CheckoutPayOrderIdRoute
   '/product/$id': typeof ProductIdRoute
   '/shop/$id': typeof ShopIdRoute
 }
@@ -369,6 +378,7 @@ export interface FileRouteTypes {
     | '/shops'
     | '/support'
     | '/terms'
+    | '/checkout-pay/$orderId'
     | '/product/$id'
     | '/shop/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -406,6 +416,7 @@ export interface FileRouteTypes {
     | '/shops'
     | '/support'
     | '/terms'
+    | '/checkout-pay/$orderId'
     | '/product/$id'
     | '/shop/$id'
   id:
@@ -443,6 +454,7 @@ export interface FileRouteTypes {
     | '/shops'
     | '/support'
     | '/terms'
+    | '/checkout-pay/$orderId'
     | '/product/$id'
     | '/shop/$id'
   fileRoutesById: FileRoutesById
@@ -481,6 +493,7 @@ export interface RootRouteChildren {
   ShopsRoute: typeof ShopsRoute
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
+  CheckoutPayOrderIdRoute: typeof CheckoutPayOrderIdRoute
   ProductIdRoute: typeof ProductIdRoute
   ShopIdRoute: typeof ShopIdRoute
 }
@@ -732,6 +745,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout-pay/$orderId': {
+      id: '/checkout-pay/$orderId'
+      path: '/checkout-pay/$orderId'
+      fullPath: '/checkout-pay/$orderId'
+      preLoaderRoute: typeof CheckoutPayOrderIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -769,6 +789,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopsRoute: ShopsRoute,
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
+  CheckoutPayOrderIdRoute: CheckoutPayOrderIdRoute,
   ProductIdRoute: ProductIdRoute,
   ShopIdRoute: ShopIdRoute,
 }
