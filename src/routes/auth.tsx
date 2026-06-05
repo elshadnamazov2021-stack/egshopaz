@@ -283,7 +283,7 @@ function AuthPage() {
     <div className="container mx-auto px-4 py-10 max-w-lg">
       <div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-card">
         <div className="flex justify-center mb-4">
-          <img src={egLogo} alt="EG Shop logo" className="h-24 w-24 rounded-full object-cover ring-2 ring-primary/30 shadow-lg bg-white" />
+          <img src={egLogo.url} alt="EG Shop logo" className="h-24 w-24 rounded-full object-cover ring-2 ring-primary/30 shadow-lg bg-white" />
         </div>
         <h1 className="text-2xl font-extrabold mb-1 text-center">{mode === "login" ? "Giriş" : "Qeydiyyat"}</h1>
         <p className="text-sm text-muted-foreground mb-4 text-center">
