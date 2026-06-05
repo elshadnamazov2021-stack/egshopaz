@@ -118,7 +118,7 @@ export function SiteHeader() {
       </div>
 
       {/* mobile search */}
-      <form onSubmit={onSearch} className="md:hidden px-4 pb-3 bg-gradient-brand">
+      <form onSubmit={onSearch} className="lg:hidden px-4 pb-3 bg-gradient-brand">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
           <input
