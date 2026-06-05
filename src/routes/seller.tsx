@@ -124,6 +124,11 @@ interface Profile {
   shop_address: string | null;
   shop_city: string | null;
   shop_email: string | null;
+  iban: string | null;
+  bank_name: string | null;
+  card_number: string | null;
+  account_holder: string | null;
+  payout_method: string | null;
   created_at?: string | null;
 }
 interface SellerNotif {
