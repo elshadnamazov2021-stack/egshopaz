@@ -194,7 +194,13 @@ function SellerPanel() {
 
   const load = async () => {
     if (!user) return;
-    const [{ data: ps, error: productsError }, { data: cs, error: categoriesError }, { data: ois, error: itemsError }, { data: pr, error: profileError }] = await Promise.all([
+    const [
+      { data: ps, error: productsError },
+      { data: cs, error: categoriesError },
+      { data: ois, error: itemsError },
+      { data: pr, error: profileError },
+      { count: followersCount },
+    ] = await Promise.all([
       supabase
         .from("products")
         .select("*")
@@ -216,6 +222,7 @@ function SellerPanel() {
         )
         .eq("id", user.id)
         .maybeSingle(),
+      supabase.from("shop_followers").select("id", { count: "exact", head: true }).eq("seller_id", user.id),
     ]);
     const firstError = productsError ?? categoriesError ?? itemsError ?? profileError;
     if (firstError) {
