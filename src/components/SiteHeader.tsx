@@ -45,7 +45,7 @@ export function SiteHeader() {
           </Link>
           <LiveClock />
 
-          <form onSubmit={onSearch} className="flex-1 max-w-2xl hidden md:flex">
+          <form onSubmit={onSearch} className="flex-1 max-w-2xl hidden lg:flex">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
               <input
@@ -68,7 +68,7 @@ export function SiteHeader() {
           <nav className="ml-auto flex items-center gap-1 sm:gap-2">
             <DesktopViewToggle />
             <LanguageSwitcher />
-            <Link to="/discover" className="hidden md:flex flex-col items-center text-xs px-3 py-1.5 hover:text-white/80 transition text-white">
+            <Link to="/discover" className="hidden lg:flex flex-col items-center text-xs px-3 py-1.5 hover:text-white/80 transition text-white">
               <span className="h-5 w-5 mb-0.5 text-base">🔥</span>
               <span>{t("sidebar.discover")}</span>
             </Link>
@@ -118,7 +118,7 @@ export function SiteHeader() {
       </div>
 
       {/* mobile search */}
-      <form onSubmit={onSearch} className="md:hidden px-4 pb-3 bg-gradient-brand">
+      <form onSubmit={onSearch} className="lg:hidden px-4 pb-3 bg-gradient-brand">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
           <input
