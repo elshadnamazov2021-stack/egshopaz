@@ -76,7 +76,7 @@ function SupportPage() {
           )}
         </div>
 
-        <div className="flex gap-2 mb-4 border-b border-border">
+        <div className="panel-scroll-row mb-4 border-b border-border">
           <button onClick={() => setTab("ai")}
             className={`px-4 h-10 font-semibold inline-flex items-center gap-2 border-b-2 -mb-px ${tab === "ai" ? "border-primary text-primary" : "border-transparent text-muted-foreground"}`}>
             <Bot className="h-4 w-4" /> AI Asistent

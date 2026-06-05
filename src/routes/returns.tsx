@@ -105,7 +105,7 @@ function ReturnsPage() {
           <Undo2 className="h-6 w-6 text-primary" /> Qaytarmalarım ({returns.length})
         </h1>
 
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
+        <div className="panel-scroll-row pb-2 mb-4">
           {tabs.map(([k, l]) => (
             <button key={k} onClick={() => setFilter(k)}
                     className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap border ${filter === k ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-secondary"}`}>

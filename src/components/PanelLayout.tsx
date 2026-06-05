@@ -25,7 +25,7 @@ export function PanelLayout({ title, subtitle, items, children }: Props) {
 
   return (
     <div className="container mx-auto px-4 py-6 grid gap-4 lg:grid-cols-[260px_1fr] lg:gap-6">
-      <aside className="bg-card border border-border rounded-2xl p-3 h-fit lg:sticky lg:top-20 lg:self-start">
+      <aside className="bg-card border border-border rounded-2xl p-3 h-fit min-w-0 max-w-full overflow-hidden lg:sticky lg:top-20 lg:self-start">
         <div className="px-3 py-3 border-b border-border mb-3 lg:mb-2">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
@@ -35,7 +35,7 @@ export function PanelLayout({ title, subtitle, items, children }: Props) {
             <LiveClock compact />
           </div>
         </div>
-        <nav className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-0.5 lg:overflow-visible lg:pb-0">
+        <nav className="panel-scroll-row pb-1 lg:block lg:space-y-0.5 lg:overflow-visible lg:pb-0">
           {items.map((it) => {
             const isActive = it.active ?? (it.to ? pathname === it.to : false);
             const cls = `flex shrink-0 items-center gap-2 whitespace-nowrap px-3 py-2.5 rounded-lg text-sm font-medium transition text-left lg:w-full lg:gap-3 ${
