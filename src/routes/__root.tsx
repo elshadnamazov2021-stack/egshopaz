@@ -36,7 +36,7 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=5.0, user-scalable=yes" },
       { title: "EG Shop — Azərbaycanın onlayn marketi" },
       { name: "description", content: "Milyonlarla məhsul, sürətli çatdırılma və sərfəli qiymətlər. EG Shop Azərbaycanda." },
       { property: "og:title", content: "EG Shop — Azərbaycanın onlayn marketi" },
