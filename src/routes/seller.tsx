@@ -163,7 +163,9 @@ function SellerPanel() {
     | "shop"
     | "support"
     | "returns"
+    | "followers"
   >("dashboard");
+
   const [unreadMsgs, setUnreadMsgs] = useState(0);
   const [sellerNotifs, setSellerNotifs] = useState<SellerNotif[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
