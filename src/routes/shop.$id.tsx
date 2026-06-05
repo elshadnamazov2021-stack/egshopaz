@@ -35,7 +35,7 @@ function ShopPage() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [products, setProducts] = useState<ProductCardData[]>([]);
-  const [stats, setStats] = useState({ count: 0, avg: 0, reviews: 0 });
+  const [stats, setStats] = useState({ count: 0, avg: 0, reviews: 0, years: 0 });
   const [loading, setLoading] = useState(true);
   const [following, setFollowing] = useState(false);
   const [followers, setFollowers] = useState(0);
