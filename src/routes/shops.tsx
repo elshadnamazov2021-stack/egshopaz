@@ -6,7 +6,7 @@ import { Store, MapPin, Search, Heart, Check } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/shops")({
-  head: () => ({ meta: [{ title: "Mağazalar — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Mağazalar — EG Shop" }] }),
   component: ShopsPage,
 });
 

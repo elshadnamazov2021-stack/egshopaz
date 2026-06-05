@@ -7,7 +7,7 @@ import { PvzOrderChat } from "@/components/PvzOrderChat";
 import { MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/messages-pvz")({
-  head: () => ({ meta: [{ title: "PVZ ilə əlaqə — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "PVZ ilə əlaqə — EG Shop" }] }),
   component: MessagesPvzPage,
 });
 

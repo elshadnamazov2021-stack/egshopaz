@@ -53,7 +53,7 @@ import {
 } from "@/components/ui/table";
 
 export const Route = createFileRoute("/pvz")({
-  head: () => ({ meta: [{ title: "PVZ işçi paneli — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "PVZ işçi paneli — EG Shop" }] }),
   component: PvzPanel,
 });
 

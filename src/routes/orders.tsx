@@ -15,7 +15,7 @@ import { ReturnRequestDialog } from "@/components/ReturnRequestDialog";
 import { DateRangeFilter, emptyRange, inRange, type DateRange } from "@/components/DateRangeFilter";
 
 export const Route = createFileRoute("/orders")({
-  head: () => ({ meta: [{ title: "Sifarişlərim — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Sifarişlərim — EG Shop" }] }),
   component: OrdersPage,
 });
 

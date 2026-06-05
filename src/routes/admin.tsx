@@ -14,7 +14,7 @@ import { PanelLayout, type PanelNavItem } from "@/components/PanelLayout";
 import { AZ_CITY_NAMES, findCity } from "@/lib/azCities";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin paneli — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Admin paneli — EG Shop" }] }),
   component: AdminPanel,
 });
 

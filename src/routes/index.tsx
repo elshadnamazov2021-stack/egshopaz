@@ -17,9 +17,9 @@ const VisualSearchDialog = lazy(() =>
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Elzan Shop — Azərbaycanın onlayn marketi" },
+      { title: "EG Shop — Azərbaycanın onlayn marketi" },
       { name: "description", content: "Geyim, texnika, ev üçün mallar — sərfəli qiymətlərlə. Azərbaycan üzrə çatdırılma." },
-      { property: "og:title", content: "Elzan Shop — Azərbaycanın onlayn marketi" },
+      { property: "og:title", content: "EG Shop — Azərbaycanın onlayn marketi" },
       { property: "og:description", content: "Milyonlarla məhsul, sürətli çatdırılma." },
     ],
   }),

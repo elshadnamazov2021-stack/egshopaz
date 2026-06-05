@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { formatAZN, formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/referral")({
-  head: () => ({ meta: [{ title: "Dostunu dəvət et — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Dostunu dəvət et — EG Shop" }] }),
   component: ReferralPage,
 });
 
@@ -52,7 +52,7 @@ function ReferralPage() {
   const copy = (text: string) => { navigator.clipboard.writeText(text); toast.success("Kopyalandı"); };
   const share = async () => {
     if (navigator.share) {
-      try { await navigator.share({ title: "Elzan Shop", text: `Mənim dəvət kodum: ${code}. Qeydiyyatda istifadə et və hər ikimiz 5 AZN bonus alaq!`, url: link }); } catch {}
+      try { await navigator.share({ title: "EG Shop", text: `Mənim dəvət kodum: ${code}. Qeydiyyatda istifadə et və hər ikimiz 5 AZN bonus alaq!`, url: link }); } catch {}
     } else copy(link);
   };
 

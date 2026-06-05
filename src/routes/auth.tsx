@@ -10,11 +10,11 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import elzanLogo from "@/assets/elzan-logo.png";
+import egLogo from "@/assets/eg-logo.png.asset.json";
 import { AZ_CITIES } from "@/lib/azCities";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Giriş / Qeydiyyat — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Giriş / Qeydiyyat — EG Shop" }] }),
   component: AuthPage,
 });
 
@@ -23,51 +23,51 @@ type RoleTab = "buyer" | "seller" | "pvz" | "admin";
 const TERMS_TEXT: Record<Exclude<RoleTab, "admin">, { title: string; body: string }> = {
   buyer: {
     title: "Müştəri istifadəçi razılaşması",
-    body: `Elzan Shop platformasından istifadə etməklə Siz aşağıdakı şərtləri qeyd-şərtsiz qəbul edirsiniz:
+    body: `EG Shop platformasından istifadə etməklə Siz aşağıdakı şərtləri qeyd-şərtsiz qəbul edirsiniz:
 
-1. ELZAN SHOP YALNIZ TEXNOLOJİ VASİTƏÇİ PLATFORMADIR. Məhsulları Elzan Shop satmır — satışı müstəqil satıcılar həyata keçirir. Məhsulun keyfiyyəti, orijinallığı, təsvirə uyğunluğu, çatdırılma müddəti və qarantiyasına görə tam məsuliyyət SATICIYA aiddir.
+1. ELZAN SHOP YALNIZ TEXNOLOJİ VASİTƏÇİ PLATFORMADIR. Məhsulları EG Shop satmır — satışı müstəqil satıcılar həyata keçirir. Məhsulun keyfiyyəti, orijinallığı, təsvirə uyğunluğu, çatdırılma müddəti və qarantiyasına görə tam məsuliyyət SATICIYA aiddir.
 2. Şəxsi məlumatlarınız (ad, telefon, ünvan) yalnız sifariş və çatdırılma məqsədilə istifadə olunur.
 3. Saxta hesab, saxta sifariş, ödənişdən imtina (kart fırıldaqçılığı), başqa istifadəçiləri narahat etmək və ya platformanı sui-istifadə etmək QƏTİYYƏN qadağandır və hesabın dərhal bağlanmasına, hüquqi orqanlara müraciət olunmasına səbəb olur.
 4. Qadağan olunmuş malların (narkotik, silah, partlayıcı, saxta sənəd, oğurluq mal, müəllif hüquqlarını pozan kontrafakt, qanunla qadağan olunmuş hər hansı məhsul) sifarişi qətiyyən qadağandır. Belə hallarda məsuliyyət tam müştəri/satıcının üzərinə düşür.
 5. Bonus, endirim, promo-kod və qiymətlər platforma tərəfindən istənilən vaxt birtərəfli qaydada dəyişdirilə bilər.
-6. Mübahisə yarandıqda Elzan Shop könüllü vasitəçi rolunu oynaya bilər, lakin son qərar və kompensasiya öhdəliyi satıcıya aiddir. Elzan Shop heç bir halda zərərə görə birbaşa cavabdeh deyil.
-7. Çatdırılma zamanı yolda baş verən zədə, itki, gecikmə, hava şəraiti, fors-major hallar — Elzan Shop-un məsuliyyətindən kənardır.
+6. Mübahisə yarandıqda EG Shop könüllü vasitəçi rolunu oynaya bilər, lakin son qərar və kompensasiya öhdəliyi satıcıya aiddir. EG Shop heç bir halda zərərə görə birbaşa cavabdeh deyil.
+7. Çatdırılma zamanı yolda baş verən zədə, itki, gecikmə, hava şəraiti, fors-major hallar — EG Shop-un məsuliyyətindən kənardır.
 8. Bu razılaşma Azərbaycan Respublikası qanunvericiliyinə uyğun tənzimlənir; mübahisələr Bakı şəhəri məhkəmələrinin müstəsna yurisdiksiyasındadır.
 
 Qeydiyyatdan keçməklə Siz yuxarıdakı şərtləri tam oxuduğunuzu, başa düşdüyünüzü və qeyd-şərtsiz qəbul etdiyinizi təsdiqləyirsiniz.`,
   },
   seller: {
     title: "Satıcı razılaşması",
-    body: `Elzan Shop-da satıcı kimi qeydiyyatdan keçməklə Siz aşağıdakı öhdəlikləri TAM və QEYD-ŞƏRTSİZ qəbul edirsiniz:
+    body: `EG Shop-da satıcı kimi qeydiyyatdan keçməklə Siz aşağıdakı öhdəlikləri TAM və QEYD-ŞƏRTSİZ qəbul edirsiniz:
 
-1. SATIŞIN BÜTÜN HÜQUQİ MƏSULİYYƏTİ SATICIYA AİDDİR. Elzan Shop yalnız texnoloji platforma və ödəniş/çatdırılma vasitəçisidir. Satılan məhsulun keyfiyyəti, orijinallığı, qanuniliyi, sertifikatları, qarantiyası, vergi öhdəlikləri və istehlakçı hüquqlarına dair bütün iddialar üçün yeganə cavabdeh tərəf SATICIDIR.
+1. SATIŞIN BÜTÜN HÜQUQİ MƏSULİYYƏTİ SATICIYA AİDDİR. EG Shop yalnız texnoloji platforma və ödəniş/çatdırılma vasitəçisidir. Satılan məhsulun keyfiyyəti, orijinallığı, qanuniliyi, sertifikatları, qarantiyası, vergi öhdəlikləri və istehlakçı hüquqlarına dair bütün iddialar üçün yeganə cavabdeh tərəf SATICIDIR.
 2. QADAĞAN OLUNMUŞ MALLARIN SATIŞI QƏTİYYƏN QADAĞANDIR: narkotik və psixotrop maddələr, silah/sursat/partlayıcı, saxta pul və sənədlər, oğurluq mal, kontrafakt (saxta brend), reseptlə buraxılan dərmanlar, insan orqanları, vəhşi heyvan, pornoqrafik məhsullar, AR qanunvericiliyi ilə qadağan olunmuş istənilən digər mal. Belə malın aşkarlanması halında: hesab dərhal bağlanır, vəsait dondurulur və məlumat hüquq-mühafizə orqanlarına ötürülür. Bütün cinayət və mülki məsuliyyət SATICININ üzərindədir.
 3. Satıcı məhsulun orijinal, qanuni, təsvirə tam uyğun, sertifikatlı (tələb olunarsa) olduğuna ZƏMANƏT verir. Yanlış məlumat verilməsi fırıldaqçılıq sayılır.
 4. Sifariş qəbul olunduqdan sonra 48 saat ərzində satıcı paketi göndərməyə borcludur. Vaxtında göndərilməyən sifarişlərə görə cərimə tətbiq oluna bilər.
-5. Yolda zədələnmə, itki, yanlış qablaşdırma, keyfiyyətsiz məhsul, geri qaytarma — bütün xərclər və kompensasiya SATICININ üzərinə düşür. Elzan Shop bu xərclərə görə cavabdeh deyil.
+5. Yolda zədələnmə, itki, yanlış qablaşdırma, keyfiyyətsiz məhsul, geri qaytarma — bütün xərclər və kompensasiya SATICININ üzərinə düşür. EG Shop bu xərclərə görə cavabdeh deyil.
 6. Müştəri şikayəti və geri ödəniş halında məbləğ avtomatik olaraq satıcının balansından tutulur. Satıcı bunu əvvəlcədən qəbul edir.
-7. Platformanın komissiyası (cari: 10%) hər satışdan tutulur. Komissiya, tariflər və qaydalar Elzan Shop tərəfindən birtərəfli dəyişdirilə bilər.
-8. Vergi öhdəlikləri (gəlir vergisi, ƏDV, sosial ödənişlər) tam SATICIYA aiddir. Elzan Shop vergi agenti deyil.
+7. Platformanın komissiyası (cari: 10%) hər satışdan tutulur. Komissiya, tariflər və qaydalar EG Shop tərəfindən birtərəfli dəyişdirilə bilər.
+8. Vergi öhdəlikləri (gəlir vergisi, ƏDV, sosial ödənişlər) tam SATICIYA aiddir. EG Shop vergi agenti deyil.
 9. VÖEN/şəxsiyyət vəsiqəsi məlumatları yoxlama, mübahisə və qanuni tələblər üçün saxlanılır və zərurət yarandıqda dövlət orqanlarına təqdim olunur.
 10. Müştəri ilə kobud davranış, qiymət manipulyasiyası, saxta rəy yazmaq, platformadan kənar əlaqə təklif etmək — hesabın bağlanmasına səbəb olur, ödənilməmiş vəsait dondurulur.
-11. Mübahisə yarandıqda Elzan Shop adminin qərarı son və icbaridir. Satıcı bu qərara qeyd-şərtsiz tabe olur.
-12. Elzan Shop heç bir halda dolayı zərər, mənfəət itkisi, reputasiya zərəri və ya üçüncü tərəf iddialarına görə cavabdeh deyil. Maksimum məsuliyyət hüdudu — son 30 günün komissiya gəliri ilə məhdudlaşır.
+11. Mübahisə yarandıqda EG Shop adminin qərarı son və icbaridir. Satıcı bu qərara qeyd-şərtsiz tabe olur.
+12. EG Shop heç bir halda dolayı zərər, mənfəət itkisi, reputasiya zərəri və ya üçüncü tərəf iddialarına görə cavabdeh deyil. Maksimum məsuliyyət hüdudu — son 30 günün komissiya gəliri ilə məhdudlaşır.
 13. Bu razılaşma Azərbaycan Respublikası qanunvericiliyinə tabedir; bütün mübahisələr Bakı şəhəri məhkəmələrində həll olunur.
 
 Qeydiyyatdan keçməklə bu şərtləri tam, qeyd-şərtsiz və geri dönülməz şəkildə qəbul edirsiniz.`,
   },
   pvz: {
     title: "PVZ (çatdırılma nöqtəsi) işçi razılaşması",
-    body: `Elzan Shop PVZ işçisi kimi qeydiyyatdan keçməklə Siz aşağıdakı qaydaları TAM və QEYD-ŞƏRTSİZ qəbul edirsiniz:
+    body: `EG Shop PVZ işçisi kimi qeydiyyatdan keçməklə Siz aşağıdakı qaydaları TAM və QEYD-ŞƏRTSİZ qəbul edirsiniz:
 
 1. Paketləri qəbul etmək və müştəriyə YALNIZ doğru kod/QR yoxlamasından sonra təhvil vermək. Yanlış təhvilə görə tam maddi məsuliyyət PVZ işçisinin üzərindədir.
 2. PVZ işçisi paketin məzmununu yoxlamır və satıcının məhsulun qanuniliyinə görə cavabdehliyini öz üzərinə götürmür. Şübhəli (narkotik, silah, qadağan olunmuş mal) paketləri dərhal admin və hüquq-mühafizə orqanlarına bildirməyə borcludur.
 3. PVZ-nin iş saatlarına dəqiq riayət etmək. İşə çıxmama və ya gecikmə cərimə ilə nəticələnə bilər.
 4. Müştəri ilə hörmətlə davranmaq; kobud davranış, müştəri ilə mübahisə, rüşvət tələbi — dərhal işdən azad olunmaya səbəb olur.
-5. Paketin saxlanma müddətində zədələnməsi, itməsi, oğurlanması halında — maddi məsuliyyət birbaşa PVZ işçisinin və/və ya nöqtə sahibinin üzərinə düşür. Elzan Shop bu zərərə görə cavabdeh deyil.
+5. Paketin saxlanma müddətində zədələnməsi, itməsi, oğurlanması halında — maddi məsuliyyət birbaşa PVZ işçisinin və/və ya nöqtə sahibinin üzərinə düşür. EG Shop bu zərərə görə cavabdeh deyil.
 6. Şəxsi və müştəri məlumatlarının məxfiliyini qorumaq. Məlumat sızması cinayət məsuliyyəti yaradır.
 7. PVZ nöqtəsinin avadanlıqlarına (skaner, terminal, rəflər) tam maddi məsuliyyət daşıyırsınız.
-8. Elzan Shop bu razılaşmanı istənilən vaxt birtərəfli ləğv edə bilər. Ödənilməmiş haqq son hesablama dövrü əsasında ödənilir.
+8. EG Shop bu razılaşmanı istənilən vaxt birtərəfli ləğv edə bilər. Ödənilməmiş haqq son hesablama dövrü əsasında ödənilir.
 9. Bu razılaşma Azərbaycan Respublikası qanunvericiliyinə tabedir; mübahisələr Bakı şəhəri məhkəmələrində həll olunur.
 
 Qeydiyyatdan keçməklə bu qaydalara qeyd-şərtsiz əməl etməyə razılıq verirsiniz.`,
@@ -283,7 +283,7 @@ function AuthPage() {
     <div className="container mx-auto px-4 py-10 max-w-lg">
       <div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-card">
         <div className="flex justify-center mb-4">
-          <img src={elzanLogo} alt="Elzan Shop logo" className="h-24 w-24 rounded-full object-cover ring-2 ring-primary/30 shadow-lg bg-white" />
+          <img src={egLogo.url} alt="EG Shop logo" className="h-24 w-24 rounded-full object-cover ring-2 ring-primary/30 shadow-lg bg-white" />
         </div>
         <h1 className="text-2xl font-extrabold mb-1 text-center">{mode === "login" ? "Giriş" : "Qeydiyyat"}</h1>
         <p className="text-sm text-muted-foreground mb-4 text-center">

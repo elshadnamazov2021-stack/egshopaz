@@ -10,7 +10,7 @@ import { formatAZN, formatDateTime } from "@/lib/format";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/notifications")({
-  head: () => ({ meta: [{ title: "Bildirişlər — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Bildirişlər — EG Shop" }] }),
   component: NotificationsPage,
 });
 

@@ -11,7 +11,7 @@ import { CitySelect } from "@/components/CitySelect";
 import { findCity } from "@/lib/azCities";
 
 export const Route = createFileRoute("/addresses")({
-  head: () => ({ meta: [{ title: "Ünvanlarım — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Ünvanlarım — EG Shop" }] }),
   component: AddressesPage,
 });
 

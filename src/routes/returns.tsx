@@ -9,7 +9,7 @@ import { OrderQRDialog } from "@/components/OrderQRDialog";
 import { formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/returns")({
-  head: () => ({ meta: [{ title: "Qaytarmalarım — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Qaytarmalarım — EG Shop" }] }),
   component: ReturnsPage,
 });
 

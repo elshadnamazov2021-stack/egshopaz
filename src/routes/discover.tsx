@@ -8,7 +8,7 @@ import { Flame, Heart, Tag, Sparkles, TrendingUp } from "lucide-react";
 export const Route = createFileRoute("/discover")({
   head: () => ({
     meta: [
-      { title: "Discover — Elzan Shop" },
+      { title: "Discover — EG Shop" },
       { name: "description", content: "Trending products, most loved items, discounts and new arrivals all in one place." },
     ],
   }),

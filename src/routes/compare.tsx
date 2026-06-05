@@ -7,7 +7,7 @@ import { X, ShoppingCart, Scale } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/compare")({
-  head: () => ({ meta: [{ title: "Müqayisə — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Müqayisə — EG Shop" }] }),
   component: ComparePage,
 });
 

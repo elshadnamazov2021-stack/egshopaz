@@ -9,7 +9,7 @@ import { Coins, TrendingUp, TrendingDown } from "lucide-react";
 import { formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/bonus")({
-  head: () => ({ meta: [{ title: "Bonus xallar — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Bonus xallar — EG Shop" }] }),
   component: BonusPage,
 });
 

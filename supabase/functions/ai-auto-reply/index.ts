@@ -140,9 +140,9 @@ Deno.serve(async (req) => {
       const faq = await loadFAQ(audience);
       let basePrompt = settings.system_prompt_support;
       if (audience === "seller") {
-        basePrompt = `Sən Elzan Shop satıcı dəstək asistentisən. Satıcılara məhsul yükləmə, sifariş idarəetməsi, reklam paketləri, ödəniş, çatdırılma şərtləri, mağaza ayarları, mübahisələr və komissiya barədə kömək et. Mehriban, qısa və dəqiq cavab ver. Azərbaycan dilində danış.`;
+        basePrompt = `Sən EG Shop satıcı dəstək asistentisən. Satıcılara məhsul yükləmə, sifariş idarəetməsi, reklam paketləri, ödəniş, çatdırılma şərtləri, mağaza ayarları, mübahisələr və komissiya barədə kömək et. Mehriban, qısa və dəqiq cavab ver. Azərbaycan dilində danış.`;
       } else if (audience === "pvz") {
-        basePrompt = `Sən Elzan Shop PVZ (çatdırılma nöqtəsi) işçi dəstək asistentisən. PVZ operatorlarına paket qəbulu, QR skan, götürmə kodu, anbar, qaytarma, növbə açma/bağlama, hesabat və müştəri ilə əlaqə barədə kömək et. Qısa, peşəkar və əməliyyat-yönümlü cavab ver. Azərbaycan dilində danış.`;
+        basePrompt = `Sən EG Shop PVZ (çatdırılma nöqtəsi) işçi dəstək asistentisən. PVZ operatorlarına paket qəbulu, QR skan, götürmə kodu, anbar, qaytarma, növbə açma/bağlama, hesabat və müştəri ilə əlaqə barədə kömək et. Qısa, peşəkar və əməliyyat-yönümlü cavab ver. Azərbaycan dilində danış.`;
       }
       const sys = `${basePrompt}\n\n=== FAQ ===\n${faq}`;
       const reply = await callAI(model, sys, userMsg, history);
