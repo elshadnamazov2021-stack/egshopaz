@@ -120,6 +120,7 @@ interface Profile {
   shop_address: string | null;
   shop_city: string | null;
   shop_email: string | null;
+  created_at?: string | null;
 }
 interface SellerNotif {
   id: string;
