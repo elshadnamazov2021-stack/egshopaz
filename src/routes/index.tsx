@@ -92,7 +92,7 @@ function Index() {
   };
 
   return (
-    <div className="container mx-auto px-3 md:px-4 py-4 space-y-6 md:space-y-8">
+    <div className="container mx-auto px-3 md:px-4 py-4 space-y-5 md:space-y-8">
       {/* DEV: Panel keçidləri — domen alana qədər */}
       <section className="rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 p-3 md:p-5">
         <div className="flex items-center justify-between mb-3">
@@ -130,7 +130,7 @@ function Index() {
 
 
       {/* Visual Search Banner */}
-      <section className="rounded-3xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-500 p-6 md:p-8 text-white shadow-elegant relative overflow-hidden">
+      <section className="rounded-2xl md:rounded-3xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-500 p-5 md:p-8 text-white shadow-elegant relative overflow-hidden">
         <div className="absolute -right-10 -top-10 w-48 h-48 bg-white/20 rounded-full blur-3xl" />
         <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-yellow-300/30 rounded-full blur-2xl" />
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
@@ -155,7 +155,7 @@ function Index() {
       </section>
 
       {giveaways.length > 0 && (
-        <section className="rounded-3xl bg-gradient-to-br from-amber-400 via-orange-500 to-pink-500 p-6 md:p-8 text-white shadow-elegant relative overflow-hidden">
+        <section className="rounded-2xl md:rounded-3xl bg-gradient-to-br from-amber-400 via-orange-500 to-pink-500 p-4 md:p-8 text-white shadow-elegant relative overflow-hidden">
           <div className="absolute -right-12 -top-12 w-48 h-48 bg-white/20 rounded-full blur-3xl" />
           <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-yellow-200/30 rounded-full blur-2xl" />
           <div className="relative z-10 flex items-end justify-between mb-5">
@@ -163,28 +163,28 @@ function Index() {
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-bold mb-2">
                 <Gift className="h-3.5 w-3.5" /> UDUŞ
               </div>
-              <h2 className="text-2xl md:text-4xl font-black">🎁 Uduşlu Məhsullar</h2>
+              <h2 className="text-xl md:text-4xl font-black">🎁 Uduşlu Məhsullar</h2>
               <p className="text-sm opacity-95 mt-1">Bu məhsulları al və uduşda iştirak et!</p>
             </div>
           </div>
-          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3 bg-white rounded-2xl p-3 mobile-product-grid">
+          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 bg-white rounded-xl md:rounded-2xl p-2.5 md:p-3 mobile-product-grid home-product-strip">
             {giveaways.slice(0, 4).map((p) => <ProductCard key={p.id} p={p} enableFavorite={false} />)}
           </div>
         </section>
       )}
 
       {discounted.length > 0 && (
-        <section className="rounded-3xl bg-gradient-to-br from-discount via-discount to-rose-700 p-6 md:p-8 text-white shadow-elegant">
-          <div className="flex items-center justify-between mb-5">
+        <section className="rounded-2xl md:rounded-3xl bg-gradient-to-br from-discount via-discount to-rose-700 p-4 md:p-8 text-white shadow-elegant">
+          <div className="flex items-center justify-between gap-3 mb-4 md:mb-5">
             <div>
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-bold mb-2">
                 <Tag className="h-3.5 w-3.5" /> {t("home.discountBadge")}
               </div>
-              <h2 className="text-2xl md:text-4xl font-black">{t("home.discountTitle")}</h2>
+              <h2 className="text-xl md:text-4xl font-black leading-tight">{t("home.discountTitle")}</h2>
             </div>
             <Link to="/discover" className="text-sm font-bold hover:underline whitespace-nowrap">{t("home.viewAllArrow")}</Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3 bg-white rounded-2xl p-3 mobile-product-grid">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 bg-white rounded-xl md:rounded-2xl p-2.5 md:p-3 mobile-product-grid home-product-strip">
             {discounted.slice(0, 5).map((p) => <ProductCard key={p.id} p={p} enableFavorite={false} />)}
           </div>
         </section>
@@ -238,7 +238,7 @@ function Index() {
             </div>
             <Link to="/discover" className="text-sm text-primary font-bold hover:underline">{t("home.viewAllArrow")}</Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 mobile-product-grid">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 mobile-product-grid">
             {trending.slice(0, 6).map((p) => <ProductCard key={p.id} p={p} enableFavorite={false} />)}
           </div>
         </section>
@@ -286,7 +286,7 @@ function Index() {
             <Link to="/become-seller" className="text-primary font-bold hover:underline">{t("home.becomeFirstSeller")}</Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 mobile-product-grid">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 mobile-product-grid">
             {allProducts.map((p) => <ProductCard key={p.id} p={p} enableFavorite={false} />)}
           </div>
         )}
