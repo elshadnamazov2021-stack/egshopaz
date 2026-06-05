@@ -42,7 +42,7 @@ function ProductPage() {
   const [followersCount, setFollowersCount] = useState(0);
 
   const sendMessage = async () => {
-    if (!user) { navigate({ to: "/auth" }); return; }
+    if (!user) { navigate({ to: "/auth", search: { role: "buyer" } as never }); return; }
     if (!p) return;
     const body = msgBody.trim();
     if (body.length < 2) { toast.error(t("orders.messageShort")); return; }
@@ -63,7 +63,7 @@ function ProductPage() {
   };
 
   const toggleFollow = async () => {
-    if (!user) { navigate({ to: "/auth" }); return; }
+    if (!user) { navigate({ to: "/auth", search: { role: "buyer" } as never }); return; }
     if (!p) return;
     if (user.id === p.seller_id) { toast.error("Öz mağazanızı izləyə bilməzsiniz"); return; }
     if (isFollowing) {
@@ -104,7 +104,7 @@ function ProductPage() {
   }, [id, user]);
 
   const addToCart = async () => {
-    if (!user) { navigate({ to: "/auth" }); return; }
+    if (!user) { navigate({ to: "/auth", search: { role: "buyer" } as never }); return; }
     if (!p) return;
     const { data: existing } = await supabase.from("cart_items")
       .select("id,quantity").eq("user_id", user.id).eq("product_id", p.id).maybeSingle();
