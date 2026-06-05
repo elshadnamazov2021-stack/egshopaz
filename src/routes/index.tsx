@@ -32,6 +32,11 @@ interface PromoCode { id: string; code: string; discount_percent: number | null;
 
 function Index() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const buyerHref = user ? "/profile" : "/auth?role=buyer";
+  const sellerHref = user ? "/seller" : "/auth?role=seller";
+  const adminHref = user ? "/admin" : "/auth?role=admin";
+  const pvzHref = user ? "/pvz" : "/auth?role=pvz";
   const [allProducts, setAllProducts] = useState<ProductCardData[]>([]);
   const [discounted, setDiscounted] = useState<ProductCardData[]>([]);
   const [trending, setTrending] = useState<ProductCardData[]>([]);
