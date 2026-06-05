@@ -93,11 +93,31 @@ export function ProductReviews({ productId }: { productId: string }) {
           <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows={3} maxLength={1000}
                     placeholder="Məhsul haqqında fikriniz..."
                     className="w-full p-3 rounded-lg border border-input bg-background text-sm resize-none" />
-          <div>
-            <input type="file" accept="image/*" multiple
-                   onChange={(e) => setFiles([...(e.target.files ?? [])].slice(0, 4))}
-                   className="text-xs" />
-            {files.length > 0 && <div className="text-xs text-muted-foreground mt-1">{files.length} foto seçildi (max 4)</div>}
+          <div className="space-y-2">
+            <div className="flex flex-wrap gap-2">
+              <label className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-background border border-input cursor-pointer text-xs font-medium hover:bg-accent">
+                📷 Şəkil çək
+                <input type="file" accept="image/*" capture="environment" className="hidden"
+                       onChange={(e) => setFiles((prev) => [...prev, ...[...(e.target.files ?? [])]].slice(0, 4))} />
+              </label>
+              <label className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-background border border-input cursor-pointer text-xs font-medium hover:bg-accent">
+                🖼 Qalereyadan seç
+                <input type="file" accept="image/*" multiple className="hidden"
+                       onChange={(e) => setFiles((prev) => [...prev, ...[...(e.target.files ?? [])]].slice(0, 4))} />
+              </label>
+            </div>
+            {files.length > 0 && (
+              <div className="flex gap-2 flex-wrap">
+                {files.map((f, i) => (
+                  <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border">
+                    <img src={URL.createObjectURL(f)} alt="" className="w-full h-full object-cover" />
+                    <button type="button" onClick={() => setFiles(files.filter((_, j) => j !== i))}
+                            className="absolute top-0.5 right-0.5 bg-destructive text-destructive-foreground rounded-full w-5 h-5 text-xs leading-none">×</button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="text-xs text-muted-foreground">Maksimum 4 şəkil. Məhsulun şəklini çəkib rəyinizlə birlikdə göndərin.</div>
           </div>
           <button onClick={submit} disabled={busy}
                   className="bg-primary text-primary-foreground px-5 py-2.5 rounded-lg font-bold inline-flex items-center gap-2 disabled:opacity-50">
