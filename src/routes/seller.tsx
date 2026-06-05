@@ -1325,6 +1325,73 @@ function SellerPanel() {
                 />
               </div>
             </div>
+
+            <div className="pt-4 mt-2 border-t border-border">
+              <h4 className="font-bold text-base mb-1">💳 Ödəniş hesabı (payout)</h4>
+              <p className="text-xs text-muted-foreground mb-3">
+                Sifariş tamamlandıqdan 3 gün sonra satış məbləği (komissiya çıxılmaqla) avtomatik bu hesaba köçürülür. IBAN tövsiyə olunur — limit yoxdur və qanuni sənədləşmə üçün uyğundur.
+              </p>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm font-semibold">Üstün ödəniş üsulu</label>
+                  <select
+                    value={profile.payout_method ?? "iban"}
+                    onChange={(e) => setProfile({ ...profile, payout_method: e.target.value })}
+                    className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
+                  >
+                    <option value="iban">IBAN (bank hesabı)</option>
+                    <option value="card">Kart nömrəsi</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-semibold">Hesab sahibi</label>
+                  <input
+                    value={profile.account_holder ?? ""}
+                    onChange={(e) => setProfile({ ...profile, account_holder: e.target.value.toUpperCase() })}
+                    maxLength={100}
+                    placeholder="ADI SOYADI / ŞİRKƏT ADI"
+                    className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background uppercase"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="text-sm font-semibold">IBAN</label>
+                  <input
+                    value={profile.iban ?? ""}
+                    onChange={(e) => setProfile({ ...profile, iban: e.target.value.toUpperCase().replace(/[^A-Z0-9 ]/g, "") })}
+                    maxLength={34}
+                    placeholder="AZ21 NABZ 0000 0000 1370 1000 1944"
+                    className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background tracking-wider"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">28 simvol, AZ ilə başlayır. Bütün banklarda işləyir.</p>
+                </div>
+                <div>
+                  <label className="text-sm font-semibold">Bank adı</label>
+                  <input
+                    value={profile.bank_name ?? ""}
+                    onChange={(e) => setProfile({ ...profile, bank_name: e.target.value })}
+                    maxLength={100}
+                    placeholder="Kapital Bank, ABB, ..."
+                    className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-semibold">Kart nömrəsi (alternativ)</label>
+                  <input
+                    value={profile.card_number ?? ""}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, "").slice(0, 19);
+                      const f = v.replace(/(\d{4})/g, "$1 ").trim();
+                      setProfile({ ...profile, card_number: f });
+                    }}
+                    maxLength={23}
+                    placeholder="4169 7388 0000 0000"
+                    className="mt-1 w-full h-11 px-3 rounded-lg border border-input bg-background tracking-wider"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">m10, LeoBank, Birbank və s. Kiçik məbləğlər üçün uyğundur (gündəlik limit ola bilər).</p>
+                </div>
+              </div>
+            </div>
+
             <button
               onClick={saveShop}
               disabled={savingShop}
