@@ -22,7 +22,7 @@ export function SiteFooter() {
           </ul>
         </div>
         <div>
-          <h4 className="font-bold mb-3">Elzan Shop</h4>
+          <h4 className="font-bold mb-3">EG Shop</h4>
           <p className="text-muted-foreground">{t("footer.shopBrand")}</p>
         </div>
         <div>
@@ -31,7 +31,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-border py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Elzan Shop — {t("footer.rights")}
+        © {new Date().getFullYear()} EG Shop — {t("footer.rights")}
       </div>
     </footer>
   );

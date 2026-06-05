@@ -18,7 +18,7 @@ export const Route = createFileRoute("/catalog")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Kataloq — Elzan Shop" },
+      { title: "Kataloq — EG Shop" },
       { name: "description", content: "Bütün məhsullar bir yerdə. Kateqoriya, marka və qiymətə görə filter." },
     ],
   }),

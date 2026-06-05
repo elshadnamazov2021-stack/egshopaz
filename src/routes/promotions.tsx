@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/promotions")({
-  head: () => ({ meta: [{ title: "Aksiyalar — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Aksiyalar — EG Shop" }] }),
   component: PromotionsPage,
 });
 

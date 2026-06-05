@@ -37,12 +37,12 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Elzan Shop — Azərbaycanın onlayn marketi" },
-      { name: "description", content: "Milyonlarla məhsul, sürətli çatdırılma və sərfəli qiymətlər. Elzan Shop Azərbaycanda." },
-      { property: "og:title", content: "Elzan Shop — Azərbaycanın onlayn marketi" },
-      { name: "twitter:title", content: "Elzan Shop — Azərbaycanın onlayn marketi" },
-      { property: "og:description", content: "Milyonlarla məhsul, sürətli çatdırılma və sərfəli qiymətlər. Elzan Shop Azərbaycanda." },
-      { name: "twitter:description", content: "Milyonlarla məhsul, sürətli çatdırılma və sərfəli qiymətlər. Elzan Shop Azərbaycanda." },
+      { title: "EG Shop — Azərbaycanın onlayn marketi" },
+      { name: "description", content: "Milyonlarla məhsul, sürətli çatdırılma və sərfəli qiymətlər. EG Shop Azərbaycanda." },
+      { property: "og:title", content: "EG Shop — Azərbaycanın onlayn marketi" },
+      { name: "twitter:title", content: "EG Shop — Azərbaycanın onlayn marketi" },
+      { property: "og:description", content: "Milyonlarla məhsul, sürətli çatdırılma və sərfəli qiymətlər. EG Shop Azərbaycanda." },
+      { name: "twitter:description", content: "Milyonlarla məhsul, sürətli çatdırılma və sərfəli qiymətlər. EG Shop Azərbaycanda." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3c5472a7-d4ed-4606-9418-2239a7902322/id-preview-9aa023f3--ce089083-d587-4e6d-8fae-500699d0362d.lovable.app-1780491005862.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3c5472a7-d4ed-4606-9418-2239a7902322/id-preview-9aa023f3--ce089083-d587-4e6d-8fae-500699d0362d.lovable.app-1780491005862.png" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -92,7 +92,7 @@ function WorkHeader({ label }: { label: string }) {
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
       <div className="container mx-auto px-4 h-14 flex items-center gap-3">
-        <div className="font-extrabold text-primary tracking-tight">Elzan Shop · {label}</div>
+        <div className="font-extrabold text-primary tracking-tight">EG Shop · {label}</div>
         <div className="ml-auto flex items-center gap-3">
           <LiveClock />
           {user && (

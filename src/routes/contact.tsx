@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Mail, Phone, MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({ meta: [{ title: "Əlaqə — Elzan Shop" }, { name: "description", content: "Elzan Shop ilə əlaqə məlumatları" }] }),
+  head: () => ({ meta: [{ title: "Əlaqə — EG Shop" }, { name: "description", content: "EG Shop ilə əlaqə məlumatları" }] }),
   component: ContactPage,
 });
 

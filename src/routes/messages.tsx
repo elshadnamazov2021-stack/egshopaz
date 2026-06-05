@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/messages")({
-  head: () => ({ meta: [{ title: "Mesajlarım — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Mesajlarım — EG Shop" }] }),
   component: MessagesPage,
 });
 

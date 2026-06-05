@@ -11,7 +11,7 @@ import { AISupportChat } from "@/components/AISupportChat";
 import { formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/support")({
-  head: () => ({ meta: [{ title: "Dəstək — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Dəstək — EG Shop" }] }),
   component: SupportPage,
 });
 

@@ -6,7 +6,7 @@ import { z } from "zod";
 import { Eye, EyeOff } from "lucide-react";
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => ({ meta: [{ title: "Şifrəni yenilə — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Şifrəni yenilə — EG Shop" }] }),
   component: ResetPasswordPage,
 });
 

@@ -7,7 +7,7 @@ import { Store, TrendingUp, Package } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/become-seller")({
-  head: () => ({ meta: [{ title: "Satıcı ol — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Satıcı ol — EG Shop" }] }),
   component: BecomeSeller,
 });
 

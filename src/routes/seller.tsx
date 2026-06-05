@@ -51,7 +51,7 @@ import { findCity } from "@/lib/azCities";
 import { DateRangeFilter, emptyRange, inRange, type DateRange } from "@/components/DateRangeFilter";
 
 export const Route = createFileRoute("/seller")({
-  head: () => ({ meta: [{ title: "Satıcı paneli — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Satıcı paneli — EG Shop" }] }),
   component: SellerPanel,
 });
 
@@ -603,7 +603,7 @@ function SellerPanel() {
     <div class="pickup">${pickupCode}</div>
     <div class="qr-cap">PVZ qəbul kodu</div>
   </div>
-  <div class="footer">Elzan Shop · ${formatDate(new Date())}</div>
+  <div class="footer">EG Shop · ${formatDate(new Date())}</div>
 </div>
 <script>setTimeout(()=>window.print(),300);</script>
 </body></html>`;

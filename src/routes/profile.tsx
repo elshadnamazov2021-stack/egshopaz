@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/profile")({
-  head: () => ({ meta: [{ title: "Müştəri paneli — Elzan Shop" }] }),
+  head: () => ({ meta: [{ title: "Müştəri paneli — EG Shop" }] }),
   component: Profile,
 });
 
