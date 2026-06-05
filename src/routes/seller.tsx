@@ -1101,6 +1101,8 @@ function SellerPanel() {
 
       {tab === "advertising" && <SellerAdvertising />}
 
+      {tab === "followers" && <SellerFollowers sellerId={user.id} />}
+
       {tab === "support" && (
         <div className="space-y-4">
           <div>
