@@ -128,12 +128,24 @@ function ShopPage() {
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div>
-                  <h1 className="text-2xl md:text-3xl font-black leading-tight">{name}</h1>
-                  {profile.shop_city && (
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
-                      <MapPin className="h-3.5 w-3.5" /> {profile.shop_city}
-                    </div>
-                  )}
+                  <h1 className="text-2xl md:text-3xl font-black leading-tight flex items-center gap-2">
+                    {name}
+                    {followers >= 100 && (
+                      <BadgeCheck className="h-6 w-6 md:h-7 md:w-7 text-blue-500 fill-blue-500" />
+                    )}
+                  </h1>
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mt-1">
+                    {profile.shop_city && (
+                      <span className="inline-flex items-center gap-1">
+                        <MapPin className="h-3.5 w-3.5" /> {profile.shop_city}
+                      </span>
+                    )}
+                    {profile.phone && (
+                      <span className="inline-flex items-center gap-1">
+                        <Phone className="h-3.5 w-3.5" /> {profile.phone}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 {user?.id !== id && (
                   <button
