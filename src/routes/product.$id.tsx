@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN, calcDiscount } from "@/lib/format";
 import { useAuth } from "@/contexts/AuthContext";
-import { Star, ShoppingCart, Heart, Truck, ShieldCheck, MessageCircle, Send, Store } from "lucide-react";
+import { Star, ShoppingCart, Heart, Truck, ShieldCheck, MessageCircle, Send, Store, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { ProductReviews } from "@/components/ProductReviews";
 import { CompareButton } from "@/components/CompareButton";
@@ -34,6 +34,12 @@ function ProductPage() {
   const [msgOpen, setMsgOpen] = useState(false);
   const [msgBody, setMsgBody] = useState("");
   const [msgSending, setMsgSending] = useState(false);
+  const [shopInfo, setShopInfo] = useState<{
+    id: string; shop_name: string | null; full_name: string | null;
+    shop_logo_url: string | null; shop_description: string | null; shop_city: string | null;
+  } | null>(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followersCount, setFollowersCount] = useState(0);
 
   const sendMessage = async () => {
     if (!user) { navigate({ to: "/auth" }); return; }
@@ -56,18 +62,46 @@ function ProductPage() {
     setMsgOpen(false);
   };
 
+  const toggleFollow = async () => {
+    if (!user) { navigate({ to: "/auth" }); return; }
+    if (!p) return;
+    if (user.id === p.seller_id) { toast.error("Öz mağazanızı izləyə bilməzsiniz"); return; }
+    if (isFollowing) {
+      await supabase.from("shop_followers").delete().eq("user_id", user.id).eq("seller_id", p.seller_id);
+      setIsFollowing(false);
+      setFollowersCount((c) => Math.max(0, c - 1));
+      toast.success("İzləməkdən çıxarıldı");
+    } else {
+      const { error } = await supabase.from("shop_followers").insert({ user_id: user.id, seller_id: p.seller_id });
+      if (error) { toast.error(error.message); return; }
+      setIsFollowing(true);
+      setFollowersCount((c) => c + 1);
+      toast.success("Mağaza izlənildi 💙");
+    }
+  };
+
   useEffect(() => {
     setLoading(true);
     supabase.from("products").select("*").eq("id", id).maybeSingle().then(async ({ data }) => {
       setP(data as Product | null);
       if (data) {
-        const { data: seller } = await supabase.from("profiles").select("shop_name,full_name").eq("id", data.seller_id).maybeSingle();
-        setShopName(seller?.shop_name || seller?.full_name || t("product.seller"));
+        const [{ data: seller }, { count }] = await Promise.all([
+          supabase.from("profiles").select("id,shop_name,full_name,shop_logo_url,shop_description,shop_city").eq("id", data.seller_id).maybeSingle(),
+          supabase.from("shop_followers").select("id", { count: "exact", head: true }).eq("seller_id", data.seller_id),
+        ]);
+        const name = seller?.shop_name || seller?.full_name || t("product.seller");
+        setShopName(name);
+        setShopInfo(seller as any);
+        setFollowersCount(count ?? 0);
+        if (user) {
+          const { data: f } = await supabase.from("shop_followers").select("id").eq("user_id", user.id).eq("seller_id", data.seller_id).maybeSingle();
+          setIsFollowing(!!f);
+        }
       }
       setLoading(false);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, user]);
 
   const addToCart = async () => {
     if (!user) { navigate({ to: "/auth" }); return; }
@@ -162,24 +196,52 @@ function ProductPage() {
             </div>
           </div>
 
-          <div className="pt-2">
-            <div className="text-sm text-muted-foreground">{t("product.seller")}</div>
-            <div className="flex items-center justify-between gap-3">
-              <Link to="/shop/$id" params={{ id: p.seller_id }} className="font-semibold hover:text-primary inline-flex items-center gap-1.5">
-                <Store className="h-4 w-4" /> {shopName}
+          <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
+            <div className="flex items-start gap-3">
+              <Link to="/shop/$id" params={{ id: p.seller_id }} className="shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-secondary overflow-hidden flex items-center justify-center">
+                  {shopInfo?.shop_logo_url
+                    ? <img src={shopInfo.shop_logo_url} alt={shopName} className="w-full h-full object-cover" />
+                    : <Store className="h-5 w-5 text-muted-foreground" />}
+                </div>
               </Link>
+              <div className="flex-1 min-w-0">
+                <Link to="/shop/$id" params={{ id: p.seller_id }} className="font-bold hover:text-primary inline-flex items-center gap-1.5">
+                  <Store className="h-4 w-4" /> {shopName}
+                </Link>
+                {shopInfo?.shop_description && (
+                  <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{shopInfo.shop_description}</p>
+                )}
+                <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                  {shopInfo?.shop_city && <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" />{shopInfo.shop_city}</span>}
+                  <span className="inline-flex items-center gap-1"><Heart className="h-3 w-3" />{followersCount} izləyici</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              {user?.id !== p.seller_id && (
+                <button
+                  onClick={toggleFollow}
+                  className={`flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl font-bold text-sm transition ${isFollowing ? "bg-primary/10 text-primary border border-primary/30" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
+                >
+                  <Heart className={`h-4 w-4 ${isFollowing ? "fill-primary" : ""}`} />
+                  {isFollowing ? "İzlənilir" : "İzlə"}
+                </button>
+              )}
               {user?.id !== p.seller_id && (
                 <button
                   onClick={() => setMsgOpen((v) => !v)}
-                  className="text-sm flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border hover:border-primary hover:text-primary transition font-semibold"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl border border-border hover:border-primary hover:text-primary transition font-semibold text-sm"
                 >
                   <MessageCircle className="h-4 w-4" />
                   {t("product.writeShop")}
                 </button>
               )}
             </div>
+
             {msgOpen && (
-              <div className="mt-3 bg-secondary/50 border border-border rounded-xl p-3 space-y-2">
+              <div className="mt-1 bg-secondary/50 border border-border rounded-xl p-3 space-y-2">
                 <textarea
                   value={msgBody}
                   onChange={(e) => setMsgBody(e.target.value)}
