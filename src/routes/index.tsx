@@ -87,6 +87,28 @@ function Index() {
 
   return (
     <div className="container mx-auto px-3 md:px-4 py-4 space-y-6 md:space-y-8">
+      {/* DEV: Panel keçidləri — domen alana qədər */}
+      <section className="rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 p-4 md:p-5">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Panel keçidləri</span>
+          <span className="text-[10px] text-muted-foreground">domen alana qədər</span>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <Link to="/seller" className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-orange-500 to-rose-500 text-white p-4 hover:scale-[1.02] transition shadow-card">
+            <Store className="h-6 w-6" />
+            <span className="text-sm font-black">Satıcı</span>
+          </Link>
+          <Link to="/admin" className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white p-4 hover:scale-[1.02] transition shadow-card">
+            <Shield className="h-6 w-6" />
+            <span className="text-sm font-black">Admin</span>
+          </Link>
+          <Link to="/pvz" className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-4 hover:scale-[1.02] transition shadow-card">
+            <Package className="h-6 w-6" />
+            <span className="text-sm font-black">PVZ</span>
+          </Link>
+        </div>
+      </section>
+
       {/* 1) Kateqoriya tablar + kompakt alt kateqoriyalar + banner */}
       <HomeCategoryBrowser />
 
