@@ -64,7 +64,7 @@ export function AdminPayouts() {
       ? (prompt("Qeyd (məsələn: bank köçürmə referansı)") ?? "")
       : (prompt("Rədd səbəbi:") ?? "");
     if (!approve && !note.trim()) return toast.error("Səbəb daxil edin");
-    const { error } = await supabase.rpc("complete_payout_request", { _id: id, _approve: approve, _note: note || null });
+    const { error } = await supabase.rpc("complete_payout_request", { _id: id, _approve: approve, _note: note || undefined });
     if (error) return toast.error(error.message);
     toast.success(approve ? "Ödənildi olaraq qeyd olundu" : "Rədd edildi");
     void load();
