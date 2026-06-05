@@ -116,10 +116,25 @@ function WorkHeader({ label }: { label: string }) {
 
 function AppShell() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { isSeller, isAdmin, isPvz, loading } = useAuth();
   const isSellerPanel = pathname === "/seller" || pathname.startsWith("/seller/");
   const isPvzPanel = pathname === "/pvz" || pathname.startsWith("/pvz/");
   const isAdminPanel = pathname === "/admin" || pathname.startsWith("/admin/");
   const isWorkPanel = isSellerPanel || isPvzPanel || isAdminPanel;
+  const isAuthRoute = pathname === "/auth" || pathname.startsWith("/auth/") || pathname === "/reset-password";
+
+  // Sellers (without admin/pvz) should only use the seller panel — block customer-side pages
+  useEffect(() => {
+    if (loading) return;
+    if (isSeller && !isAdmin && !isPvz && !isWorkPanel && !isAuthRoute) {
+      navigate({ to: "/seller", replace: true });
+    }
+  }, [loading, isSeller, isAdmin, isPvz, isWorkPanel, isAuthRoute, pathname, navigate]);
+
+  if (isSeller && !isAdmin && !isPvz && !isWorkPanel && !isAuthRoute) {
+    return null;
+  }
 
   if (isWorkPanel) {
     const label = isSellerPanel ? "Satıcı paneli" : isPvzPanel ? "PVZ PUNKT paneli" : "Admin";
@@ -132,6 +147,7 @@ function AppShell() {
       </div>
     );
   }
+
 
   return (
     <SidebarProvider defaultOpen={false}>
