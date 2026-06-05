@@ -78,14 +78,14 @@ export function HomeCategoryBrowser() {
     <section className="space-y-4">
       {/* TAB BAR — Trendyol stil (narıncı seçilmiş, fon dolu) */}
       <div className="bg-card rounded-2xl border border-border overflow-hidden">
-        <div className="flex gap-1.5 overflow-x-auto px-3 py-3 scrollbar-none">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:flex gap-2 px-3 py-3">
           {roots.map((c) => {
             const isActive = c.id === activeRootId;
             return (
               <button
                 key={c.id}
                 onClick={() => selectRoot(c.id)}
-                className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition whitespace-nowrap ${
+                className={`min-w-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition ${
                   isActive
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "bg-secondary/50 text-foreground hover:bg-secondary"
@@ -141,15 +141,15 @@ export function HomeCategoryBrowser() {
                   {catName(activeRoot)} — {seeAll}
                 </Link>
               ) : (
-                <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1">
+                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:flex gap-2 pb-1">
                   {subCats.slice(0, 12).map((s) => {
                     const hasChildren = cats.some((c) => c.parent_id === s.id);
                     return (
-                      <div key={s.id} className="shrink-0">
+                       <div key={s.id} className="min-w-0">
                         {hasChildren ? (
                           <button
                             onClick={() => setActiveSubId(s.id)}
-                            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition whitespace-nowrap"
+                            className="w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition"
                           >
                             <span className="text-base">{s.icon || activeRoot.icon || "🛍️"}</span>
                             <span>{catName(s)}</span>
@@ -158,7 +158,7 @@ export function HomeCategoryBrowser() {
                           <Link
                             to="/catalog"
                             search={{ cat: s.slug, q: undefined } as never}
-                            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition whitespace-nowrap"
+                            className="w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition"
                           >
                             <span className="text-base">{s.icon || activeRoot.icon || "🛍️"}</span>
                             <span>{catName(s)}</span>
