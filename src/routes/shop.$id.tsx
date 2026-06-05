@@ -242,12 +242,6 @@ function ShopPage() {
                   <div><div className="text-xs text-muted-foreground">Email</div><div className="font-semibold break-all">{profile.shop_email}</div></div>
                 </div>
               )}
-              {profile.phone && (
-                <div className="flex items-start gap-2.5 text-sm">
-                  <Phone className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                  <div><div className="text-xs text-muted-foreground">Telefon</div><div className="font-semibold">{profile.phone}</div></div>
-                </div>
-              )}
               <div className="flex items-start gap-2.5 text-sm">
                 <Calendar className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                 <div><div className="text-xs text-muted-foreground">Qoşulub</div><div className="font-semibold">{formatDate(profile.created_at)}</div></div>
