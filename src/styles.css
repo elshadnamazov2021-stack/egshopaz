@@ -125,12 +125,25 @@
 
 @layer base {
   * { border-color: var(--color-border); }
+  html {
+    /* Mobil versiyada bütün yazıları və ölçüləri böyüt (rem-əsaslı komponentlər avtomatik böyüyür) */
+    font-size: 18px;
+  }
+  @media (min-width: 768px) {
+    html { font-size: 16px; }
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
+  /* Mobil: kiçik mətnləri də oxunaqlı et */
+  @media (max-width: 767px) {
+    .text-xs { font-size: 0.85rem; line-height: 1.25rem; }
+    .text-\[10px\], .text-\[11px\], .text-\[9px\] { font-size: 0.8rem !important; }
+  }
 }
+
 
 @utility bg-gradient-brand { background-image: var(--gradient-brand); }
 @utility bg-gradient-soft { background-image: var(--gradient-soft); }
