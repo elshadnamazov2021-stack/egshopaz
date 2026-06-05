@@ -403,6 +403,9 @@ interface DBOrderItem {
     recipient_phone: string | null;
     pickup_point_id: string | null;
     created_at: string | null;
+    total: number | null;
+    payment_method: string | null;
+    payment_status: string | null;
   } | null;
 }
 
@@ -412,6 +415,9 @@ type OrderInfo = {
   recipient_phone: string | null;
   pickup_point_id: string | null;
   created_at: string | null;
+  total: number | null;
+  payment_method: string | null;
+  payment_status: string | null;
 };
 
 async function attachOrderInfo(rows: DBOrderItem[]): Promise<DBOrderItem[]> {
@@ -419,12 +425,13 @@ async function attachOrderInfo(rows: DBOrderItem[]): Promise<DBOrderItem[]> {
   const { data } = ids.length
     ? await supabase
         .from("orders")
-        .select("id,recipient_name,recipient_phone,pickup_point_id,created_at")
+        .select("id,recipient_name,recipient_phone,pickup_point_id,created_at,total,payment_method,payment_status")
         .in("id", ids)
     : { data: [] };
   const map = new Map((data ?? []).map((order) => [order.id, order as OrderInfo]));
   return rows.map((row) => ({ ...row, orders: map.get(row.order_id) ?? null }));
 }
+
 
 async function findItemByCode(code: string): Promise<DBOrderItem | null> {
   const trimmed = code.trim().toUpperCase();
@@ -821,6 +828,25 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
               </div>
             </div>
 
+            {confirmItem.orders?.payment_method === "cod_pvz" && confirmItem.orders?.payment_status === "unpaid" && (
+              <div className="rounded-xl border-2 border-yellow-500 bg-yellow-500/10 p-4 space-y-1">
+                <div className="text-[11px] uppercase text-yellow-800 font-bold tracking-wider">
+                  💵 Nağd ödəniş — müştəridən pulu alın
+                </div>
+                <div className="text-3xl font-extrabold text-yellow-700">
+                  {formatAZN(Number(confirmItem.orders?.total ?? 0))}
+                </div>
+                <div className="text-xs text-yellow-800">
+                  Sifarişin tam məbləği. Bütün məhsullar təhvil verildikdə avtomatik "ödənilib" olacaq.
+                </div>
+              </div>
+            )}
+            {confirmItem.orders?.payment_status === "paid" && (
+              <div className="rounded-xl bg-green-500/10 border border-green-500/40 p-3 text-sm text-green-800 font-semibold">
+                ✅ Bu sifariş artıq ödənilib — pul almaq lazım deyil.
+              </div>
+            )}
+
             {step === "found" && (
               <>
                 <p className="text-sm text-muted-foreground">
@@ -835,7 +861,7 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
             {step === "ready" && (
               <>
                 <p className="text-sm text-success font-semibold">
-                  ✓ Məhsul hazırdır. İndi müştəriyə təhvil verin.
+                  ✓ Məhsul hazırdır. İndi müştəriyə təhvil verin{confirmItem.orders?.payment_method === "cod_pvz" && confirmItem.orders?.payment_status === "unpaid" ? " və nağd pulu alın" : ""}.
                 </p>
                 <Button className="w-full" disabled={busy} onClick={confirmDeliver}>
                   <CheckCircle2 className="h-4 w-4 mr-2" /> {busy ? "..." : "Təhvil verildi"}
@@ -845,6 +871,7 @@ function Delivery({ search, setSearch }: { search: string; setSearch: (v: string
                 </Button>
               </>
             )}
+
           </div>
         </div>
       )}
