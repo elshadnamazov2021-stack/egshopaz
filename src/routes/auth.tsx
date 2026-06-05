@@ -80,7 +80,10 @@ function AuthPage() {
   const navigate = useNavigate();
 
   const [mode, setMode] = useState<"login" | "signup">("login");
-  const [role, setRole] = useState<RoleTab>("buyer");
+  const lockedRole = (typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("role") : null) as RoleTab | null;
+  const validLocked: RoleTab | null = lockedRole && ["buyer","seller","pvz","admin"].includes(lockedRole) ? lockedRole : null;
+  const [role, setRole] = useState<RoleTab>(validLocked ?? "buyer");
+  useEffect(() => { if (validLocked === "admin") setMode("login"); }, [validLocked]);
 
   // shared
   const [email, setEmail] = useState("");
