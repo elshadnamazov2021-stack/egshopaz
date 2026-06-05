@@ -23,7 +23,7 @@ export const Route = createFileRoute("/admin")({
 type TabKey =
   | "dashboard" | "customers" | "sellers" | "couriers" | "pvz_staff"
   | "categories" | "products" | "shops" | "warehouses" | "pickup_points"
-  | "orders" | "returns" | "finance" | "payouts" | "marketing" | "banners" | "packages" | "promo" | "analytics"
+  | "orders" | "returns" | "finance" | "treasury" | "payouts" | "marketing" | "banners" | "packages" | "promo" | "analytics"
   | "security" | "disputes" | "content" | "settings" | "support" | "ai_bot";
 
 interface Stat { users: number; products: number; orders: number; revenue: number; sellers: number }
