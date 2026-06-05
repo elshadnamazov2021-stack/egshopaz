@@ -328,6 +328,7 @@ function CartPage() {
         <h2 className="text-2xl font-bold mb-2">{t("cart.loginRequired")}</h2>
         <Link
           to="/auth"
+          search={{ role: "buyer" } as never}
           className="inline-block mt-4 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold"
         >
           {t("cart.login")}
