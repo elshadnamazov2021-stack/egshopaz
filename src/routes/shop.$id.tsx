@@ -53,7 +53,8 @@ function ShopPage() {
       setProducts(list);
       const totalReviews = list.reduce((s, p) => s + (p.reviews_count || 0), 0);
       const weightedSum = list.reduce((s, p) => s + (Number(p.rating) || 0) * (p.reviews_count || 0), 0);
-      setStats({ count: list.length, avg: totalReviews > 0 ? weightedSum / totalReviews : 0, reviews: totalReviews });
+      const years = prof?.created_at ? Math.floor((Date.now() - new Date(prof.created_at).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : 0;
+      setStats({ count: list.length, avg: totalReviews > 0 ? weightedSum / totalReviews : 0, reviews: totalReviews, years });
       setFollowers(count ?? 0);
       setLoading(false);
     });
