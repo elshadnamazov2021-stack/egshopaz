@@ -32,13 +32,13 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border shadow-sm">
-      <div className="w-full px-4 py-4 sm:h-36 sm:py-0 flex items-center bg-gradient-brand text-white">
-        <div className="max-w-7xl mx-auto w-full flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4">
+      <div className="w-full px-3 sm:px-4 py-2 sm:py-3 flex items-center bg-gradient-brand text-white">
+        <div className="max-w-7xl mx-auto w-full flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-4">
           <SidebarTrigger className="shrink-0 text-white" />
 
           <Link to="/" className="flex items-center gap-2 sm:gap-3 shrink-0 hover:scale-105 transition-transform" aria-label="EG Shop">
-            <img src={egLogo.url} alt="EG Shop logo" width={256} height={256} className="h-14 sm:h-20 md:h-24 w-14 sm:w-20 md:w-24 rounded-full object-cover ring-2 ring-white/30 shadow-lg" />
-            <span className="text-2xl sm:text-3xl md:text-4xl uppercase tracking-wide text-white whitespace-nowrap" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+            <img src={egLogo.url} alt="EG Shop logo" width={256} height={256} className="h-11 w-11 sm:h-14 sm:w-14 md:h-16 md:w-16 rounded-full object-cover ring-2 ring-white/30 shadow-lg" />
+            <span className="text-xl sm:text-2xl md:text-3xl uppercase tracking-wide text-white whitespace-nowrap" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
               EG Shop
             </span>
           </Link>
@@ -66,7 +66,7 @@ export function SiteHeader() {
             </div>
           </form>
 
-          <nav className="order-3 sm:order-none w-full sm:w-auto sm:ml-auto grid grid-cols-4 sm:flex items-center gap-1 sm:gap-2 pt-2 sm:pt-0 border-t border-white/15 sm:border-t-0">
+          <nav className="order-3 sm:order-none w-full sm:w-auto sm:ml-auto grid grid-cols-5 sm:flex items-center gap-1 sm:gap-2 pt-2 sm:pt-0 border-t border-white/15 sm:border-t-0">
             <LanguageSwitcher />
             <Link to="/discover" className="hidden lg:flex flex-col items-center text-xs px-3 py-1.5 hover:text-white/80 transition text-white">
               <span className="h-5 w-5 mb-0.5 text-base">🔥</span>
@@ -118,14 +118,14 @@ export function SiteHeader() {
       </div>
 
       {/* mobile search */}
-      <form onSubmit={onSearch} className="lg:hidden px-4 pb-3 bg-gradient-brand">
+      <form onSubmit={onSearch} className="lg:hidden px-3 sm:px-4 pb-3 bg-gradient-brand">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={t("common.search")}
-            className="w-full pl-10 pr-11 h-10 rounded-lg border border-white/30 bg-white/20 focus:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 transition text-sm text-white placeholder:text-white/70"
+            className="w-full pl-10 pr-11 h-11 rounded-lg border border-white/30 bg-white/20 focus:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 transition text-base sm:text-sm text-white placeholder:text-white/70"
           />
           <button
             type="button"
