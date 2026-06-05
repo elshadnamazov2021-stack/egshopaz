@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState, lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +32,11 @@ interface PromoCode { id: string; code: string; discount_percent: number | null;
 
 function Index() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const buyerHref = user ? "/profile" : "/auth?role=buyer";
+  const sellerHref = user ? "/seller" : "/auth?role=seller";
+  const adminHref = user ? "/admin" : "/auth?role=admin";
+  const pvzHref = user ? "/pvz" : "/auth?role=pvz";
   const [allProducts, setAllProducts] = useState<ProductCardData[]>([]);
   const [discounted, setDiscounted] = useState<ProductCardData[]>([]);
   const [trending, setTrending] = useState<ProductCardData[]>([]);
@@ -94,22 +100,22 @@ function Index() {
           <span className="text-[10px] text-muted-foreground">domen alana qədər</span>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Link to="/profile" className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white p-4 hover:scale-[1.02] transition shadow-card">
+          <a href={buyerHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white p-4 hover:scale-[1.02] transition shadow-card">
             <UserIcon className="h-6 w-6" />
             <span className="text-sm font-black">Müştəri</span>
-          </Link>
-          <Link to="/seller" className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-orange-500 to-rose-500 text-white p-4 hover:scale-[1.02] transition shadow-card">
+          </a>
+          <a href={sellerHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-orange-500 to-rose-500 text-white p-4 hover:scale-[1.02] transition shadow-card">
             <Store className="h-6 w-6" />
             <span className="text-sm font-black">Satıcı</span>
-          </Link>
-          <Link to="/admin" className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white p-4 hover:scale-[1.02] transition shadow-card">
+          </a>
+          <a href={adminHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white p-4 hover:scale-[1.02] transition shadow-card">
             <Shield className="h-6 w-6" />
             <span className="text-sm font-black">Admin</span>
-          </Link>
-          <Link to="/pvz" className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-4 hover:scale-[1.02] transition shadow-card">
+          </a>
+          <a href={pvzHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-4 hover:scale-[1.02] transition shadow-card">
             <Package className="h-6 w-6" />
             <span className="text-sm font-black">PVZ</span>
-          </Link>
+          </a>
         </div>
       </section>
 
