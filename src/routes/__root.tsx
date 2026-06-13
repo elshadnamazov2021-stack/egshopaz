@@ -9,6 +9,7 @@ import { MainSidebar } from "@/components/MainSidebar";
 import { LogOut, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { useIsNativeApp } from "@/hooks/useIsNativeApp";
 import "@/i18n";
 
 import "../styles.css";
