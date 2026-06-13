@@ -30,6 +30,7 @@ import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as FollowedShopsRouteImport } from './routes/followed-shops'
 import { Route as FavoritesRouteImport } from './routes/favorites'
+import { Route as DownloadRouteImport } from './routes/download'
 import { Route as DisputesRouteImport } from './routes/disputes'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -151,6 +152,11 @@ const FavoritesRoute = FavoritesRouteImport.update({
   path: '/favorites',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DownloadRoute = DownloadRouteImport.update({
+  id: '/download',
+  path: '/download',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DisputesRoute = DisputesRouteImport.update({
   id: '/disputes',
   path: '/disputes',
@@ -240,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
   '/disputes': typeof DisputesRoute
+  '/download': typeof DownloadRoute
   '/favorites': typeof FavoritesRoute
   '/followed-shops': typeof FollowedShopsRoute
   '/map': typeof MapRoute
@@ -278,6 +285,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
   '/disputes': typeof DisputesRoute
+  '/download': typeof DownloadRoute
   '/favorites': typeof FavoritesRoute
   '/followed-shops': typeof FollowedShopsRoute
   '/map': typeof MapRoute
@@ -317,6 +325,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
   '/disputes': typeof DisputesRoute
+  '/download': typeof DownloadRoute
   '/favorites': typeof FavoritesRoute
   '/followed-shops': typeof FollowedShopsRoute
   '/map': typeof MapRoute
@@ -357,6 +366,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/discover'
     | '/disputes'
+    | '/download'
     | '/favorites'
     | '/followed-shops'
     | '/map'
@@ -395,6 +405,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/discover'
     | '/disputes'
+    | '/download'
     | '/favorites'
     | '/followed-shops'
     | '/map'
@@ -433,6 +444,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/discover'
     | '/disputes'
+    | '/download'
     | '/favorites'
     | '/followed-shops'
     | '/map'
@@ -472,6 +484,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DiscoverRoute: typeof DiscoverRoute
   DisputesRoute: typeof DisputesRoute
+  DownloadRoute: typeof DownloadRoute
   FavoritesRoute: typeof FavoritesRoute
   FollowedShopsRoute: typeof FollowedShopsRoute
   MapRoute: typeof MapRoute
@@ -647,6 +660,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FavoritesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/download': {
+      id: '/download'
+      path: '/download'
+      fullPath: '/download'
+      preLoaderRoute: typeof DownloadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/disputes': {
       id: '/disputes'
       path: '/disputes'
@@ -768,6 +788,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DiscoverRoute: DiscoverRoute,
   DisputesRoute: DisputesRoute,
+  DownloadRoute: DownloadRoute,
   FavoritesRoute: FavoritesRoute,
   FollowedShopsRoute: FollowedShopsRoute,
   MapRoute: MapRoute,
