@@ -9,16 +9,10 @@ const SHOW_AGAIN_AFTER_MS = 1000 * 60 * 60 * 24 * 7; // 7 gün
 export function InstallAppBanner() {
   const isNativeApp = useIsNativeApp();
   const [visible, setVisible] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (isNativeApp) return;
-
-    const ua = navigator.userAgent || "";
-    const mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
-    setIsMobile(mobile);
-    if (!mobile) return;
 
     const dismissedAt = Number(localStorage.getItem(STORAGE_KEY) || 0);
     if (dismissedAt && Date.now() - dismissedAt < SHOW_AGAIN_AFTER_MS) return;
@@ -32,7 +26,7 @@ export function InstallAppBanner() {
     setVisible(false);
   };
 
-  if (!visible || !isMobile || isNativeApp) return null;
+  if (!visible || isNativeApp) return null;
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[60] p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] animate-in slide-in-from-bottom-5">
