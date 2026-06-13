@@ -271,3 +271,15 @@
     scroll-snap-align: start;
   }
 }
+
+/* ============ Mobil Tətbiq (Capacitor) üçün safe-area ============ */
+html.is-native-app body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+html.is-native-app .sticky {
+  top: env(safe-area-inset-top) !important;
+}
