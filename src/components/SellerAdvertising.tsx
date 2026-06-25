@@ -311,10 +311,32 @@ export function SellerAdvertising() {
     setUploadingBanner(false);
   };
 
+  const uploadBannerVideo = async (file: File) => {
+    if (!user) return;
+    if (file.size > 50 * 1024 * 1024) { toast.error("Video 50MB-dan böyükdür"); return; }
+    // Check duration <= 60s
+    const durationOk = await new Promise<boolean>((resolve) => {
+      const v = document.createElement("video");
+      v.preload = "metadata";
+      v.onloadedmetadata = () => { resolve(v.duration <= 61); URL.revokeObjectURL(v.src); };
+      v.onerror = () => resolve(false);
+      v.src = URL.createObjectURL(file);
+    });
+    if (!durationOk) { toast.error("Video 60 saniyədən qısa olmalıdır"); return; }
+    setUploadingBannerVideo(true);
+    const ext = file.name.split(".").pop();
+    const path = `${user.id}/banner-video-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("product-images").upload(path, file, { contentType: file.type });
+    if (error) { toast.error(error.message); setUploadingBannerVideo(false); return; }
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    setBannerForm((f) => f ? { ...f, video_url: data.publicUrl } : f);
+    setUploadingBannerVideo(false);
+  };
+
   const saveBanner = async () => {
     if (!user || !bannerForm || !activeSub) return;
     if (!bannerForm.title.trim()) { toast.error("Başlıq daxil edin"); return; }
-    if (!bannerForm.image_url) { toast.error("Şəkil yükləyin"); return; }
+    if (!bannerForm.image_url && !bannerForm.video_url) { toast.error("Şəkil və ya video yükləyin"); return; }
     if (bannersLeft <= 0) { toast.error("Banner limiti dolub. Yeni paket alın."); return; }
     setCheckout({ kind: "slot_banner", price: SLOT_BANNER_FEE, form: { ...bannerForm } });
   };
