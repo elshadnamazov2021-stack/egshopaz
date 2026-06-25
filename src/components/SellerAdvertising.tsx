@@ -165,9 +165,11 @@ export function SellerAdvertising() {
     if (checkout.kind === "pkg") return { label: `${checkout.pkg.name} paketi`, price: checkout.pkg.price, color: checkout.pkg.color, days: checkout.pkg.duration_days };
     if (checkout.kind === "one_product") return { label: `Məhsul reklamı: ${checkout.productTitle}`, price: checkout.price, color: "#f59e0b", days: checkout.days };
     if (checkout.kind === "one_shop") return { label: "Mağaza reklamı (ana səhifə)", price: checkout.price, color: "#3b82f6", days: checkout.days };
+    if (checkout.kind === "one_banner") return { label: `Banner reklamı: ${checkout.form.title || "Yeni banner"}`, price: checkout.price, color: "#3b82f6", days: checkout.days };
     if (checkout.kind === "slot_product") return { label: `Slot aktivasiyası: ${checkout.productTitle}`, price: checkout.price, color: "#f59e0b", days: 0 };
     if (checkout.kind === "slot_shop") return { label: "Slot aktivasiyası: Mağaza", price: checkout.price, color: "#3b82f6", days: 0 };
     return { label: "Slot aktivasiyası: Banner", price: checkout.price, color: "#3b82f6", days: 0 };
+
   })();
 
   // Prefill saved card when opening checkout
