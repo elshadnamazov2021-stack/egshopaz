@@ -42,6 +42,7 @@ interface Banner {
   id: string;
   title: string;
   image_url: string | null;
+  video_url?: string | null;
   link_url: string | null;
   position: string;
   is_active: boolean;
@@ -83,7 +84,7 @@ type CheckoutTarget =
   | { kind: "one_shop"; price: number; days: number }
   | { kind: "slot_product"; productId: string; productTitle: string; price: number }
   | { kind: "slot_shop"; price: number }
-  | { kind: "slot_banner"; price: number; form: { title: string; link_url: string; image_url: string } };
+  | { kind: "slot_banner"; price: number; form: { title: string; link_url: string; image_url: string; video_url: string } };
 
 // Fixed prices for slot activations (kept low because seller already paid for package)
 const SLOT_PRODUCT_FEE = 1;
@@ -111,8 +112,9 @@ export function SellerAdvertising() {
   const [oneOffPickProduct, setOneOffPickProduct] = useState(false); // paid one-off product picker
 
   // Banner form
-  const [bannerForm, setBannerForm] = useState<{ title: string; link_url: string; image_url: string } | null>(null);
+  const [bannerForm, setBannerForm] = useState<{ title: string; link_url: string; image_url: string; video_url: string } | null>(null);
   const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [uploadingBannerVideo, setUploadingBannerVideo] = useState(false);
 
   // Sponsored (slot-based) form
   const [pickProduct, setPickProduct] = useState(false);
@@ -270,7 +272,8 @@ export function SellerAdvertising() {
           seller_id: user.id,
           subscription_id: activeSub.id,
           title: checkout.form.title.trim().slice(0, 200),
-          image_url: checkout.form.image_url,
+          image_url: checkout.form.image_url || null,
+          video_url: checkout.form.video_url || null,
           link_url: checkout.form.link_url.trim().slice(0, 500) || null,
           position: "home_top",
           is_active: true,
@@ -308,10 +311,32 @@ export function SellerAdvertising() {
     setUploadingBanner(false);
   };
 
+  const uploadBannerVideo = async (file: File) => {
+    if (!user) return;
+    if (file.size > 50 * 1024 * 1024) { toast.error("Video 50MB-dan böyükdür"); return; }
+    // Check duration <= 60s
+    const durationOk = await new Promise<boolean>((resolve) => {
+      const v = document.createElement("video");
+      v.preload = "metadata";
+      v.onloadedmetadata = () => { resolve(v.duration <= 61); URL.revokeObjectURL(v.src); };
+      v.onerror = () => resolve(false);
+      v.src = URL.createObjectURL(file);
+    });
+    if (!durationOk) { toast.error("Video 60 saniyədən qısa olmalıdır"); return; }
+    setUploadingBannerVideo(true);
+    const ext = file.name.split(".").pop();
+    const path = `${user.id}/banner-video-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("product-images").upload(path, file, { contentType: file.type });
+    if (error) { toast.error(error.message); setUploadingBannerVideo(false); return; }
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    setBannerForm((f) => f ? { ...f, video_url: data.publicUrl } : f);
+    setUploadingBannerVideo(false);
+  };
+
   const saveBanner = async () => {
     if (!user || !bannerForm || !activeSub) return;
     if (!bannerForm.title.trim()) { toast.error("Başlıq daxil edin"); return; }
-    if (!bannerForm.image_url) { toast.error("Şəkil yükləyin"); return; }
+    if (!bannerForm.image_url && !bannerForm.video_url) { toast.error("Şəkil və ya video yükləyin"); return; }
     if (bannersLeft <= 0) { toast.error("Banner limiti dolub. Yeni paket alın."); return; }
     setCheckout({ kind: "slot_banner", price: SLOT_BANNER_FEE, form: { ...bannerForm } });
   };
@@ -444,7 +469,7 @@ export function SellerAdvertising() {
               <span className="text-xs bg-secondary px-2 py-0.5 rounded-full">{activeBanners.length}/{activeSub.ad_packages?.banner_slots ?? 0}</span>
             </div>
             <button
-              onClick={() => setBannerForm({ title: "", link_url: "", image_url: "" })}
+              onClick={() => setBannerForm({ title: "", link_url: "", image_url: "", video_url: "" })}
               disabled={bannersLeft <= 0}
               className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
@@ -632,7 +657,7 @@ export function SellerAdvertising() {
                 <input value={bannerForm.link_url} onChange={(e) => setBannerForm({ ...bannerForm, link_url: e.target.value })} placeholder="/catalog və ya /product/..." className="w-full mt-1 px-3 py-2 rounded-lg bg-secondary border border-border focus:border-primary outline-none" />
               </div>
               <div>
-                <label className="text-xs font-semibold text-muted-foreground">Şəkil (3:1 nisbət tövsiyə olunur)</label>
+                <label className="text-xs font-semibold text-muted-foreground">Şəkil (3:1 nisbət tövsiyə olunur) — opsional</label>
                 <div className="mt-1 border-2 border-dashed border-border rounded-lg p-4 text-center">
                   {bannerForm.image_url ? (
                     <div className="relative">
@@ -648,10 +673,28 @@ export function SellerAdvertising() {
                   )}
                 </div>
               </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground">Video (max 60 san., səssiz oynayacaq) — opsional</label>
+                <div className="mt-1 border-2 border-dashed border-border rounded-lg p-4 text-center">
+                  {bannerForm.video_url ? (
+                    <div className="relative">
+                      <video src={bannerForm.video_url} className="w-full max-h-40 object-cover rounded" muted playsInline controls />
+                      <button onClick={() => setBannerForm({ ...bannerForm, video_url: "" })} className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1"><X className="h-3 w-3" /></button>
+                    </div>
+                  ) : (
+                    <label className="cursor-pointer block">
+                      <input type="file" accept="video/mp4,video/webm,video/quicktime" className="hidden" onChange={(e) => e.target.files?.[0] && uploadBannerVideo(e.target.files[0])} />
+                      <Megaphone className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                      <span className="text-sm text-muted-foreground">{uploadingBannerVideo ? "Yüklənir..." : "Video seç (max 60 san, 50MB)"}</span>
+                    </label>
+                  )}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1">Video yükləsəniz, banner ana səhifədə avtomatik səssiz oynayacaq.</p>
+              </div>
             </div>
             <div className="flex justify-end gap-2 mt-5">
               <button onClick={() => setBannerForm(null)} className="px-4 py-2 rounded-lg border border-border">Ləğv et</button>
-              <button onClick={saveBanner} disabled={uploadingBanner} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold disabled:opacity-60">Yarat</button>
+              <button onClick={saveBanner} disabled={uploadingBanner || uploadingBannerVideo} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold disabled:opacity-60">Yarat</button>
             </div>
           </div>
         </div>
@@ -772,7 +815,7 @@ export function SellerAdvertising() {
                 <Store className="h-6 w-6 text-primary shrink-0" />
                 <div><div className="font-bold">Mağazanı önə çək</div><div className="text-xs text-muted-foreground">Bütün mağazanız "Önə çıxan mağazalar" bölməsində ({Math.max(0, shopPromoLeft)} slot qalır)</div></div>
               </button>
-              <button onClick={() => { setPostPay(false); setBannerForm({ title: "", link_url: "", image_url: "" }); }} disabled={bannersLeft <= 0}
+              <button onClick={() => { setPostPay(false); setBannerForm({ title: "", link_url: "", image_url: "", video_url: "" }); }} disabled={bannersLeft <= 0}
                 className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-primary hover:bg-primary/5 disabled:opacity-50 disabled:cursor-not-allowed text-left transition">
                 <Megaphone className="h-6 w-6 text-primary shrink-0" />
                 <div><div className="font-bold">Banner əlavə et</div><div className="text-xs text-muted-foreground">Ana səhifənin üstündə böyük banner ({Math.max(0, bannersLeft)} slot qalır)</div></div>
