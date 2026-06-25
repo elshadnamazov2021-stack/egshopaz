@@ -363,35 +363,21 @@ export function SellerAdvertising() {
     if (!user || !bannerForm) return;
     if (!bannerForm.title.trim()) { toast.error("Başlıq daxil edin"); return; }
     if (!bannerForm.image_url && !bannerForm.video_url) { toast.error("Şəkil və ya video yükləyin"); return; }
-    // If seller has active subscription, respect slot limit; otherwise free tier = 1 active banner
-    const freeLimit = 1;
+
+    // Active subscription → use included slot (still uses slot_banner small fee path)
     if (activeSub) {
       if (bannersLeft <= 0) { toast.error("Banner limiti dolub. Yeni paket alın."); return; }
-    } else {
-      if (activeBanners.length >= freeLimit) {
-        toast.error("Pulsuz tarifdə yalnız 1 aktiv banner ola bilər. Daha çox üçün paket alın.");
-        return;
-      }
+      setCheckout({ kind: "slot_banner", price: SLOT_BANNER_FEE, form: bannerForm });
+      return;
     }
-    const ends = activeSub
-      ? activeSub.ends_at
-      : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-    const { error } = await supabase.from("banners").insert({
-      seller_id: user.id,
-      subscription_id: activeSub?.id ?? null,
-      title: bannerForm.title.trim().slice(0, 200),
-      image_url: bannerForm.image_url || null,
-      video_url: bannerForm.video_url || null,
-      link_url: bannerForm.link_url.trim().slice(0, 500) || null,
-      position: "home_top",
-      is_active: true,
-      ends_at: ends,
-    });
-    if (error) { toast.error(error.message); return; }
-    toast.success("Banner əlavə olundu 🎉");
-    setBannerForm(null);
-    await load();
+
+    // No subscription → paid one-off banner (admin-set price + days)
+    const price = Number(promoSettings?.single_banner_price ?? 5);
+    const days = Number(promoSettings?.single_banner_days ?? 30);
+    setCheckout({ kind: "one_banner", price, days, form: bannerForm });
   };
+
+
 
   const deleteBanner = async (id: string) => {
     if (!confirm("Bu banner silinsin?")) return;
