@@ -33,6 +33,32 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
   const [adding, setAdding] = useState(false);
   const { isFav, toggle: toggleFav, busy: favBusy } = useFavorite(p.id, enableFavorite);
   const discount = calcDiscount(Number(p.price), p.old_price ? Number(p.old_price) : undefined);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const [videoVisible, setVideoVisible] = useState(false);
+
+  useEffect(() => {
+    if (!p.video_url || !wrapRef.current) return;
+    const el = wrapRef.current;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          setVideoVisible(entry.isIntersecting && entry.intersectionRatio > 0.5);
+          const v = videoRef.current;
+          if (!v) return;
+          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+            v.play().catch(() => {});
+          } else {
+            v.pause();
+          }
+        });
+      },
+      { threshold: [0, 0.5, 1] }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [p.video_url]);
+
 
   const addToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
