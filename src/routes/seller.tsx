@@ -494,10 +494,6 @@ function SellerPanel() {
     }
 
     const images = editing.images ?? [];
-    if (images.length < 6) {
-      toast.error(`Ən azı 6 şəkil yükləyin (hazırda ${images.length})`);
-      return;
-    }
     const data = {
       ...payload,
       images,
