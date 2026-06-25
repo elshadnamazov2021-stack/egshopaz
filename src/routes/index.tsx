@@ -243,10 +243,10 @@ function Index() {
             {trending.slice(0, 6).map((p) => <ProductCard key={p.id} p={p} enableFavorite={false} />)}
           </div>
         </section>
-      )}
 
-      {/* REKLAM — Sponsored placement (ikinci prioritet) */}
-      <SponsoredProducts limit={6} />
+      {/* Kateqoriya tablar + kompakt alt kateqoriyalar + banner */}
+      <HomeCategoryBrowser />
+
 
       {/* Benefits */}
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
