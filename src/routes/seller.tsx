@@ -1526,6 +1526,47 @@ function SellerPanel() {
                 </p>
               </div>
 
+              {/* Video (max 60 sec) */}
+              <div>
+                <label className="text-sm font-semibold mb-2 block">
+                  🎬 Məhsul videosu (maks. 60 saniyə) — opsional
+                </label>
+                {editing.video_url ? (
+                  <div className="relative rounded-lg overflow-hidden bg-black">
+                    <video src={editing.video_url} controls className="w-full max-h-64" />
+                    <button
+                      onClick={() => setEditing({ ...editing, video_url: null, video_duration: null })}
+                      className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full w-8 h-8 flex items-center justify-center"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                    {editing.video_duration && (
+                      <span className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                        {editing.video_duration} san
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <label className="border-2 border-dashed border-border rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-secondary/50 transition">
+                    <Upload className="h-6 w-6 text-muted-foreground mb-2" />
+                    <span className="text-sm text-muted-foreground">
+                      {uploading ? "Yüklənir..." : "Video seçin (MP4, WebM, maks 50MB, 60 san)"}
+                    </span>
+                    <input
+                      type="file"
+                      accept="video/mp4,video/webm,video/quicktime"
+                      className="hidden"
+                      disabled={uploading}
+                      onChange={(e) => uploadVideo(e.target.files?.[0])}
+                    />
+                  </label>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">
+                  Qısa video məhsulun satışını artırır. 60 saniyədən uzun videolar avtomatik rədd edilir.
+                </p>
+              </div>
+
+
               <div>
                 <label className="text-sm font-semibold">Başlıq *</label>
                 <input
