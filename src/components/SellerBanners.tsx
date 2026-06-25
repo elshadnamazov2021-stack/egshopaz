@@ -7,48 +7,21 @@ interface Banner {
   image_url: string | null;
   video_url: string | null;
   link_url: string | null;
+  seller_id: string | null;
 }
 
-export function SellerBanners() {
-  const [banners, setBanners] = useState<Banner[]>([]);
-  const [idx, setIdx] = useState(0);
+function BannerCard({ b }: { b: Banner }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  useEffect(() => {
-    void (async () => {
-      const nowIso = new Date().toISOString();
-      const { data } = await supabase
-        .from("banners")
-        .select("id,title,image_url,video_url,link_url,ends_at,seller_id")
-        .eq("is_active", true)
-        .eq("position", "home_top")
-        .not("seller_id", "is", null)
-        .or(`ends_at.is.null,ends_at.gt.${nowIso}`)
-        .limit(10);
-      setBanners((data ?? []).filter((b) => b.image_url || b.video_url) as Banner[]);
-    })();
-  }, []);
-
-  useEffect(() => {
-    if (banners.length < 2) return;
-    const t = setInterval(() => {
-      setIdx((i) => (i + 1) % banners.length);
-    }, 7000);
-    return () => clearInterval(t);
-  }, [banners.length]);
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     v.muted = true;
     void v.play().catch(() => { /* ignore autoplay block */ });
-  }, [idx, banners.length]);
-
-  if (banners.length === 0) return null;
-  const b = banners[idx];
+  }, []);
 
   const Inner = (
-    <div className="relative aspect-[16/6] sm:aspect-[16/5] bg-secondary overflow-hidden group">
+    <div className="relative aspect-[16/6] sm:aspect-[16/5] bg-secondary overflow-hidden">
       {b.video_url ? (
         <video
           ref={videoRef}
@@ -70,37 +43,15 @@ export function SellerBanners() {
         />
       )}
 
-      {/* Subtle gradient overlay for legibility */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
 
       <div className="absolute top-2 left-2 bg-warning text-warning-foreground text-[10px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-lg">
         REKLAM
       </div>
 
-      <div className="absolute bottom-8 left-4 right-4 text-white font-black text-lg sm:text-2xl drop-shadow-lg">
+      <div className="absolute bottom-3 left-4 right-4 text-white font-black text-lg sm:text-2xl drop-shadow-lg">
         {b.title}
       </div>
-
-      {/* Progress bar */}
-      {banners.length > 1 && (
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/20">
-          <div className="h-full bg-white/80" style={{ width: `${((idx + 1) / banners.length) * 100}%` }} />
-        </div>
-      )}
-
-      {/* Dots */}
-      {banners.length > 1 && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
-          {banners.map((_, i) => (
-            <button
-              key={i}
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIdx(i); }}
-              className={`h-1.5 rounded-full transition-all duration-300 ${i === idx ? "w-6 bg-white" : "w-1.5 bg-white/60 hover:bg-white/80"}`}
-              aria-label={`Banner ${i + 1}`}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 
@@ -110,5 +61,42 @@ export function SellerBanners() {
         <a href={b.link_url} className="block">{Inner}</a>
       ) : Inner}
     </section>
+  );
+}
+
+export function SellerBanners() {
+  const [banners, setBanners] = useState<Banner[]>([]);
+
+  useEffect(() => {
+    void (async () => {
+      const nowIso = new Date().toISOString();
+      const { data } = await supabase
+        .from("banners")
+        .select("id,title,image_url,video_url,link_url,ends_at,seller_id,created_at")
+        .eq("is_active", true)
+        .eq("position", "home_top")
+        .not("seller_id", "is", null)
+        .or(`ends_at.is.null,ends_at.gt.${nowIso}`)
+        .order("created_at", { ascending: false })
+        .limit(30);
+      // One banner per seller (newest first)
+      const bySeller = new Map<string, Banner>();
+      for (const b of (data ?? []) as Banner[]) {
+        if (!b.image_url && !b.video_url) continue;
+        if (!b.seller_id) continue;
+        if (!bySeller.has(b.seller_id)) bySeller.set(b.seller_id, b);
+      }
+      setBanners(Array.from(bySeller.values()));
+    })();
+  }, []);
+
+  if (banners.length === 0) return null;
+
+  return (
+    <div className="space-y-4">
+      {banners.map((b) => (
+        <BannerCard key={b.id} b={b} />
+      ))}
+    </div>
   );
 }
