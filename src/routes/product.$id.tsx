@@ -38,6 +38,7 @@ function ProductPage() {
   const [msgSending, setMsgSending] = useState(false);
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const [zoomOpen, setZoomOpen] = useState(false);
+  const [zoom, setZoom] = useState(1);
   const [shopInfo, setShopInfo] = useState<{
     id: string; shop_name: string | null; full_name: string | null;
     shop_logo_url: string | null; shop_description: string | null; shop_city: string | null;
