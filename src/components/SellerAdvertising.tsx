@@ -247,6 +247,25 @@ export function SellerAdvertising() {
           description: `Mağaza reklamı (${checkout.days} gün)`,
         });
         toast.success("Mağazanız ana səhifədə önə çəkildi! 🎉");
+      } else if (checkout.kind === "one_banner") {
+        const ends = new Date(); ends.setDate(ends.getDate() + checkout.days);
+        const { error } = await supabase.from("banners").insert({
+          seller_id: user.id,
+          title: checkout.form.title.trim().slice(0, 200),
+          image_url: checkout.form.image_url || null,
+          video_url: checkout.form.video_url || null,
+          link_url: checkout.form.link_url.trim().slice(0, 500) || null,
+          position: "home_top",
+          is_active: true,
+          ends_at: ends.toISOString(),
+        });
+        if (error) throw error;
+        await supabase.from("payment_transactions").insert({
+          seller_id: user.id, amount: checkout.price, status: "completed", method: "mock_card",
+          description: `Banner reklamı: ${checkout.form.title} (${checkout.days} gün)`,
+        });
+        toast.success("Banner əlavə olundu 🎉");
+        setBannerForm(null);
       } else if (checkout.kind === "slot_product") {
         if (!activeSub) throw new Error("Aktiv paket yoxdur");
         const { error } = await supabase.from("sponsored_products").insert({
