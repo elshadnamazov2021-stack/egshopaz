@@ -42,6 +42,7 @@ interface Banner {
   id: string;
   title: string;
   image_url: string | null;
+  video_url?: string | null;
   link_url: string | null;
   position: string;
   is_active: boolean;
