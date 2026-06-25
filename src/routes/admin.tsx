@@ -1080,6 +1080,17 @@ function SettingsSection({ settings, updateSettings }: { settings: SettingsRow |
             <input type="number" defaultValue={settings.single_shop_promo_days} onBlur={(e) => updateSettings({ single_shop_promo_days: Number(e.target.value) })}
               className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
           </div>
+          <div>
+            <label className="text-sm font-semibold">🖼️ Banner reklamı qiyməti (AZN)</label>
+            <input type="number" step="0.5" defaultValue={settings.single_banner_price ?? 5} onBlur={(e) => updateSettings({ single_banner_price: Number(e.target.value) })}
+              className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+          </div>
+          <div>
+            <label className="text-sm font-semibold">Banner reklamı müddəti (gün)</label>
+            <input type="number" defaultValue={settings.single_banner_days ?? 30} onBlur={(e) => updateSettings({ single_banner_days: Number(e.target.value) })}
+              className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+          </div>
+
         </div>
         <div>
           <label className="text-sm font-semibold">Reklam şərtləri (satıcıya göstərilir)</label>
