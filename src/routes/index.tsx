@@ -93,7 +93,11 @@ function Index() {
 
   return (
     <div className="container mx-auto px-3 md:px-4 py-4 space-y-5 md:space-y-8">
+      {/* Kateqoriyalar — ən yuxarıda */}
+      <HomeCategoryBrowser />
+
       {/* DEV: Panel keçidləri — domen alana qədər */}
+
       <section className="rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 p-3 md:p-5">
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Panel keçidləri</span>
