@@ -248,7 +248,7 @@ function Index() {
 
 
       {/* Kateqoriya tablar + kompakt alt kateqoriyalar + banner */}
-      <HomeCategoryBrowser />
+      
 
 
       {/* Benefits */}
