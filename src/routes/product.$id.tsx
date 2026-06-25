@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN, calcDiscount } from "@/lib/format";
 import { useAuth } from "@/contexts/AuthContext";
-import { Star, ShoppingCart, Heart, Truck, ShieldCheck, MessageCircle, Send, Store, MapPin, X, ZoomIn } from "lucide-react";
+import { Star, ShoppingCart, Heart, Truck, ShieldCheck, MessageCircle, Send, Store, MapPin, X, ZoomIn, ChevronLeft, ChevronRight, Plus, Minus } from "lucide-react";
 import { toast } from "sonner";
 import { ProductReviews } from "@/components/ProductReviews";
 import { CompareButton } from "@/components/CompareButton";
@@ -38,6 +38,7 @@ function ProductPage() {
   const [msgSending, setMsgSending] = useState(false);
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const [zoomOpen, setZoomOpen] = useState(false);
+  const [zoom, setZoom] = useState(1);
   const [shopInfo, setShopInfo] = useState<{
     id: string; shop_name: string | null; full_name: string | null;
     shop_logo_url: string | null; shop_description: string | null; shop_city: string | null;
@@ -197,26 +198,88 @@ function ProductPage() {
           )}
         </div>
 
-        {zoomOpen && activeImage && (
-          <div
-            onClick={() => setZoomOpen(false)}
-            className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 cursor-zoom-out"
-          >
-            <button
-              onClick={(e) => { e.stopPropagation(); setZoomOpen(false); }}
-              className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white rounded-full w-10 h-10 flex items-center justify-center"
-              aria-label="Bağla"
+        {zoomOpen && activeImage && (() => {
+          const imgs = (p.images ?? []).filter(Boolean);
+          const all = p.image_url && !imgs.includes(p.image_url) ? [p.image_url, ...imgs] : imgs;
+          const list = all.length ? all : [activeImage];
+          const idx = Math.max(0, list.indexOf(activeImage));
+          const go = (delta: number) => {
+            const next = (idx + delta + list.length) % list.length;
+            setActiveImage(list[next]);
+            setZoom(1);
+          };
+          return (
+            <div
+              onClick={() => setZoomOpen(false)}
+              onTouchStart={(e) => { (window as any).__tsx = e.touches[0].clientX; }}
+              onTouchEnd={(e) => {
+                const sx = (window as any).__tsx as number | undefined;
+                if (sx == null) return;
+                const dx = e.changedTouches[0].clientX - sx;
+                if (Math.abs(dx) > 50 && zoom === 1) go(dx < 0 ? 1 : -1);
+              }}
+              className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 select-none"
             >
-              <X className="h-5 w-5" />
-            </button>
-            <img
-              src={activeImage}
-              alt={p.title}
-              onClick={(e) => e.stopPropagation()}
-              className="max-w-full max-h-full object-contain cursor-default"
-            />
-          </div>
-        )}
+              <button
+                onClick={(e) => { e.stopPropagation(); setZoomOpen(false); }}
+                className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white rounded-full w-10 h-10 flex items-center justify-center z-10"
+                aria-label="Bağla"
+              >
+                <X className="h-5 w-5" />
+              </button>
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setZoom((z) => Math.max(1, +(z - 0.5).toFixed(1))); }}
+                  className="bg-white/10 hover:bg-white/20 text-white rounded-full w-9 h-9 flex items-center justify-center"
+                  aria-label="Kiçilt"
+                >
+                  <Minus className="h-4 w-4" />
+                </button>
+                <span className="text-white text-sm tabular-nums w-12 text-center">{Math.round(zoom * 100)}%</span>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setZoom((z) => Math.min(4, +(z + 0.5).toFixed(1))); }}
+                  className="bg-white/10 hover:bg-white/20 text-white rounded-full w-9 h-9 flex items-center justify-center"
+                  aria-label="Böyüt"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              </div>
+              {list.length > 1 && (
+                <>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); go(-1); }}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full w-11 h-11 flex items-center justify-center z-10"
+                    aria-label="Əvvəlki"
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); go(1); }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full w-11 h-11 flex items-center justify-center z-10"
+                    aria-label="Sonrakı"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </button>
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/80 text-sm bg-black/40 px-3 py-1 rounded-full">
+                    {idx + 1} / {list.length}
+                  </div>
+                </>
+              )}
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="w-full h-full flex items-center justify-center overflow-auto"
+              >
+                <img
+                  src={activeImage}
+                  alt={p.title}
+                  onDoubleClick={() => setZoom((z) => (z === 1 ? 2 : 1))}
+                  style={{ transform: `scale(${zoom})`, transition: "transform 0.2s" }}
+                  className="max-w-full max-h-[88vh] object-contain cursor-zoom-in origin-center"
+                />
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="space-y-4">
           {p.brand && <div className="text-sm text-muted-foreground font-semibold uppercase">{p.brand}</div>}

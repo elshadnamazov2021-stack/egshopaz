@@ -400,6 +400,10 @@ function SellerPanel() {
     setUploading(true);
     const newImages: string[] = [...(editing.images ?? [])];
     for (const file of Array.from(files)) {
+      if (newImages.length >= 10) {
+        toast.error("Maksimum 10 şəkil yükləyə bilərsiniz");
+        break;
+      }
       if (file.size > 5 * 1024 * 1024) {
         toast.error(`${file.name} 5MB-dan böyükdür`);
         continue;
@@ -494,10 +498,6 @@ function SellerPanel() {
     }
 
     const images = editing.images ?? [];
-    if (images.length < 6) {
-      toast.error(`Ən azı 6 şəkil yükləyin (hazırda ${images.length})`);
-      return;
-    }
     const data = {
       ...payload,
       images,
@@ -1480,7 +1480,7 @@ function SellerPanel() {
               {/* Images */}
               <div>
                 <label className="text-sm font-semibold mb-2 block">
-                  Şəkillər (minimum 6, ilk şəkil əsas olacaq) — {(editing.images ?? []).length}/6
+                  Şəkillər (1-dən 10-a qədər, ilk şəkil əsas olacaq) — {(editing.images ?? []).length}/10
                 </label>
                 <div className="grid grid-cols-4 gap-2 mb-2">
                   {(editing.images ?? []).map((url, idx) => (
