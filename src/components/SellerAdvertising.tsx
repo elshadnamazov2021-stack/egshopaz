@@ -84,7 +84,7 @@ type CheckoutTarget =
   | { kind: "one_shop"; price: number; days: number }
   | { kind: "slot_product"; productId: string; productTitle: string; price: number }
   | { kind: "slot_shop"; price: number }
-  | { kind: "slot_banner"; price: number; form: { title: string; link_url: string; image_url: string } };
+  | { kind: "slot_banner"; price: number; form: { title: string; link_url: string; image_url: string; video_url: string } };
 
 // Fixed prices for slot activations (kept low because seller already paid for package)
 const SLOT_PRODUCT_FEE = 1;
