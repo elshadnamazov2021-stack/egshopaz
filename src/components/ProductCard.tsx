@@ -5,7 +5,7 @@ import { formatAZN, calcDiscount } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useFavorite } from "@/hooks/useFavorite";
 
 export interface ProductCardData {
@@ -14,6 +14,7 @@ export interface ProductCardData {
   price: number;
   old_price: number | null;
   image_url: string | null;
+  video_url?: string | null;
   rating: number;
   reviews_count: number;
   brand: string | null;
@@ -24,6 +25,7 @@ export interface ProductCardData {
   fast_delivery?: boolean | null;
   stock?: number | null;
 }
+
 
 export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; enableFavorite?: boolean }) {
   const { t } = useTranslation();
