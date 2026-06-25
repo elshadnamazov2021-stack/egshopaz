@@ -89,13 +89,25 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
       params={{ id: p.id }}
       className="group min-w-0 bg-card rounded-xl overflow-hidden border border-border/60 hover:border-border hover:shadow-card transition flex flex-col mobile-readable-card"
     >
-      <div className="product-image relative aspect-square sm:aspect-[3/4] bg-secondary overflow-hidden">
+      <div ref={wrapRef} className="product-image relative aspect-square sm:aspect-[3/4] bg-secondary overflow-hidden">
         {p.image_url ? (
           <img src={p.image_url} alt={p.title} loading="lazy"
                className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">—</div>
         )}
+        {p.video_url && (
+          <video
+            ref={videoRef}
+            src={p.video_url}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 pointer-events-none ${videoVisible ? "opacity-100" : "opacity-0"}`}
+          />
+        )}
+
         {discount > 0 && (
           <span className="absolute top-2 left-2 bg-discount text-discount-foreground text-xs font-bold px-2 py-1 rounded">
             -{discount}%
