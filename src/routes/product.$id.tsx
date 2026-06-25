@@ -89,6 +89,8 @@ function ProductPage() {
     supabase.from("products").select("*").eq("id", id).maybeSingle().then(async ({ data }) => {
       setP(data as Product | null);
       if (data) {
+        const imgs = ((data as any).images as string[] | null) ?? [];
+        setActiveImage((data as any).image_url || imgs[0] || null);
         const [{ data: seller }, { count }] = await Promise.all([
           supabase.from("profiles").select("id,shop_name,full_name,shop_logo_url,shop_description,shop_city").eq("id", data.seller_id).maybeSingle(),
           supabase.from("shop_followers").select("id", { count: "exact", head: true }).eq("seller_id", data.seller_id),
