@@ -75,16 +75,21 @@ interface PromoSettings {
   single_product_promo_days: number;
   single_shop_promo_price: number;
   single_shop_promo_days: number;
+  single_banner_price: number;
+  single_banner_days: number;
   promo_terms_text: string;
 }
+
 
 type CheckoutTarget =
   | { kind: "pkg"; pkg: Pkg }
   | { kind: "one_product"; productId: string; productTitle: string; price: number; days: number }
   | { kind: "one_shop"; price: number; days: number }
+  | { kind: "one_banner"; price: number; days: number; form: { title: string; link_url: string; image_url: string; video_url: string } }
   | { kind: "slot_product"; productId: string; productTitle: string; price: number }
   | { kind: "slot_shop"; price: number }
   | { kind: "slot_banner"; price: number; form: { title: string; link_url: string; image_url: string; video_url: string } };
+
 
 // Fixed prices for slot activations (kept low because seller already paid for package)
 const SLOT_PRODUCT_FEE = 1;
@@ -130,7 +135,7 @@ export function SellerAdvertising() {
       supabase.from("sponsored_products").select("*, products(id,title,image_url,price)").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("sponsored_shops").select("id,ends_at,is_active").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("products").select("id,title,image_url,price").eq("seller_id", user.id).eq("is_active", true).order("created_at", { ascending: false }),
-      supabase.from("system_settings").select("single_product_promo_price,single_product_promo_days,single_shop_promo_price,single_shop_promo_days,promo_terms_text").limit(1).maybeSingle(),
+      supabase.from("system_settings").select("single_product_promo_price,single_product_promo_days,single_shop_promo_price,single_shop_promo_days,single_banner_price,single_banner_days,promo_terms_text").limit(1).maybeSingle(),
     ]);
     setPackages((pk.data ?? []) as unknown as Pkg[]);
     setSubs((sb.data ?? []) as unknown as Sub[]);
@@ -160,9 +165,11 @@ export function SellerAdvertising() {
     if (checkout.kind === "pkg") return { label: `${checkout.pkg.name} paketi`, price: checkout.pkg.price, color: checkout.pkg.color, days: checkout.pkg.duration_days };
     if (checkout.kind === "one_product") return { label: `Məhsul reklamı: ${checkout.productTitle}`, price: checkout.price, color: "#f59e0b", days: checkout.days };
     if (checkout.kind === "one_shop") return { label: "Mağaza reklamı (ana səhifə)", price: checkout.price, color: "#3b82f6", days: checkout.days };
+    if (checkout.kind === "one_banner") return { label: `Banner reklamı: ${checkout.form.title || "Yeni banner"}`, price: checkout.price, color: "#3b82f6", days: checkout.days };
     if (checkout.kind === "slot_product") return { label: `Slot aktivasiyası: ${checkout.productTitle}`, price: checkout.price, color: "#f59e0b", days: 0 };
     if (checkout.kind === "slot_shop") return { label: "Slot aktivasiyası: Mağaza", price: checkout.price, color: "#3b82f6", days: 0 };
     return { label: "Slot aktivasiyası: Banner", price: checkout.price, color: "#3b82f6", days: 0 };
+
   })();
 
   // Prefill saved card when opening checkout
@@ -240,6 +247,25 @@ export function SellerAdvertising() {
           description: `Mağaza reklamı (${checkout.days} gün)`,
         });
         toast.success("Mağazanız ana səhifədə önə çəkildi! 🎉");
+      } else if (checkout.kind === "one_banner") {
+        const ends = new Date(); ends.setDate(ends.getDate() + checkout.days);
+        const { error } = await supabase.from("banners").insert({
+          seller_id: user.id,
+          title: checkout.form.title.trim().slice(0, 200),
+          image_url: checkout.form.image_url || null,
+          video_url: checkout.form.video_url || null,
+          link_url: checkout.form.link_url.trim().slice(0, 500) || null,
+          position: "home_top",
+          is_active: true,
+          ends_at: ends.toISOString(),
+        });
+        if (error) throw error;
+        await supabase.from("payment_transactions").insert({
+          seller_id: user.id, amount: checkout.price, status: "completed", method: "mock_card",
+          description: `Banner reklamı: ${checkout.form.title} (${checkout.days} gün)`,
+        });
+        toast.success("Banner əlavə olundu 🎉");
+        setBannerForm(null);
       } else if (checkout.kind === "slot_product") {
         if (!activeSub) throw new Error("Aktiv paket yoxdur");
         const { error } = await supabase.from("sponsored_products").insert({
@@ -337,35 +363,21 @@ export function SellerAdvertising() {
     if (!user || !bannerForm) return;
     if (!bannerForm.title.trim()) { toast.error("Başlıq daxil edin"); return; }
     if (!bannerForm.image_url && !bannerForm.video_url) { toast.error("Şəkil və ya video yükləyin"); return; }
-    // If seller has active subscription, respect slot limit; otherwise free tier = 1 active banner
-    const freeLimit = 1;
+
+    // Active subscription → use included slot (still uses slot_banner small fee path)
     if (activeSub) {
       if (bannersLeft <= 0) { toast.error("Banner limiti dolub. Yeni paket alın."); return; }
-    } else {
-      if (activeBanners.length >= freeLimit) {
-        toast.error("Pulsuz tarifdə yalnız 1 aktiv banner ola bilər. Daha çox üçün paket alın.");
-        return;
-      }
+      setCheckout({ kind: "slot_banner", price: SLOT_BANNER_FEE, form: bannerForm });
+      return;
     }
-    const ends = activeSub
-      ? activeSub.ends_at
-      : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-    const { error } = await supabase.from("banners").insert({
-      seller_id: user.id,
-      subscription_id: activeSub?.id ?? null,
-      title: bannerForm.title.trim().slice(0, 200),
-      image_url: bannerForm.image_url || null,
-      video_url: bannerForm.video_url || null,
-      link_url: bannerForm.link_url.trim().slice(0, 500) || null,
-      position: "home_top",
-      is_active: true,
-      ends_at: ends,
-    });
-    if (error) { toast.error(error.message); return; }
-    toast.success("Banner əlavə olundu 🎉");
-    setBannerForm(null);
-    await load();
+
+    // No subscription → paid one-off banner (admin-set price + days)
+    const price = Number(promoSettings?.single_banner_price ?? 5);
+    const days = Number(promoSettings?.single_banner_days ?? 30);
+    setCheckout({ kind: "one_banner", price, days, form: bannerForm });
   };
+
+
 
   const deleteBanner = async (id: string) => {
     if (!confirm("Bu banner silinsin?")) return;
@@ -492,15 +504,15 @@ export function SellerAdvertising() {
             <Megaphone className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-bold">Ana səhifə bannerlərim</h2>
             <span className="text-xs bg-secondary px-2 py-0.5 rounded-full">
-              {activeBanners.length}/{activeSub ? (activeSub.ad_packages?.banner_slots ?? 0) : 1}
+              {activeBanners.length}/{activeSub ? (activeSub.ad_packages?.banner_slots ?? 0) : "∞"}
             </span>
             {!activeSub && (
-              <span className="text-[10px] bg-success/15 text-success px-2 py-0.5 rounded-full font-bold">PULSUZ</span>
+              <span className="text-[10px] bg-primary/15 text-primary px-2 py-0.5 rounded-full font-bold">ÖDƏNİŞLİ</span>
             )}
           </div>
           <button
             onClick={() => setBannerForm({ title: "", link_url: "", image_url: "", video_url: "" })}
-            disabled={activeSub ? bannersLeft <= 0 : activeBanners.length >= 1}
+            disabled={!!activeSub && bannersLeft <= 0}
             className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
           >
             <Plus className="h-4 w-4" /> Yeni banner
@@ -508,9 +520,10 @@ export function SellerAdvertising() {
         </div>
         {!activeSub && (
           <p className="text-xs text-muted-foreground mb-3">
-            Hər satıcı pulsuz olaraq 1 aktiv banner yerləşdirə bilər (30 gün). Daha çox banner üçün reklam paketi alın.
+            Banner reklamı ödənişlidir: <b>{Number(promoSettings?.single_banner_price ?? 5)} AZN</b> / <b>{Number(promoSettings?.single_banner_days ?? 30)} gün</b>. Qiymət admin tərəfindən tənzimlənir. Reklam paketi alanlar paketin slotlarından istifadə edir.
           </p>
         )}
+
         {banners.length === 0 ? (
           <div className="text-center text-muted-foreground py-8 text-sm">Hələ banner yoxdur. Ana səhifədə görünmək üçün əlavə edin.</div>
         ) : (
@@ -726,10 +739,20 @@ export function SellerAdvertising() {
                 <p className="text-[11px] text-muted-foreground mt-1">Video yükləsəniz, banner ana səhifədə avtomatik səssiz oynayacaq.</p>
               </div>
             </div>
-            <div className="flex justify-end gap-2 mt-5">
-              <button onClick={() => setBannerForm(null)} className="px-4 py-2 rounded-lg border border-border">Ləğv et</button>
-              <button onClick={saveBanner} disabled={uploadingBanner || uploadingBannerVideo} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold disabled:opacity-60">Yarat</button>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-5">
+              {!activeSub && (
+                <div className="text-xs text-muted-foreground">
+                  Ödəniş: <b className="text-foreground">{Number(promoSettings?.single_banner_price ?? 5)} AZN</b> ({Number(promoSettings?.single_banner_days ?? 30)} gün)
+                </div>
+              )}
+              <div className="flex justify-end gap-2 sm:ml-auto">
+                <button onClick={() => setBannerForm(null)} className="px-4 py-2 rounded-lg border border-border">Ləğv et</button>
+                <button onClick={saveBanner} disabled={uploadingBanner || uploadingBannerVideo} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold disabled:opacity-60">
+                  {activeSub ? "Yarat" : "Ödə və yarat"}
+                </button>
+              </div>
             </div>
+
           </div>
         </div>
       )}
