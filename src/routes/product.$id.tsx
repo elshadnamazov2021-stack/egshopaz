@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN, calcDiscount } from "@/lib/format";
 import { useAuth } from "@/contexts/AuthContext";
-import { Star, ShoppingCart, Heart, Truck, ShieldCheck, MessageCircle, Send, Store, MapPin, X, ZoomIn } from "lucide-react";
+import { Star, ShoppingCart, Heart, Truck, ShieldCheck, MessageCircle, Send, Store, MapPin, X, ZoomIn, ChevronLeft, ChevronRight, Plus, Minus } from "lucide-react";
 import { toast } from "sonner";
 import { ProductReviews } from "@/components/ProductReviews";
 import { CompareButton } from "@/components/CompareButton";
