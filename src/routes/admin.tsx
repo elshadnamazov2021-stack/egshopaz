@@ -1038,6 +1038,12 @@ function SettingsSection({ settings, updateSettings }: { settings: SettingsRow |
           <input type="number" defaultValue={settings.min_payout} onBlur={(e) => updateSettings({ min_payout: Number(e.target.value) })}
             className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
         </div>
+        <div>
+          <label className="text-sm font-semibold">💼 Satıcı qeydiyyat haqqı (AZN)</label>
+          <input type="number" step="0.5" defaultValue={settings.seller_signup_fee ?? 20} onBlur={(e) => updateSettings({ seller_signup_fee: Number(e.target.value) })}
+            className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+          <div className="text-xs text-muted-foreground mt-1">Yeni satıcı qeydiyyat zamanı ödəyəcəyi birdəfəlik məbləğ</div>
+        </div>
         <div className="flex items-center justify-between pt-2 border-t border-border">
           <div>
             <div className="font-semibold">Texniki xidmət rejimi</div>
