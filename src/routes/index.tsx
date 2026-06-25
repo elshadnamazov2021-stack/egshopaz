@@ -119,14 +119,15 @@ function Index() {
         </div>
       </section>
 
-      {/* 1) Kateqoriya tablar + kompakt alt kateqoriyalar + banner */}
-      <HomeCategoryBrowser />
-
-      {/* 2) REKLAM — Satıcı bannerləri (birinci prioritet) */}
+      {/* 1) REKLAM — Satıcı bannerləri (birinci prioritet) */}
       <SellerBanners />
 
-      {/* Featured (sponsored) shops */}
+      {/* 2) REKLAM — Featured shops */}
       <FeaturedShops />
+
+      {/* 3) REKLAM — Sponsored products (önə çıxan) */}
+      <SponsoredProducts limit={8} />
+
 
 
       {/* Visual Search Banner */}
