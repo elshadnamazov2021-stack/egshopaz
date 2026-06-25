@@ -510,6 +510,8 @@ function SellerPanel() {
       fast_delivery: !!editing.fast_delivery,
       condition: editing.condition || "new",
       is_giveaway: !!editing.is_giveaway,
+      video_url: editing.video_url ?? null,
+      video_duration: editing.video_duration ?? null,
     };
 
     if (editing.id) {
