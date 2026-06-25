@@ -243,6 +243,9 @@ function Index() {
             {trending.slice(0, 6).map((p) => <ProductCard key={p.id} p={p} enableFavorite={false} />)}
           </div>
         </section>
+      )}
+
+
 
       {/* Kateqoriya tablar + kompakt alt kateqoriyalar + banner */}
       <HomeCategoryBrowser />
