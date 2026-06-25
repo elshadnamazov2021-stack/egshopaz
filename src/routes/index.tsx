@@ -48,7 +48,7 @@ function Index() {
     // Kritik: ana məhsullar dərhal
 
     supabase.from("products")
-      .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
+      .select("id,title,price,old_price,image_url,video_url,rating,reviews_count,brand")
       .eq("is_active", true)
       .order("created_at", { ascending: false })
       .limit(10)
@@ -57,13 +57,13 @@ function Index() {
     // Ləng: ikinci dərəcəli bölmələr — idle vaxtında
     const loadSecondary = () => {
       supabase.from("products")
-        .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
+        .select("id,title,price,old_price,image_url,video_url,rating,reviews_count,brand")
         .eq("is_active", true).not("old_price", "is", null)
         .order("old_price", { ascending: false }).limit(5)
         .then(({ data }) => setDiscounted((data ?? []) as ProductCardData[]));
 
       supabase.from("products")
-        .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
+        .select("id,title,price,old_price,image_url,video_url,rating,reviews_count,brand")
         .eq("is_active", true)
         .order("reviews_count", { ascending: false }).limit(6)
         .then(({ data }) => setTrending((data ?? []) as ProductCardData[]));
@@ -72,7 +72,7 @@ function Index() {
         .then(({ data }) => setPromos((data ?? []) as PromoCode[]));
 
       supabase.from("products")
-        .select("id,title,price,old_price,image_url,rating,reviews_count,brand")
+        .select("id,title,price,old_price,image_url,video_url,rating,reviews_count,brand")
         .eq("is_active", true).eq("is_giveaway", true)
         .order("created_at", { ascending: false }).limit(4)
         .then(({ data }) => setGiveaways((data ?? []) as ProductCardData[]));

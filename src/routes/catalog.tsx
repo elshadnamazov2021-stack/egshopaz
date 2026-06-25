@@ -65,7 +65,7 @@ function Catalog() {
     }
 
     let query: any = supabase.from("products")
-      .select("id,title,price,old_price,image_url,rating,reviews_count,brand,stock,delivery_days_min,delivery_days_max,delivery_city,free_shipping,fast_delivery,condition,categories!inner(slug)")
+      .select("id,title,price,old_price,image_url,video_url,rating,reviews_count,brand,stock,delivery_days_min,delivery_days_max,delivery_city,free_shipping,fast_delivery,condition,categories!inner(slug)")
       .eq("is_active", true);
     if (q) query = query.ilike("title", `%${q}%`);
     if (catSlugs) query = query.in("categories.slug", catSlugs);
