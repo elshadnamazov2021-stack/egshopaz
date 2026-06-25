@@ -334,11 +334,37 @@ export function SellerAdvertising() {
   };
 
   const saveBanner = async () => {
-    if (!user || !bannerForm || !activeSub) return;
+    if (!user || !bannerForm) return;
     if (!bannerForm.title.trim()) { toast.error("Başlıq daxil edin"); return; }
     if (!bannerForm.image_url && !bannerForm.video_url) { toast.error("Şəkil və ya video yükləyin"); return; }
-    if (bannersLeft <= 0) { toast.error("Banner limiti dolub. Yeni paket alın."); return; }
-    setCheckout({ kind: "slot_banner", price: SLOT_BANNER_FEE, form: { ...bannerForm } });
+    // If seller has active subscription, respect slot limit; otherwise free tier = 1 active banner
+    const freeLimit = 1;
+    if (activeSub) {
+      if (bannersLeft <= 0) { toast.error("Banner limiti dolub. Yeni paket alın."); return; }
+    } else {
+      if (activeBanners.length >= freeLimit) {
+        toast.error("Pulsuz tarifdə yalnız 1 aktiv banner ola bilər. Daha çox üçün paket alın.");
+        return;
+      }
+    }
+    const ends = activeSub
+      ? activeSub.ends_at
+      : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const { error } = await supabase.from("banners").insert({
+      seller_id: user.id,
+      subscription_id: activeSub?.id ?? null,
+      title: bannerForm.title.trim().slice(0, 200),
+      image_url: bannerForm.image_url || null,
+      video_url: bannerForm.video_url || null,
+      link_url: bannerForm.link_url.trim().slice(0, 500) || null,
+      position: "home_top",
+      is_active: true,
+      ends_at: ends,
+    });
+    if (error) { toast.error(error.message); return; }
+    toast.success("Banner əlavə olundu 🎉");
+    setBannerForm(null);
+    await load();
   };
 
   const deleteBanner = async (id: string) => {
@@ -459,48 +485,56 @@ export function SellerAdvertising() {
       ) : null}
 
 
-      {/* === BANNER MANAGER === */}
-      {activeSub ? (
-        <div className="bg-card border border-border rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-            <div className="flex items-center gap-2">
-              <Megaphone className="h-5 w-5 text-primary" />
-              <h2 className="text-lg font-bold">Ana səhifə bannerlərim</h2>
-              <span className="text-xs bg-secondary px-2 py-0.5 rounded-full">{activeBanners.length}/{activeSub.ad_packages?.banner_slots ?? 0}</span>
-            </div>
-            <button
-              onClick={() => setBannerForm({ title: "", link_url: "", image_url: "", video_url: "" })}
-              disabled={bannersLeft <= 0}
-              className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-            >
-              <Plus className="h-4 w-4" /> Yeni banner
-            </button>
+      {/* === BANNER MANAGER (always available to sellers) === */}
+      <div className="bg-card border border-border rounded-2xl p-6">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <Megaphone className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-bold">Ana səhifə bannerlərim</h2>
+            <span className="text-xs bg-secondary px-2 py-0.5 rounded-full">
+              {activeBanners.length}/{activeSub ? (activeSub.ad_packages?.banner_slots ?? 0) : 1}
+            </span>
+            {!activeSub && (
+              <span className="text-[10px] bg-success/15 text-success px-2 py-0.5 rounded-full font-bold">PULSUZ</span>
+            )}
           </div>
-          {banners.length === 0 ? (
-            <div className="text-center text-muted-foreground py-8 text-sm">Hələ banner yoxdur. Ana səhifədə görünmək üçün əlavə edin.</div>
-          ) : (
-            <div className="grid sm:grid-cols-2 gap-3">
-              {banners.map((b) => (
-                <div key={b.id} className="border border-border rounded-xl overflow-hidden">
-                  <div className="aspect-[3/1] bg-secondary">
-                    {b.image_url && <img src={b.image_url} alt={b.title} className="w-full h-full object-cover" />}
+          <button
+            onClick={() => setBannerForm({ title: "", link_url: "", image_url: "", video_url: "" })}
+            disabled={activeSub ? bannersLeft <= 0 : activeBanners.length >= 1}
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+          >
+            <Plus className="h-4 w-4" /> Yeni banner
+          </button>
+        </div>
+        {!activeSub && (
+          <p className="text-xs text-muted-foreground mb-3">
+            Hər satıcı pulsuz olaraq 1 aktiv banner yerləşdirə bilər (30 gün). Daha çox banner üçün reklam paketi alın.
+          </p>
+        )}
+        {banners.length === 0 ? (
+          <div className="text-center text-muted-foreground py-8 text-sm">Hələ banner yoxdur. Ana səhifədə görünmək üçün əlavə edin.</div>
+        ) : (
+          <div className="grid sm:grid-cols-2 gap-3">
+            {banners.map((b) => (
+              <div key={b.id} className="border border-border rounded-xl overflow-hidden">
+                <div className="aspect-[3/1] bg-secondary">
+                  {b.image_url && <img src={b.image_url} alt={b.title} className="w-full h-full object-cover" />}
+                </div>
+                <div className="p-3 flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="font-semibold text-sm line-clamp-1">{b.title}</div>
+                    <div className="text-xs text-muted-foreground">{b.is_active ? "Aktiv" : "Pasiv"} • {b.ends_at ? formatDate(b.ends_at) : "—"}</div>
                   </div>
-                  <div className="p-3 flex items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="font-semibold text-sm line-clamp-1">{b.title}</div>
-                      <div className="text-xs text-muted-foreground">{b.is_active ? "Aktiv" : "Pasiv"} • {b.ends_at ? formatDate(b.ends_at) : "—"}</div>
-                    </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button onClick={() => toggleBanner(b)} className="text-xs px-2 py-1 rounded bg-secondary hover:bg-secondary/70">{b.is_active ? "Söndür" : "Yandır"}</button>
-                      <button onClick={() => deleteBanner(b.id)} className="p-1.5 text-destructive hover:bg-destructive/10 rounded"><Trash2 className="h-4 w-4" /></button>
-                    </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => toggleBanner(b)} className="text-xs px-2 py-1 rounded bg-secondary hover:bg-secondary/70">{b.is_active ? "Söndür" : "Yandır"}</button>
+                    <button onClick={() => deleteBanner(b.id)} className="p-1.5 text-destructive hover:bg-destructive/10 rounded"><Trash2 className="h-4 w-4" /></button>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : null}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* === SPONSORED PRODUCTS MANAGER === */}
       {activeSub ? (
