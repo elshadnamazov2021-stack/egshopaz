@@ -10,6 +10,7 @@ import { ProductReviews } from "@/components/ProductReviews";
 import { CompareButton } from "@/components/CompareButton";
 import { ProductRecommendations } from "@/components/ProductRecommendations";
 import { useFavorite } from "@/hooks/useFavorite";
+import { PinchZoomImage } from "@/components/PinchZoomImage";
 
 export const Route = createFileRoute("/product/$id")({
   component: ProductPage,
@@ -211,14 +212,7 @@ function ProductPage() {
           return (
             <div
               onClick={() => setZoomOpen(false)}
-              onTouchStart={(e) => { (window as any).__tsx = e.touches[0].clientX; }}
-              onTouchEnd={(e) => {
-                const sx = (window as any).__tsx as number | undefined;
-                if (sx == null) return;
-                const dx = e.changedTouches[0].clientX - sx;
-                if (Math.abs(dx) > 50 && zoom === 1) go(dx < 0 ? 1 : -1);
-              }}
-              className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 select-none"
+              className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center select-none touch-none overflow-hidden"
             >
               <button
                 onClick={(e) => { e.stopPropagation(); setZoomOpen(false); }}
@@ -227,23 +221,6 @@ function ProductPage() {
               >
                 <X className="h-5 w-5" />
               </button>
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
-                <button
-                  onClick={(e) => { e.stopPropagation(); setZoom((z) => Math.max(1, +(z - 0.5).toFixed(1))); }}
-                  className="bg-white/10 hover:bg-white/20 text-white rounded-full w-9 h-9 flex items-center justify-center"
-                  aria-label="Kiçilt"
-                >
-                  <Minus className="h-4 w-4" />
-                </button>
-                <span className="text-white text-sm tabular-nums w-12 text-center">{Math.round(zoom * 100)}%</span>
-                <button
-                  onClick={(e) => { e.stopPropagation(); setZoom((z) => Math.min(4, +(z + 0.5).toFixed(1))); }}
-                  className="bg-white/10 hover:bg-white/20 text-white rounded-full w-9 h-9 flex items-center justify-center"
-                  aria-label="Böyüt"
-                >
-                  <Plus className="h-4 w-4" />
-                </button>
-              </div>
               {list.length > 1 && (
                 <>
                   <button
@@ -265,21 +242,16 @@ function ProductPage() {
                   </div>
                 </>
               )}
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="w-full h-full flex items-center justify-center overflow-auto"
-              >
-                <img
-                  src={activeImage}
-                  alt={p.title}
-                  onDoubleClick={() => setZoom((z) => (z === 1 ? 2 : 1))}
-                  style={{ transform: `scale(${zoom})`, transition: "transform 0.2s" }}
-                  className="max-w-full max-h-[88vh] object-contain cursor-zoom-in origin-center"
-                />
-              </div>
+              <PinchZoomImage
+                src={activeImage}
+                alt={p.title}
+                onSwipe={(dir) => go(dir)}
+                onClose={() => setZoomOpen(false)}
+              />
             </div>
           );
         })()}
+
 
         <div className="space-y-4">
           {p.brand && <div className="text-sm text-muted-foreground font-semibold uppercase">{p.brand}</div>}
