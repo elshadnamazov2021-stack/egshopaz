@@ -21,13 +21,13 @@ function BannerCard({ b }: { b: Banner }) {
   }, []);
 
   const Inner = (
-    <div className="relative aspect-[16/6] sm:aspect-[16/5] bg-secondary overflow-hidden">
+    <div className="relative bg-secondary overflow-hidden">
       {b.video_url ? (
         <video
           ref={videoRef}
           src={b.video_url}
           poster={b.image_url ?? undefined}
-          className="w-full h-full object-cover"
+          className="w-full h-auto max-h-[80vh] object-contain bg-black"
           muted
           autoPlay
           loop
@@ -39,9 +39,10 @@ function BannerCard({ b }: { b: Banner }) {
           src={b.image_url!}
           alt={b.title}
           loading="lazy"
-          className="w-full h-full object-cover"
+          className="w-full h-auto max-h-[80vh] object-contain bg-black"
         />
       )}
+
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
 
