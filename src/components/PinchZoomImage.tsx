@@ -29,7 +29,7 @@ export function PinchZoomImage({ src, alt, onSwipe, onClose, maxScale = 2 }: Pro
 
   useEffect(() => { setScale(1); setTx(0); setTy(0); }, [src]);
 
-  const dist = (a: Touch, b: Touch) => Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+  const dist = (a: React.Touch, b: React.Touch) => Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
 
   const onTouchStart = (e: React.TouchEvent) => {
     e.stopPropagation();
