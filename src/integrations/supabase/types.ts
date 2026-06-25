@@ -234,6 +234,7 @@ export type Database = {
           subscription_id: string | null
           title: string
           updated_at: string
+          video_url: string | null
         }
         Insert: {
           clicks?: number
@@ -250,6 +251,7 @@ export type Database = {
           subscription_id?: string | null
           title: string
           updated_at?: string
+          video_url?: string | null
         }
         Update: {
           clicks?: number
@@ -266,6 +268,7 @@ export type Database = {
           subscription_id?: string | null
           title?: string
           updated_at?: string
+          video_url?: string | null
         }
         Relationships: []
       }
