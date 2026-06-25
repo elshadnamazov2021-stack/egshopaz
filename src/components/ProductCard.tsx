@@ -5,7 +5,7 @@ import { formatAZN, calcDiscount } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useFavorite } from "@/hooks/useFavorite";
 
 export interface ProductCardData {
@@ -14,6 +14,7 @@ export interface ProductCardData {
   price: number;
   old_price: number | null;
   image_url: string | null;
+  video_url?: string | null;
   rating: number;
   reviews_count: number;
   brand: string | null;
@@ -25,12 +26,39 @@ export interface ProductCardData {
   stock?: number | null;
 }
 
+
 export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; enableFavorite?: boolean }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [adding, setAdding] = useState(false);
   const { isFav, toggle: toggleFav, busy: favBusy } = useFavorite(p.id, enableFavorite);
   const discount = calcDiscount(Number(p.price), p.old_price ? Number(p.old_price) : undefined);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const [videoVisible, setVideoVisible] = useState(false);
+
+  useEffect(() => {
+    if (!p.video_url || !wrapRef.current) return;
+    const el = wrapRef.current;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          setVideoVisible(entry.isIntersecting && entry.intersectionRatio > 0.5);
+          const v = videoRef.current;
+          if (!v) return;
+          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+            v.play().catch(() => {});
+          } else {
+            v.pause();
+          }
+        });
+      },
+      { threshold: [0, 0.5, 1] }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [p.video_url]);
+
 
   const addToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -61,13 +89,25 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
       params={{ id: p.id }}
       className="group min-w-0 bg-card rounded-xl overflow-hidden border border-border/60 hover:border-border hover:shadow-card transition flex flex-col mobile-readable-card"
     >
-      <div className="product-image relative aspect-square sm:aspect-[3/4] bg-secondary overflow-hidden">
+      <div ref={wrapRef} className="product-image relative aspect-square sm:aspect-[3/4] bg-secondary overflow-hidden">
         {p.image_url ? (
           <img src={p.image_url} alt={p.title} loading="lazy"
                className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">—</div>
         )}
+        {p.video_url && (
+          <video
+            ref={videoRef}
+            src={p.video_url}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 pointer-events-none ${videoVisible ? "opacity-100" : "opacity-0"}`}
+          />
+        )}
+
         {discount > 0 && (
           <span className="absolute top-2 left-2 bg-discount text-discount-foreground text-xs font-bold px-2 py-1 rounded">
             -{discount}%
