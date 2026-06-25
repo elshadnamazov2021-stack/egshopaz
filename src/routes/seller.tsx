@@ -82,6 +82,8 @@ interface Product {
   color?: string | null;
   size?: string | null;
   is_giveaway?: boolean | null;
+  video_url?: string | null;
+  video_duration?: number | null;
 }
 interface Category {
   id: string;
