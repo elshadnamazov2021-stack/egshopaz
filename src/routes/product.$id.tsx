@@ -10,6 +10,7 @@ import { ProductReviews } from "@/components/ProductReviews";
 import { CompareButton } from "@/components/CompareButton";
 import { ProductRecommendations } from "@/components/ProductRecommendations";
 import { useFavorite } from "@/hooks/useFavorite";
+import { PinchZoomImage } from "@/components/PinchZoomImage";
 
 export const Route = createFileRoute("/product/$id")({
   component: ProductPage,
