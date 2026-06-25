@@ -446,7 +446,7 @@ export function SellerAdvertising() {
               <span className="text-xs bg-secondary px-2 py-0.5 rounded-full">{activeBanners.length}/{activeSub.ad_packages?.banner_slots ?? 0}</span>
             </div>
             <button
-              onClick={() => setBannerForm({ title: "", link_url: "", image_url: "" })}
+              onClick={() => setBannerForm({ title: "", link_url: "", image_url: "", video_url: "" })}
               disabled={bannersLeft <= 0}
               className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
@@ -774,7 +774,7 @@ export function SellerAdvertising() {
                 <Store className="h-6 w-6 text-primary shrink-0" />
                 <div><div className="font-bold">Mağazanı önə çək</div><div className="text-xs text-muted-foreground">Bütün mağazanız "Önə çıxan mağazalar" bölməsində ({Math.max(0, shopPromoLeft)} slot qalır)</div></div>
               </button>
-              <button onClick={() => { setPostPay(false); setBannerForm({ title: "", link_url: "", image_url: "" }); }} disabled={bannersLeft <= 0}
+              <button onClick={() => { setPostPay(false); setBannerForm({ title: "", link_url: "", image_url: "", video_url: "" }); }} disabled={bannersLeft <= 0}
                 className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-primary hover:bg-primary/5 disabled:opacity-50 disabled:cursor-not-allowed text-left transition">
                 <Megaphone className="h-6 w-6 text-primary shrink-0" />
                 <div><div className="font-bold">Banner əlavə et</div><div className="text-xs text-muted-foreground">Ana səhifənin üstündə böyük banner ({Math.max(0, bannersLeft)} slot qalır)</div></div>
