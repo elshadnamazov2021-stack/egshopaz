@@ -657,7 +657,7 @@ export function SellerAdvertising() {
                 <input value={bannerForm.link_url} onChange={(e) => setBannerForm({ ...bannerForm, link_url: e.target.value })} placeholder="/catalog və ya /product/..." className="w-full mt-1 px-3 py-2 rounded-lg bg-secondary border border-border focus:border-primary outline-none" />
               </div>
               <div>
-                <label className="text-xs font-semibold text-muted-foreground">Şəkil (3:1 nisbət tövsiyə olunur)</label>
+                <label className="text-xs font-semibold text-muted-foreground">Şəkil (3:1 nisbət tövsiyə olunur) — opsional</label>
                 <div className="mt-1 border-2 border-dashed border-border rounded-lg p-4 text-center">
                   {bannerForm.image_url ? (
                     <div className="relative">
@@ -673,10 +673,28 @@ export function SellerAdvertising() {
                   )}
                 </div>
               </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground">Video (max 60 san., səssiz oynayacaq) — opsional</label>
+                <div className="mt-1 border-2 border-dashed border-border rounded-lg p-4 text-center">
+                  {bannerForm.video_url ? (
+                    <div className="relative">
+                      <video src={bannerForm.video_url} className="w-full max-h-40 object-cover rounded" muted playsInline controls />
+                      <button onClick={() => setBannerForm({ ...bannerForm, video_url: "" })} className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1"><X className="h-3 w-3" /></button>
+                    </div>
+                  ) : (
+                    <label className="cursor-pointer block">
+                      <input type="file" accept="video/mp4,video/webm,video/quicktime" className="hidden" onChange={(e) => e.target.files?.[0] && uploadBannerVideo(e.target.files[0])} />
+                      <Megaphone className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                      <span className="text-sm text-muted-foreground">{uploadingBannerVideo ? "Yüklənir..." : "Video seç (max 60 san, 50MB)"}</span>
+                    </label>
+                  )}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1">Video yükləsəniz, banner ana səhifədə avtomatik səssiz oynayacaq.</p>
+              </div>
             </div>
             <div className="flex justify-end gap-2 mt-5">
               <button onClick={() => setBannerForm(null)} className="px-4 py-2 rounded-lg border border-border">Ləğv et</button>
-              <button onClick={saveBanner} disabled={uploadingBanner} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold disabled:opacity-60">Yarat</button>
+              <button onClick={saveBanner} disabled={uploadingBanner || uploadingBannerVideo} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold disabled:opacity-60">Yarat</button>
             </div>
           </div>
         </div>
