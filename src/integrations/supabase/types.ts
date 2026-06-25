@@ -1781,6 +1781,8 @@ export type Database = {
           payments_mode: string
           promo_terms_text: string
           seller_signup_fee: number
+          single_banner_days: number
+          single_banner_price: number
           single_product_promo_days: number
           single_product_promo_price: number
           single_shop_promo_days: number
@@ -1800,6 +1802,8 @@ export type Database = {
           payments_mode?: string
           promo_terms_text?: string
           seller_signup_fee?: number
+          single_banner_days?: number
+          single_banner_price?: number
           single_product_promo_days?: number
           single_product_promo_price?: number
           single_shop_promo_days?: number
@@ -1819,6 +1823,8 @@ export type Database = {
           payments_mode?: string
           promo_terms_text?: string
           seller_signup_fee?: number
+          single_banner_days?: number
+          single_banner_price?: number
           single_product_promo_days?: number
           single_product_promo_price?: number
           single_shop_promo_days?: number
