@@ -38,7 +38,7 @@ interface PickupRow { id: string; name: string; city: string; address: string; p
 interface BannerRow { id: string; title: string; image_url: string | null; link_url: string | null; position: string; is_active: boolean; clicks: number; impressions: number }
 interface DisputeRow { id: string; order_id: string | null; buyer_id: string; seller_id: string | null; reason: string; status: string; compensation: number | null; created_at: string }
 interface PromoRow { id: string; code: string; discount_percent: number | null; discount_amount: number | null; is_active: boolean; used_count: number; usage_limit: number | null; min_order: number }
-interface SettingsRow { id: string; commission_percent: number; delivery_base_fee: number; storage_fee_per_day: number; maintenance_mode: boolean; min_payout: number; single_product_promo_price: number; single_product_promo_days: number; single_shop_promo_price: number; single_shop_promo_days: number; promo_terms_text: string }
+interface SettingsRow { id: string; commission_percent: number; delivery_base_fee: number; storage_fee_per_day: number; maintenance_mode: boolean; min_payout: number; single_product_promo_price: number; single_product_promo_days: number; single_shop_promo_price: number; single_shop_promo_days: number; promo_terms_text: string; seller_signup_fee: number }
 interface TicketRow { id: string; subject: string; category: string; status: string; user_id: string; created_at: string; admin_reply: string | null }
 interface AdPackageRow {
   id: string; name: string; tier: string; price: number; duration_days: number;
@@ -1037,6 +1037,12 @@ function SettingsSection({ settings, updateSettings }: { settings: SettingsRow |
           <label className="text-sm font-semibold">Min ödəniş (satıcı üçün, AZN)</label>
           <input type="number" defaultValue={settings.min_payout} onBlur={(e) => updateSettings({ min_payout: Number(e.target.value) })}
             className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+        </div>
+        <div>
+          <label className="text-sm font-semibold">💼 Satıcı qeydiyyat haqqı (AZN)</label>
+          <input type="number" step="0.5" defaultValue={settings.seller_signup_fee ?? 20} onBlur={(e) => updateSettings({ seller_signup_fee: Number(e.target.value) })}
+            className="mt-1 w-full h-10 px-3 rounded-lg border border-input bg-background" />
+          <div className="text-xs text-muted-foreground mt-1">Yeni satıcı qeydiyyat zamanı ödəyəcəyi birdəfəlik məbləğ</div>
         </div>
         <div className="flex items-center justify-between pt-2 border-t border-border">
           <div>

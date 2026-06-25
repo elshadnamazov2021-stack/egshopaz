@@ -82,6 +82,8 @@ interface Product {
   color?: string | null;
   size?: string | null;
   is_giveaway?: boolean | null;
+  video_url?: string | null;
+  video_duration?: number | null;
 }
 interface Category {
   id: string;
@@ -435,6 +437,43 @@ function SellerPanel() {
     });
   };
 
+  const uploadVideo = async (file: File | null | undefined) => {
+    if (!file || !user || !editing) return;
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error("Video 50MB-dan böyük ola bilməz");
+      return;
+    }
+    if (!file.type.startsWith("video/")) {
+      toast.error("Yalnız video fayl yükləyin");
+      return;
+    }
+    // Check duration client-side
+    const duration = await new Promise<number>((resolve) => {
+      const v = document.createElement("video");
+      v.preload = "metadata";
+      v.onloadedmetadata = () => resolve(Math.round(v.duration));
+      v.onerror = () => resolve(0);
+      v.src = URL.createObjectURL(file);
+    });
+    if (duration > 60) {
+      toast.error(`Video ${duration} saniyədir. Maksimum 60 saniyə olmalıdır.`);
+      return;
+    }
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `${user.id}/videos/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("product-images").upload(path, file);
+    if (error) {
+      toast.error(error.message);
+      setUploading(false);
+      return;
+    }
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    setEditing({ ...editing, video_url: data.publicUrl, video_duration: duration });
+    setUploading(false);
+    toast.success("Video yükləndi");
+  };
+
   const save = async () => {
     if (!user || !editing) return;
     const payload = {
@@ -471,6 +510,8 @@ function SellerPanel() {
       fast_delivery: !!editing.fast_delivery,
       condition: editing.condition || "new",
       is_giveaway: !!editing.is_giveaway,
+      video_url: editing.video_url ?? null,
+      video_duration: editing.video_duration ?? null,
     };
 
     if (editing.id) {
@@ -1484,6 +1525,47 @@ function SellerPanel() {
                   <ImageIcon className="h-3 w-3" /> JPG, PNG, WebP. Maks 5MB.
                 </p>
               </div>
+
+              {/* Video (max 60 sec) */}
+              <div>
+                <label className="text-sm font-semibold mb-2 block">
+                  🎬 Məhsul videosu (maks. 60 saniyə) — opsional
+                </label>
+                {editing.video_url ? (
+                  <div className="relative rounded-lg overflow-hidden bg-black">
+                    <video src={editing.video_url} controls className="w-full max-h-64" />
+                    <button
+                      onClick={() => setEditing({ ...editing, video_url: null, video_duration: null })}
+                      className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full w-8 h-8 flex items-center justify-center"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                    {editing.video_duration && (
+                      <span className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                        {editing.video_duration} san
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <label className="border-2 border-dashed border-border rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-secondary/50 transition">
+                    <Upload className="h-6 w-6 text-muted-foreground mb-2" />
+                    <span className="text-sm text-muted-foreground">
+                      {uploading ? "Yüklənir..." : "Video seçin (MP4, WebM, maks 50MB, 60 san)"}
+                    </span>
+                    <input
+                      type="file"
+                      accept="video/mp4,video/webm,video/quicktime"
+                      className="hidden"
+                      disabled={uploading}
+                      onChange={(e) => uploadVideo(e.target.files?.[0])}
+                    />
+                  </label>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">
+                  Qısa video məhsulun satışını artırır. 60 saniyədən uzun videolar avtomatik rədd edilir.
+                </p>
+              </div>
+
 
               <div>
                 <label className="text-sm font-semibold">Başlıq *</label>

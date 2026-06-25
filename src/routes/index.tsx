@@ -119,14 +119,15 @@ function Index() {
         </div>
       </section>
 
-      {/* 1) Kateqoriya tablar + kompakt alt kateqoriyalar + banner */}
-      <HomeCategoryBrowser />
-
-      {/* 2) REKLAM — Satıcı bannerləri (birinci prioritet) */}
+      {/* 1) REKLAM — Satıcı bannerləri (birinci prioritet) */}
       <SellerBanners />
 
-      {/* Featured (sponsored) shops */}
+      {/* 2) REKLAM — Featured shops */}
       <FeaturedShops />
+
+      {/* 3) REKLAM — Sponsored products (önə çıxan) */}
+      <SponsoredProducts limit={8} />
+
 
 
       {/* Visual Search Banner */}
@@ -244,8 +245,11 @@ function Index() {
         </section>
       )}
 
-      {/* REKLAM — Sponsored placement (ikinci prioritet) */}
-      <SponsoredProducts limit={6} />
+
+
+      {/* Kateqoriya tablar + kompakt alt kateqoriyalar + banner */}
+      <HomeCategoryBrowser />
+
 
       {/* Benefits */}
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">

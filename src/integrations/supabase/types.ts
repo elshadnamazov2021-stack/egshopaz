@@ -1048,6 +1048,8 @@ export type Database = {
           stock: number
           title: string
           updated_at: string
+          video_duration: number | null
+          video_url: string | null
           weight: number | null
         }
         Insert: {
@@ -1077,6 +1079,8 @@ export type Database = {
           stock?: number
           title: string
           updated_at?: string
+          video_duration?: number | null
+          video_url?: string | null
           weight?: number | null
         }
         Update: {
@@ -1106,6 +1110,8 @@ export type Database = {
           stock?: number
           title?: string
           updated_at?: string
+          video_duration?: number | null
+          video_url?: string | null
           weight?: number | null
         }
         Relationships: [
@@ -1771,6 +1777,7 @@ export type Database = {
           min_payout: number
           payments_mode: string
           promo_terms_text: string
+          seller_signup_fee: number
           single_product_promo_days: number
           single_product_promo_price: number
           single_shop_promo_days: number
@@ -1789,6 +1796,7 @@ export type Database = {
           min_payout?: number
           payments_mode?: string
           promo_terms_text?: string
+          seller_signup_fee?: number
           single_product_promo_days?: number
           single_product_promo_price?: number
           single_shop_promo_days?: number
@@ -1807,6 +1815,7 @@ export type Database = {
           min_payout?: number
           payments_mode?: string
           promo_terms_text?: string
+          seller_signup_fee?: number
           single_product_promo_days?: number
           single_product_promo_price?: number
           single_shop_promo_days?: number
