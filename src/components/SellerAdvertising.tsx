@@ -112,8 +112,9 @@ export function SellerAdvertising() {
   const [oneOffPickProduct, setOneOffPickProduct] = useState(false); // paid one-off product picker
 
   // Banner form
-  const [bannerForm, setBannerForm] = useState<{ title: string; link_url: string; image_url: string } | null>(null);
+  const [bannerForm, setBannerForm] = useState<{ title: string; link_url: string; image_url: string; video_url: string } | null>(null);
   const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [uploadingBannerVideo, setUploadingBannerVideo] = useState(false);
 
   // Sponsored (slot-based) form
   const [pickProduct, setPickProduct] = useState(false);
