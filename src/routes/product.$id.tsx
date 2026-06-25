@@ -134,16 +134,26 @@ function ProductPage() {
         <Link to="/" className="hover:text-primary">{t("product.home")}</Link> / <span>{p.title}</span>
       </div>
       <div className="grid md:grid-cols-2 gap-8">
-        <div className="aspect-square bg-secondary rounded-2xl overflow-hidden relative">
-          {p.image_url ? (
-            <img src={p.image_url} alt={p.title} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground">{t("product.noImage")}</div>
-          )}
-          {discount > 0 && (
-            <span className="absolute top-4 left-4 bg-discount text-discount-foreground text-sm font-bold px-3 py-1.5 rounded-lg">
-              -{discount}%
-            </span>
+        <div className="space-y-3">
+          <div className="aspect-square bg-secondary rounded-2xl overflow-hidden relative">
+            {p.image_url ? (
+              <img src={p.image_url} alt={p.title} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground">{t("product.noImage")}</div>
+            )}
+            {discount > 0 && (
+              <span className="absolute top-4 left-4 bg-discount text-discount-foreground text-sm font-bold px-3 py-1.5 rounded-lg">
+                -{discount}%
+              </span>
+            )}
+          </div>
+          {p.video_url && (
+            <div className="rounded-2xl overflow-hidden bg-black relative">
+              <video src={p.video_url} controls playsInline className="w-full max-h-96" />
+              <span className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded">
+                🎬 Video {p.video_duration ? `· ${p.video_duration}san` : ""}
+              </span>
+            </div>
           )}
         </div>
 
