@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAZN, calcDiscount } from "@/lib/format";
 import { useAuth } from "@/contexts/AuthContext";
-import { Star, ShoppingCart, Heart, Truck, ShieldCheck, MessageCircle, Send, Store, MapPin } from "lucide-react";
+import { Star, ShoppingCart, Heart, Truck, ShieldCheck, MessageCircle, Send, Store, MapPin, X, ZoomIn } from "lucide-react";
 import { toast } from "sonner";
 import { ProductReviews } from "@/components/ProductReviews";
 import { CompareButton } from "@/components/CompareButton";
@@ -18,6 +18,7 @@ export const Route = createFileRoute("/product/$id")({
 interface Product {
   id: string; title: string; description: string | null;
   price: number; old_price: number | null; image_url: string | null;
+  images?: string[] | null;
   rating: number; reviews_count: number; brand: string | null;
   stock: number; seller_id: string;
   video_url?: string | null; video_duration?: number | null;
@@ -35,6 +36,8 @@ function ProductPage() {
   const [msgOpen, setMsgOpen] = useState(false);
   const [msgBody, setMsgBody] = useState("");
   const [msgSending, setMsgSending] = useState(false);
+  const [activeImage, setActiveImage] = useState<string | null>(null);
+  const [zoomOpen, setZoomOpen] = useState(false);
   const [shopInfo, setShopInfo] = useState<{
     id: string; shop_name: string | null; full_name: string | null;
     shop_logo_url: string | null; shop_description: string | null; shop_city: string | null;
@@ -86,6 +89,8 @@ function ProductPage() {
     supabase.from("products").select("*").eq("id", id).maybeSingle().then(async ({ data }) => {
       setP(data as Product | null);
       if (data) {
+        const imgs = ((data as any).images as string[] | null) ?? [];
+        setActiveImage((data as any).image_url || imgs[0] || null);
         const [{ data: seller }, { count }] = await Promise.all([
           supabase.from("profiles").select("id,shop_name,full_name,shop_logo_url,shop_description,shop_city").eq("id", data.seller_id).maybeSingle(),
           supabase.from("shop_followers").select("id", { count: "exact", head: true }).eq("seller_id", data.seller_id),
@@ -135,9 +140,18 @@ function ProductPage() {
       </div>
       <div className="grid md:grid-cols-2 gap-8">
         <div className="space-y-3">
-          <div className="aspect-square bg-secondary rounded-2xl overflow-hidden relative">
-            {p.image_url ? (
-              <img src={p.image_url} alt={p.title} className="w-full h-full object-cover" />
+          <button
+            type="button"
+            onClick={() => activeImage && setZoomOpen(true)}
+            className="block w-full aspect-square bg-secondary rounded-2xl overflow-hidden relative group"
+          >
+            {activeImage ? (
+              <>
+                <img src={activeImage} alt={p.title} className="w-full h-full object-cover" />
+                <span className="absolute bottom-3 right-3 bg-black/60 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition">
+                  <ZoomIn className="h-4 w-4" />
+                </span>
+              </>
             ) : (
               <div className="w-full h-full flex items-center justify-center text-muted-foreground">{t("product.noImage")}</div>
             )}
@@ -146,16 +160,63 @@ function ProductPage() {
                 -{discount}%
               </span>
             )}
-          </div>
+          </button>
+          {(() => {
+            const imgs = (p.images ?? []).filter(Boolean);
+            const all = p.image_url && !imgs.includes(p.image_url) ? [p.image_url, ...imgs] : imgs;
+            if (all.length < 2) return null;
+            return (
+              <div className="grid grid-cols-6 gap-2">
+                {all.map((url) => (
+                  <button
+                    key={url}
+                    type="button"
+                    onClick={() => setActiveImage(url)}
+                    className={`aspect-square rounded-lg overflow-hidden border-2 transition ${activeImage === url ? "border-primary" : "border-transparent hover:border-border"}`}
+                  >
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            );
+          })()}
           {p.video_url && (
             <div className="rounded-2xl overflow-hidden bg-black relative">
-              <video src={p.video_url} controls playsInline className="w-full max-h-96" />
+              <video
+                src={p.video_url}
+                controls
+                muted
+                playsInline
+                preload="metadata"
+                className="w-full max-h-96"
+              />
               <span className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded">
                 🎬 Video {p.video_duration ? `· ${p.video_duration}san` : ""}
               </span>
             </div>
           )}
         </div>
+
+        {zoomOpen && activeImage && (
+          <div
+            onClick={() => setZoomOpen(false)}
+            className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 cursor-zoom-out"
+          >
+            <button
+              onClick={(e) => { e.stopPropagation(); setZoomOpen(false); }}
+              className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white rounded-full w-10 h-10 flex items-center justify-center"
+              aria-label="Bağla"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <img
+              src={activeImage}
+              alt={p.title}
+              onClick={(e) => e.stopPropagation()}
+              className="max-w-full max-h-full object-contain cursor-default"
+            />
+          </div>
+        )}
 
         <div className="space-y-4">
           {p.brand && <div className="text-sm text-muted-foreground font-semibold uppercase">{p.brand}</div>}
