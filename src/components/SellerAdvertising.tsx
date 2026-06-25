@@ -135,7 +135,7 @@ export function SellerAdvertising() {
       supabase.from("sponsored_products").select("*, products(id,title,image_url,price)").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("sponsored_shops").select("id,ends_at,is_active").eq("seller_id", user.id).order("created_at", { ascending: false }),
       supabase.from("products").select("id,title,image_url,price").eq("seller_id", user.id).eq("is_active", true).order("created_at", { ascending: false }),
-      supabase.from("system_settings").select("single_product_promo_price,single_product_promo_days,single_shop_promo_price,single_shop_promo_days,promo_terms_text").limit(1).maybeSingle(),
+      supabase.from("system_settings").select("single_product_promo_price,single_product_promo_days,single_shop_promo_price,single_shop_promo_days,single_banner_price,single_banner_days,promo_terms_text").limit(1).maybeSingle(),
     ]);
     setPackages((pk.data ?? []) as unknown as Pkg[]);
     setSubs((sb.data ?? []) as unknown as Sub[]);
