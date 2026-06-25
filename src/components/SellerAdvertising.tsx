@@ -504,15 +504,15 @@ export function SellerAdvertising() {
             <Megaphone className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-bold">Ana səhifə bannerlərim</h2>
             <span className="text-xs bg-secondary px-2 py-0.5 rounded-full">
-              {activeBanners.length}/{activeSub ? (activeSub.ad_packages?.banner_slots ?? 0) : 1}
+              {activeBanners.length}/{activeSub ? (activeSub.ad_packages?.banner_slots ?? 0) : "∞"}
             </span>
             {!activeSub && (
-              <span className="text-[10px] bg-success/15 text-success px-2 py-0.5 rounded-full font-bold">PULSUZ</span>
+              <span className="text-[10px] bg-primary/15 text-primary px-2 py-0.5 rounded-full font-bold">ÖDƏNİŞLİ</span>
             )}
           </div>
           <button
             onClick={() => setBannerForm({ title: "", link_url: "", image_url: "", video_url: "" })}
-            disabled={activeSub ? bannersLeft <= 0 : activeBanners.length >= 1}
+            disabled={!!activeSub && bannersLeft <= 0}
             className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
           >
             <Plus className="h-4 w-4" /> Yeni banner
@@ -520,9 +520,10 @@ export function SellerAdvertising() {
         </div>
         {!activeSub && (
           <p className="text-xs text-muted-foreground mb-3">
-            Hər satıcı pulsuz olaraq 1 aktiv banner yerləşdirə bilər (30 gün). Daha çox banner üçün reklam paketi alın.
+            Banner reklamı ödənişlidir: <b>{Number(promoSettings?.single_banner_price ?? 5)} AZN</b> / <b>{Number(promoSettings?.single_banner_days ?? 30)} gün</b>. Qiymət admin tərəfindən tənzimlənir. Reklam paketi alanlar paketin slotlarından istifadə edir.
           </p>
         )}
+
         {banners.length === 0 ? (
           <div className="text-center text-muted-foreground py-8 text-sm">Hələ banner yoxdur. Ana səhifədə görünmək üçün əlavə edin.</div>
         ) : (
