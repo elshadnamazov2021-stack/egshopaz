@@ -437,6 +437,43 @@ function SellerPanel() {
     });
   };
 
+  const uploadVideo = async (file: File | null | undefined) => {
+    if (!file || !user || !editing) return;
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error("Video 50MB-dan böyük ola bilməz");
+      return;
+    }
+    if (!file.type.startsWith("video/")) {
+      toast.error("Yalnız video fayl yükləyin");
+      return;
+    }
+    // Check duration client-side
+    const duration = await new Promise<number>((resolve) => {
+      const v = document.createElement("video");
+      v.preload = "metadata";
+      v.onloadedmetadata = () => resolve(Math.round(v.duration));
+      v.onerror = () => resolve(0);
+      v.src = URL.createObjectURL(file);
+    });
+    if (duration > 60) {
+      toast.error(`Video ${duration} saniyədir. Maksimum 60 saniyə olmalıdır.`);
+      return;
+    }
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `${user.id}/videos/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("product-images").upload(path, file);
+    if (error) {
+      toast.error(error.message);
+      setUploading(false);
+      return;
+    }
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    setEditing({ ...editing, video_url: data.publicUrl, video_duration: duration });
+    setUploading(false);
+    toast.success("Video yükləndi");
+  };
+
   const save = async () => {
     if (!user || !editing) return;
     const payload = {
