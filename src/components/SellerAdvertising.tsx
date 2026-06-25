@@ -739,10 +739,20 @@ export function SellerAdvertising() {
                 <p className="text-[11px] text-muted-foreground mt-1">Video yükləsəniz, banner ana səhifədə avtomatik səssiz oynayacaq.</p>
               </div>
             </div>
-            <div className="flex justify-end gap-2 mt-5">
-              <button onClick={() => setBannerForm(null)} className="px-4 py-2 rounded-lg border border-border">Ləğv et</button>
-              <button onClick={saveBanner} disabled={uploadingBanner || uploadingBannerVideo} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold disabled:opacity-60">Yarat</button>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-5">
+              {!activeSub && (
+                <div className="text-xs text-muted-foreground">
+                  Ödəniş: <b className="text-foreground">{Number(promoSettings?.single_banner_price ?? 5)} AZN</b> ({Number(promoSettings?.single_banner_days ?? 30)} gün)
+                </div>
+              )}
+              <div className="flex justify-end gap-2 sm:ml-auto">
+                <button onClick={() => setBannerForm(null)} className="px-4 py-2 rounded-lg border border-border">Ləğv et</button>
+                <button onClick={saveBanner} disabled={uploadingBanner || uploadingBannerVideo} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold disabled:opacity-60">
+                  {activeSub ? "Yarat" : "Ödə və yarat"}
+                </button>
+              </div>
             </div>
+
           </div>
         </div>
       )}
