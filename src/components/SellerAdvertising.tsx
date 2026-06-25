@@ -75,8 +75,11 @@ interface PromoSettings {
   single_product_promo_days: number;
   single_shop_promo_price: number;
   single_shop_promo_days: number;
+  single_banner_price: number;
+  single_banner_days: number;
   promo_terms_text: string;
 }
+
 
 type CheckoutTarget =
   | { kind: "pkg"; pkg: Pkg }
