@@ -400,6 +400,10 @@ function SellerPanel() {
     setUploading(true);
     const newImages: string[] = [...(editing.images ?? [])];
     for (const file of Array.from(files)) {
+      if (newImages.length >= 10) {
+        toast.error("Maksimum 10 şəkil yükləyə bilərsiniz");
+        break;
+      }
       if (file.size > 5 * 1024 * 1024) {
         toast.error(`${file.name} 5MB-dan böyükdür`);
         continue;
