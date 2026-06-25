@@ -1480,7 +1480,7 @@ function SellerPanel() {
               {/* Images */}
               <div>
                 <label className="text-sm font-semibold mb-2 block">
-                  Şəkillər (ilk şəkil əsas olacaq)
+                  Şəkillər (minimum 6, ilk şəkil əsas olacaq) — {(editing.images ?? []).length}/6
                 </label>
                 <div className="grid grid-cols-4 gap-2 mb-2">
                   {(editing.images ?? []).map((url, idx) => (
