@@ -42,9 +42,10 @@ export function SiteHeader() {
               EG Shop
             </span>
           </Link>
-          <div className="hidden md:block">
-            <LiveClock />
+          <div className="block">
+            <LiveClock compact />
           </div>
+
 
           <form onSubmit={onSearch} className="flex-1 max-w-2xl hidden lg:flex">
             <div className="relative w-full">
