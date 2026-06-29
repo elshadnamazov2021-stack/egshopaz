@@ -11,8 +11,9 @@ const LANGS: { code: "az" | "ru" | "en"; label: string; flag: string }[] = [
 ];
 
 export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
-  const { i18n } = useTranslation();
-  const current = LANGS.find((l) => l.code === i18n.language) ?? LANGS[0];
+  const { i18n, t } = useTranslation();
+  const activeLang = i18n.resolvedLanguage || i18n.language;
+  const current = LANGS.find((l) => activeLang.startsWith(l.code)) ?? LANGS[0];
 
   return (
     <DropdownMenu>
@@ -24,7 +25,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
           <>
             <span className="hidden sm:inline">{current.flag}</span>
             <span className="hidden sm:inline font-medium">{current.code.toUpperCase()}</span>
-            <span className="sm:hidden font-semibold">Dil</span>
+            <span className="sm:hidden font-semibold">{t("header.language")}</span>
           </>
         )}
       </DropdownMenuTrigger>
