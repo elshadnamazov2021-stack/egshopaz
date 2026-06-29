@@ -40,30 +40,30 @@ export function MainSidebar() {
 
   const mainLinks = isSeller ? [
     { to: "/", label: t("sidebar.home"), icon: Home },
-    { to: "/seller", label: "Satıcı panelim", icon: Store },
+    { to: "/seller", label: t("sidebar.mySellerPanel"), icon: Store },
   ] : [
     { to: "/", label: t("sidebar.home"), icon: Home },
     { to: "/catalog", label: t("sidebar.catalog"), icon: LayoutGrid, search: { q: undefined, cat: undefined } as never },
-    { to: "/shops", label: "Mağazalar", icon: Store },
+    { to: "/shops", label: t("sidebar.shops"), icon: Store },
     { to: "/discover", label: t("sidebar.discover"), icon: Flame },
-    { to: "/compare", label: "Müqayisə", icon: GitCompare },
-    { to: "/map", label: "Xəritə", icon: MapIcon },
+    { to: "/compare", label: t("sidebar.compare"), icon: GitCompare },
+    { to: "/map", label: t("sidebar.map"), icon: MapIcon },
     { to: "/promotions", label: t("sidebar.promotions"), icon: Tag },
     { to: "/bonus", label: t("sidebar.bonuses"), icon: Gift },
   ];
 
   const userLinks = user ? (isSeller ? [
-    { to: "/seller", label: "Satıcı panelim", icon: Store },
+    { to: "/seller", label: t("sidebar.mySellerPanel"), icon: Store },
     { to: "/notifications", label: t("sidebar.notifications"), icon: Bell },
   ] : [
     { to: "/profile", label: t("sidebar.profile"), icon: User },
     { to: "/orders", label: t("sidebar.orders"), icon: Package },
     { to: "/favorites", label: t("sidebar.favorites"), icon: Heart },
-    { to: "/followed-shops", label: "İzlədiyim mağazalar", icon: Heart },
+    { to: "/followed-shops", label: t("sidebar.followedShops"), icon: Heart },
     { to: "/cart", label: t("sidebar.cart"), icon: ShoppingCart },
     { to: "/messages", label: t("sidebar.messages"), icon: MessageCircle },
     { to: "/notifications", label: t("sidebar.notifications"), icon: Bell },
-    { to: "/referral", label: "Referral proqramı", icon: Users },
+    { to: "/referral", label: t("sidebar.referral"), icon: Users },
   ]) : [];
 
   return (

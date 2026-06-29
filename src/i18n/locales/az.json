@@ -79,7 +79,13 @@
     "myReviews": "Rəylərim",
     "disputes": "Mübahisələr",
     "pickupPoints": "PVZ məntəqələri",
-    "discover": "Kəşf et"
+    "discover": "Kəşf et",
+    "shops": "Mağazalar",
+    "compare": "Müqayisə",
+    "map": "Xəritə",
+    "followedShops": "İzlədiyim mağazalar",
+    "referral": "Referral proqramı",
+    "mySellerPanel": "Satıcı panelim"
   },
   "footer": {
     "about": "Haqqımızda",
@@ -131,7 +137,10 @@
     "noProducts": "Hələ məhsul əlavə olunmayıb",
     "becomeFirstSeller": "İlk satıcı olun →",
     "codeCopied": "{{code}} kopyalandı",
-    "visualSearchTitle": "Şəkillə axtar (AI)"
+    "visualSearchTitle": "Şəkillə axtar (AI)",
+    "giveawayBadge": "UDUŞ",
+    "giveawayTitle": "🎁 Uduşlu Məhsullar",
+    "giveawayDesc": "Bu məhsulları al və uduşda iştirak et!"
   },
   "catalog": {
     "title": "Kataloq",
@@ -199,7 +208,20 @@
     "addedToCart": "Səbətə əlavə olundu",
     "addedToFavorites": "Sevimlilərə əlavə olundu",
     "favoriteAria": "Sevimli",
-    "buyer": "Alıcı"
+    "buyer": "Alıcı",
+    "ownShopFollowError": "Öz mağazanızı izləyə bilməzsiniz",
+    "unfollowedShop": "İzləməkdən çıxarıldı",
+    "followedShop": "Mağaza izlənildi 💙",
+    "maxStock": "Maksimum stok: {{count}} ədəd",
+    "cartUpdateError": "Səbət yenilənmədi: {{message}}",
+    "closeAria": "Bağla",
+    "prevAria": "Əvvəlki",
+    "nextAria": "Sonrakı",
+    "video": "Video",
+    "secondsShort": "san",
+    "followers": "{{count}} izləyici",
+    "follow": "İzlə",
+    "following": "İzlənilir"
   },
   "cart": {
     "title": "Səbət",
@@ -309,7 +331,10 @@
   "notifications": {
     "title": "Bildirişlər",
     "empty": "Bildiriş yoxdur",
-    "markAll": "Hamısını oxunmuş işarələ"
+    "markAll": "Hamısını oxunmuş işarələ",
+    "one": "Bildiriş",
+    "markAllRead": "Hamısı oxundu",
+    "viewAll": "Hamısına bax"
   },
   "messages": {
     "title": "Mesajlar",
@@ -456,7 +481,26 @@
     "security": "Təhlükəsizlik"
   },
   "categoryBar": {
-    "all": "Hamısı"
+    "all": "Hamısı",
+    "featuredCategories": "Önə çıxan kateqoriyalar",
+    "productTypes": "Məhsul tipləri",
+    "selectRoot": "Ana kateqoriya seçin...",
+    "selectSub": "Alt kateqoriya seçin (opsional)...",
+    "selectSub2": "Alt-alt kateqoriya seçin (opsional)...",
+    "searchPlaceholder": "Kateqoriya axtar..."
+  },
+  "ads": {
+    "label": "Reklam",
+    "featuredShops": "Önə çıxan mağazalar",
+    "followedShops": "İzlədiklərim →",
+    "followLogin": "Mağazanı izləmək üçün daxil olun",
+    "unfollowed": "İzləməkdən çıxarıldı",
+    "followed": "Mağaza izlənildi 💙",
+    "following": "İzlənilir",
+    "follow": "İzlə",
+    "sponsoredProducts": "Sponsor məhsullar",
+    "adShort": "REKLAM",
+    "adAria": "Reklam {{index}}"
   },
   "shop": {
     "title": "Mağaza",
@@ -466,5 +510,49 @@
     "shopProducts": "Mağazanın məhsulları",
     "noProducts": "Hələ məhsul yoxdur",
     "defaultName": "Mağaza"
+  },
+  "shops": {
+    "title": "Mağazalar",
+    "count": "{{count}} mağaza",
+    "followed": "İzlədiklərim",
+    "searchPlaceholder": "Mağaza adı, şəhər və ya təsvir axtar...",
+    "notFound": "Mağaza tapılmadı.",
+    "shopFallback": "Mağaza",
+    "ownShop": "Sizin mağazanız",
+    "loginRequired": "Daxil olun",
+    "follow": "İzlə",
+    "following": "İzlənilir",
+    "ownShopFollowError": "Öz mağazanızı izləyə bilməzsiniz",
+    "unfollowed": "İzləməkdən çıxarıldı",
+    "followedSuccess": "İzlənilir",
+    "followedTitle": "İzlədiyim mağazalar",
+    "followedCount": "{{count}} mağaza izlənilir",
+    "loginToFollow": "Mağazaları izləmək üçün hesaba daxil olun.",
+    "emptyFollowed": "Hələ heç bir mağazanı izləmirsiniz.",
+    "discover": "Mağazaları kəşf et →"
+  },
+  "compare": {
+    "removed": "Müqayisədən çıxarıldı",
+    "max": "Maksimum 4 məhsul müqayisə edə bilərsiniz",
+    "added": "Müqayisəyə əlavə olundu",
+    "view": "Bax",
+    "inCompare": "Müqayisədə",
+    "compare": "Müqayisə et"
+  },
+  "aiSupport": {
+    "title": "AI Dəstək Asistenti",
+    "subtitle": "24/7 dərhal cavab",
+    "emptyTitle": "Salam! Sualınızı yazın, dərhal cavab verim.",
+    "emptyDesc": "Sifariş, çatdırılma, ödəniş, qaytarma və s.",
+    "placeholder": "Sualınızı yazın...",
+    "disabled": "AI dəstək hazırda deaktivdir",
+    "noReply": "AI cavab vermədi"
+  },
+  "seo": {
+    "homeTitle": "EG Shop — Azərbaycanın onlayn marketi",
+    "homeDescription": "Geyim, texnika, ev üçün mallar — sərfəli qiymətlərlə. Azərbaycan üzrə çatdırılma.",
+    "homeOgDescription": "Milyonlarla məhsul, sürətli çatdırılma.",
+    "catalogTitle": "Kataloq — EG Shop",
+    "catalogDescription": "Bütün məhsullar bir yerdə. Kateqoriya, marka və qiymətə görə filter."
   }
 }

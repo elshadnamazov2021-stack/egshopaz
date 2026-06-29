@@ -79,7 +79,13 @@
     "myReviews": "My reviews",
     "disputes": "Disputes",
     "pickupPoints": "Pickup points",
-    "discover": "Discover"
+    "discover": "Discover",
+    "shops": "Shops",
+    "compare": "Compare",
+    "map": "Map",
+    "followedShops": "Followed shops",
+    "referral": "Referral program",
+    "mySellerPanel": "My seller panel"
   },
   "footer": {
     "about": "About",
@@ -131,7 +137,10 @@
     "noProducts": "No products yet",
     "becomeFirstSeller": "Become the first seller →",
     "codeCopied": "{{code}} copied",
-    "visualSearchTitle": "Search by photo (AI)"
+    "visualSearchTitle": "Search by photo (AI)",
+    "giveawayBadge": "GIVEAWAY",
+    "giveawayTitle": "🎁 Giveaway products",
+    "giveawayDesc": "Buy these products and join the giveaway!"
   },
   "catalog": {
     "title": "Catalog",
@@ -199,7 +208,20 @@
     "addedToCart": "Added to cart",
     "addedToFavorites": "Added to favorites",
     "favoriteAria": "Favorite",
-    "buyer": "Buyer"
+    "buyer": "Buyer",
+    "ownShopFollowError": "You cannot follow your own shop",
+    "unfollowedShop": "Unfollowed",
+    "followedShop": "Shop followed 💙",
+    "maxStock": "Maximum stock: {{count}} units",
+    "cartUpdateError": "Cart was not updated: {{message}}",
+    "closeAria": "Close",
+    "prevAria": "Previous",
+    "nextAria": "Next",
+    "video": "Video",
+    "secondsShort": "s",
+    "followers": "{{count}} followers",
+    "follow": "Follow",
+    "following": "Following"
   },
   "cart": {
     "title": "Cart",
@@ -309,7 +331,10 @@
   "notifications": {
     "title": "Notifications",
     "empty": "No notifications",
-    "markAll": "Mark all read"
+    "markAll": "Mark all read",
+    "one": "Notification",
+    "markAllRead": "All read",
+    "viewAll": "View all"
   },
   "messages": {
     "title": "Messages",
@@ -456,7 +481,26 @@
     "security": "Security"
   },
   "categoryBar": {
-    "all": "All"
+    "all": "All",
+    "featuredCategories": "Featured categories",
+    "productTypes": "Product types",
+    "selectRoot": "Select main category...",
+    "selectSub": "Select subcategory (optional)...",
+    "selectSub2": "Select sub-subcategory (optional)...",
+    "searchPlaceholder": "Search category..."
+  },
+  "ads": {
+    "label": "Ad",
+    "featuredShops": "Featured shops",
+    "followedShops": "Following →",
+    "followLogin": "Sign in to follow the shop",
+    "unfollowed": "Unfollowed",
+    "followed": "Shop followed 💙",
+    "following": "Following",
+    "follow": "Follow",
+    "sponsoredProducts": "Sponsored products",
+    "adShort": "AD",
+    "adAria": "Ad {{index}}"
   },
   "shop": {
     "title": "Shop",
@@ -466,5 +510,49 @@
     "shopProducts": "Shop products",
     "noProducts": "No products yet",
     "defaultName": "Shop"
+  },
+  "shops": {
+    "title": "Shops",
+    "count": "{{count}} shops",
+    "followed": "Following",
+    "searchPlaceholder": "Search shop name, city, or description...",
+    "notFound": "Shop not found.",
+    "shopFallback": "Shop",
+    "ownShop": "Your shop",
+    "loginRequired": "Sign in",
+    "follow": "Follow",
+    "following": "Following",
+    "ownShopFollowError": "You cannot follow your own shop",
+    "unfollowed": "Unfollowed",
+    "followedSuccess": "Following",
+    "followedTitle": "Followed shops",
+    "followedCount": "{{count}} shops followed",
+    "loginToFollow": "Sign in to follow shops.",
+    "emptyFollowed": "You are not following any shops yet.",
+    "discover": "Discover shops →"
+  },
+  "compare": {
+    "removed": "Removed from comparison",
+    "max": "You can compare up to 4 products",
+    "added": "Added to comparison",
+    "view": "View",
+    "inCompare": "In compare",
+    "compare": "Compare"
+  },
+  "aiSupport": {
+    "title": "AI Support Assistant",
+    "subtitle": "Instant answers 24/7",
+    "emptyTitle": "Hi! Write your question and I will answer right away.",
+    "emptyDesc": "Orders, delivery, payment, returns, etc.",
+    "placeholder": "Write your question...",
+    "disabled": "AI support is currently disabled",
+    "noReply": "AI did not respond"
+  },
+  "seo": {
+    "homeTitle": "EG Shop — Azerbaijan online market",
+    "homeDescription": "Clothing, electronics, home goods — at great prices. Delivery across Azerbaijan.",
+    "homeOgDescription": "Millions of products, fast delivery.",
+    "catalogTitle": "Catalog — EG Shop",
+    "catalogDescription": "All products in one place. Filter by category, brand and price."
   }
 }

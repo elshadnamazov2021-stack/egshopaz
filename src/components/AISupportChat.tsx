@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Bot, Send, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface AIMsg {
   id: string;
@@ -11,6 +12,7 @@ interface AIMsg {
 }
 
 export function AISupportChat({ userId, audience = "buyer" }: { userId: string; audience?: "buyer" | "seller" | "pvz" | "all" }) {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<AIMsg[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -51,11 +53,11 @@ export function AISupportChat({ userId, audience = "buyer" }: { userId: string; 
       if (data?.reply) {
         setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "assistant", content: data.reply, created_at: new Date().toISOString() }]);
       } else if (data?.skipped === "ai_disabled" || data?.skipped === "channel_off") {
-        toast.info("AI dəstək hazırda deaktivdir");
+        toast.info(t("aiSupport.disabled"));
       }
     } catch (e) {
       console.error(e);
-      toast.error("AI cavab vermədi");
+      toast.error(t("aiSupport.noReply"));
     } finally {
       setSending(false);
     }
@@ -69,9 +71,9 @@ export function AISupportChat({ userId, audience = "buyer" }: { userId: string; 
         </div>
         <div className="flex-1">
           <div className="font-bold flex items-center gap-1.5">
-            AI Dəstək Asistenti <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+            {t("aiSupport.title")} <Sparkles className="h-3.5 w-3.5 text-amber-500" />
           </div>
-          <div className="text-xs text-muted-foreground">24/7 dərhal cavab</div>
+          <div className="text-xs text-muted-foreground">{t("aiSupport.subtitle")}</div>
         </div>
       </div>
 
@@ -79,8 +81,8 @@ export function AISupportChat({ userId, audience = "buyer" }: { userId: string; 
         {messages.length === 0 && (
           <div className="text-center py-8">
             <Bot className="h-10 w-10 mx-auto text-primary/50 mb-2" />
-            <div className="text-sm text-muted-foreground">Salam! Sualınızı yazın, dərhal cavab verim.</div>
-            <div className="text-xs text-muted-foreground mt-2">Sifariş, çatdırılma, ödəniş, qaytarma və s.</div>
+            <div className="text-sm text-muted-foreground">{t("aiSupport.emptyTitle")}</div>
+            <div className="text-xs text-muted-foreground mt-2">{t("aiSupport.emptyDesc")}</div>
           </div>
         )}
         {messages.filter((m) => m.role !== "system").map((m) => {
@@ -112,7 +114,7 @@ export function AISupportChat({ userId, audience = "buyer" }: { userId: string; 
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-          placeholder="Sualınızı yazın..."
+          placeholder={t("aiSupport.placeholder")}
           maxLength={2000}
           rows={1}
           disabled={sending}

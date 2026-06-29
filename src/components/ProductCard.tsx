@@ -70,11 +70,11 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
       ({ error } = await supabase.from("cart_items").insert({ user_id: user.id, product_id: p.id, quantity: 1 }));
     }
     if (error) {
-      toast.error(`Səbət yenilənmədi: ${error.message}`);
+      toast.error(t("product.cartUpdateError", { message: error.message }));
       setAdding(false);
       return;
     }
-    toast.success(t("product.addToCart"));
+    toast.success(t("product.addedToCart"));
     setAdding(false);
   };
 

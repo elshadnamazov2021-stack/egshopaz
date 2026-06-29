@@ -88,6 +88,9 @@ interface Product {
 interface Category {
   id: string;
   name: string;
+  name_ru?: string | null;
+  name_en?: string | null;
+  slug?: string | null;
   parent_id: string | null;
   icon?: string | null;
 }
@@ -221,7 +224,7 @@ function SellerPanel() {
         .select("*")
         .eq("seller_id", user.id)
         .order("created_at", { ascending: false }),
-      supabase.from("categories").select("id,name,parent_id,icon").order("sort_order"),
+      supabase.from("categories").select("id,name,name_ru,name_en,slug,parent_id,icon").order("sort_order"),
       supabase
         .from("order_items")
         .select(

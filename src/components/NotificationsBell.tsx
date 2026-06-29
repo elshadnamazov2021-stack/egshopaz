@@ -4,6 +4,7 @@ import { Bell, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatDateTime } from "@/lib/format";
+import { useTranslation } from "react-i18next";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -38,6 +39,7 @@ function playNotifSound() {
 }
 
 export function NotificationsBell() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [items, setItems] = useState<Notif[]>([]);
   const unread = items.filter((n) => !n.is_read).length;
@@ -89,20 +91,20 @@ export function NotificationsBell() {
             {unread > 9 ? "9+" : unread}
           </span>
         )}
-        <span>Bildiriş</span>
+        <span>{t("notifications.one")}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80 p-0 max-h-[70vh] overflow-hidden flex flex-col">
         <div className="flex items-center justify-between p-3 border-b">
-          <div className="font-bold text-sm">Bildirişlər</div>
+          <div className="font-bold text-sm">{t("notifications.title")}</div>
           {unread > 0 && (
             <button onClick={markAll} className="text-xs text-primary hover:underline inline-flex items-center gap-1">
-              <Check className="h-3 w-3" /> Hamısı oxundu
+              <Check className="h-3 w-3" /> {t("notifications.markAllRead")}
             </button>
           )}
         </div>
         <div className="overflow-y-auto flex-1">
           {items.length === 0 ? (
-            <div className="p-8 text-center text-xs text-muted-foreground">Bildiriş yoxdur</div>
+            <div className="p-8 text-center text-xs text-muted-foreground">{t("notifications.empty")}</div>
           ) : items.map((n) => (
             <Link
               key={n.id}
@@ -129,7 +131,7 @@ export function NotificationsBell() {
           ))}
         </div>
         <Link to="/notifications" className="p-2 text-center text-xs font-semibold text-primary hover:bg-secondary/50 border-t">
-          Hamısına bax
+          {t("notifications.viewAll")}
         </Link>
       </DropdownMenuContent>
     </DropdownMenu>

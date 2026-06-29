@@ -9,14 +9,15 @@ import { Tag, Flame, TicketPercent, TrendingUp, Copy, Truck, ShieldCheck, Clock,
 import { toast } from "sonner";
 import { HomeCategoryBrowser } from "@/components/HomeCategoryBrowser";
 import { FeaturedShops } from "@/components/FeaturedShops";
+import i18n from "@/i18n";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "EG Shop — Azərbaycanın onlayn marketi" },
-      { name: "description", content: "Geyim, texnika, ev üçün mallar — sərfəli qiymətlərlə. Azərbaycan üzrə çatdırılma." },
-      { property: "og:title", content: "EG Shop — Azərbaycanın onlayn marketi" },
-      { property: "og:description", content: "Milyonlarla məhsul, sürətli çatdırılma." },
+      { title: i18n.t("seo.homeTitle") },
+      { name: "description", content: i18n.t("seo.homeDescription") },
+      { property: "og:title", content: i18n.t("seo.homeTitle") },
+      { property: "og:description", content: i18n.t("seo.homeOgDescription") },
     ],
   }),
   component: Index,
@@ -102,10 +103,10 @@ function Index() {
           <div className="relative z-10 flex items-end justify-between mb-5">
             <div>
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-bold mb-2">
-                <Gift className="h-3.5 w-3.5" /> UDUŞ
+                <Gift className="h-3.5 w-3.5" /> {t("home.giveawayBadge")}
               </div>
-              <h2 className="text-xl md:text-4xl font-black">🎁 Uduşlu Məhsullar</h2>
-              <p className="text-sm opacity-95 mt-1">Bu məhsulları al və uduşda iştirak et!</p>
+              <h2 className="text-xl md:text-4xl font-black">{t("home.giveawayTitle")}</h2>
+              <p className="text-sm opacity-95 mt-1">{t("home.giveawayDesc")}</p>
             </div>
           </div>
           <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 bg-white rounded-xl md:rounded-2xl p-2.5 md:p-3 mobile-product-grid home-product-strip">

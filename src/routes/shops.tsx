@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Store, MapPin, Search, Heart, Check } from "lucide-react";
@@ -21,6 +22,7 @@ interface Shop {
 }
 
 function ShopsPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [shops, setShops] = useState<Shop[]>([]);
   const [following, setFollowing] = useState<Set<string>>(new Set());
@@ -58,17 +60,17 @@ function ShopsPage() {
   }, [shops, q]);
 
   const toggleFollow = async (sellerId: string) => {
-    if (!user) { toast.error("Daxil olun"); return; }
-    if (user.id === sellerId) { toast.error("Öz mağazanızı izləyə bilməzsiniz"); return; }
+    if (!user) { toast.error(t("shops.loginRequired")); return; }
+    if (user.id === sellerId) { toast.error(t("shops.ownShopFollowError")); return; }
     if (following.has(sellerId)) {
       await supabase.from("shop_followers").delete().eq("user_id", user.id).eq("seller_id", sellerId);
       const n = new Set(following); n.delete(sellerId); setFollowing(n);
-      toast.success("İzləməkdən çıxarıldı");
+      toast.success(t("shops.unfollowed"));
     } else {
       const { error } = await supabase.from("shop_followers").insert({ user_id: user.id, seller_id: sellerId });
       if (error) { toast.error(error.message); return; }
       const n = new Set(following); n.add(sellerId); setFollowing(n);
-      toast.success("İzlənilir");
+      toast.success(t("shops.followedSuccess"));
     }
   };
 
@@ -79,12 +81,12 @@ function ShopsPage() {
           <Store className="h-6 w-6 text-white" />
         </div>
         <div className="flex-1">
-          <h1 className="text-2xl md:text-3xl font-black">Mağazalar</h1>
-          <p className="text-sm text-muted-foreground">{filtered.length} mağaza</p>
+          <h1 className="text-2xl md:text-3xl font-black">{t("shops.title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("shops.count", { count: filtered.length })}</p>
         </div>
         {user && (
           <Link to="/followed-shops" className="text-sm font-bold text-primary hover:underline inline-flex items-center gap-1">
-            <Heart className="h-4 w-4" /> İzlədiklərim
+            <Heart className="h-4 w-4" /> {t("shops.followed")}
           </Link>
         )}
       </div>
@@ -94,22 +96,22 @@ function ShopsPage() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Mağaza adı, şəhər və ya təsvir axtar..."
+          placeholder={t("shops.searchPlaceholder")}
           className="w-full pl-10 pr-4 py-3 rounded-xl bg-secondary border border-border focus:border-primary outline-none"
         />
       </div>
 
       {loading ? (
-        <div className="text-center py-10 text-muted-foreground">Yüklənir...</div>
+        <div className="text-center py-10 text-muted-foreground">{t("common.loading")}</div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 bg-secondary/40 rounded-2xl">
           <Store className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-          <p className="text-muted-foreground">Mağaza tapılmadı.</p>
+          <p className="text-muted-foreground">{t("shops.notFound")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((p) => {
-            const name = p.shop_name || p.full_name || "Mağaza";
+            const name = p.shop_name || p.full_name || t("shops.shopFallback");
             const isFollowing = following.has(p.id);
             const own = user?.id === p.id;
             return (
@@ -133,7 +135,7 @@ function ShopsPage() {
                 </Link>
                 <div className="p-4 pt-3">
                   {own ? (
-                    <div className="text-xs text-center text-muted-foreground py-2">Sizin mağazanız</div>
+                    <div className="text-xs text-center text-muted-foreground py-2">{t("shops.ownShop")}</div>
                   ) : (
                     <button
                       onClick={() => toggleFollow(p.id)}
@@ -143,7 +145,7 @@ function ShopsPage() {
                           : "bg-primary text-primary-foreground hover:opacity-90"
                       }`}
                     >
-                      {isFollowing ? <><Check className="h-3.5 w-3.5" /> İzlənilir</> : <><Heart className="h-3.5 w-3.5" /> İzlə</>}
+                      {isFollowing ? <><Check className="h-3.5 w-3.5" /> {t("shops.following")}</> : <><Heart className="h-3.5 w-3.5" /> {t("shops.follow")}</>}
                     </button>
                   )}
                 </div>
