@@ -74,15 +74,6 @@ export function HomeCategoryBrowser() {
   const seeAll = lang.startsWith("ru") ? "Все" : lang.startsWith("en") ? "See all" : "Hamısı";
   const backLabel = lang.startsWith("ru") ? "Назад" : lang.startsWith("en") ? "Back" : "Geri";
 
-  const rootScrollRef = useRef<HTMLDivElement>(null);
-  const subScrollRef = useRef<HTMLDivElement>(null);
-
-  const scrollBy = (ref: React.RefObject<HTMLDivElement | null>, dir: "left" | "right") => {
-    const el = ref.current;
-    if (!el) return;
-    el.scrollBy({ left: dir === "left" ? -240 : 240, behavior: "smooth" });
-  };
-
   return (
     <section className="space-y-4 min-w-0 max-w-full overflow-hidden">
       {/* TAB BAR — Trendyol stil (narıncı seçilmiş, fon dolu) */}
