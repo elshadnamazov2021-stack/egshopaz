@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useIsNativeApp } from "@/hooks/useIsNativeApp";
 import { InstallAppBanner } from "@/components/InstallAppBanner";
+import { MobileTabBar } from "@/components/MobileTabBar";
 import "@/i18n";
 
 import "../styles.css";
@@ -176,10 +177,11 @@ function AppShell() {
         <div className="flex-1 flex flex-col min-w-0">
           <SiteHeader />
           <CategoryBar />
-          <main className="flex-1">
+          <main className="flex-1 pb-20 lg:pb-0">
             <Outlet />
           </main>
           <SiteFooter />
+          <MobileTabBar />
         </div>
       </div>
     </SidebarProvider>
