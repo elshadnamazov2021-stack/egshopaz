@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, ShoppingCart, Star, Truck, Zap } from "lucide-react";
+import { Heart, Star } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { formatAZN, calcDiscount } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,7 +26,6 @@ export interface ProductCardData {
   stock?: number | null;
 }
 
-
 export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; enableFavorite?: boolean }) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -43,14 +42,11 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          setVideoVisible(entry.isIntersecting && entry.intersectionRatio > 0.5);
+          const on = entry.isIntersecting && entry.intersectionRatio > 0.5;
+          setVideoVisible(on);
           const v = videoRef.current;
           if (!v) return;
-          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-            v.play().catch(() => {});
-          } else {
-            v.pause();
-          }
+          if (on) v.play().catch(() => {}); else v.pause();
         });
       },
       { threshold: [0, 0.5, 1] }
@@ -58,7 +54,6 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
     io.observe(el);
     return () => io.disconnect();
   }, [p.video_url]);
-
 
   const addToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -87,12 +82,12 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
     <Link
       to="/product/$id"
       params={{ id: p.id }}
-      className="group min-w-0 bg-card rounded-xl overflow-hidden border border-border/60 hover:border-border hover:shadow-card transition flex flex-col mobile-readable-card"
+      className="group min-w-0 flex flex-col rounded-xl overflow-hidden bg-card"
     >
-      <div ref={wrapRef} className="product-image relative aspect-square sm:aspect-[3/4] bg-secondary overflow-hidden">
+      <div ref={wrapRef} className="relative aspect-[3/4] bg-secondary overflow-hidden rounded-xl">
         {p.image_url ? (
           <img src={p.image_url} alt={p.title} loading="lazy"
-               className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+               className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">—</div>
         )}
@@ -100,16 +95,13 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
           <video
             ref={videoRef}
             src={p.video_url}
-            muted
-            loop
-            playsInline
-            preload="metadata"
+            muted loop playsInline preload="metadata"
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 pointer-events-none ${videoVisible ? "opacity-100" : "opacity-0"}`}
           />
         )}
 
         {discount > 0 && (
-          <span className="absolute top-2 left-2 bg-discount text-discount-foreground text-xs font-bold px-2 py-1 rounded">
+          <span className="absolute top-2 left-2 bg-discount text-discount-foreground text-[11px] font-extrabold px-1.5 py-0.5 rounded">
             -{discount}%
           </span>
         )}
@@ -117,45 +109,28 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
           <button
             onClick={toggleFav}
             disabled={favBusy}
-            className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center transition ${isFav ? "text-discount" : "hover:text-primary"}`}
+            className={`absolute top-1.5 right-1.5 w-8 h-8 rounded-full bg-white/85 backdrop-blur flex items-center justify-center transition ${isFav ? "text-discount" : "text-foreground/70 hover:text-discount"}`}
             aria-label={t("product.addToFavorites")}
           >
             <Heart className={`h-4 w-4 ${isFav ? "fill-discount" : ""}`} />
           </button>
         )}
       </div>
-      <div className="p-2 sm:p-3 flex flex-col gap-1 sm:gap-1.5 flex-1">
-        <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 min-w-0">
-          <span className="text-base sm:text-lg font-extrabold leading-tight">{formatAZN(p.price)}</span>
+
+      <div className="pt-2 pb-1 px-1 flex flex-col gap-1 flex-1">
+        <div className="flex items-baseline gap-1.5 min-w-0">
+          <span className="text-[15px] sm:text-base font-black text-foreground leading-none">
+            {formatAZN(p.price)}
+          </span>
           {p.old_price && Number(p.old_price) > Number(p.price) && (
-            <span className="text-xs text-muted-foreground line-through">{formatAZN(p.old_price)}</span>
+            <span className="text-[11px] text-muted-foreground line-through">{formatAZN(p.old_price)}</span>
           )}
         </div>
-        {p.brand && <span className="text-xs text-muted-foreground font-semibold uppercase">{p.brand}</span>}
-        <p className="text-xs sm:text-sm line-clamp-2 text-foreground/80 leading-snug">{p.title}</p>
-        {(p.fast_delivery || p.free_shipping || p.delivery_days_max) && (
-          <div className="flex items-center gap-1 flex-wrap">
-            {p.fast_delivery && (
-              <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-warning/15 text-warning px-1.5 py-0.5 rounded">
-                <Zap className="h-2.5 w-2.5" /> 24s
-              </span>
-            )}
-            {p.free_shipping && (
-              <span className="inline-flex items-center gap-0.5 text-[10px] font-bold bg-success/15 text-success px-1.5 py-0.5 rounded">
-                <Truck className="h-2.5 w-2.5" /> {t("catalog.freeShippingShort")}
-              </span>
-            )}
-            {!p.fast_delivery && p.delivery_days_max ? (
-              <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-muted-foreground">
-                <Truck className="h-2.5 w-2.5" />
-                {p.delivery_days_min && p.delivery_days_min !== p.delivery_days_max
-                  ? `${p.delivery_days_min}-${p.delivery_days_max}`
-                  : p.delivery_days_max} {t("catalog.daysShort")}
-              </span>
-            ) : null}
-          </div>
-        )}
-        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-auto pt-1">
+        <p className="text-[12px] sm:text-[13px] line-clamp-2 text-foreground/85 leading-snug">
+          {p.brand && <span className="font-bold mr-1">{p.brand}</span>}
+          {p.title}
+        </p>
+        <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-auto">
           <Star className="h-3 w-3 fill-warning text-warning" />
           <span className="font-semibold text-foreground">{Number(p.rating).toFixed(1)}</span>
           <span>· {p.reviews_count}</span>
@@ -163,9 +138,8 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
         <button
           onClick={addToCart}
           disabled={adding}
-          className="mt-1.5 sm:mt-2 w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 rounded-lg py-2 sm:py-2 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 transition"
+          className="mt-1 w-full bg-gradient-brand text-primary-foreground disabled:opacity-60 rounded-lg py-1.5 text-[12px] sm:text-[13px] font-bold transition hover:opacity-95"
         >
-          <ShoppingCart className="h-4 w-4 shrink-0" />
           {t("product.addToCart")}
         </button>
       </div>

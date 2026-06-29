@@ -1,19 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useAuth } from "@/contexts/AuthContext";
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { SponsoredProducts } from "@/components/SponsoredProducts";
 import { SellerBanners } from "@/components/SellerBanners";
-import { Tag, Flame, TicketPercent, TrendingUp, Sparkles, Copy, Camera, Truck, ShieldCheck, Clock, Gift, Store, Shield, Package, User as UserIcon } from "lucide-react";
+import { Tag, Flame, TicketPercent, TrendingUp, Copy, Truck, ShieldCheck, Clock, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { HomeCategoryBrowser } from "@/components/HomeCategoryBrowser";
 import { FeaturedShops } from "@/components/FeaturedShops";
-
-const VisualSearchDialog = lazy(() =>
-  import("@/components/VisualSearchDialog").then((m) => ({ default: m.VisualSearchDialog }))
-);
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,17 +27,11 @@ interface PromoCode { id: string; code: string; discount_percent: number | null;
 
 function Index() {
   const { t } = useTranslation();
-  const { user } = useAuth();
-  const buyerHref = user ? "/profile" : "/auth?role=buyer";
-  const sellerHref = user ? "/seller" : "/auth?role=seller";
-  const adminHref = user ? "/admin" : "/auth?role=admin";
-  const pvzHref = user ? "/pvz" : "/auth?role=pvz";
   const [allProducts, setAllProducts] = useState<ProductCardData[]>([]);
   const [discounted, setDiscounted] = useState<ProductCardData[]>([]);
   const [trending, setTrending] = useState<ProductCardData[]>([]);
   const [giveaways, setGiveaways] = useState<ProductCardData[]>([]);
   const [promos, setPromos] = useState<PromoCode[]>([]);
-  const [visualOpen, setVisualOpen] = useState(false);
 
   useEffect(() => {
     // Kritik: ana məhsullar dərhal
@@ -96,33 +85,6 @@ function Index() {
       {/* Kateqoriyalar — ən yuxarıda */}
       <HomeCategoryBrowser />
 
-      {/* DEV: Panel keçidləri — domen alana qədər */}
-
-      <section className="rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 p-3 md:p-5">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Panel keçidləri</span>
-          <span className="text-[10px] text-muted-foreground">domen alana qədər</span>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <a href={buyerHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white p-3 sm:p-4 hover:scale-[1.02] transition shadow-card">
-            <UserIcon className="h-6 w-6" />
-            <span className="text-sm font-black">Müştəri</span>
-          </a>
-          <a href={sellerHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-orange-500 to-rose-500 text-white p-3 sm:p-4 hover:scale-[1.02] transition shadow-card">
-            <Store className="h-6 w-6" />
-            <span className="text-sm font-black">Satıcı</span>
-          </a>
-          <a href={adminHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white p-3 sm:p-4 hover:scale-[1.02] transition shadow-card">
-            <Shield className="h-6 w-6" />
-            <span className="text-sm font-black">Admin</span>
-          </a>
-          <a href={pvzHref} className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-3 sm:p-4 hover:scale-[1.02] transition shadow-card">
-            <Package className="h-6 w-6" />
-            <span className="text-sm font-black">PVZ</span>
-          </a>
-        </div>
-      </section>
-
       {/* 1) REKLAM — Satıcı bannerləri (birinci prioritet) */}
       <SellerBanners />
 
@@ -132,32 +94,6 @@ function Index() {
       {/* 3) REKLAM — Sponsored products (önə çıxan) */}
       <SponsoredProducts limit={8} />
 
-
-
-      {/* Visual Search Banner */}
-      <section className="rounded-2xl md:rounded-3xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-500 p-5 md:p-8 text-white shadow-elegant relative overflow-hidden">
-        <div className="absolute -right-10 -top-10 w-48 h-48 bg-white/20 rounded-full blur-3xl" />
-        <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-yellow-300/30 rounded-full blur-2xl" />
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-bold">
-              <Sparkles className="h-3.5 w-3.5" /> {t("home.visualBadge")}
-            </div>
-            <h2 className="text-2xl md:text-4xl font-black leading-tight">
-              {t("home.visualTitle")}
-            </h2>
-            <p className="text-sm md:text-base opacity-95 max-w-md">
-              {t("home.visualDesc")}
-            </p>
-          </div>
-          <button
-            onClick={() => setVisualOpen(true)}
-            className="inline-flex items-center gap-2 bg-white text-fuchsia-700 px-6 py-4 rounded-xl font-extrabold hover:scale-105 transition shadow-elegant whitespace-nowrap"
-          >
-            <Camera className="h-5 w-5" /> {t("home.visualBtn")}
-          </button>
-        </div>
-      </section>
 
       {giveaways.length > 0 && (
         <section className="rounded-2xl md:rounded-3xl bg-gradient-to-br from-amber-400 via-orange-500 to-pink-500 p-4 md:p-8 text-white shadow-elegant relative overflow-hidden">
@@ -300,11 +236,6 @@ function Index() {
         )}
       </section>
 
-      {visualOpen && (
-        <Suspense fallback={null}>
-          <VisualSearchDialog open={visualOpen} onOpenChange={setVisualOpen} />
-        </Suspense>
-      )}
     </div>
   );
 }
