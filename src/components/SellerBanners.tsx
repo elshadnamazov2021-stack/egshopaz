@@ -10,63 +10,12 @@ interface Banner {
   seller_id: string | null;
 }
 
-function BannerCard({ b }: { b: Banner }) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.muted = true;
-    void v.play().catch(() => { /* ignore autoplay block */ });
-  }, []);
-
-  const Inner = (
-    <div className="relative bg-secondary overflow-hidden">
-      {b.video_url ? (
-        <video
-          ref={videoRef}
-          src={b.video_url}
-          poster={b.image_url ?? undefined}
-          className="w-full h-auto max-h-[80vh] object-contain bg-black"
-          muted
-          autoPlay
-          loop
-          playsInline
-          preload="metadata"
-        />
-      ) : (
-        <img
-          src={b.image_url!}
-          alt={b.title}
-          loading="lazy"
-          className="w-full h-auto max-h-[80vh] object-contain bg-black"
-        />
-      )}
-
-
-      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
-
-      <div className="absolute top-2 left-2 bg-warning text-warning-foreground text-[10px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-lg">
-        REKLAM
-      </div>
-
-      <div className="absolute bottom-3 left-4 right-4 text-white font-black text-lg sm:text-2xl drop-shadow-lg">
-        {b.title}
-      </div>
-    </div>
-  );
-
-  return (
-    <section className="rounded-3xl overflow-hidden shadow-elegant hover:shadow-2xl transition-shadow duration-500">
-      {b.link_url ? (
-        <a href={b.link_url} className="block">{Inner}</a>
-      ) : Inner}
-    </section>
-  );
-}
+const ROTATE_MS = 6000;
 
 export function SellerBanners() {
   const [banners, setBanners] = useState<Banner[]>([]);
+  const [idx, setIdx] = useState(0);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -79,8 +28,7 @@ export function SellerBanners() {
         .not("seller_id", "is", null)
         .or(`ends_at.is.null,ends_at.gt.${nowIso}`)
         .order("created_at", { ascending: false })
-        .limit(30);
-      // One banner per seller (newest first)
+        .limit(50);
       const bySeller = new Map<string, Banner>();
       for (const b of (data ?? []) as Banner[]) {
         if (!b.image_url && !b.video_url) continue;
@@ -91,13 +39,89 @@ export function SellerBanners() {
     })();
   }, []);
 
+  // Auto-rotate: video → next when ended; image → next on timer
+  useEffect(() => {
+    if (banners.length <= 1) return;
+    const current = banners[idx];
+    if (current?.video_url) return; // handled by onEnded
+    const t = setTimeout(() => setIdx((i) => (i + 1) % banners.length), ROTATE_MS);
+    return () => clearTimeout(t);
+  }, [idx, banners]);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = true;
+    void v.play().catch(() => { /* ignore */ });
+  }, [idx]);
+
   if (banners.length === 0) return null;
 
-  return (
-    <div className="space-y-4">
-      {banners.map((b) => (
-        <BannerCard key={b.id} b={b} />
-      ))}
+  const b = banners[idx];
+  const next = () => setIdx((i) => (i + 1) % banners.length);
+
+  const Inner = (
+    <div className="relative w-full aspect-[21/9] sm:aspect-[24/9] bg-secondary overflow-hidden">
+      {/* Blurred backdrop to fill sides instead of black */}
+      {b.image_url && (
+        <img
+          src={b.image_url}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-60"
+        />
+      )}
+
+      {b.video_url ? (
+        <video
+          ref={videoRef}
+          key={b.id}
+          src={b.video_url}
+          poster={b.image_url ?? undefined}
+          className="relative w-full h-full object-cover"
+          muted
+          autoPlay
+          playsInline
+          preload="metadata"
+          onEnded={next}
+        />
+      ) : (
+        <img
+          src={b.image_url!}
+          alt={b.title}
+          loading="lazy"
+          className="relative w-full h-full object-cover"
+        />
+      )}
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+
+      <div className="absolute top-3 left-3 bg-warning text-warning-foreground text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg">
+        REKLAM
+      </div>
+
+      <div className="absolute bottom-4 left-5 right-5 text-white font-black text-lg sm:text-2xl drop-shadow-lg line-clamp-2">
+        {b.title}
+      </div>
+
+      {banners.length > 1 && (
+        <div className="absolute bottom-3 right-3 flex gap-1.5">
+          {banners.map((_, i) => (
+            <button
+              key={i}
+              onClick={(e) => { e.preventDefault(); setIdx(i); }}
+              aria-label={`Reklam ${i + 1}`}
+              className={`h-2 rounded-full transition-all ${i === idx ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/80"}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
+  );
+
+  return (
+    <section className="rounded-3xl overflow-hidden shadow-elegant">
+      {b.link_url ? <a href={b.link_url} className="block">{Inner}</a> : Inner}
+    </section>
   );
 }
