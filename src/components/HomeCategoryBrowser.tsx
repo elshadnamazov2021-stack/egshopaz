@@ -58,6 +58,15 @@ export function HomeCategoryBrowser() {
     setActiveSubId(null);
   };
 
+  const rootScrollRef = useRef<HTMLDivElement>(null);
+  const subScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollBy = (ref: React.RefObject<HTMLDivElement | null>, dir: "left" | "right") => {
+    const el = ref.current;
+    if (!el) return;
+    el.scrollBy({ left: dir === "left" ? -240 : 240, behavior: "smooth" });
+  };
+
   if (roots.length === 0) return null;
 
   const lang = i18n.language || "az";
