@@ -138,7 +138,7 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
         <button
           onClick={addToCart}
           disabled={adding}
-          className="mt-1 w-full bg-gradient-brand text-primary-foreground disabled:opacity-60 rounded-lg py-2 text-sm font-bold transition hover:opacity-95"
+          className="mt-1 w-full h-10 flex items-center justify-center bg-gradient-brand text-primary-foreground disabled:opacity-60 rounded-lg text-sm font-bold transition hover:opacity-95"
         >
           {t("product.addToCart")}
         </button>
