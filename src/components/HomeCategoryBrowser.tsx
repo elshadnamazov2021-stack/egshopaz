@@ -168,8 +168,17 @@ export function HomeCategoryBrowser() {
                   {catName(activeRoot)} — {seeAll}
                 </Link>
               ) : (
-                 <div className="flex w-full max-w-full gap-2 pb-1 overflow-x-auto overscroll-x-contain scrollbar-hide">
-                  {subCats.slice(0, 12).map((s) => {
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => scrollBy(subScrollRef, "left")}
+                    className="hidden lg:inline-flex shrink-0 items-center justify-center w-8 h-8 rounded-full bg-secondary hover:bg-primary/10 text-foreground transition"
+                    aria-label="Geri"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <div ref={subScrollRef} className="flex-1 flex w-full max-w-full gap-2 pb-1 overflow-x-auto overscroll-x-contain scrollbar-responsive">
+                    {subCats.slice(0, 12).map((s) => {
                     const hasChildren = cats.some((c) => c.parent_id === s.id);
                     return (
                        <div key={s.id} className="shrink-0 w-36 sm:w-40">
