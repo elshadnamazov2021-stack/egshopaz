@@ -29,7 +29,7 @@ export function SellerFollowers({ sellerId }: { sellerId: string }) {
       let profilesMap: Record<string, { full_name: string | null; avatar_url: string | null }> = {};
       if (ids.length) {
         const { data: profs } = await supabase
-          .from("profiles")
+          .from("profiles_public")
           .select("id, full_name, avatar_url")
           .in("id", ids);
         profilesMap = Object.fromEntries((profs ?? []).map((p: any) => [p.id, p]));

@@ -54,7 +54,7 @@ function MessagesPage() {
     const sellerIds = Array.from(new Set(list.map((m) => m.seller_id)));
     if (sellerIds.length) {
       const { data: ps } = await supabase
-        .from("profiles")
+        .from("profiles_public")
         .select("id,shop_name,full_name,shop_logo_url,avatar_url")
         .in("id", sellerIds);
       const map: Record<string, SellerProfile> = {};

@@ -36,7 +36,7 @@ function ReferralPage() {
       // Fetch names
       const ids = list.map((r) => r.referred_id);
       if (ids.length > 0) {
-        const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", ids);
+        const { data: profs } = await supabase.from("profiles_public").select("id, full_name").in("id", ids);
         const map: Record<string, string | null> = {};
         (profs ?? []).forEach((p: any) => { map[p.id] = p.full_name; });
         list.forEach((r) => { r.profile = { full_name: map[r.referred_id] ?? null }; });

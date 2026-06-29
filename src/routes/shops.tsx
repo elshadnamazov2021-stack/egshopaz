@@ -32,7 +32,7 @@ function ShopsPage() {
   const load = async () => {
     setLoading(true);
     const { data } = await supabase
-      .from("profiles")
+      .from("profiles_public")
       .select("id,shop_name,full_name,shop_logo_url,shop_banner_url,shop_city,shop_description")
       .not("shop_name", "is", null)
       .order("shop_name");

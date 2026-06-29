@@ -43,7 +43,7 @@ export function SellerAnalytics({ sellerId }: Props) {
         supabase.from("order_items")
           .select("price, quantity, status, title, product_id, order_id, delivered_at")
           .eq("seller_id", sellerId),
-        supabase.from("profiles")
+        supabase.from("profiles_public")
           .select("seller_tier, seller_total_sales, seller_total_orders")
           .eq("id", sellerId).maybeSingle(),
       ]);
