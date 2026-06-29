@@ -18,6 +18,12 @@ void i18n
     interpolation: { escapeValue: false },
   });
 
+i18n.on("languageChanged", (lng) => {
+  if (typeof window !== "undefined" && ["az", "ru", "en"].includes(lng)) {
+    localStorage.setItem("elzan_lang", lng);
+  }
+});
+
 // After hydration, sync with user-selected language from localStorage
 if (typeof window !== "undefined") {
   const saved = localStorage.getItem("elzan_lang");
