@@ -137,7 +137,7 @@ function Catalog() {
 
       <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6">
         <aside className="hidden md:block">
-          <h3 className="font-bold mb-3">{t("catalog.categories")}</h3>
+          <h2 className="font-bold mb-3">{t("catalog.categories")}</h2>
           <ul className="space-y-1">
             <li>
               <Link to="/catalog" search={{ q, cat: undefined } as never}

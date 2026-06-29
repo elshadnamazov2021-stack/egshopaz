@@ -1,7 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/terms")({
-  head: () => ({ meta: [{ title: "Şərtlər və qaydalar — EG Shop" }, { name: "description", content: "İstifadə şərtləri və qaydaları" }] }),
+  head: () => ({
+    meta: [
+      { title: "Şərtlər və qaydalar — EG Shop" },
+      { name: "description", content: "EG Shop platformasının istifadə şərtləri və qaydaları: sifariş, çatdırılma, geri qaytarma və alıcı-satıcı məsuliyyətləri." },
+      { property: "og:title", content: "Şərtlər və qaydalar — EG Shop" },
+      { property: "og:description", content: "EG Shop platformasının istifadə şərtləri və qaydaları: sifariş, çatdırılma, geri qaytarma və alıcı-satıcı məsuliyyətləri." },
+      { property: "og:url", content: "https://egshopaz.lovable.app/terms" },
+      { property: "og:type", content: "website" },
+    ],
+    links: [{ rel: "canonical", href: "https://egshopaz.lovable.app/terms" }],
+  }),
   component: TermsPage,
 });
 
