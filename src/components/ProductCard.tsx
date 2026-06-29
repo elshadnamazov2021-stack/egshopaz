@@ -126,7 +126,7 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
             <span className="text-[12px] sm:text-[13px] text-muted-foreground line-through">{formatAZN(p.old_price)}</span>
           )}
         </div>
-        <p className="text-[13px] sm:text-sm line-clamp-2 text-foreground/85 leading-snug">
+        <p className="text-[13px] sm:text-sm line-clamp-2 text-foreground/85 leading-snug min-h-[2.25rem]">
           {p.brand && <span className="font-bold mr-1">{p.brand}</span>}
           {p.title}
         </p>
