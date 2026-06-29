@@ -84,7 +84,7 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
       params={{ id: p.id }}
       className="group min-w-0 flex flex-col rounded-xl overflow-hidden bg-card"
     >
-      <div ref={wrapRef} className="relative aspect-[3/4] bg-secondary overflow-hidden rounded-xl">
+      <div ref={wrapRef} className="relative aspect-[3/4.2] bg-secondary overflow-hidden rounded-xl">
         {p.image_url ? (
           <img src={p.image_url} alt={p.title} loading="lazy"
                className="w-full h-full object-cover" />
@@ -101,7 +101,7 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
         )}
 
         {discount > 0 && (
-          <span className="absolute top-2 left-2 bg-discount text-discount-foreground text-[11px] font-extrabold px-1.5 py-0.5 rounded">
+          <span className="absolute top-2 left-2 bg-discount text-discount-foreground text-xs font-extrabold px-2 py-0.5 rounded-md">
             -{discount}%
           </span>
         )}
@@ -109,36 +109,36 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
           <button
             onClick={toggleFav}
             disabled={favBusy}
-            className={`absolute top-1.5 right-1.5 w-8 h-8 rounded-full bg-white/85 backdrop-blur flex items-center justify-center transition ${isFav ? "text-discount" : "text-foreground/70 hover:text-discount"}`}
+            className={`absolute top-2 right-2 w-9 h-9 rounded-full bg-white/85 backdrop-blur flex items-center justify-center transition ${isFav ? "text-discount" : "text-foreground/70 hover:text-discount"}`}
             aria-label={t("product.addToFavorites")}
           >
-            <Heart className={`h-4 w-4 ${isFav ? "fill-discount" : ""}`} />
+            <Heart className={`h-5 w-5 ${isFav ? "fill-discount" : ""}`} />
           </button>
         )}
       </div>
 
-      <div className="pt-2 pb-1 px-1 flex flex-col gap-1 flex-1">
-        <div className="flex items-baseline gap-1.5 min-w-0">
-          <span className="text-[15px] sm:text-base font-black text-foreground leading-none">
+      <div className="pt-2.5 pb-1.5 px-1.5 flex flex-col gap-1.5 flex-1">
+        <div className="flex items-baseline gap-2 min-w-0">
+          <span className="text-lg sm:text-xl font-black text-discount leading-none">
             {formatAZN(p.price)}
           </span>
           {p.old_price && Number(p.old_price) > Number(p.price) && (
-            <span className="text-[11px] text-muted-foreground line-through">{formatAZN(p.old_price)}</span>
+            <span className="text-[12px] sm:text-[13px] text-muted-foreground line-through">{formatAZN(p.old_price)}</span>
           )}
         </div>
-        <p className="text-[12px] sm:text-[13px] line-clamp-2 text-foreground/85 leading-snug">
+        <p className="text-[13px] sm:text-sm line-clamp-2 text-foreground/85 leading-snug">
           {p.brand && <span className="font-bold mr-1">{p.brand}</span>}
           {p.title}
         </p>
-        <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-auto">
-          <Star className="h-3 w-3 fill-warning text-warning" />
+        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-auto">
+          <Star className="h-3.5 w-3.5 fill-warning text-warning" />
           <span className="font-semibold text-foreground">{Number(p.rating).toFixed(1)}</span>
           <span>· {p.reviews_count}</span>
         </div>
         <button
           onClick={addToCart}
           disabled={adding}
-          className="mt-1 w-full bg-gradient-brand text-primary-foreground disabled:opacity-60 rounded-lg py-1.5 text-[12px] sm:text-[13px] font-bold transition hover:opacity-95"
+          className="mt-1 w-full bg-gradient-brand text-primary-foreground disabled:opacity-60 rounded-lg py-2 text-sm font-bold transition hover:opacity-95"
         >
           {t("product.addToCart")}
         </button>

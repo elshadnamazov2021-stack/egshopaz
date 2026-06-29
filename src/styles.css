@@ -216,6 +216,7 @@
     .home-product-strip > * {
       flex: 0 0 calc((100% - 0.75rem) / 2);
       scroll-snap-align: start;
+      min-width: 0;
     }
   }
 
