@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 
 interface SponsoredItem {
   id: string;
@@ -15,6 +15,7 @@ interface SponsoredItem {
     image_url: string | null;
     images: string[];
     rating: number;
+    reviews_count: number;
   } | null;
 }
 
@@ -40,7 +41,7 @@ export function SponsoredProducts({ limit = 6 }: { limit?: number }) {
 
       const { data: products } = await supabase
         .from("products")
-        .select("id,title,price,old_price,image_url,images,rating")
+        .select("id,title,price,old_price,image_url,images,rating,reviews_count")
         .in("id", ids)
         .eq("is_active", true);
       const productMap = new Map((products ?? []).map((p) => [p.id, p]));
@@ -61,20 +62,26 @@ export function SponsoredProducts({ limit = 6 }: { limit?: number }) {
         <span className="text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full font-semibold">{t("ads.adShort")}</span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mobile-product-grid">
-        {items.map((s) => s.products && (
-          <Link key={s.id} to="/product/$id" params={{ id: s.products.id }} className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition group relative">
-            <span className="absolute top-2 left-2 z-10 bg-warning text-warning-foreground text-[10px] font-bold px-1.5 py-0.5 rounded">{t("ads.adShort")}</span>
-            <div className="aspect-square bg-secondary overflow-hidden">
-              {(s.products.image_url ?? s.products.images[0]) && (
-                <img src={s.products.image_url ?? s.products.images[0]} alt={s.products.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition" />
-              )}
+        {items.map((s) => {
+          const prod = s.products;
+          if (!prod) return null;
+          const p: ProductCardData = {
+            id: prod.id,
+            title: prod.title,
+            price: prod.price,
+            old_price: prod.old_price,
+            image_url: prod.image_url ?? prod.images[0] ?? null,
+            rating: prod.rating,
+            reviews_count: prod.reviews_count,
+            brand: null,
+          };
+          return (
+            <div key={s.id} className="relative">
+              <span className="absolute top-2 left-2 z-10 bg-warning text-warning-foreground text-[10px] font-bold px-1.5 py-0.5 rounded">{t("ads.adShort")}</span>
+              <ProductCard p={p} enableFavorite={false} />
             </div>
-            <div className="p-2">
-              <div className="text-xs line-clamp-2 mb-1">{s.products.title}</div>
-              <div className="font-bold text-sm">{s.products.price.toFixed(2)} ₼</div>
-            </div>
-          </Link>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

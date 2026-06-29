@@ -82,7 +82,7 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
     <Link
       to="/product/$id"
       params={{ id: p.id }}
-      className="group min-w-0 flex flex-col rounded-xl overflow-hidden bg-card"
+      className="group min-w-0 flex flex-col rounded-xl overflow-hidden bg-card h-full min-h-[420px]"
     >
       <div ref={wrapRef} className="relative aspect-[3/4.2] bg-secondary overflow-hidden rounded-xl">
         {p.image_url ? (
@@ -117,8 +117,8 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
         )}
       </div>
 
-      <div className="pt-2.5 pb-1.5 px-1.5 flex flex-col gap-1.5 flex-1">
-        <div className="flex items-baseline gap-2 min-w-0">
+      <div className="pt-2.5 pb-1.5 px-1.5 flex flex-col gap-1.5 flex-1 justify-between">
+        <div className="flex items-baseline gap-2 min-w-0 h-6">
           <span className="text-lg sm:text-xl font-black text-discount leading-none">
             {formatAZN(p.price)}
           </span>
@@ -126,11 +126,11 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
             <span className="text-[12px] sm:text-[13px] text-muted-foreground line-through">{formatAZN(p.old_price)}</span>
           )}
         </div>
-        <p className="text-[13px] sm:text-sm line-clamp-2 text-foreground/85 leading-snug">
+        <p className="text-[13px] sm:text-sm line-clamp-2 text-foreground/85 leading-snug min-h-[2.25rem]">
           {p.brand && <span className="font-bold mr-1">{p.brand}</span>}
           {p.title}
         </p>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-auto">
+        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-auto h-4">
           <Star className="h-3.5 w-3.5 fill-warning text-warning" />
           <span className="font-semibold text-foreground">{Number(p.rating).toFixed(1)}</span>
           <span>· {p.reviews_count}</span>
@@ -138,7 +138,7 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
         <button
           onClick={addToCart}
           disabled={adding}
-          className="mt-1 w-full bg-gradient-brand text-primary-foreground disabled:opacity-60 rounded-lg py-2 text-sm font-bold transition hover:opacity-95"
+          className="mt-1 w-full h-10 flex items-center justify-center bg-gradient-brand text-primary-foreground disabled:opacity-60 rounded-lg text-sm font-bold transition hover:opacity-95"
         >
           {t("product.addToCart")}
         </button>
