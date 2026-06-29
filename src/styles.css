@@ -270,7 +270,20 @@
     flex-shrink: 0;
     scroll-snap-align: start;
   }
+
+  @media (min-width: 1024px) {
+    .panel-scroll-row {
+      display: block;
+      overflow: visible;
+      gap: 0;
+    }
+    .panel-scroll-row > * {
+      flex-shrink: initial;
+      scroll-snap-align: none;
+    }
+  }
 }
+
 
 /* ============ Mobil Tətbiq (Capacitor) üçün safe-area ============ */
 html.is-native-app body {
