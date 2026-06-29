@@ -331,7 +331,10 @@
   "notifications": {
     "title": "Bildirişlər",
     "empty": "Bildiriş yoxdur",
-    "markAll": "Hamısını oxunmuş işarələ"
+    "markAll": "Hamısını oxunmuş işarələ",
+    "one": "Bildiriş",
+    "markAllRead": "Hamısı oxundu",
+    "viewAll": "Hamısına bax"
   },
   "messages": {
     "title": "Mesajlar",

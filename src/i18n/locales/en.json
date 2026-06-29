@@ -331,7 +331,10 @@
   "notifications": {
     "title": "Notifications",
     "empty": "No notifications",
-    "markAll": "Mark all read"
+    "markAll": "Mark all read",
+    "one": "Notification",
+    "markAllRead": "All read",
+    "viewAll": "View all"
   },
   "messages": {
     "title": "Messages",
