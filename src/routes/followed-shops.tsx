@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Store, Heart, MapPin } from "lucide-react";
@@ -24,6 +25,7 @@ interface Row {
 }
 
 function FollowedShopsPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,7 +47,7 @@ function FollowedShopsPage() {
   const unfollow = async (sellerId: string) => {
     if (!user) return;
     await supabase.from("shop_followers").delete().eq("user_id", user.id).eq("seller_id", sellerId);
-    toast.success("İzləməkdən çıxarıldı");
+    toast.success(t("shops.unfollowed"));
     void load();
   };
 
@@ -53,9 +55,9 @@ function FollowedShopsPage() {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <Heart className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-        <h1 className="text-2xl font-bold mb-2">İzlədiyim mağazalar</h1>
-        <p className="text-muted-foreground mb-4">Mağazaları izləmək üçün hesaba daxil olun.</p>
-        <Link to="/auth" className="bg-primary text-primary-foreground px-5 py-2.5 rounded-xl font-bold">Daxil ol</Link>
+        <h1 className="text-2xl font-bold mb-2">{t("shops.followedTitle")}</h1>
+        <p className="text-muted-foreground mb-4">{t("shops.loginToFollow")}</p>
+        <Link to="/auth" className="bg-primary text-primary-foreground px-5 py-2.5 rounded-xl font-bold">{t("header.login")}</Link>
       </div>
     );
   }
@@ -67,25 +69,25 @@ function FollowedShopsPage() {
           <Heart className="h-6 w-6 text-white fill-white" />
         </div>
         <div>
-          <h1 className="text-2xl md:text-3xl font-black">İzlədiyim mağazalar</h1>
-          <p className="text-sm text-muted-foreground">{rows.length} mağaza izlənilir</p>
+          <h1 className="text-2xl md:text-3xl font-black">{t("shops.followedTitle")}</h1>
+          <p className="text-sm text-muted-foreground">{t("shops.followedCount", { count: rows.length })}</p>
         </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-10 text-muted-foreground">Yüklənir...</div>
+        <div className="text-center py-10 text-muted-foreground">{t("common.loading")}</div>
       ) : rows.length === 0 ? (
         <div className="text-center py-16 bg-secondary/40 rounded-2xl">
           <Store className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-          <p className="text-muted-foreground mb-2">Hələ heç bir mağazanı izləmirsiniz.</p>
-          <Link to="/" className="text-primary font-bold hover:underline">Mağazaları kəşf et →</Link>
+          <p className="text-muted-foreground mb-2">{t("shops.emptyFollowed")}</p>
+          <Link to="/" className="text-primary font-bold hover:underline">{t("shops.discover")}</Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {rows.map((r) => {
             const p = r.profiles;
             if (!p) return null;
-            const name = p.shop_name || p.full_name || "Mağaza";
+            const name = p.shop_name || p.full_name || t("shops.shopFallback");
             return (
               <div key={r.seller_id} className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-elegant transition">
                 <Link to="/shop/$id" params={{ id: r.seller_id }} className="block">
@@ -107,7 +109,7 @@ function FollowedShopsPage() {
                 </Link>
                 <div className="p-4 pt-3">
                   <button onClick={() => unfollow(r.seller_id)} className="w-full text-xs font-bold py-2 rounded-lg bg-secondary text-foreground hover:bg-destructive/10 hover:text-destructive transition">
-                    İzləməkdən çıx
+                    {t("shops.unfollowed")}
                   </button>
                 </div>
               </div>
