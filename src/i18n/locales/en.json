@@ -131,7 +131,10 @@
     "noProducts": "No products yet",
     "becomeFirstSeller": "Become the first seller →",
     "codeCopied": "{{code}} copied",
-    "visualSearchTitle": "Search by photo (AI)"
+    "visualSearchTitle": "Search by photo (AI)",
+    "giveawayBadge": "GIVEAWAY",
+    "giveawayTitle": "🎁 Giveaway products",
+    "giveawayDesc": "Buy these products and join the giveaway!"
   },
   "catalog": {
     "title": "Catalog",
@@ -456,7 +459,26 @@
     "security": "Security"
   },
   "categoryBar": {
-    "all": "All"
+    "all": "All",
+    "featuredCategories": "Featured categories",
+    "productTypes": "Product types",
+    "selectRoot": "Select main category...",
+    "selectSub": "Select subcategory (optional)...",
+    "selectSub2": "Select sub-subcategory (optional)...",
+    "searchPlaceholder": "Search category..."
+  },
+  "ads": {
+    "label": "Ad",
+    "featuredShops": "Featured shops",
+    "followedShops": "Following →",
+    "followLogin": "Sign in to follow the shop",
+    "unfollowed": "Unfollowed",
+    "followed": "Shop followed 💙",
+    "following": "Following",
+    "follow": "Follow",
+    "sponsoredProducts": "Sponsored products",
+    "adShort": "AD",
+    "adAria": "Ad {{index}}"
   },
   "shop": {
     "title": "Shop",
