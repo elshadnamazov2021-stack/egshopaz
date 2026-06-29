@@ -79,7 +79,13 @@
     "myReviews": "Rəylərim",
     "disputes": "Mübahisələr",
     "pickupPoints": "PVZ məntəqələri",
-    "discover": "Kəşf et"
+    "discover": "Kəşf et",
+    "shops": "Mağazalar",
+    "compare": "Müqayisə",
+    "map": "Xəritə",
+    "followedShops": "İzlədiyim mağazalar",
+    "referral": "Referral proqramı",
+    "mySellerPanel": "Satıcı panelim"
   },
   "footer": {
     "about": "Haqqımızda",

@@ -79,7 +79,13 @@
     "myReviews": "My reviews",
     "disputes": "Disputes",
     "pickupPoints": "Pickup points",
-    "discover": "Discover"
+    "discover": "Discover",
+    "shops": "Shops",
+    "compare": "Compare",
+    "map": "Map",
+    "followedShops": "Followed shops",
+    "referral": "Referral program",
+    "mySellerPanel": "My seller panel"
   },
   "footer": {
     "about": "About",

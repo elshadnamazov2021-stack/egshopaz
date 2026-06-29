@@ -79,7 +79,13 @@
     "myReviews": "Мои отзывы",
     "disputes": "Споры",
     "pickupPoints": "Пункты выдачи",
-    "discover": "Открыть"
+    "discover": "Открыть",
+    "shops": "Магазины",
+    "compare": "Сравнение",
+    "map": "Карта",
+    "followedShops": "Мои подписки",
+    "referral": "Реферальная программа",
+    "mySellerPanel": "Моя панель продавца"
   },
   "footer": {
     "about": "О нас",
