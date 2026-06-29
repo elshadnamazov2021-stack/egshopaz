@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
 
 interface Banner {
   id: string;
@@ -13,6 +14,7 @@ interface Banner {
 const ROTATE_MS = 6000;
 
 export function SellerBanners() {
+  const { t } = useTranslation();
   const [banners, setBanners] = useState<Banner[]>([]);
   const [idx, setIdx] = useState(0);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -97,7 +99,7 @@ export function SellerBanners() {
       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
 
       <div className="absolute top-3 left-3 bg-warning text-warning-foreground text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg">
-        REKLAM
+        {t("ads.adShort")}
       </div>
 
       <div className="absolute bottom-4 left-5 right-5 text-white font-black text-lg sm:text-2xl drop-shadow-lg line-clamp-2">
@@ -110,7 +112,7 @@ export function SellerBanners() {
             <button
               key={i}
               onClick={(e) => { e.preventDefault(); setIdx(i); }}
-              aria-label={`Reklam ${i + 1}`}
+              aria-label={t("ads.adAria", { index: i + 1 })}
               className={`h-2 rounded-full transition-all ${i === idx ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/80"}`}
             />
           ))}
