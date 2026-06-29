@@ -198,6 +198,13 @@ export function LanguageDomSync() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const saved = localStorage.getItem("elzan_lang");
+    const next = langCode(saved || i18n.language);
+    if (next !== langCode(i18n.language)) void i18n.changeLanguage(next);
+  }, [i18n]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
     let raf = 0;
     const schedule = () => {
       window.cancelAnimationFrame(raf);
