@@ -83,16 +83,6 @@ function Index() {
 
   return (
     <div className="container mx-auto px-3 md:px-4 py-4 space-y-5 md:space-y-8">
-      {/* MÜVƏQQƏTI — domen hazır olana qədər panel girişləri */}
-      <div className="rounded-xl border border-dashed border-amber-400 bg-amber-50 dark:bg-amber-950/20 p-3 flex flex-wrap items-center gap-2 text-xs">
-        <span className="font-bold text-amber-700 dark:text-amber-300">⚙️ Panel girişləri (müvəqqəti):</span>
-        <Link to="/auth" search={{ role: "seller" } as never} className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90">Satıcı</Link>
-        <Link to="/auth" search={{ role: "pvz" } as never} className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90">PVZ</Link>
-        <Link to="/auth" search={{ role: "admin" } as never} className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90">Admin</Link>
-        <Link to="/become-seller" className="px-3 py-1.5 rounded-lg bg-secondary font-bold hover:bg-secondary/80">Satıcı ol</Link>
-        <span className="ml-auto text-muted-foreground hidden sm:inline">Domen ayrılandan sonra silinəcək</span>
-      </div>
-
       {/* Kateqoriyalar — ən yuxarıda */}
       <HomeCategoryBrowser />
 
