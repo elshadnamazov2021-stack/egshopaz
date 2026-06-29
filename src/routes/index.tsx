@@ -191,25 +191,6 @@ function Index() {
       
 
 
-      {/* Benefits */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-        {[
-          { icon: Truck, t: t("home.benefitFreeShipping"), s: t("home.benefitFreeShippingDesc"), color: "from-violet-500 to-purple-500" },
-          { icon: ShieldCheck, t: t("home.benefitWarranty"), s: t("home.benefitWarrantyDesc"), color: "from-emerald-500 to-teal-500" },
-          { icon: Tag, t: t("home.benefitDiscounts"), s: t("home.benefitDiscountsDesc"), color: "from-rose-500 to-pink-500" },
-          { icon: Clock, t: t("home.benefitSupport"), s: t("home.benefitSupportDesc"), color: "from-amber-500 to-orange-500" },
-        ].map((b, i) => (
-          <div key={i} className="bg-card border-2 border-border rounded-2xl p-4 flex items-center gap-3 hover:border-primary/40 hover:shadow-card transition">
-            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${b.color} flex items-center justify-center text-white shrink-0`}>
-              <b.icon className="h-6 w-6" />
-            </div>
-            <div>
-              <div className="font-black text-sm">{b.t}</div>
-              <div className="text-xs text-muted-foreground">{b.s}</div>
-            </div>
-          </div>
-        ))}
-      </section>
 
       {/* Latest products */}
       <section>
