@@ -18,7 +18,10 @@ export const Route = createFileRoute("/")({
       { name: "description", content: i18n.t("seo.homeDescription") },
       { property: "og:title", content: i18n.t("seo.homeTitle") },
       { property: "og:description", content: i18n.t("seo.homeOgDescription") },
+      { property: "og:url", content: "https://egshopaz.lovable.app/" },
+      { property: "og:type", content: "website" },
     ],
+    links: [{ rel: "canonical", href: "https://egshopaz.lovable.app/" }],
   }),
   component: Index,
 });
@@ -84,6 +87,7 @@ function Index() {
   return (
     <div className="container mx-auto px-3 md:px-4 py-4 space-y-5 md:space-y-8">
       {/* Müvəqqəti panel girişləri — domen ayrılandan sonra silinəcək */}
+      <h1 className="sr-only">EG Shop — Azərbaycanın onlayn marketi</h1>
       <div className="flex items-center gap-2 overflow-x-auto pb-1 panel-scroll-row">
         <Link to="/auth?role=seller" className="whitespace-nowrap px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition">Satıcı girişi</Link>
         <Link to="/auth?role=pvz" className="whitespace-nowrap px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition">PVZ girişi</Link>
