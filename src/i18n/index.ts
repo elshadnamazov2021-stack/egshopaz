@@ -5,11 +5,6 @@ import ru from "./locales/ru.json";
 import en from "./locales/en.json";
 
 const supportedLngs = ["az", "ru", "en"];
-const initialLng = (() => {
-  if (typeof window === "undefined") return "az";
-  const saved = localStorage.getItem("elzan_lang");
-  return saved && supportedLngs.includes(saved) ? saved : "az";
-})();
 
 void i18n
   .use(initReactI18next)
@@ -19,7 +14,7 @@ void i18n
       ru: { translation: ru },
       en: { translation: en },
     },
-    lng: initialLng,
+    lng: "az",
     fallbackLng: "az",
     supportedLngs,
     interpolation: { escapeValue: false },
