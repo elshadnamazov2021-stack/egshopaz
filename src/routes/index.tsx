@@ -236,11 +236,6 @@ function Index() {
         )}
       </section>
 
-      {visualOpen && (
-        <Suspense fallback={null}>
-          <VisualSearchDialog open={visualOpen} onOpenChange={setVisualOpen} />
-        </Suspense>
-      )}
     </div>
   );
 }
