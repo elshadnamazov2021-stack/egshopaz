@@ -37,7 +37,7 @@ export function OrderTrackDialog({ open, onClose, orderId, pickupPointId, courie
         const { data: c } = await supabase.from("couriers_public").select("full_name,city,lat,lng").eq("id", courierId).maybeSingle();
         if (c?.lat && c?.lng) out.push({
           id: "cour", lat: Number(c.lat), lng: Number(c.lng), kind: "courier",
-          title: `🚚 ${c.full_name}`, description: c.city,
+          title: `🚚 ${c.full_name}`, description: c.city ?? undefined,
         });
       }
       if (!cancelled) setMarkers(out);
