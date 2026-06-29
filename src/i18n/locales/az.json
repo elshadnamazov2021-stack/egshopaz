@@ -538,5 +538,21 @@
     "view": "Bax",
     "inCompare": "Müqayisədə",
     "compare": "Müqayisə et"
+  },
+  "aiSupport": {
+    "title": "AI Dəstək Asistenti",
+    "subtitle": "24/7 dərhal cavab",
+    "emptyTitle": "Salam! Sualınızı yazın, dərhal cavab verim.",
+    "emptyDesc": "Sifariş, çatdırılma, ödəniş, qaytarma və s.",
+    "placeholder": "Sualınızı yazın...",
+    "disabled": "AI dəstək hazırda deaktivdir",
+    "noReply": "AI cavab vermədi"
+  },
+  "seo": {
+    "homeTitle": "EG Shop — Azərbaycanın onlayn marketi",
+    "homeDescription": "Geyim, texnika, ev üçün mallar — sərfəli qiymətlərlə. Azərbaycan üzrə çatdırılma.",
+    "homeOgDescription": "Milyonlarla məhsul, sürətli çatdırılma.",
+    "catalogTitle": "Kataloq — EG Shop",
+    "catalogDescription": "Bütün məhsullar bir yerdə. Kateqoriya, marka və qiymətə görə filter."
   }
 }

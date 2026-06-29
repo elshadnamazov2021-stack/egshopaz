@@ -538,5 +538,21 @@
     "view": "View",
     "inCompare": "In compare",
     "compare": "Compare"
+  },
+  "aiSupport": {
+    "title": "AI Support Assistant",
+    "subtitle": "Instant answers 24/7",
+    "emptyTitle": "Hi! Write your question and I will answer right away.",
+    "emptyDesc": "Orders, delivery, payment, returns, etc.",
+    "placeholder": "Write your question...",
+    "disabled": "AI support is currently disabled",
+    "noReply": "AI did not respond"
+  },
+  "seo": {
+    "homeTitle": "EG Shop — Azerbaijan online market",
+    "homeDescription": "Clothing, electronics, home goods — at great prices. Delivery across Azerbaijan.",
+    "homeOgDescription": "Millions of products, fast delivery.",
+    "catalogTitle": "Catalog — EG Shop",
+    "catalogDescription": "All products in one place. Filter by category, brand and price."
   }
 }
