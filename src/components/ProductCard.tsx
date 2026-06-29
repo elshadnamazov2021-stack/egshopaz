@@ -118,7 +118,7 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
       </div>
 
       <div className="pt-2.5 pb-1.5 px-1.5 flex flex-col gap-1.5 flex-1 justify-between">
-        <div className="flex items-baseline gap-2 min-w-0">
+        <div className="flex items-baseline gap-2 min-w-0 h-6">
           <span className="text-lg sm:text-xl font-black text-discount leading-none">
             {formatAZN(p.price)}
           </span>
