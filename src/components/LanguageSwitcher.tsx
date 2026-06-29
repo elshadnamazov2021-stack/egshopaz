@@ -15,6 +15,14 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
   const activeLang = i18n.resolvedLanguage || i18n.language;
   const current = LANGS.find((l) => activeLang.startsWith(l.code)) ?? LANGS[0];
 
+  const changeLanguage = async (code: "az" | "ru" | "en") => {
+    await i18n.changeLanguage(code);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("eg-language-sync"));
+      window.setTimeout(() => window.dispatchEvent(new Event("eg-language-sync")), 150);
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1 px-2 py-1.5 rounded-md hover:bg-white/15 sm:hover:bg-secondary transition outline-none text-xs sm:text-sm text-white sm:text-inherit">
@@ -33,7 +41,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
         {LANGS.map((l) => (
           <DropdownMenuItem
             key={l.code}
-            onClick={() => i18n.changeLanguage(l.code)}
+            onClick={() => void changeLanguage(l.code)}
             className={l.code === current.code ? "bg-secondary font-semibold" : ""}
           >
             <span className="mr-2 text-base">{l.flag}</span>
