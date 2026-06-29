@@ -2131,6 +2131,45 @@ export type Database = {
         }
         Relationships: []
       }
+      seller_shops_public: {
+        Row: {
+          id: string | null
+          seller_tier: string | null
+          seller_total_orders: number | null
+          shop_address: string | null
+          shop_city: string | null
+          shop_description: string | null
+          shop_lat: number | null
+          shop_lng: number | null
+          shop_logo_url: string | null
+          shop_name: string | null
+        }
+        Insert: {
+          id?: string | null
+          seller_tier?: string | null
+          seller_total_orders?: number | null
+          shop_address?: string | null
+          shop_city?: string | null
+          shop_description?: string | null
+          shop_lat?: number | null
+          shop_lng?: number | null
+          shop_logo_url?: string | null
+          shop_name?: string | null
+        }
+        Update: {
+          id?: string | null
+          seller_tier?: string | null
+          seller_total_orders?: number | null
+          shop_address?: string | null
+          shop_city?: string | null
+          shop_description?: string | null
+          shop_lat?: number | null
+          shop_lng?: number | null
+          shop_logo_url?: string | null
+          shop_name?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_manual_treasury: {
