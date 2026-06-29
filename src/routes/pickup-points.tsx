@@ -52,7 +52,7 @@ function PickupPointsPage() {
                 <div className="text-sm space-y-1 text-muted-foreground">
                   <div className="flex items-start gap-2"><MapPin className="h-4 w-4 mt-0.5 shrink-0" /> {p.address}</div>
                   <div className="flex items-center gap-2"><Clock className="h-4 w-4" /> {p.working_hours}</div>
-                  {p.phone && <div className="flex items-center gap-2"><Phone className="h-4 w-4" /> {p.phone}</div>}
+                  
                 </div>
               </div>
             ))}
