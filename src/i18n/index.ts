@@ -4,6 +4,13 @@ import az from "./locales/az.json";
 import ru from "./locales/ru.json";
 import en from "./locales/en.json";
 
+const supportedLngs = ["az", "ru", "en"];
+const initialLng = (() => {
+  if (typeof window === "undefined") return "az";
+  const saved = localStorage.getItem("elzan_lang");
+  return saved && supportedLngs.includes(saved) ? saved : "az";
+})();
+
 void i18n
   .use(initReactI18next)
   .init({
@@ -12,25 +19,16 @@ void i18n
       ru: { translation: ru },
       en: { translation: en },
     },
-    lng: "az",
+    lng: initialLng,
     fallbackLng: "az",
-    supportedLngs: ["az", "ru", "en"],
+    supportedLngs,
     interpolation: { escapeValue: false },
   });
 
 i18n.on("languageChanged", (lng) => {
-  if (typeof window !== "undefined" && ["az", "ru", "en"].includes(lng)) {
+  if (typeof window !== "undefined" && supportedLngs.includes(lng)) {
     localStorage.setItem("elzan_lang", lng);
   }
 });
-
-// After hydration, sync with user-selected language from localStorage
-if (typeof window !== "undefined") {
-  const saved = localStorage.getItem("elzan_lang");
-  if (saved && ["az", "ru", "en"].includes(saved) && saved !== "az") {
-    // Defer change until after hydration completes
-    setTimeout(() => { void i18n.changeLanguage(saved); }, 0);
-  }
-}
 
 export default i18n;
