@@ -130,7 +130,7 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
           {p.brand && <span className="font-bold mr-1">{p.brand}</span>}
           {p.title}
         </p>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-auto">
+        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-auto h-4">
           <Star className="h-3.5 w-3.5 fill-warning text-warning" />
           <span className="font-semibold text-foreground">{Number(p.rating).toFixed(1)}</span>
           <span>· {p.reviews_count}</span>
