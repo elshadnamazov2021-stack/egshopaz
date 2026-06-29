@@ -27,7 +27,7 @@ function MapPage() {
   });
 
   useEffect(() => {
-    supabase.from("pickup_points_public").select("id,name,city,address,working_hours,lat,lng")
+    supabase.from("pickup_points").select("id,name,city,address,working_hours,lat,lng")
       .then(({ data }) => setPvz(data ?? []));
     supabase.from("seller_shops_public").select("id,shop_name,shop_city,shop_address,shop_lat,shop_lng")
       .not("shop_lat", "is", null).not("shop_name", "is", null)

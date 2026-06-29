@@ -22,7 +22,7 @@ function PickupPointsPage() {
   const [q, setQ] = useState("");
 
   useEffect(() => {
-    supabase.from("pickup_points_public").select("id,name,city,address,working_hours,lat,lng,point_number,is_active,created_at").eq("is_active", true).order("point_number", { ascending: true })
+    supabase.from("pickup_points").select("*").eq("is_active", true).order("point_number", { ascending: true })
       .then(({ data }) => setList((data ?? []) as PVZ[]));
   }, []);
 

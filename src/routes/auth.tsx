@@ -118,7 +118,7 @@ function AuthPage() {
 
   useEffect(() => {
     if (role !== "pvz") return;
-    supabase.from("pickup_points_public").select("id,name,city").eq("is_active", true).order("city")
+    supabase.from("pickup_points").select("id,name,city").eq("is_active", true).order("city")
       .then(({ data }) => setPvzList(data ?? []));
   }, [role]);
 
