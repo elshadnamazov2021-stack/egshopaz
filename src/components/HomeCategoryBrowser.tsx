@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { catName } from "@/lib/catName";
-import { ChevronRight, ArrowLeft } from "lucide-react";
+import { ChevronRight, ArrowLeft, ChevronLeft } from "lucide-react";
 
 interface Category {
   id: string;
@@ -58,6 +58,15 @@ export function HomeCategoryBrowser() {
     setActiveSubId(null);
   };
 
+  const rootScrollRef = useRef<HTMLDivElement>(null);
+  const subScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollBy = (ref: React.RefObject<HTMLDivElement | null>, dir: "left" | "right") => {
+    const el = ref.current;
+    if (!el) return;
+    el.scrollBy({ left: dir === "left" ? -240 : 240, behavior: "smooth" });
+  };
+
   if (roots.length === 0) return null;
 
   const lang = i18n.language || "az";
@@ -78,24 +87,42 @@ export function HomeCategoryBrowser() {
     <section className="space-y-4 min-w-0 max-w-full overflow-hidden">
       {/* TAB BAR — Trendyol stil (narıncı seçilmiş, fon dolu) */}
       <div className="bg-card rounded-2xl border border-border overflow-hidden min-w-0 max-w-full">
-        <div className="flex w-full max-w-full gap-2 px-3 py-3 overflow-x-auto overscroll-x-contain scrollbar-hide">
-          {roots.map((c) => {
-            const isActive = c.id === activeRootId;
-            return (
-              <button
-                key={c.id}
-                onClick={() => selectRoot(c.id)}
-                 className={`shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition ${
-                  isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "bg-secondary/50 text-foreground hover:bg-secondary"
-                }`}
-              >
-                <span>{c.icon}</span>
-                <span>{catName(c)}</span>
-              </button>
-            );
-          })}
+        <div className="flex items-center gap-1 px-1">
+          <button
+            type="button"
+            onClick={() => scrollBy(rootScrollRef, "left")}
+            className="hidden lg:inline-flex shrink-0 items-center justify-center w-8 h-8 rounded-full bg-secondary hover:bg-primary/10 text-foreground transition"
+            aria-label="Geri"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <div ref={rootScrollRef} className="flex-1 flex w-full max-w-full gap-2 px-2 py-3 overflow-x-auto overscroll-x-contain scrollbar-responsive">
+            {roots.map((c) => {
+              const isActive = c.id === activeRootId;
+              return (
+                <button
+                  key={c.id}
+                  onClick={() => selectRoot(c.id)}
+                  className={`shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition ${
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "bg-secondary/50 text-foreground hover:bg-secondary"
+                  }`}
+                >
+                  <span>{c.icon}</span>
+                  <span>{catName(c)}</span>
+                </button>
+              );
+            })}
+          </div>
+          <button
+            type="button"
+            onClick={() => scrollBy(rootScrollRef, "right")}
+            className="hidden lg:inline-flex shrink-0 items-center justify-center w-8 h-8 rounded-full bg-secondary hover:bg-primary/10 text-foreground transition"
+            aria-label="İrəli"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
         </div>
       </div>
 
@@ -141,32 +168,50 @@ export function HomeCategoryBrowser() {
                   {catName(activeRoot)} — {seeAll}
                 </Link>
               ) : (
-                 <div className="flex w-full max-w-full gap-2 pb-1 overflow-x-auto overscroll-x-contain scrollbar-hide">
-                  {subCats.slice(0, 12).map((s) => {
-                    const hasChildren = cats.some((c) => c.parent_id === s.id);
-                    return (
-                       <div key={s.id} className="shrink-0 w-36 sm:w-40">
-                        {hasChildren ? (
-                          <button
-                            onClick={() => setActiveSubId(s.id)}
-                             className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition"
-                          >
-                            <span className="text-base">{s.icon || activeRoot.icon || "🛍️"}</span>
-                             <span className="truncate">{catName(s)}</span>
-                          </button>
-                        ) : (
-                          <Link
-                            to="/catalog"
-                            search={{ cat: s.slug, q: undefined } as never}
-                             className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition"
-                          >
-                            <span className="text-base">{s.icon || activeRoot.icon || "🛍️"}</span>
-                             <span className="truncate">{catName(s)}</span>
-                          </Link>
-                        )}
-                      </div>
-                    );
-                  })}
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => scrollBy(subScrollRef, "left")}
+                    className="hidden lg:inline-flex shrink-0 items-center justify-center w-8 h-8 rounded-full bg-secondary hover:bg-primary/10 text-foreground transition"
+                    aria-label="Geri"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <div ref={subScrollRef} className="flex-1 flex w-full max-w-full gap-2 pb-1 overflow-x-auto overscroll-x-contain scrollbar-responsive">
+                    {subCats.slice(0, 12).map((s) => {
+                      const hasChildren = cats.some((c) => c.parent_id === s.id);
+                      return (
+                        <div key={s.id} className="shrink-0 w-36 sm:w-40">
+                          {hasChildren ? (
+                            <button
+                              onClick={() => setActiveSubId(s.id)}
+                              className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition"
+                            >
+                              <span className="text-base">{s.icon || activeRoot.icon || "🛍️"}</span>
+                              <span className="truncate">{catName(s)}</span>
+                            </button>
+                          ) : (
+                            <Link
+                              to="/catalog"
+                              search={{ cat: s.slug, q: undefined } as never}
+                              className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition"
+                            >
+                              <span className="text-base">{s.icon || activeRoot.icon || "🛍️"}</span>
+                              <span className="truncate">{catName(s)}</span>
+                            </Link>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => scrollBy(subScrollRef, "right")}
+                    className="hidden lg:inline-flex shrink-0 items-center justify-center w-8 h-8 rounded-full bg-secondary hover:bg-primary/10 text-foreground transition"
+                    aria-label="İrəli"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
                 </div>
               )}
             </div>

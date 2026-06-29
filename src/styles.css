@@ -248,6 +248,38 @@
     display: none;
   }
 
+  /* PC-də skroll görünsün, mobil/tabletdə gizlənsin */
+  .scrollbar-responsive {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  @media (max-width: 1023px) {
+    .scrollbar-responsive {
+      scrollbar-width: none;
+    }
+    .scrollbar-responsive::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  @media (min-width: 1024px) {
+    .scrollbar-responsive {
+      scrollbar-width: thin;
+      -ms-overflow-style: auto;
+    }
+    .scrollbar-responsive::-webkit-scrollbar {
+      display: block;
+      height: 6px;
+    }
+    .scrollbar-responsive::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .scrollbar-responsive::-webkit-scrollbar-thumb {
+      background-color: var(--color-muted-foreground);
+      border-radius: 3px;
+    }
+  }
+
   .panel-scroll-row {
     display: flex;
     width: 100%;
