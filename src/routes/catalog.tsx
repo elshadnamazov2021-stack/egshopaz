@@ -6,6 +6,7 @@ import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { SponsoredProducts } from "@/components/SponsoredProducts";
 import { CatalogFilters, type Filters } from "@/components/CatalogFilters";
 import { catName } from "@/lib/catName";
+import i18n from "@/i18n";
 import { z } from "zod";
 
 const searchSchema = z.object({
@@ -18,8 +19,8 @@ export const Route = createFileRoute("/catalog")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Kataloq — EG Shop" },
-      { name: "description", content: "Bütün məhsullar bir yerdə. Kateqoriya, marka və qiymətə görə filter." },
+      { title: i18n.t("seo.catalogTitle") },
+      { name: "description", content: i18n.t("seo.catalogDescription") },
     ],
   }),
   component: Catalog,

@@ -9,14 +9,15 @@ import { Tag, Flame, TicketPercent, TrendingUp, Copy, Truck, ShieldCheck, Clock,
 import { toast } from "sonner";
 import { HomeCategoryBrowser } from "@/components/HomeCategoryBrowser";
 import { FeaturedShops } from "@/components/FeaturedShops";
+import i18n from "@/i18n";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "EG Shop — Azərbaycanın onlayn marketi" },
-      { name: "description", content: "Geyim, texnika, ev üçün mallar — sərfəli qiymətlərlə. Azərbaycan üzrə çatdırılma." },
-      { property: "og:title", content: "EG Shop — Azərbaycanın onlayn marketi" },
-      { property: "og:description", content: "Milyonlarla məhsul, sürətli çatdırılma." },
+      { title: i18n.t("seo.homeTitle") },
+      { name: "description", content: i18n.t("seo.homeDescription") },
+      { property: "og:title", content: i18n.t("seo.homeTitle") },
+      { property: "og:description", content: i18n.t("seo.homeOgDescription") },
     ],
   }),
   component: Index,
