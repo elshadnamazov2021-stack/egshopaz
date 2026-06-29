@@ -16,7 +16,7 @@ interface Category {
 }
 
 export function HomeCategoryBrowser() {
-  const { i18n } = useTranslation();
+  const { t } = useTranslation();
   const [cats, setCats] = useState<Category[]>([]);
   const [activeRootId, setActiveRootId] = useState<string | null>(null);
   const [activeSubId, setActiveSubId] = useState<string | null>(null);
@@ -69,19 +69,10 @@ export function HomeCategoryBrowser() {
 
   if (roots.length === 0) return null;
 
-  const lang = i18n.language || "az";
-  const featuredTitle = lang.startsWith("ru")
-    ? "Популярные категории"
-    : lang.startsWith("en")
-      ? "Featured Categories"
-      : "Öne Çıxan Kateqoriyalar";
-  const typesTitle = lang.startsWith("ru")
-    ? "Типы товаров"
-    : lang.startsWith("en")
-      ? "Product Types"
-      : "Məhsul tipləri";
-  const seeAll = lang.startsWith("ru") ? "Все" : lang.startsWith("en") ? "See all" : "Hamısı";
-  const backLabel = lang.startsWith("ru") ? "Назад" : lang.startsWith("en") ? "Back" : "Geri";
+  const featuredTitle = t("categoryBar.featuredCategories");
+  const typesTitle = t("categoryBar.productTypes");
+  const seeAll = t("common.all");
+  const backLabel = t("common.back");
 
   return (
     <section className="space-y-4 min-w-0 max-w-full overflow-hidden">
@@ -92,7 +83,7 @@ export function HomeCategoryBrowser() {
             type="button"
             onClick={() => scrollBy(rootScrollRef, "left")}
             className="hidden lg:inline-flex shrink-0 items-center justify-center w-8 h-8 rounded-full bg-secondary hover:bg-primary/10 text-foreground transition"
-            aria-label="Geri"
+            aria-label={t("common.back")}
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -119,7 +110,7 @@ export function HomeCategoryBrowser() {
             type="button"
             onClick={() => scrollBy(rootScrollRef, "right")}
             className="hidden lg:inline-flex shrink-0 items-center justify-center w-8 h-8 rounded-full bg-secondary hover:bg-primary/10 text-foreground transition"
-            aria-label="İrəli"
+            aria-label={t("common.next")}
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -173,7 +164,7 @@ export function HomeCategoryBrowser() {
                     type="button"
                     onClick={() => scrollBy(subScrollRef, "left")}
                     className="hidden lg:inline-flex shrink-0 items-center justify-center w-8 h-8 rounded-full bg-secondary hover:bg-primary/10 text-foreground transition"
-                    aria-label="Geri"
+                    aria-label={t("common.back")}
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </button>
@@ -208,7 +199,7 @@ export function HomeCategoryBrowser() {
                     type="button"
                     onClick={() => scrollBy(subScrollRef, "right")}
                     className="hidden lg:inline-flex shrink-0 items-center justify-center w-8 h-8 rounded-full bg-secondary hover:bg-primary/10 text-foreground transition"
-                    aria-label="İrəli"
+                    aria-label={t("common.next")}
                   >
                     <ChevronRight className="h-4 w-4" />
                   </button>
