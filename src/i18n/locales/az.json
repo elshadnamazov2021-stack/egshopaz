@@ -530,5 +530,13 @@
     "loginToFollow": "Mağazaları izləmək üçün hesaba daxil olun.",
     "emptyFollowed": "Hələ heç bir mağazanı izləmirsiniz.",
     "discover": "Mağazaları kəşf et →"
+  },
+  "compare": {
+    "removed": "Müqayisədən çıxarıldı",
+    "max": "Maksimum 4 məhsul müqayisə edə bilərsiniz",
+    "added": "Müqayisəyə əlavə olundu",
+    "view": "Bax",
+    "inCompare": "Müqayisədə",
+    "compare": "Müqayisə et"
   }
 }

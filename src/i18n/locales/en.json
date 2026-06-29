@@ -530,5 +530,13 @@
     "loginToFollow": "Sign in to follow shops.",
     "emptyFollowed": "You are not following any shops yet.",
     "discover": "Discover shops →"
+  },
+  "compare": {
+    "removed": "Removed from comparison",
+    "max": "You can compare up to 4 products",
+    "added": "Added to comparison",
+    "view": "View",
+    "inCompare": "In compare",
+    "compare": "Compare"
   }
 }
