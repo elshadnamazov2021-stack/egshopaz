@@ -131,7 +131,10 @@
     "noProducts": "Hələ məhsul əlavə olunmayıb",
     "becomeFirstSeller": "İlk satıcı olun →",
     "codeCopied": "{{code}} kopyalandı",
-    "visualSearchTitle": "Şəkillə axtar (AI)"
+    "visualSearchTitle": "Şəkillə axtar (AI)",
+    "giveawayBadge": "UDUŞ",
+    "giveawayTitle": "🎁 Uduşlu Məhsullar",
+    "giveawayDesc": "Bu məhsulları al və uduşda iştirak et!"
   },
   "catalog": {
     "title": "Kataloq",
@@ -456,7 +459,26 @@
     "security": "Təhlükəsizlik"
   },
   "categoryBar": {
-    "all": "Hamısı"
+    "all": "Hamısı",
+    "featuredCategories": "Önə çıxan kateqoriyalar",
+    "productTypes": "Məhsul tipləri",
+    "selectRoot": "Ana kateqoriya seçin...",
+    "selectSub": "Alt kateqoriya seçin (opsional)...",
+    "selectSub2": "Alt-alt kateqoriya seçin (opsional)...",
+    "searchPlaceholder": "Kateqoriya axtar..."
+  },
+  "ads": {
+    "label": "Reklam",
+    "featuredShops": "Önə çıxan mağazalar",
+    "followedShops": "İzlədiklərim →",
+    "followLogin": "Mağazanı izləmək üçün daxil olun",
+    "unfollowed": "İzləməkdən çıxarıldı",
+    "followed": "Mağaza izlənildi 💙",
+    "following": "İzlənilir",
+    "follow": "İzlə",
+    "sponsoredProducts": "Sponsor məhsullar",
+    "adShort": "REKLAM",
+    "adAria": "Reklam {{index}}"
   },
   "shop": {
     "title": "Mağaza",
