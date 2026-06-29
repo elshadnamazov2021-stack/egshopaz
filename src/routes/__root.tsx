@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { useIsNativeApp } from "@/hooks/useIsNativeApp";
 import { InstallAppBanner } from "@/components/InstallAppBanner";
 import { MobileTabBar } from "@/components/MobileTabBar";
+import { LanguageDomSync } from "@/components/LanguageDomSync";
 import "@/i18n";
 
 import "../styles.css";
@@ -191,6 +192,7 @@ function AppShell() {
 function RootComponent() {
   return (
     <AuthProvider>
+      <LanguageDomSync />
       <AppShell />
       <InstallAppBanner />
       <Toaster position="top-center" richColors />
