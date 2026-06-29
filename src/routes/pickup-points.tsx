@@ -12,7 +12,7 @@ export const Route = createFileRoute("/pickup-points")({
   component: PickupPointsPage,
 });
 
-interface PVZ { id: string; name: string; city: string; address: string; phone: string | null; working_hours: string; point_number: number | null }
+interface PVZ { id: string; name: string; city: string; address: string; working_hours: string; point_number: number | null }
 
 function PickupPointsPage() {
   const { t } = useTranslation();
