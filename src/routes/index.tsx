@@ -83,6 +83,14 @@ function Index() {
 
   return (
     <div className="container mx-auto px-3 md:px-4 py-4 space-y-5 md:space-y-8">
+      {/* Müvəqqəti panel girişləri — domen ayrılandan sonra silinəcək */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 panel-scroll-row">
+        <Link to="/auth?role=seller" className="whitespace-nowrap px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition">Satıcı girişi</Link>
+        <Link to="/auth?role=pvz" className="whitespace-nowrap px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition">PVZ girişi</Link>
+        <Link to="/auth?role=admin" className="whitespace-nowrap px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition">Admin</Link>
+        <Link to="/become-seller" className="whitespace-nowrap px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 text-xs font-bold hover:bg-emerald-200 transition">Satıcı ol</Link>
+      </div>
+
       {/* Kateqoriyalar — ən yuxarıda */}
       <HomeCategoryBrowser />
 
