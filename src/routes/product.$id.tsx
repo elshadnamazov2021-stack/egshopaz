@@ -71,18 +71,18 @@ function ProductPage() {
   const toggleFollow = async () => {
     if (!user) { navigate({ to: "/auth", search: { role: "buyer" } as never }); return; }
     if (!p) return;
-    if (user.id === p.seller_id) { toast.error("Öz mağazanızı izləyə bilməzsiniz"); return; }
+    if (user.id === p.seller_id) { toast.error(t("product.ownShopFollowError")); return; }
     if (isFollowing) {
       await supabase.from("shop_followers").delete().eq("user_id", user.id).eq("seller_id", p.seller_id);
       setIsFollowing(false);
       setFollowersCount((c) => Math.max(0, c - 1));
-      toast.success("İzləməkdən çıxarıldı");
+      toast.success(t("product.unfollowedShop"));
     } else {
       const { error } = await supabase.from("shop_followers").insert({ user_id: user.id, seller_id: p.seller_id });
       if (error) { toast.error(error.message); return; }
       setIsFollowing(true);
       setFollowersCount((c) => c + 1);
-      toast.success("Mağaza izlənildi 💙");
+      toast.success(t("product.followedShop"));
     }
   };
 
@@ -119,14 +119,14 @@ function ProductPage() {
     let error: { message: string } | null = null;
     if (existing) {
       if (existing.quantity >= p.stock) {
-        toast.error(`Maksimum stok: ${p.stock} ədəd`);
+        toast.error(t("product.maxStock", { count: p.stock }));
         return;
       }
       ({ error } = await supabase.from("cart_items").update({ quantity: existing.quantity + 1 }).eq("id", existing.id));
     } else {
       ({ error } = await supabase.from("cart_items").insert({ user_id: user.id, product_id: p.id, quantity: 1 }));
     }
-    if (error) { toast.error(`Səbət yenilənmədi: ${error.message}`); return; }
+    if (error) { toast.error(t("product.cartUpdateError", { message: error.message })); return; }
     toast.success(t("product.addedToCart"));
   };
 
@@ -193,7 +193,7 @@ function ProductPage() {
                 className="w-full max-h-96"
               />
               <span className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded">
-                🎬 Video {p.video_duration ? `· ${p.video_duration}san` : ""}
+                🎬 {t("product.video")} {p.video_duration ? `· ${p.video_duration}${t("product.secondsShort")}` : ""}
               </span>
             </div>
           )}
@@ -217,7 +217,7 @@ function ProductPage() {
               <button
                 onClick={(e) => { e.stopPropagation(); setZoomOpen(false); }}
                 className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white rounded-full w-10 h-10 flex items-center justify-center z-10"
-                aria-label="Bağla"
+                aria-label={t("product.closeAria")}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -226,14 +226,14 @@ function ProductPage() {
                   <button
                     onClick={(e) => { e.stopPropagation(); go(-1); }}
                     className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full w-11 h-11 flex items-center justify-center z-10"
-                    aria-label="Əvvəlki"
+                    aria-label={t("product.prevAria")}
                   >
                     <ChevronLeft className="h-6 w-6" />
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); go(1); }}
                     className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full w-11 h-11 flex items-center justify-center z-10"
-                    aria-label="Sonrakı"
+                    aria-label={t("product.nextAria")}
                   >
                     <ChevronRight className="h-6 w-6" />
                   </button>
@@ -321,7 +321,7 @@ function ProductPage() {
                 )}
                 <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-muted-foreground">
                   {shopInfo?.shop_city && <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" />{shopInfo.shop_city}</span>}
-                  <span className="inline-flex items-center gap-1"><Heart className="h-3 w-3" />{followersCount} izləyici</span>
+                  <span className="inline-flex items-center gap-1"><Heart className="h-3 w-3" />{t("product.followers", { count: followersCount })}</span>
                 </div>
               </div>
             </div>
@@ -333,7 +333,7 @@ function ProductPage() {
                   className={`flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl font-bold text-sm transition ${isFollowing ? "bg-primary/10 text-primary border border-primary/30" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
                 >
                   <Heart className={`h-4 w-4 ${isFollowing ? "fill-primary" : ""}`} />
-                  {isFollowing ? "İzlənilir" : "İzlə"}
+                  {isFollowing ? t("product.following") : t("product.follow")}
                 </button>
               )}
               {user?.id !== p.seller_id && (
