@@ -82,7 +82,7 @@ export function ProductCard({ p, enableFavorite = true }: { p: ProductCardData; 
     <Link
       to="/product/$id"
       params={{ id: p.id }}
-      className="group min-w-0 flex flex-col rounded-xl overflow-hidden bg-card h-full"
+      className="group min-w-0 flex flex-col rounded-xl overflow-hidden bg-card h-full min-h-[420px]"
     >
       <div ref={wrapRef} className="relative aspect-[3/4.2] bg-secondary overflow-hidden rounded-xl">
         {p.image_url ? (
