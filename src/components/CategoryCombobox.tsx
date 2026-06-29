@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronsUpDown, Search, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { catName } from "@/lib/catName";
 
-interface Category { id: string; name: string }
+interface Category { id: string; name: string; name_ru?: string | null; name_en?: string | null; slug?: string | null }
 
 interface Props {
   categories: Category[];
@@ -10,7 +12,8 @@ interface Props {
   placeholder?: string;
 }
 
-export function CategoryCombobox({ categories, value, onChange, placeholder = "Kateqoriya axtar..." }: Props) {
+export function CategoryCombobox({ categories, value, onChange, placeholder }: Props) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const ref = useRef<HTMLDivElement>(null);
@@ -21,7 +24,7 @@ export function CategoryCombobox({ categories, value, onChange, placeholder = "K
     const q = query.trim().toLowerCase();
     if (!q) return categories.slice(0, 50);
     return categories
-      .filter((c) => c.name.toLowerCase().includes(q))
+      .filter((c) => catName(c).toLowerCase().includes(q) || c.name.toLowerCase().includes(q))
       .slice(0, 50);
   }, [categories, query]);
 
@@ -42,7 +45,7 @@ export function CategoryCombobox({ categories, value, onChange, placeholder = "K
         className="w-full h-11 px-3 rounded-lg border border-input bg-background text-left flex items-center justify-between gap-2"
       >
         <span className={selected ? "" : "text-muted-foreground"}>
-          {selected ? selected.name : "Seçin..."}
+          {selected ? catName(selected) : t("categoryBar.selectRoot")}
         </span>
         <span className="flex items-center gap-1">
           {selected && (
@@ -62,13 +65,13 @@ export function CategoryCombobox({ categories, value, onChange, placeholder = "K
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={placeholder}
+              placeholder={placeholder ?? t("categoryBar.searchPlaceholder")}
               className="flex-1 h-8 bg-transparent outline-none text-sm"
             />
           </div>
           <div className="max-h-64 overflow-y-auto">
             {filtered.length === 0 ? (
-              <div className="px-3 py-4 text-sm text-muted-foreground text-center">Tapılmadı</div>
+              <div className="px-3 py-4 text-sm text-muted-foreground text-center">{t("common.notFound")}</div>
             ) : (
               filtered.map((c) => (
                 <button
@@ -77,7 +80,7 @@ export function CategoryCombobox({ categories, value, onChange, placeholder = "K
                   onClick={() => { onChange(c.id); setOpen(false); setQuery(""); }}
                   className="w-full px-3 py-2 text-sm text-left hover:bg-secondary flex items-center justify-between"
                 >
-                  <span>{c.name}</span>
+                  <span>{catName(c)}</span>
                   {c.id === value && <Check className="h-4 w-4 text-primary" />}
                 </button>
               ))
