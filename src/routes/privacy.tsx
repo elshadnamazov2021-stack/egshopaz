@@ -1,7 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/privacy")({
-  head: () => ({ meta: [{ title: "Məxfilik — EG Shop" }, { name: "description", content: "Məxfilik siyasəti" }] }),
+  head: () => ({
+    meta: [
+      { title: "Məxfilik siyasəti — EG Shop" },
+      { name: "description", content: "EG Shop məxfilik siyasəti: hansı şəxsi məlumatları toplayırıq, necə istifadə edirik, hara saxlayırıq və üçüncü tərəflərlə paylaşılma qaydaları." },
+      { property: "og:title", content: "Məxfilik siyasəti — EG Shop" },
+      { property: "og:description", content: "EG Shop məxfilik siyasəti: şəxsi məlumatların toplanması, istifadəsi və qorunması haqqında ətraflı." },
+      { property: "og:url", content: "https://egshopaz.lovable.app/privacy" },
+      { property: "og:type", content: "website" },
+    ],
+    links: [{ rel: "canonical", href: "https://egshopaz.lovable.app/privacy" }],
+  }),
   component: PrivacyPage,
 });
 

@@ -10,7 +10,52 @@ import { toast } from "sonner";
 import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/shop/$id")({
-  head: ({ params }) => ({ meta: [{ title: `Shop — EG Shop` }, { name: "description", content: `Seller shop ${params.id}` }] }),
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("profiles_public")
+      .select("id,shop_name,full_name,shop_description,shop_city,shop_logo_url,shop_banner_url")
+      .eq("id", params.id)
+      .maybeSingle();
+    return { shop: data };
+  },
+  head: ({ params, loaderData }) => {
+    const s = loaderData?.shop;
+    const url = `https://egshopaz.lovable.app/shop/${params.id}`;
+    const name = s?.shop_name || s?.full_name || "Mağaza";
+    const title = `${name} — EG Shop`;
+    const desc = ((s?.shop_description ?? "").trim() ||
+      `${name} mağazası EG Shop-da. Geniş çeşid, sərfəli qiymətlər və sürətli çatdırılma.`).slice(0, 160);
+    const image = s?.shop_banner_url || s?.shop_logo_url || undefined;
+    const meta: Array<Record<string, string>> = [
+      { title },
+      { name: "description", content: desc },
+      { property: "og:title", content: title },
+      { property: "og:description", content: desc },
+      { property: "og:url", content: url },
+      { property: "og:type", content: "website" },
+    ];
+    if (image) {
+      meta.push({ property: "og:image", content: image });
+      meta.push({ name: "twitter:image", content: image });
+    }
+    return {
+      meta,
+      links: [{ rel: "canonical", href: url }],
+      scripts: [{
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name,
+          description: desc,
+          url,
+          logo: s?.shop_logo_url || undefined,
+          image,
+          address: s?.shop_city ? { "@type": "PostalAddress", addressLocality: s.shop_city, addressCountry: "AZ" } : undefined,
+        }),
+      }],
+    };
+  },
   component: ShopPage,
 });
 

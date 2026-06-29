@@ -13,6 +13,65 @@ import { useFavorite } from "@/hooks/useFavorite";
 import { PinchZoomImage } from "@/components/PinchZoomImage";
 
 export const Route = createFileRoute("/product/$id")({
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("products")
+      .select("id,title,description,price,image_url,brand,stock")
+      .eq("id", params.id)
+      .maybeSingle();
+    return { product: data };
+  },
+  head: ({ params, loaderData }) => {
+    const p = loaderData?.product;
+    const url = `https://egshopaz.lovable.app/product/${params.id}`;
+    if (!p) {
+      return {
+        meta: [
+          { title: "Məhsul — EG Shop" },
+          { name: "description", content: "EG Shop məhsul səhifəsi." },
+          { property: "og:url", content: url },
+        ],
+        links: [{ rel: "canonical", href: url }],
+      };
+    }
+    const title = `${p.title} — EG Shop`;
+    const rawDesc = (p.description ?? "").replace(/\s+/g, " ").trim();
+    const desc = (rawDesc || `${p.title} EG Shop-da sərfəli qiymətə. Sürətli çatdırılma və təhlükəsiz ödəniş.`).slice(0, 160);
+    const meta: Array<Record<string, string>> = [
+      { title },
+      { name: "description", content: desc },
+      { property: "og:title", content: title },
+      { property: "og:description", content: desc },
+      { property: "og:url", content: url },
+      { property: "og:type", content: "product" },
+    ];
+    if (p.image_url) {
+      meta.push({ property: "og:image", content: p.image_url });
+      meta.push({ name: "twitter:image", content: p.image_url });
+    }
+    return {
+      meta,
+      links: [{ rel: "canonical", href: url }],
+      scripts: [{
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: p.title,
+          description: desc,
+          image: p.image_url || undefined,
+          brand: p.brand ? { "@type": "Brand", name: p.brand } : undefined,
+          offers: {
+            "@type": "Offer",
+            url,
+            price: Number(p.price),
+            priceCurrency: "AZN",
+            availability: (p.stock ?? 0) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          },
+        }),
+      }],
+    };
+  },
   component: ProductPage,
 });
 

@@ -17,12 +17,27 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/catalog")({
   validateSearch: searchSchema,
-  head: () => ({
-    meta: [
-      { title: i18n.t("seo.catalogTitle") },
-      { name: "description", content: i18n.t("seo.catalogDescription") },
-    ],
-  }),
+  loaderDeps: ({ search }) => ({ q: search.q, cat: search.cat, brand: search.brand }),
+  loader: ({ deps }) => deps,
+  head: ({ loaderData }) => {
+    const focus = loaderData?.cat || loaderData?.brand || loaderData?.q;
+    const base = i18n.t("seo.catalogTitle");
+    const title = focus ? `${focus} — EG Shop` : base;
+    const desc = focus
+      ? `${focus} kateqoriyasında məhsullar — EG Shop kataloqunda sərfəli qiymət, geniş çeşid və sürətli çatdırılma.`
+      : i18n.t("seo.catalogDescription");
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:url", content: "https://egshopaz.lovable.app/catalog" },
+        { property: "og:type", content: "website" },
+      ],
+      links: [{ rel: "canonical", href: "https://egshopaz.lovable.app/catalog" }],
+    };
+  },
   component: Catalog,
 });
 
@@ -137,7 +152,7 @@ function Catalog() {
 
       <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6">
         <aside className="hidden md:block">
-          <h3 className="font-bold mb-3">{t("catalog.categories")}</h3>
+          <h2 className="font-bold mb-3">{t("catalog.categories")}</h2>
           <ul className="space-y-1">
             <li>
               <Link to="/catalog" search={{ q, cat: undefined } as never}

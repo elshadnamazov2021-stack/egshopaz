@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SupportRouteImport } from './routes/support'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ShopsRouteImport } from './routes/shops'
 import { Route as SellerRouteImport } from './routes/seller'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ReferralRouteImport } from './routes/referral'
@@ -28,6 +30,7 @@ import { Route as MyReviewsRouteImport } from './routes/my-reviews'
 import { Route as MessagesPvzRouteImport } from './routes/messages-pvz'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as MapRouteImport } from './routes/map'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as FollowedShopsRouteImport } from './routes/followed-shops'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as DownloadRouteImport } from './routes/download'
@@ -57,6 +60,11 @@ const SupportRoute = SupportRouteImport.update({
   path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopsRoute = ShopsRouteImport.update({
   id: '/shops',
   path: '/shops',
@@ -65,6 +73,11 @@ const ShopsRoute = ShopsRouteImport.update({
 const SellerRoute = SellerRouteImport.update({
   id: '/seller',
   path: '/seller',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReturnsRoute = ReturnsRouteImport.update({
@@ -140,6 +153,11 @@ const MessagesRoute = MessagesRouteImport.update({
 const MapRoute = MapRouteImport.update({
   id: '/map',
   path: '/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FollowedShopsRoute = FollowedShopsRouteImport.update({
@@ -249,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/download': typeof DownloadRoute
   '/favorites': typeof FavoritesRoute
   '/followed-shops': typeof FollowedShopsRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/map': typeof MapRoute
   '/messages': typeof MessagesRoute
   '/messages-pvz': typeof MessagesPvzRoute
@@ -264,8 +283,10 @@ export interface FileRoutesByFullPath {
   '/referral': typeof ReferralRoute
   '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/seller': typeof SellerRoute
   '/shops': typeof ShopsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/checkout-pay/$orderId': typeof CheckoutPayOrderIdRoute
@@ -288,6 +309,7 @@ export interface FileRoutesByTo {
   '/download': typeof DownloadRoute
   '/favorites': typeof FavoritesRoute
   '/followed-shops': typeof FollowedShopsRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/map': typeof MapRoute
   '/messages': typeof MessagesRoute
   '/messages-pvz': typeof MessagesPvzRoute
@@ -303,8 +325,10 @@ export interface FileRoutesByTo {
   '/referral': typeof ReferralRoute
   '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/seller': typeof SellerRoute
   '/shops': typeof ShopsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/checkout-pay/$orderId': typeof CheckoutPayOrderIdRoute
@@ -328,6 +352,7 @@ export interface FileRoutesById {
   '/download': typeof DownloadRoute
   '/favorites': typeof FavoritesRoute
   '/followed-shops': typeof FollowedShopsRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/map': typeof MapRoute
   '/messages': typeof MessagesRoute
   '/messages-pvz': typeof MessagesPvzRoute
@@ -343,8 +368,10 @@ export interface FileRoutesById {
   '/referral': typeof ReferralRoute
   '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/seller': typeof SellerRoute
   '/shops': typeof ShopsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/checkout-pay/$orderId': typeof CheckoutPayOrderIdRoute
@@ -369,6 +396,7 @@ export interface FileRouteTypes {
     | '/download'
     | '/favorites'
     | '/followed-shops'
+    | '/llms.txt'
     | '/map'
     | '/messages'
     | '/messages-pvz'
@@ -384,8 +412,10 @@ export interface FileRouteTypes {
     | '/referral'
     | '/reset-password'
     | '/returns'
+    | '/robots.txt'
     | '/seller'
     | '/shops'
+    | '/sitemap.xml'
     | '/support'
     | '/terms'
     | '/checkout-pay/$orderId'
@@ -408,6 +438,7 @@ export interface FileRouteTypes {
     | '/download'
     | '/favorites'
     | '/followed-shops'
+    | '/llms.txt'
     | '/map'
     | '/messages'
     | '/messages-pvz'
@@ -423,8 +454,10 @@ export interface FileRouteTypes {
     | '/referral'
     | '/reset-password'
     | '/returns'
+    | '/robots.txt'
     | '/seller'
     | '/shops'
+    | '/sitemap.xml'
     | '/support'
     | '/terms'
     | '/checkout-pay/$orderId'
@@ -447,6 +480,7 @@ export interface FileRouteTypes {
     | '/download'
     | '/favorites'
     | '/followed-shops'
+    | '/llms.txt'
     | '/map'
     | '/messages'
     | '/messages-pvz'
@@ -462,8 +496,10 @@ export interface FileRouteTypes {
     | '/referral'
     | '/reset-password'
     | '/returns'
+    | '/robots.txt'
     | '/seller'
     | '/shops'
+    | '/sitemap.xml'
     | '/support'
     | '/terms'
     | '/checkout-pay/$orderId'
@@ -487,6 +523,7 @@ export interface RootRouteChildren {
   DownloadRoute: typeof DownloadRoute
   FavoritesRoute: typeof FavoritesRoute
   FollowedShopsRoute: typeof FollowedShopsRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   MapRoute: typeof MapRoute
   MessagesRoute: typeof MessagesRoute
   MessagesPvzRoute: typeof MessagesPvzRoute
@@ -502,8 +539,10 @@ export interface RootRouteChildren {
   ReferralRoute: typeof ReferralRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ReturnsRoute: typeof ReturnsRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   SellerRoute: typeof SellerRoute
   ShopsRoute: typeof ShopsRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
   CheckoutPayOrderIdRoute: typeof CheckoutPayOrderIdRoute
@@ -527,6 +566,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shops': {
       id: '/shops'
       path: '/shops'
@@ -539,6 +585,13 @@ declare module '@tanstack/react-router' {
       path: '/seller'
       fullPath: '/seller'
       preLoaderRoute: typeof SellerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/returns': {
@@ -644,6 +697,13 @@ declare module '@tanstack/react-router' {
       path: '/map'
       fullPath: '/map'
       preLoaderRoute: typeof MapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/followed-shops': {
@@ -791,6 +851,7 @@ const rootRouteChildren: RootRouteChildren = {
   DownloadRoute: DownloadRoute,
   FavoritesRoute: FavoritesRoute,
   FollowedShopsRoute: FollowedShopsRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   MapRoute: MapRoute,
   MessagesRoute: MessagesRoute,
   MessagesPvzRoute: MessagesPvzRoute,
@@ -806,8 +867,10 @@ const rootRouteChildren: RootRouteChildren = {
   ReferralRoute: ReferralRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ReturnsRoute: ReturnsRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   SellerRoute: SellerRoute,
   ShopsRoute: ShopsRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
   CheckoutPayOrderIdRoute: CheckoutPayOrderIdRoute,
