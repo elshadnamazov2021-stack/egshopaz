@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface SponsoredItem {
   id: string;
@@ -18,6 +19,7 @@ interface SponsoredItem {
 }
 
 export function SponsoredProducts({ limit = 6 }: { limit?: number }) {
+  const { t } = useTranslation();
   const [items, setItems] = useState<SponsoredItem[]>([]);
 
   useEffect(() => {
@@ -55,13 +57,13 @@ export function SponsoredProducts({ limit = 6 }: { limit?: number }) {
     <section>
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="h-5 w-5 text-warning" />
-        <h2 className="text-xl md:text-2xl font-bold">Sponsor məhsullar</h2>
-        <span className="text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full font-semibold">REKLAM</span>
+        <h2 className="text-xl md:text-2xl font-bold">{t("ads.sponsoredProducts")}</h2>
+        <span className="text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full font-semibold">{t("ads.adShort")}</span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mobile-product-grid">
         {items.map((s) => s.products && (
           <Link key={s.id} to="/product/$id" params={{ id: s.products.id }} className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition group relative">
-            <span className="absolute top-2 left-2 z-10 bg-warning text-warning-foreground text-[10px] font-bold px-1.5 py-0.5 rounded">AD</span>
+            <span className="absolute top-2 left-2 z-10 bg-warning text-warning-foreground text-[10px] font-bold px-1.5 py-0.5 rounded">{t("ads.adShort")}</span>
             <div className="aspect-square bg-secondary overflow-hidden">
               {(s.products.image_url ?? s.products.images[0]) && (
                 <img src={s.products.image_url ?? s.products.images[0]} alt={s.products.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition" />
