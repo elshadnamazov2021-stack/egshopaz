@@ -96,7 +96,7 @@ function OrdersPage() {
         ? supabase.from("order_items").select("id,title,price,quantity,image_url,status,seller_id,product_id,pickup_code,accepted_at,delivered_at,pickup_point_id,order_id").in("order_id", orderIds)
         : Promise.resolve({ data: [], error: null }),
       pickupIds.length
-        ? supabase.from("pickup_points").select("id,name,address,city").in("id", pickupIds)
+        ? supabase.from("pickup_points_public").select("id,name,address,city").in("id", pickupIds)
         : Promise.resolve({ data: [], error: null }),
     ]);
     if (itemsError || pickupError) {

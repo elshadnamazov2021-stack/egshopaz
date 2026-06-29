@@ -55,7 +55,7 @@ function ReturnsPage() {
     const pvzIds = [...new Set(rows.map((r) => r.pickup_point_id).filter((x): x is string => !!x))];
     const [{ data: items }, { data: pvz }] = await Promise.all([
       itemIds.length ? supabase.from("order_items").select("id,title").in("id", itemIds) : Promise.resolve({ data: [] as { id: string; title: string }[] }),
-      pvzIds.length ? supabase.from("pickup_points").select("id,name,address,city").in("id", pvzIds) : Promise.resolve({ data: [] as { id: string; name: string; address: string; city: string }[] }),
+      pvzIds.length ? supabase.from("pickup_points_public").select("id,name,address,city").in("id", pvzIds) : Promise.resolve({ data: [] as { id: string; name: string; address: string; city: string }[] }),
     ]);
     const itemMap = new Map((items ?? []).map((i) => [i.id, i]));
     const pvzMap = new Map((pvz ?? []).map((p) => [p.id, p]));

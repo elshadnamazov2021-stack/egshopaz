@@ -35,10 +35,10 @@ export function OrderTrackingMap({ orderItemId }: Props) {
 
       const [pvzRes, courierRes] = await Promise.all([
         item.pickup_point_id
-          ? supabase.from("pickup_points").select("name, address, city, lat, lng").eq("id", item.pickup_point_id).maybeSingle()
+          ? supabase.from("pickup_points_public").select("name, address, city, lat, lng").eq("id", item.pickup_point_id).maybeSingle()
           : Promise.resolve({ data: null }),
         item.courier_id
-          ? supabase.from("couriers").select("full_name, phone, lat, lng, vehicle_type").eq("id", item.courier_id).maybeSingle()
+          ? supabase.from("couriers_public").select("full_name, lat, lng, vehicle_type").eq("id", item.courier_id).maybeSingle()
           : Promise.resolve({ data: null }),
       ]);
 

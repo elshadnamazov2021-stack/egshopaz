@@ -68,7 +68,7 @@ function CartPage() {
       supabase.from("profiles").select("bonus_balance,full_name,phone").eq("id", user.id).maybeSingle(),
       supabase.from("system_settings").select("bonus_to_azn").limit(1).maybeSingle(),
       supabase
-        .from("pickup_points")
+        .from("pickup_points_public")
         .select("id,name,city,address,point_number,phone,working_hours")
         .eq("is_active", true)
         .order("point_number", { ascending: true }),
