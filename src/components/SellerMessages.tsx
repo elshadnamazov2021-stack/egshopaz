@@ -37,7 +37,7 @@ export function SellerMessages({ sellerId }: { sellerId: string }) {
     const buyerIds = Array.from(new Set(list.map((m) => m.buyer_id)));
     if (buyerIds.length) {
       const { data: ps } = await supabase
-        .from("profiles")
+        .from("profiles_public")
         .select("id,full_name,avatar_url")
         .in("id", buyerIds);
       const map: Record<string, BuyerProfile> = {};

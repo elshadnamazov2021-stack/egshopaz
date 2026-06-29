@@ -31,9 +31,9 @@ export function ProductReviews({ productId }: { productId: string }) {
     setReviews(list);
     const ids = [...new Set(list.map((r) => r.user_id))];
     if (ids.length) {
-      const { data: profs } = await supabase.from("profiles").select("id,full_name,avatar_url").in("id", ids);
+      const { data: profs } = await supabase.from("profiles_public").select("id,full_name,avatar_url").in("id", ids);
       const map: ProfileMap = {};
-      (profs ?? []).forEach((p) => { map[p.id] = { full_name: p.full_name, avatar_url: p.avatar_url }; });
+      (profs ?? []).forEach((p) => { if (p.id) map[p.id] = { full_name: p.full_name, avatar_url: p.avatar_url }; });
       setProfiles(map);
     }
   };

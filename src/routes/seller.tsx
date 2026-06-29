@@ -270,7 +270,7 @@ function SellerPanel() {
     const { data: pickupRows, error: pickupError } = pickupIds.length
       ? await supabase
           .from("pickup_points")
-          .select("id,name,city,address,point_number,phone,working_hours")
+          .select("id,name,city,address,point_number,working_hours")
           .in("id", pickupIds)
       : { data: [], error: null };
     if (pickupError) {

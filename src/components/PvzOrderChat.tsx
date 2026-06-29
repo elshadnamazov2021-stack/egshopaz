@@ -43,7 +43,7 @@ export function PvzOrderChat({ mode, currentUserId }: { mode: "buyer" | "pvz"; c
     if (mode === "pvz") {
       const ids = Array.from(new Set(list.map((m) => m.buyer_id)));
       if (ids.length) {
-        const { data: ps } = await supabase.from("profiles").select("id,full_name,avatar_url").in("id", ids);
+        const { data: ps } = await supabase.from("profiles_public").select("id,full_name,avatar_url").in("id", ids);
         const map: Record<string, BuyerProfile> = {};
         (ps ?? []).forEach((p) => { map[(p as BuyerProfile).id] = p as BuyerProfile; });
         setProfiles(map);

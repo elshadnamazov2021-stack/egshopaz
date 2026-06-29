@@ -40,9 +40,9 @@ export function ShopReviews({ sellerId }: { sellerId: string }) {
       const uids = [...new Set(list.map((r) => r.user_id))];
       if (uids.length) {
         const { data: profs } = await supabase
-          .from("profiles").select("id,full_name,avatar_url").in("id", uids);
+          .from("profiles_public").select("id,full_name,avatar_url").in("id", uids);
         const m: Record<string, ProfileLite> = {};
-        (profs ?? []).forEach((p) => { m[p.id] = p as ProfileLite; });
+        (profs ?? []).forEach((p) => { if (p.id) m[p.id] = p as ProfileLite; });
         setProfiles(m);
       }
       setLoading(false);

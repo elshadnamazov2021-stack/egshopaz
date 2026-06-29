@@ -27,12 +27,12 @@ function MapPage() {
   });
 
   useEffect(() => {
-    supabase.from("pickup_points").select("id,name,city,address,phone,working_hours,lat,lng").eq("is_active", true)
+    supabase.from("pickup_points").select("id,name,city,address,working_hours,lat,lng")
       .then(({ data }) => setPvz(data ?? []));
-    supabase.from("profiles").select("id,shop_name,shop_city,shop_address,shop_lat,shop_lng")
+    supabase.from("seller_shops_public").select("id,shop_name,shop_city,shop_address,shop_lat,shop_lng")
       .not("shop_lat", "is", null).not("shop_name", "is", null)
       .then(({ data }) => setShops(data ?? []));
-    supabase.from("couriers").select("id,full_name,city,vehicle_type,lat,lng,last_seen_at").eq("is_active", true)
+    supabase.from("couriers_public").select("id,full_name,city,vehicle_type,lat,lng,last_seen_at")
       .then(({ data }) => setCouriers(data ?? []));
   }, []);
 

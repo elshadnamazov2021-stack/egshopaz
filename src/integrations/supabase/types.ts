@@ -746,6 +746,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "order_items_pickup_point_id_fkey"
+            columns: ["pickup_point_id"]
+            isOneToOne: false
+            referencedRelation: "pickup_points_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "order_items_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
@@ -827,10 +834,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "orders_collected_by_pvz_id_fkey"
+            columns: ["collected_by_pvz_id"]
+            isOneToOne: false
+            referencedRelation: "pickup_points_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "orders_pickup_point_id_fkey"
             columns: ["pickup_point_id"]
             isOneToOne: false
             referencedRelation: "pickup_points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_pickup_point_id_fkey"
+            columns: ["pickup_point_id"]
+            isOneToOne: false
+            referencedRelation: "pickup_points_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1373,6 +1394,13 @@ export type Database = {
             referencedRelation: "pickup_points"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "pvz_staff_pickup_point_id_fkey"
+            columns: ["pickup_point_id"]
+            isOneToOne: false
+            referencedRelation: "pickup_points_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       referrals: {
@@ -1906,6 +1934,13 @@ export type Database = {
             referencedRelation: "pickup_points"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "treasury_transactions_pickup_point_id_fkey"
+            columns: ["pickup_point_id"]
+            isOneToOne: false
+            referencedRelation: "pickup_points_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -1973,12 +2008,180 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      couriers_public: {
+        Row: {
+          city: string | null
+          full_name: string | null
+          id: string | null
+          is_active: boolean | null
+          last_seen_at: string | null
+          lat: number | null
+          lng: number | null
+          rating: number | null
+          total_deliveries: number | null
+          vehicle_type: string | null
+        }
+        Insert: {
+          city?: string | null
+          full_name?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          last_seen_at?: string | null
+          lat?: number | null
+          lng?: number | null
+          rating?: number | null
+          total_deliveries?: number | null
+          vehicle_type?: string | null
+        }
+        Update: {
+          city?: string | null
+          full_name?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          last_seen_at?: string | null
+          lat?: number | null
+          lng?: number | null
+          rating?: number | null
+          total_deliveries?: number | null
+          vehicle_type?: string | null
+        }
+        Relationships: []
+      }
+      pickup_points_public: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string | null
+          id: string | null
+          is_active: boolean | null
+          lat: number | null
+          lng: number | null
+          name: string | null
+          point_number: number | null
+          working_hours: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          lat?: number | null
+          lng?: number | null
+          name?: string | null
+          point_number?: number | null
+          working_hours?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          lat?: number | null
+          lng?: number | null
+          name?: string | null
+          point_number?: number | null
+          working_hours?: string | null
+        }
+        Relationships: []
+      }
+      profiles_public: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          full_name: string | null
+          id: string | null
+          seller_tier: string | null
+          seller_total_orders: number | null
+          shop_banner_url: string | null
+          shop_city: string | null
+          shop_description: string | null
+          shop_email: string | null
+          shop_logo_url: string | null
+          shop_name: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          seller_tier?: string | null
+          seller_total_orders?: number | null
+          shop_banner_url?: string | null
+          shop_city?: string | null
+          shop_description?: string | null
+          shop_email?: string | null
+          shop_logo_url?: string | null
+          shop_name?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          seller_tier?: string | null
+          seller_total_orders?: number | null
+          shop_banner_url?: string | null
+          shop_city?: string | null
+          shop_description?: string | null
+          shop_email?: string | null
+          shop_logo_url?: string | null
+          shop_name?: string | null
+        }
+        Relationships: []
+      }
+      seller_shops_public: {
+        Row: {
+          id: string | null
+          seller_tier: string | null
+          seller_total_orders: number | null
+          shop_address: string | null
+          shop_city: string | null
+          shop_description: string | null
+          shop_lat: number | null
+          shop_lng: number | null
+          shop_logo_url: string | null
+          shop_name: string | null
+        }
+        Insert: {
+          id?: string | null
+          seller_tier?: string | null
+          seller_total_orders?: number | null
+          shop_address?: string | null
+          shop_city?: string | null
+          shop_description?: string | null
+          shop_lat?: number | null
+          shop_lng?: number | null
+          shop_logo_url?: string | null
+          shop_name?: string | null
+        }
+        Update: {
+          id?: string | null
+          seller_tier?: string | null
+          seller_total_orders?: number | null
+          shop_address?: string | null
+          shop_city?: string | null
+          shop_description?: string | null
+          shop_lat?: number | null
+          shop_lng?: number | null
+          shop_logo_url?: string | null
+          shop_name?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_manual_treasury: {
         Args: { _amount: number; _direction: string; _note: string }
         Returns: string
+      }
+      admin_get_pickup_phones: {
+        Args: never
+        Returns: {
+          id: string
+          phone: string
+        }[]
       }
       auto_payout_after_3_days: { Args: never; Returns: number }
       become_seller: { Args: { _shop_name: string }; Returns: undefined }
