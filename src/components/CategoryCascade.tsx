@@ -1,8 +1,13 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { catName } from "@/lib/catName";
 
 interface Category {
   id: string;
   name: string;
+  name_ru?: string | null;
+  name_en?: string | null;
+  slug?: string | null;
   parent_id: string | null;
   icon?: string | null;
 }
@@ -15,6 +20,7 @@ interface Props {
 
 // Cascading category picker: Root → Sub → Sub-sub (only dropdowns, no manual input)
 export function CategoryCascade({ categories, value, onChange }: Props) {
+  const { t } = useTranslation();
   const byId = useMemo(() => {
     const m = new Map<string, Category>();
     categories.forEach((c) => m.set(c.id, c));
@@ -53,10 +59,10 @@ export function CategoryCascade({ categories, value, onChange }: Props) {
         value={rootSel}
         onChange={(e) => onChange(e.target.value || null)}
       >
-        <option value="">Ana kateqoriya seçin...</option>
+        <option value="">{t("categoryBar.selectRoot")}</option>
         {roots.map((c) => (
           <option key={c.id} value={c.id}>
-            {c.icon ? `${c.icon} ` : ""}{c.name}
+            {c.icon ? `${c.icon} ` : ""}{catName(c)}
           </option>
         ))}
       </select>
@@ -67,10 +73,10 @@ export function CategoryCascade({ categories, value, onChange }: Props) {
           value={subSel}
           onChange={(e) => onChange(e.target.value || rootSel)}
         >
-          <option value="">Alt kateqoriya seçin (opsional)...</option>
+          <option value="">{t("categoryBar.selectSub")}</option>
           {subs.map((c) => (
             <option key={c.id} value={c.id}>
-              {c.name}
+              {catName(c)}
             </option>
           ))}
         </select>
@@ -82,10 +88,10 @@ export function CategoryCascade({ categories, value, onChange }: Props) {
           value={sub2Sel}
           onChange={(e) => onChange(e.target.value || subSel)}
         >
-          <option value="">Alt-alt kateqoriya seçin (opsional)...</option>
+          <option value="">{t("categoryBar.selectSub2")}</option>
           {sub2s.map((c) => (
             <option key={c.id} value={c.id}>
-              {c.name}
+              {catName(c)}
             </option>
           ))}
         </select>
