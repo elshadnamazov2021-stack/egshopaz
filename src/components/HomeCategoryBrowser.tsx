@@ -103,7 +103,7 @@ export function HomeCategoryBrowser() {
                 <button
                   key={c.id}
                   onClick={() => selectRoot(c.id)}
-                   className={`shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition ${
+                  className={`shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition ${
                     isActive
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "bg-secondary/50 text-foreground hover:bg-secondary"
@@ -179,30 +179,39 @@ export function HomeCategoryBrowser() {
                   </button>
                   <div ref={subScrollRef} className="flex-1 flex w-full max-w-full gap-2 pb-1 overflow-x-auto overscroll-x-contain scrollbar-responsive">
                     {subCats.slice(0, 12).map((s) => {
-                    const hasChildren = cats.some((c) => c.parent_id === s.id);
-                    return (
-                       <div key={s.id} className="shrink-0 w-36 sm:w-40">
-                        {hasChildren ? (
-                          <button
-                            onClick={() => setActiveSubId(s.id)}
-                             className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition"
-                          >
-                            <span className="text-base">{s.icon || activeRoot.icon || "🛍️"}</span>
-                             <span className="truncate">{catName(s)}</span>
-                          </button>
-                        ) : (
-                          <Link
-                            to="/catalog"
-                            search={{ cat: s.slug, q: undefined } as never}
-                             className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition"
-                          >
-                            <span className="text-base">{s.icon || activeRoot.icon || "🛍️"}</span>
-                             <span className="truncate">{catName(s)}</span>
-                          </Link>
-                        )}
-                      </div>
-                    );
-                  })}
+                      const hasChildren = cats.some((c) => c.parent_id === s.id);
+                      return (
+                        <div key={s.id} className="shrink-0 w-36 sm:w-40">
+                          {hasChildren ? (
+                            <button
+                              onClick={() => setActiveSubId(s.id)}
+                              className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition"
+                            >
+                              <span className="text-base">{s.icon || activeRoot.icon || "🛍️"}</span>
+                              <span className="truncate">{catName(s)}</span>
+                            </button>
+                          ) : (
+                            <Link
+                              to="/catalog"
+                              search={{ cat: s.slug, q: undefined } as never}
+                              className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-sm text-sm font-bold transition"
+                            >
+                              <span className="text-base">{s.icon || activeRoot.icon || "🛍️"}</span>
+                              <span className="truncate">{catName(s)}</span>
+                            </Link>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => scrollBy(subScrollRef, "right")}
+                    className="hidden lg:inline-flex shrink-0 items-center justify-center w-8 h-8 rounded-full bg-secondary hover:bg-primary/10 text-foreground transition"
+                    aria-label="İrəli"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
                 </div>
               )}
             </div>
