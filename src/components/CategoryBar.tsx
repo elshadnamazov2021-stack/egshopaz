@@ -43,6 +43,7 @@ export function CategoryBar() {
             onClick={() => scrollBy("left")}
             className="hidden lg:inline-flex shrink-0 items-center justify-center w-8 h-8 rounded-full bg-secondary hover:bg-primary/10 text-foreground transition"
             aria-label="Geri"
+            aria-label={t("common.back")}
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -72,6 +73,7 @@ export function CategoryBar() {
             onClick={() => scrollBy("right")}
             className="hidden lg:inline-flex shrink-0 items-center justify-center w-8 h-8 rounded-full bg-secondary hover:bg-primary/10 text-foreground transition"
             aria-label="İrəli"
+            aria-label={t("common.next")}
           >
             <ChevronRight className="h-4 w-4" />
           </button>
