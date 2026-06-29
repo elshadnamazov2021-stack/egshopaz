@@ -2176,6 +2176,13 @@ export type Database = {
         Args: { _amount: number; _direction: string; _note: string }
         Returns: string
       }
+      admin_get_pickup_phones: {
+        Args: never
+        Returns: {
+          id: string
+          phone: string
+        }[]
+      }
       auto_payout_after_3_days: { Args: never; Returns: number }
       become_seller: { Args: { _shop_name: string }; Returns: undefined }
       call_ai_auto_reply: {
