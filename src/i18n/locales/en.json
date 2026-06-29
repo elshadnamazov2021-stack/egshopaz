@@ -202,7 +202,20 @@
     "addedToCart": "Added to cart",
     "addedToFavorites": "Added to favorites",
     "favoriteAria": "Favorite",
-    "buyer": "Buyer"
+    "buyer": "Buyer",
+    "ownShopFollowError": "You cannot follow your own shop",
+    "unfollowedShop": "Unfollowed",
+    "followedShop": "Shop followed 💙",
+    "maxStock": "Maximum stock: {{count}} units",
+    "cartUpdateError": "Cart was not updated: {{message}}",
+    "closeAria": "Close",
+    "prevAria": "Previous",
+    "nextAria": "Next",
+    "video": "Video",
+    "secondsShort": "s",
+    "followers": "{{count}} followers",
+    "follow": "Follow",
+    "following": "Following"
   },
   "cart": {
     "title": "Cart",
@@ -488,5 +501,25 @@
     "shopProducts": "Shop products",
     "noProducts": "No products yet",
     "defaultName": "Shop"
+  },
+  "shops": {
+    "title": "Shops",
+    "count": "{{count}} shops",
+    "followed": "Following",
+    "searchPlaceholder": "Search shop name, city, or description...",
+    "notFound": "Shop not found.",
+    "shopFallback": "Shop",
+    "ownShop": "Your shop",
+    "loginRequired": "Sign in",
+    "follow": "Follow",
+    "following": "Following",
+    "ownShopFollowError": "You cannot follow your own shop",
+    "unfollowed": "Unfollowed",
+    "followedSuccess": "Following",
+    "followedTitle": "Followed shops",
+    "followedCount": "{{count}} shops followed",
+    "loginToFollow": "Sign in to follow shops.",
+    "emptyFollowed": "You are not following any shops yet.",
+    "discover": "Discover shops →"
   }
 }

@@ -202,7 +202,20 @@
     "addedToCart": "Səbətə əlavə olundu",
     "addedToFavorites": "Sevimlilərə əlavə olundu",
     "favoriteAria": "Sevimli",
-    "buyer": "Alıcı"
+    "buyer": "Alıcı",
+    "ownShopFollowError": "Öz mağazanızı izləyə bilməzsiniz",
+    "unfollowedShop": "İzləməkdən çıxarıldı",
+    "followedShop": "Mağaza izlənildi 💙",
+    "maxStock": "Maksimum stok: {{count}} ədəd",
+    "cartUpdateError": "Səbət yenilənmədi: {{message}}",
+    "closeAria": "Bağla",
+    "prevAria": "Əvvəlki",
+    "nextAria": "Sonrakı",
+    "video": "Video",
+    "secondsShort": "san",
+    "followers": "{{count}} izləyici",
+    "follow": "İzlə",
+    "following": "İzlənilir"
   },
   "cart": {
     "title": "Səbət",
@@ -488,5 +501,25 @@
     "shopProducts": "Mağazanın məhsulları",
     "noProducts": "Hələ məhsul yoxdur",
     "defaultName": "Mağaza"
+  },
+  "shops": {
+    "title": "Mağazalar",
+    "count": "{{count}} mağaza",
+    "followed": "İzlədiklərim",
+    "searchPlaceholder": "Mağaza adı, şəhər və ya təsvir axtar...",
+    "notFound": "Mağaza tapılmadı.",
+    "shopFallback": "Mağaza",
+    "ownShop": "Sizin mağazanız",
+    "loginRequired": "Daxil olun",
+    "follow": "İzlə",
+    "following": "İzlənilir",
+    "ownShopFollowError": "Öz mağazanızı izləyə bilməzsiniz",
+    "unfollowed": "İzləməkdən çıxarıldı",
+    "followedSuccess": "İzlənilir",
+    "followedTitle": "İzlədiyim mağazalar",
+    "followedCount": "{{count}} mağaza izlənilir",
+    "loginToFollow": "Mağazaları izləmək üçün hesaba daxil olun.",
+    "emptyFollowed": "Hələ heç bir mağazanı izləmirsiniz.",
+    "discover": "Mağazaları kəşf et →"
   }
 }

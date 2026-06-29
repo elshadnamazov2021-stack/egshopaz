@@ -202,7 +202,20 @@
     "addedToCart": "Добавлено в корзину",
     "addedToFavorites": "Добавлено в избранное",
     "favoriteAria": "Избранное",
-    "buyer": "Покупатель"
+    "buyer": "Покупатель",
+    "ownShopFollowError": "Нельзя подписаться на свой магазин",
+    "unfollowedShop": "Вы отписались от магазина",
+    "followedShop": "Магазин добавлен в подписки 💙",
+    "maxStock": "Максимум на складе: {{count}} шт.",
+    "cartUpdateError": "Корзина не обновлена: {{message}}",
+    "closeAria": "Закрыть",
+    "prevAria": "Предыдущий",
+    "nextAria": "Следующий",
+    "video": "Видео",
+    "secondsShort": "с",
+    "followers": "{{count}} подписчиков",
+    "follow": "Подписаться",
+    "following": "Вы подписаны"
   },
   "cart": {
     "title": "Корзина",
@@ -488,5 +501,25 @@
     "shopProducts": "Товары магазина",
     "noProducts": "Пока нет товаров",
     "defaultName": "Магазин"
+  },
+  "shops": {
+    "title": "Магазины",
+    "count": "{{count}} магазинов",
+    "followed": "Мои подписки",
+    "searchPlaceholder": "Искать по названию магазина, городу или описанию...",
+    "notFound": "Магазин не найден.",
+    "shopFallback": "Магазин",
+    "ownShop": "Ваш магазин",
+    "loginRequired": "Войдите в аккаунт",
+    "follow": "Подписаться",
+    "following": "Вы подписаны",
+    "ownShopFollowError": "Нельзя подписаться на свой магазин",
+    "unfollowed": "Вы отписались от магазина",
+    "followedSuccess": "Вы подписаны",
+    "followedTitle": "Магазины, на которые я подписан",
+    "followedCount": "{{count}} магазинов в подписках",
+    "loginToFollow": "Войдите в аккаунт, чтобы подписываться на магазины.",
+    "emptyFollowed": "Вы пока не подписаны ни на один магазин.",
+    "discover": "Найти магазины →"
   }
 }
