@@ -131,7 +131,10 @@
     "noProducts": "Пока нет товаров",
     "becomeFirstSeller": "Стать первым продавцом →",
     "codeCopied": "{{code}} скопирован",
-    "visualSearchTitle": "Поиск по фото (AI)"
+    "visualSearchTitle": "Поиск по фото (AI)",
+    "giveawayBadge": "РОЗЫГРЫШ",
+    "giveawayTitle": "🎁 Товары с розыгрышем",
+    "giveawayDesc": "Покупайте эти товары и участвуйте в розыгрыше!"
   },
   "catalog": {
     "title": "Каталог",
@@ -456,7 +459,26 @@
     "security": "Безопасность"
   },
   "categoryBar": {
-    "all": "Все"
+    "all": "Все",
+    "featuredCategories": "Популярные категории",
+    "productTypes": "Типы товаров",
+    "selectRoot": "Выберите основную категорию...",
+    "selectSub": "Выберите подкатегорию (необязательно)...",
+    "selectSub2": "Выберите под-подкатегорию (необязательно)...",
+    "searchPlaceholder": "Поиск категории..."
+  },
+  "ads": {
+    "label": "Реклама",
+    "featuredShops": "Продвигаемые магазины",
+    "followedShops": "Мои подписки →",
+    "followLogin": "Войдите, чтобы подписаться на магазин",
+    "unfollowed": "Вы отписались",
+    "followed": "Магазин добавлен в подписки 💙",
+    "following": "Вы подписаны",
+    "follow": "Подписаться",
+    "sponsoredProducts": "Спонсорские товары",
+    "adShort": "РЕКЛАМА",
+    "adAria": "Реклама {{index}}"
   },
   "shop": {
     "title": "Магазин",
