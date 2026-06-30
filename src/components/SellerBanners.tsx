@@ -91,9 +91,11 @@ export function SellerBanners() {
         <img
           src={b.image_url!}
           alt={b.title}
-          loading="lazy"
+          fetchPriority="high"
+          decoding="async"
           className="relative w-full h-full object-cover"
         />
+
       )}
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />

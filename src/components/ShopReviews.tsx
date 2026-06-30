@@ -78,7 +78,7 @@ export function ShopReviews({ sellerId }: { sellerId: string }) {
                 </div>
                 <div className="flex items-center gap-0.5 mt-0.5">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className={`h-3.5 w-3.5 ${i < r.rating ? "fill-warning text-warning" : "text-muted-foreground/30"}`} />
+                    <Star key={i} className={`h-3.5 w-3.5 ${i < r.rating ? "fill-warning text-warning" : "text-muted-foreground"}`} />
                   ))}
                 </div>
                 {r.comment && <p className="text-sm mt-2 text-foreground/90 whitespace-pre-line">{r.comment}</p>}
