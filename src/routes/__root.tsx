@@ -209,7 +209,7 @@ function RootComponent() {
     <AuthProvider>
       <LanguageDomSync />
       <AppShell />
-      <InstallAppBanner />
+      
       <Toaster position="top-center" richColors />
     </AuthProvider>
   );
