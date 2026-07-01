@@ -9,8 +9,6 @@ import { MainSidebar } from "@/components/MainSidebar";
 import { LogOut, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { useIsNativeApp } from "@/hooks/useIsNativeApp";
-import { InstallAppBanner } from "@/components/InstallAppBanner";
 import { MobileTabBar } from "@/components/MobileTabBar";
 import { LanguageDomSync } from "@/components/LanguageDomSync";
 import "@/i18n";
@@ -145,19 +143,12 @@ function AppShell() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { isSeller, isAdmin, isPvz, loading } = useAuth();
-  const isNativeApp = useIsNativeApp();
   const isSellerPanel = pathname === "/seller" || pathname.startsWith("/seller/");
   const isPvzPanel = pathname === "/pvz" || pathname.startsWith("/pvz/");
   const isAdminPanel = pathname === "/admin" || pathname.startsWith("/admin/");
   const isWorkPanel = isSellerPanel || isPvzPanel || isAdminPanel;
   const isAuthRoute = pathname === "/auth" || pathname.startsWith("/auth/") || pathname === "/reset-password";
 
-  // Mobil tətbiqdə yalnız müştəri (alış-veriş) təcrübəsi: satıcı/admin/pvz/satıcı ol səhifələri gizli
-  useEffect(() => {
-    if (!isNativeApp) return;
-    const blocked = isWorkPanel || pathname === "/become-seller" || pathname.startsWith("/become-seller/");
-    if (blocked) navigate({ to: "/", replace: true });
-  }, [isNativeApp, isWorkPanel, pathname, navigate]);
 
   // Subdomain-based routing: seller.* / admin.* / pvz.* avtomatik öz panelinə açılır
   useEffect(() => {
@@ -218,7 +209,7 @@ function RootComponent() {
     <AuthProvider>
       <LanguageDomSync />
       <AppShell />
-      <InstallAppBanner />
+      
       <Toaster position="top-center" richColors />
     </AuthProvider>
   );
