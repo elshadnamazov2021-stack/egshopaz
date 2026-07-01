@@ -7,10 +7,10 @@ export const Route = createFileRoute("/privacy")({
       { name: "description", content: "EG Shop məxfilik siyasəti: hansı şəxsi məlumatları toplayırıq, necə istifadə edirik, hara saxlayırıq və üçüncü tərəflərlə paylaşılma qaydaları." },
       { property: "og:title", content: "Məxfilik siyasəti — EG Shop" },
       { property: "og:description", content: "EG Shop məxfilik siyasəti: şəxsi məlumatların toplanması, istifadəsi və qorunması haqqında ətraflı." },
-      { property: "og:url", content: "https://egshopaz.lovable.app/privacy" },
+      { property: "og:url", content: "https://egshop.az/privacy" },
       { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "canonical", href: "https://egshopaz.lovable.app/privacy" }],
+    links: [{ rel: "canonical", href: "https://egshop.az/privacy" }],
   }),
   component: PrivacyPage,
 });
