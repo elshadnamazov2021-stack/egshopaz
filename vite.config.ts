@@ -1,15 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
+import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import tsConfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
   plugins: [
-    TanStackRouterVite(),
-    react(),
-    tailwindcss(),
     tsConfigPaths(),
+    tailwindcss(),
+    tanstackStart(),
+    react(),
   ],
   server: {
     port: 5173,
@@ -18,7 +18,6 @@ export default defineConfig({
   },
   build: {
     target: 'ES2020',
-    outDir: 'dist',
     sourcemap: false,
   },
 });
