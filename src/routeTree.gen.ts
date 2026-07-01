@@ -11,43 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SupportRouteImport } from './routes/support'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ShopsRouteImport } from './routes/shops'
-import { Route as SellerRouteImport } from './routes/seller'
-import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
-import { Route as ReturnsRouteImport } from './routes/returns'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as ReferralRouteImport } from './routes/referral'
-import { Route as PvzRouteImport } from './routes/pvz'
 import { Route as PromotionsRouteImport } from './routes/promotions'
-import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PickupPointsRouteImport } from './routes/pickup-points'
-import { Route as PaymentMethodsRouteImport } from './routes/payment-methods'
-import { Route as OrdersRouteImport } from './routes/orders'
-import { Route as NotificationsRouteImport } from './routes/notifications'
-import { Route as MyReviewsRouteImport } from './routes/my-reviews'
-import { Route as MessagesPvzRouteImport } from './routes/messages-pvz'
-import { Route as MessagesRouteImport } from './routes/messages'
-import { Route as MapRouteImport } from './routes/map'
-import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
-import { Route as FollowedShopsRouteImport } from './routes/followed-shops'
-import { Route as FavoritesRouteImport } from './routes/favorites'
-import { Route as DisputesRouteImport } from './routes/disputes'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CompareRouteImport } from './routes/compare'
 import { Route as CatalogRouteImport } from './routes/catalog'
-import { Route as CartRouteImport } from './routes/cart'
-import { Route as BonusRouteImport } from './routes/bonus'
-import { Route as BecomeSellerRouteImport } from './routes/become-seller'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AddressesRouteImport } from './routes/addresses'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopIdRouteImport } from './routes/shop.$id'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
-import { Route as CheckoutPayOrderIdRouteImport } from './routes/checkout-pay.$orderId'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -59,54 +32,14 @@ const SupportRoute = SupportRouteImport.update({
   path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ShopsRoute = ShopsRouteImport.update({
   id: '/shops',
   path: '/shops',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SellerRoute = SellerRouteImport.update({
-  id: '/seller',
-  path: '/seller',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
-  id: '/robots.txt',
-  path: '/robots.txt',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReturnsRoute = ReturnsRouteImport.update({
-  id: '/returns',
-  path: '/returns',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReferralRoute = ReferralRouteImport.update({
-  id: '/referral',
-  path: '/referral',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PvzRoute = PvzRouteImport.update({
-  id: '/pvz',
-  path: '/pvz',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PromotionsRoute = PromotionsRouteImport.update({
   id: '/promotions',
   path: '/promotions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -119,61 +52,6 @@ const PickupPointsRoute = PickupPointsRouteImport.update({
   path: '/pickup-points',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PaymentMethodsRoute = PaymentMethodsRouteImport.update({
-  id: '/payment-methods',
-  path: '/payment-methods',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrdersRoute = OrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NotificationsRoute = NotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MyReviewsRoute = MyReviewsRouteImport.update({
-  id: '/my-reviews',
-  path: '/my-reviews',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MessagesPvzRoute = MessagesPvzRouteImport.update({
-  id: '/messages-pvz',
-  path: '/messages-pvz',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MessagesRoute = MessagesRouteImport.update({
-  id: '/messages',
-  path: '/messages',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MapRoute = MapRouteImport.update({
-  id: '/map',
-  path: '/map',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
-  id: '/llms.txt',
-  path: '/llms.txt',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FollowedShopsRoute = FollowedShopsRouteImport.update({
-  id: '/followed-shops',
-  path: '/followed-shops',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FavoritesRoute = FavoritesRouteImport.update({
-  id: '/favorites',
-  path: '/favorites',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DisputesRoute = DisputesRouteImport.update({
-  id: '/disputes',
-  path: '/disputes',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DiscoverRoute = DiscoverRouteImport.update({
   id: '/discover',
   path: '/discover',
@@ -184,44 +62,9 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CompareRoute = CompareRouteImport.update({
-  id: '/compare',
-  path: '/compare',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CatalogRoute = CatalogRouteImport.update({
   id: '/catalog',
   path: '/catalog',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CartRoute = CartRouteImport.update({
-  id: '/cart',
-  path: '/cart',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BonusRoute = BonusRouteImport.update({
-  id: '/bonus',
-  path: '/bonus',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BecomeSellerRoute = BecomeSellerRouteImport.update({
-  id: '/become-seller',
-  path: '/become-seller',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AddressesRoute = AddressesRouteImport.update({
-  id: '/addresses',
-  path: '/addresses',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -239,133 +82,47 @@ const ProductIdRoute = ProductIdRouteImport.update({
   path: '/product/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CheckoutPayOrderIdRoute = CheckoutPayOrderIdRouteImport.update({
-  id: '/checkout-pay/$orderId',
-  path: '/checkout-pay/$orderId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/addresses': typeof AddressesRoute
-  '/admin': typeof AdminRoute
-  '/auth': typeof AuthRoute
-  '/become-seller': typeof BecomeSellerRoute
-  '/bonus': typeof BonusRoute
-  '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
-  '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
-  '/disputes': typeof DisputesRoute
-  '/favorites': typeof FavoritesRoute
-  '/followed-shops': typeof FollowedShopsRoute
-  '/llms.txt': typeof LlmsDottxtRoute
-  '/map': typeof MapRoute
-  '/messages': typeof MessagesRoute
-  '/messages-pvz': typeof MessagesPvzRoute
-  '/my-reviews': typeof MyReviewsRoute
-  '/notifications': typeof NotificationsRoute
-  '/orders': typeof OrdersRoute
-  '/payment-methods': typeof PaymentMethodsRoute
   '/pickup-points': typeof PickupPointsRoute
   '/privacy': typeof PrivacyRoute
-  '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
-  '/pvz': typeof PvzRoute
-  '/referral': typeof ReferralRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/returns': typeof ReturnsRoute
-  '/robots.txt': typeof RobotsDottxtRoute
-  '/seller': typeof SellerRoute
   '/shops': typeof ShopsRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
-  '/checkout-pay/$orderId': typeof CheckoutPayOrderIdRoute
   '/product/$id': typeof ProductIdRoute
   '/shop/$id': typeof ShopIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/addresses': typeof AddressesRoute
-  '/admin': typeof AdminRoute
-  '/auth': typeof AuthRoute
-  '/become-seller': typeof BecomeSellerRoute
-  '/bonus': typeof BonusRoute
-  '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
-  '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
-  '/disputes': typeof DisputesRoute
-  '/favorites': typeof FavoritesRoute
-  '/followed-shops': typeof FollowedShopsRoute
-  '/llms.txt': typeof LlmsDottxtRoute
-  '/map': typeof MapRoute
-  '/messages': typeof MessagesRoute
-  '/messages-pvz': typeof MessagesPvzRoute
-  '/my-reviews': typeof MyReviewsRoute
-  '/notifications': typeof NotificationsRoute
-  '/orders': typeof OrdersRoute
-  '/payment-methods': typeof PaymentMethodsRoute
   '/pickup-points': typeof PickupPointsRoute
   '/privacy': typeof PrivacyRoute
-  '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
-  '/pvz': typeof PvzRoute
-  '/referral': typeof ReferralRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/returns': typeof ReturnsRoute
-  '/robots.txt': typeof RobotsDottxtRoute
-  '/seller': typeof SellerRoute
   '/shops': typeof ShopsRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
-  '/checkout-pay/$orderId': typeof CheckoutPayOrderIdRoute
   '/product/$id': typeof ProductIdRoute
   '/shop/$id': typeof ShopIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/addresses': typeof AddressesRoute
-  '/admin': typeof AdminRoute
-  '/auth': typeof AuthRoute
-  '/become-seller': typeof BecomeSellerRoute
-  '/bonus': typeof BonusRoute
-  '/cart': typeof CartRoute
   '/catalog': typeof CatalogRoute
-  '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
-  '/disputes': typeof DisputesRoute
-  '/favorites': typeof FavoritesRoute
-  '/followed-shops': typeof FollowedShopsRoute
-  '/llms.txt': typeof LlmsDottxtRoute
-  '/map': typeof MapRoute
-  '/messages': typeof MessagesRoute
-  '/messages-pvz': typeof MessagesPvzRoute
-  '/my-reviews': typeof MyReviewsRoute
-  '/notifications': typeof NotificationsRoute
-  '/orders': typeof OrdersRoute
-  '/payment-methods': typeof PaymentMethodsRoute
   '/pickup-points': typeof PickupPointsRoute
   '/privacy': typeof PrivacyRoute
-  '/profile': typeof ProfileRoute
   '/promotions': typeof PromotionsRoute
-  '/pvz': typeof PvzRoute
-  '/referral': typeof ReferralRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/returns': typeof ReturnsRoute
-  '/robots.txt': typeof RobotsDottxtRoute
-  '/seller': typeof SellerRoute
   '/shops': typeof ShopsRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
-  '/checkout-pay/$orderId': typeof CheckoutPayOrderIdRoute
   '/product/$id': typeof ProductIdRoute
   '/shop/$id': typeof ShopIdRoute
 }
@@ -373,166 +130,58 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/addresses'
-    | '/admin'
-    | '/auth'
-    | '/become-seller'
-    | '/bonus'
-    | '/cart'
     | '/catalog'
-    | '/compare'
     | '/contact'
     | '/discover'
-    | '/disputes'
-    | '/favorites'
-    | '/followed-shops'
-    | '/llms.txt'
-    | '/map'
-    | '/messages'
-    | '/messages-pvz'
-    | '/my-reviews'
-    | '/notifications'
-    | '/orders'
-    | '/payment-methods'
     | '/pickup-points'
     | '/privacy'
-    | '/profile'
     | '/promotions'
-    | '/pvz'
-    | '/referral'
-    | '/reset-password'
-    | '/returns'
-    | '/robots.txt'
-    | '/seller'
     | '/shops'
-    | '/sitemap.xml'
     | '/support'
     | '/terms'
-    | '/checkout-pay/$orderId'
     | '/product/$id'
     | '/shop/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/addresses'
-    | '/admin'
-    | '/auth'
-    | '/become-seller'
-    | '/bonus'
-    | '/cart'
     | '/catalog'
-    | '/compare'
     | '/contact'
     | '/discover'
-    | '/disputes'
-    | '/favorites'
-    | '/followed-shops'
-    | '/llms.txt'
-    | '/map'
-    | '/messages'
-    | '/messages-pvz'
-    | '/my-reviews'
-    | '/notifications'
-    | '/orders'
-    | '/payment-methods'
     | '/pickup-points'
     | '/privacy'
-    | '/profile'
     | '/promotions'
-    | '/pvz'
-    | '/referral'
-    | '/reset-password'
-    | '/returns'
-    | '/robots.txt'
-    | '/seller'
     | '/shops'
-    | '/sitemap.xml'
     | '/support'
     | '/terms'
-    | '/checkout-pay/$orderId'
     | '/product/$id'
     | '/shop/$id'
   id:
     | '__root__'
     | '/'
-    | '/addresses'
-    | '/admin'
-    | '/auth'
-    | '/become-seller'
-    | '/bonus'
-    | '/cart'
     | '/catalog'
-    | '/compare'
     | '/contact'
     | '/discover'
-    | '/disputes'
-    | '/favorites'
-    | '/followed-shops'
-    | '/llms.txt'
-    | '/map'
-    | '/messages'
-    | '/messages-pvz'
-    | '/my-reviews'
-    | '/notifications'
-    | '/orders'
-    | '/payment-methods'
     | '/pickup-points'
     | '/privacy'
-    | '/profile'
     | '/promotions'
-    | '/pvz'
-    | '/referral'
-    | '/reset-password'
-    | '/returns'
-    | '/robots.txt'
-    | '/seller'
     | '/shops'
-    | '/sitemap.xml'
     | '/support'
     | '/terms'
-    | '/checkout-pay/$orderId'
     | '/product/$id'
     | '/shop/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AddressesRoute: typeof AddressesRoute
-  AdminRoute: typeof AdminRoute
-  AuthRoute: typeof AuthRoute
-  BecomeSellerRoute: typeof BecomeSellerRoute
-  BonusRoute: typeof BonusRoute
-  CartRoute: typeof CartRoute
   CatalogRoute: typeof CatalogRoute
-  CompareRoute: typeof CompareRoute
   ContactRoute: typeof ContactRoute
   DiscoverRoute: typeof DiscoverRoute
-  DisputesRoute: typeof DisputesRoute
-  FavoritesRoute: typeof FavoritesRoute
-  FollowedShopsRoute: typeof FollowedShopsRoute
-  LlmsDottxtRoute: typeof LlmsDottxtRoute
-  MapRoute: typeof MapRoute
-  MessagesRoute: typeof MessagesRoute
-  MessagesPvzRoute: typeof MessagesPvzRoute
-  MyReviewsRoute: typeof MyReviewsRoute
-  NotificationsRoute: typeof NotificationsRoute
-  OrdersRoute: typeof OrdersRoute
-  PaymentMethodsRoute: typeof PaymentMethodsRoute
   PickupPointsRoute: typeof PickupPointsRoute
   PrivacyRoute: typeof PrivacyRoute
-  ProfileRoute: typeof ProfileRoute
   PromotionsRoute: typeof PromotionsRoute
-  PvzRoute: typeof PvzRoute
-  ReferralRoute: typeof ReferralRoute
-  ResetPasswordRoute: typeof ResetPasswordRoute
-  ReturnsRoute: typeof ReturnsRoute
-  RobotsDottxtRoute: typeof RobotsDottxtRoute
-  SellerRoute: typeof SellerRoute
   ShopsRoute: typeof ShopsRoute
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
-  CheckoutPayOrderIdRoute: typeof CheckoutPayOrderIdRoute
   ProductIdRoute: typeof ProductIdRoute
   ShopIdRoute: typeof ShopIdRoute
 }
@@ -553,13 +202,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/shops': {
       id: '/shops'
       path: '/shops'
@@ -567,60 +209,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/seller': {
-      id: '/seller'
-      path: '/seller'
-      fullPath: '/seller'
-      preLoaderRoute: typeof SellerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/robots.txt': {
-      id: '/robots.txt'
-      path: '/robots.txt'
-      fullPath: '/robots.txt'
-      preLoaderRoute: typeof RobotsDottxtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/returns': {
-      id: '/returns'
-      path: '/returns'
-      fullPath: '/returns'
-      preLoaderRoute: typeof ReturnsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/referral': {
-      id: '/referral'
-      path: '/referral'
-      fullPath: '/referral'
-      preLoaderRoute: typeof ReferralRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pvz': {
-      id: '/pvz'
-      path: '/pvz'
-      fullPath: '/pvz'
-      preLoaderRoute: typeof PvzRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/promotions': {
       id: '/promotions'
       path: '/promotions'
       fullPath: '/promotions'
       preLoaderRoute: typeof PromotionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -637,83 +230,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PickupPointsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/payment-methods': {
-      id: '/payment-methods'
-      path: '/payment-methods'
-      fullPath: '/payment-methods'
-      preLoaderRoute: typeof PaymentMethodsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/orders': {
-      id: '/orders'
-      path: '/orders'
-      fullPath: '/orders'
-      preLoaderRoute: typeof OrdersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/notifications': {
-      id: '/notifications'
-      path: '/notifications'
-      fullPath: '/notifications'
-      preLoaderRoute: typeof NotificationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/my-reviews': {
-      id: '/my-reviews'
-      path: '/my-reviews'
-      fullPath: '/my-reviews'
-      preLoaderRoute: typeof MyReviewsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/messages-pvz': {
-      id: '/messages-pvz'
-      path: '/messages-pvz'
-      fullPath: '/messages-pvz'
-      preLoaderRoute: typeof MessagesPvzRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/messages': {
-      id: '/messages'
-      path: '/messages'
-      fullPath: '/messages'
-      preLoaderRoute: typeof MessagesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/map': {
-      id: '/map'
-      path: '/map'
-      fullPath: '/map'
-      preLoaderRoute: typeof MapRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/llms.txt': {
-      id: '/llms.txt'
-      path: '/llms.txt'
-      fullPath: '/llms.txt'
-      preLoaderRoute: typeof LlmsDottxtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/followed-shops': {
-      id: '/followed-shops'
-      path: '/followed-shops'
-      fullPath: '/followed-shops'
-      preLoaderRoute: typeof FollowedShopsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/favorites': {
-      id: '/favorites'
-      path: '/favorites'
-      fullPath: '/favorites'
-      preLoaderRoute: typeof FavoritesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/disputes': {
-      id: '/disputes'
-      path: '/disputes'
-      fullPath: '/disputes'
-      preLoaderRoute: typeof DisputesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/discover': {
       id: '/discover'
       path: '/discover'
@@ -728,60 +244,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/compare': {
-      id: '/compare'
-      path: '/compare'
-      fullPath: '/compare'
-      preLoaderRoute: typeof CompareRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/catalog': {
       id: '/catalog'
       path: '/catalog'
       fullPath: '/catalog'
       preLoaderRoute: typeof CatalogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cart': {
-      id: '/cart'
-      path: '/cart'
-      fullPath: '/cart'
-      preLoaderRoute: typeof CartRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/bonus': {
-      id: '/bonus'
-      path: '/bonus'
-      fullPath: '/bonus'
-      preLoaderRoute: typeof BonusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/become-seller': {
-      id: '/become-seller'
-      path: '/become-seller'
-      fullPath: '/become-seller'
-      preLoaderRoute: typeof BecomeSellerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/addresses': {
-      id: '/addresses'
-      path: '/addresses'
-      fullPath: '/addresses'
-      preLoaderRoute: typeof AddressesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -805,54 +272,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/checkout-pay/$orderId': {
-      id: '/checkout-pay/$orderId'
-      path: '/checkout-pay/$orderId'
-      fullPath: '/checkout-pay/$orderId'
-      preLoaderRoute: typeof CheckoutPayOrderIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AddressesRoute: AddressesRoute,
-  AdminRoute: AdminRoute,
-  AuthRoute: AuthRoute,
-  BecomeSellerRoute: BecomeSellerRoute,
-  BonusRoute: BonusRoute,
-  CartRoute: CartRoute,
   CatalogRoute: CatalogRoute,
-  CompareRoute: CompareRoute,
   ContactRoute: ContactRoute,
   DiscoverRoute: DiscoverRoute,
-  DisputesRoute: DisputesRoute,
-  FavoritesRoute: FavoritesRoute,
-  FollowedShopsRoute: FollowedShopsRoute,
-  LlmsDottxtRoute: LlmsDottxtRoute,
-  MapRoute: MapRoute,
-  MessagesRoute: MessagesRoute,
-  MessagesPvzRoute: MessagesPvzRoute,
-  MyReviewsRoute: MyReviewsRoute,
-  NotificationsRoute: NotificationsRoute,
-  OrdersRoute: OrdersRoute,
-  PaymentMethodsRoute: PaymentMethodsRoute,
   PickupPointsRoute: PickupPointsRoute,
   PrivacyRoute: PrivacyRoute,
-  ProfileRoute: ProfileRoute,
   PromotionsRoute: PromotionsRoute,
-  PvzRoute: PvzRoute,
-  ReferralRoute: ReferralRoute,
-  ResetPasswordRoute: ResetPasswordRoute,
-  ReturnsRoute: ReturnsRoute,
-  RobotsDottxtRoute: RobotsDottxtRoute,
-  SellerRoute: SellerRoute,
   ShopsRoute: ShopsRoute,
-  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
-  CheckoutPayOrderIdRoute: CheckoutPayOrderIdRoute,
   ProductIdRoute: ProductIdRoute,
   ShopIdRoute: ShopIdRoute,
 }
