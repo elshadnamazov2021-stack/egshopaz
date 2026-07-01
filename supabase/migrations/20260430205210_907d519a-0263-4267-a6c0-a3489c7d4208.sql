@@ -1,1 +1,0 @@
-REVOKE EXECUTE ON FUNCTION public.cleanup_ai_chat_messages() FROM PUBLIC, anon, authenticated;

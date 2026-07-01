@@ -8,10 +8,10 @@ export const Route = createFileRoute("/contact")({
       { name: "description", content: "EG Shop ilə əlaqə: e-poçt, telefon və ofis ünvanı. Sifariş, satıcı və texniki dəstək sualları üçün bizimlə əlaqə saxlayın." },
       { property: "og:title", content: "Əlaqə — EG Shop" },
       { property: "og:description", content: "EG Shop dəstək komandası ilə əlaqə üsulları: e-poçt, telefon və ünvan." },
-      { property: "og:url", content: "https://egshopaz.lovable.app/contact" },
+      { property: "og:url", content: "https://egshop.az/contact" },
       { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "canonical", href: "https://egshopaz.lovable.app/contact" }],
+    links: [{ rel: "canonical", href: "https://egshop.az/contact" }],
   }),
   component: ContactPage,
 });
