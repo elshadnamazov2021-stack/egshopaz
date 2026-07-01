@@ -1,2 +1,0 @@
-ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_giveaway boolean NOT NULL DEFAULT false;
-CREATE INDEX IF NOT EXISTS idx_products_is_giveaway ON public.products(is_giveaway) WHERE is_giveaway = true;

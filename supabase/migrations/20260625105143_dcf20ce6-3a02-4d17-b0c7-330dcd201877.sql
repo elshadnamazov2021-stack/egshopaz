@@ -1,1 +1,0 @@
-ALTER TABLE public.banners ADD COLUMN IF NOT EXISTS video_url TEXT;
