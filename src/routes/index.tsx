@@ -86,23 +86,23 @@ function Index() {
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <div className="bg-gradient-to-r from-purple-600 to-violet-600 py-6 text-white">
-        <div className="container mx-auto px-4">
-          <h1 className="text-5xl font-black text-center">EG Shop</h1>
-          <p className="text-center mt-2 text-xl opacity-90">Azərbaycanın ən böyük onlayn marketi</p>
-        </div>
+      <div className="bg-gradient-to-r from-purple-600 to-violet-600 py-20 text-white text-center">
+        <h1 className="text-6xl font-black">EG Shop AZ</h1>
+        <p className="text-2xl mt-4">Azərbaycanın ən böyük onlayn marketi</p>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <h2 className="text-2xl font-bold mb-6">Kateqoriyalar</h2>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+      <div className="container mx-auto px-4 py-12">
+        <h2 className="text-3xl font-bold mb-8">Kateqoriyalar</h2>
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
           {["📱 Elektronika", "👕 Geyim", "🏠 Ev", "💄 Kosmetika", "🧸 Uşaq", "🏋️ İdman"].map((cat, i) => (
-            <div key={i} className="bg-white rounded-2xl p-6 text-center shadow hover:shadow-lg transition cursor-pointer">
-              <div className="text-4xl mb-3">{cat.split(" ")[0]}</div>
-              <div className="font-semibold">{cat.split(" ")[1]}</div>
+            <div key={i} className="bg-white rounded-3xl p-8 text-center shadow hover:shadow-xl transition cursor-pointer text-xl font-semibold">
+              {cat}
             </div>
           ))}
         </div>
+      </div>
+    </div>
+  );
 
         <h2 className="text-2xl font-bold mt-12 mb-6">Məhsullar</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
