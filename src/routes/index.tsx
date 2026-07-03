@@ -85,15 +85,42 @@ function Index() {
   };
 
   return (
-    <div className="container mx-auto px-3 md:px-4 py-4 space-y-5 md:space-y-8">
-      {/* Müvəqqəti panel girişləri — domen ayrılandan sonra silinəcək */}
-      <h1 className="sr-only">EG Shop — Azərbaycanın onlayn marketi</h1>
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 panel-scroll-row">
-        <Link to="/auth?role=seller" className="whitespace-nowrap px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition">Satıcı girişi</Link>
-        <Link to="/auth?role=pvz" className="whitespace-nowrap px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition">PVZ girişi</Link>
-        <Link to="/auth?role=admin" className="whitespace-nowrap px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition">Admin</Link>
-        <Link to="/become-seller" className="whitespace-nowrap px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 text-xs font-bold hover:bg-emerald-200 transition">Satıcı ol</Link>
+    <div className="min-h-screen bg-zinc-50">
+      <div className="bg-gradient-to-r from-purple-600 to-violet-600 py-6 text-white">
+        <div className="container mx-auto px-4">
+          <h1 className="text-5xl font-black text-center">EG Shop</h1>
+          <p className="text-center mt-2 text-xl opacity-90">Azərbaycanın ən böyük onlayn marketi</p>
+        </div>
       </div>
+
+      <div className="container mx-auto px-4 py-8">
+        <h2 className="text-2xl font-bold mb-6">Kateqoriyalar</h2>
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+          {["📱 Elektronika", "👕 Geyim", "🏠 Ev", "💄 Kosmetika", "🧸 Uşaq", "🏋️ İdman"].map((cat, i) => (
+            <div key={i} className="bg-white rounded-2xl p-6 text-center shadow hover:shadow-lg transition cursor-pointer">
+              <div className="text-4xl mb-3">{cat.split(" ")[0]}</div>
+              <div className="font-semibold">{cat.split(" ")[1]}</div>
+            </div>
+          ))}
+        </div>
+
+        <h2 className="text-2xl font-bold mt-12 mb-6">Məhsullar</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {[1,2,3,4,5,6,7,8].map(i => (
+            <div key={i} className="bg-white rounded-3xl overflow-hidden shadow hover:-translate-y-1 transition">
+              <div className="h-48 bg-gradient-to-br from-zinc-200 to-zinc-300 flex items-center justify-center text-6xl">
+                🛍️
+              </div>
+              <div className="p-4">
+                <div className="font-semibold text-lg">Məhsul {i}</div>
+                <div className="text-purple-600 font-bold text-xl mt-1">29.99 ₼</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
       {/* Kateqoriyalar — ən yuxarıda */}
       <HomeCategoryBrowser />
